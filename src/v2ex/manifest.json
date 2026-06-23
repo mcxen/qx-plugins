@@ -1,0 +1,24 @@
+{
+  "id": "v2ex",
+  "name": "V2EX",
+  "version": "1.0.0",
+  "description": "Browse V2EX latest and hot topics",
+  "author": "mcx",
+  "icon": "",
+  "keywords": ["v2ex", "forum", "topics", "tech"],
+  "permissions": ["v2ex_fetch_topics", "v2ex_search_topics", "open-url", "showToast"],
+  "entry": "index.js",
+  "commands": [
+    {
+      "name": "open-v2ex",
+      "title": "Open V2EX",
+      "description": "Browse latest V2EX topics",
+      "keywords": ["v2ex", "forum", "topics", "tech", "探索"]
+    }
+  ],
+  "panel": {
+    "title": "V2EX Topics",
+    "icon": "",
+    "keywords": ["v2ex", "forum", "topics", "tech", "探索"]
+  }
+}
