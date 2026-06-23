@@ -42,6 +42,8 @@ jobs:
           }
           EOF
       - name: Commit and push
+        env:
+          GH_TOKEN: ${{ secrets.BOT_PAT }}
         run: |
           git config user.name "Qx Bot"
           git config user.email "bot@qx.app"
