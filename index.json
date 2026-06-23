@@ -1,0 +1,18 @@
+{
+  "schema_version": 1,
+  "plugins": [
+    {
+      "id": "v2ex",
+      "name": "V2EX",
+      "version": "1.0.0",
+      "description": "Browse V2EX latest and hot topics — search, navigate, open in browser",
+      "download_url": "https://raw.githubusercontent.com/mcxen/qx-plugins/main/v2ex.qx-plugin",
+      "size_bytes": 3734,
+      "checksum_sha256": "f44c5ac4e50c5ff6a632fb276fd738dfdb2715873481b42f1b3b56dc4768ab49",
+      "required_permissions": ["v2ex_fetch_topics", "v2ex_search_topics", "open-url", "showToast"],
+      "updated_at": "2026-06-23",
+      "author": "mcx",
+      "min_app_version": "0.2.0"
+    }
+  ]
+}
