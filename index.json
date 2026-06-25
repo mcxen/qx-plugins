@@ -4,15 +4,24 @@
     {
       "id": "v2ex",
       "name": "V2EX",
-      "version": "1.0.0",
-      "description": "Browse V2EX latest and hot topics — search, navigate, open in browser",
+      "version": "2.0.0",
+      "description": "Browse V2EX topics, notifications, and replies with token support",
       "download_url": "https://raw.githubusercontent.com/mcxen/qx-plugins/main/v2ex.qx-plugin",
-      "size_bytes": 3734,
-      "checksum_sha256": "f44c5ac4e50c5ff6a632fb276fd738dfdb2715873481b42f1b3b56dc4768ab49",
-      "required_permissions": ["v2ex_fetch_topics", "v2ex_search_topics", "open-url", "showToast"],
-      "updated_at": "2026-06-23",
+      "size_bytes": 4991,
+      "checksum_sha256": "f7634529cf68544bd4157d9ae7a8d7cb4add3694fb78fc2de4fc9d1700c46e10",
+      "required_permissions": [
+        "v2ex_fetch_topics",
+        "v2ex_search_topics",
+        "v2ex_fetch_node_topics",
+        "v2ex_fetch_topic_replies",
+        "v2ex_fetch_token_info",
+        "v2ex_fetch_notifications",
+        "open-url",
+        "showToast"
+      ],
+      "updated_at": "2026-06-25",
       "author": "mcx",
-      "min_app_version": "0.2.0"
+      "min_app_version": "0.4.28"
     }
   ]
 }

@@ -1,24 +1,62 @@
 {
   "id": "v2ex",
   "name": "V2EX",
-  "version": "1.0.0",
-  "description": "Browse V2EX latest and hot topics",
+  "version": "2.0.0",
+  "description": "Browse V2EX topics, notifications, and replies with token support",
   "author": "mcx",
   "icon": "",
-  "keywords": ["v2ex", "forum", "topics", "tech"],
-  "permissions": ["v2ex_fetch_topics", "v2ex_search_topics", "open-url", "showToast"],
+  "keywords": ["v2ex", "forum", "topics", "tech", "社区", "帖子"],
+  "permissions": [
+    "v2ex_fetch_topics",
+    "v2ex_search_topics",
+    "v2ex_fetch_node_topics",
+    "v2ex_fetch_topic_replies",
+    "v2ex_fetch_token_info",
+    "v2ex_fetch_notifications",
+    "open-url",
+    "showToast"
+  ],
+  "preferences": [
+    {
+      "id": "token",
+      "label": "Access Token",
+      "type": "password",
+      "required": false,
+      "description": "V2EX API v2 token. Go to https://v2ex.com/settings/tokens to create one."
+    },
+    {
+      "id": "nodes",
+      "label": "Nodes",
+      "type": "string",
+      "required": false,
+      "default": "programmer create share ideas apple jobs qna",
+      "description": "Node names for 'Topics By Node', separated by spaces."
+    }
+  ],
   "entry": "index.js",
   "commands": [
     {
       "name": "open-v2ex",
       "title": "Open V2EX",
-      "description": "Browse latest V2EX topics",
-      "keywords": ["v2ex", "forum", "topics", "tech", "探索"]
+      "description": "Browse latest and hot V2EX topics",
+      "keywords": ["v2ex", "forum", "topics", "tech", "探索", "最新", "热门"]
+    },
+    {
+      "name": "view-notifications",
+      "title": "View Notifications",
+      "description": "View your V2EX notifications (requires token)",
+      "keywords": ["v2ex", "notifications", "通知", "消息"]
+    },
+    {
+      "name": "view-token",
+      "title": "View Token Info",
+      "description": "Check your V2EX API token status (requires token)",
+      "keywords": ["v2ex", "token", "令牌"]
     }
   ],
   "panel": {
-    "title": "V2EX Topics",
+    "title": "V2EX",
     "icon": "",
-    "keywords": ["v2ex", "forum", "topics", "tech", "探索"]
+    "keywords": ["v2ex", "forum", "topics", "tech", "社区", "帖子"]
   }
 }
