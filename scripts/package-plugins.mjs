@@ -63,6 +63,7 @@ async function packagePlugin(pluginDir, archivePath) {
     zipfile.outputStream.pipe(output);
     for (const file of files) {
       zipfile.addFile(path.join(pluginDir, file), file, {
+        compress: false,
         mtime: fixedTime,
         mode: 0o100644,
       });
