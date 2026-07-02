@@ -1,0 +1,16 @@
+{
+  "name": "qx-plugins",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "convert:raycast": "node scripts/convert-raycast-extension.mjs",
+    "convert:raycast-url": "node scripts/convert-raycast-url.mjs",
+    "package:plugins": "node scripts/package-plugins.mjs"
+  },
+  "dependencies": {
+    "esbuild": "^0.25.5",
+    "react": "^19.1.0",
+    "react-dom": "^19.1.0"
+  }
+}

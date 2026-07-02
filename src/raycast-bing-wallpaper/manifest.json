@@ -1,0 +1,110 @@
+{
+  "id": "raycast-bing-wallpaper",
+  "name": "Bing Wallpaper",
+  "version": "1.0.0",
+  "description": "Get, set, auto-switch Bing wallpapers to explore the world.",
+  "author": "koinzhang",
+  "icon": "extension-icon.png",
+  "screenshots": [
+    "bing-wallpaper-1.png",
+    "bing-wallpaper-2.png",
+    "bing-wallpaper-3.png"
+  ],
+  "platforms": [
+    "macos",
+    "windows"
+  ],
+  "keywords": [],
+  "permissions": [
+    "http",
+    "open-url",
+    "clipboard",
+    "invoke:plugin_run_applescript",
+    "invoke:plugin_file_read_base64",
+    "invoke:plugin_file_exists",
+    "invoke:plugin_file_ensure_dir",
+    "invoke:plugin_file_write_base64",
+    "invoke:plugin_file_empty_dir",
+    "invoke:plugin_file_list"
+  ],
+  "entry": "index.js",
+  "commands": [
+    {
+      "name": "set-bing-wallpaper",
+      "title": "Set Bing Wallpaper",
+      "description": "Get, set, auto-download Bing wallpapers to explore the world.",
+      "icon": "bing-wallpaper-icon.png",
+      "keywords": [],
+      "mode": "view"
+    },
+    {
+      "name": "auto-random-bing-wallpaper",
+      "title": "Auto Random Bing Wallpaper",
+      "description": "Auto-switch random Bing wallpapers to desktop intervally.",
+      "icon": "random-wallpaper-icon.png",
+      "keywords": [],
+      "mode": "no-view",
+      "interval": "5m"
+    },
+    {
+      "name": "auto-switch-bing-wallpaper",
+      "title": "Auto Switch Bing Wallpaper",
+      "description": "Auto-switch latest Bing wallpapers to desktop every day (refresh every 3 hours).",
+      "icon": "auto-switch-wallpaper-icon.png",
+      "keywords": [],
+      "mode": "no-view",
+      "interval": "30m"
+    }
+  ],
+  "panel": {
+    "title": "Bing Wallpaper",
+    "icon": "extension-icon.png",
+    "keywords": []
+  },
+  "raycast": {
+    "source": "bing-wallpaper",
+    "compatible": "generic-shim",
+    "sourceCommands": [
+      "set-bing-wallpaper",
+      "auto-random-bing-wallpaper",
+      "auto-switch-bing-wallpaper"
+    ],
+    "sourceTools": [],
+    "platformCompatibility": {
+      "macos": {
+        "status": "supported",
+        "features": [
+          "Raycast UI",
+          "HTTP fetch",
+          "LocalStorage / Cache",
+          "File cache",
+          "Open URL/file",
+          "Background interval",
+          "AppleScript automation",
+          "Finder reveal"
+        ],
+        "degraded": []
+      },
+      "windows": {
+        "status": "partial",
+        "features": [
+          "Raycast UI",
+          "HTTP fetch",
+          "LocalStorage / Cache",
+          "File cache",
+          "Open URL/file",
+          "Background interval"
+        ],
+        "degraded": [
+          "showInFinder -> open target path"
+        ],
+        "unsupported": [
+          "AppleScript wallpaper setter"
+        ],
+        "notes": [
+          "This can become Windows-compatible after mapping the script to automation.wallpaper.setImage(path)."
+        ]
+      }
+    }
+  }
+}

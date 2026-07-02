@@ -1,0 +1,19 @@
+name: Convert Raycast Extension
+description: Convert a Raycast extension into a Qx plugin.
+title: "[convert] "
+labels:
+  - raycast-conversion
+body:
+  - type: input
+    id: raycast_url
+    attributes:
+      label: Raycast extension URL
+      description: Paste a github.com/raycast/extensions tree URL that points to one extension directory.
+      placeholder: https://github.com/raycast/extensions/tree/<commit>/extensions/bing-wallpaper
+    validations:
+      required: true
+  - type: textarea
+    id: notes
+    attributes:
+      label: Notes
+      description: Optional conversion notes, expected permissions, or known limitations.

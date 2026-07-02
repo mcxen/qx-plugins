@@ -5,52 +5,34 @@ on:
     branches: [main]
     paths:
       - 'src/**'
+      - 'scripts/package-plugins.mjs'
+      - 'package.json'
+      - 'package-lock.json'
   workflow_dispatch:
 
 jobs:
   package:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
     steps:
       - uses: actions/checkout@v4
-      - name: Package V2EX plugin
-        run: |
-          cd src/v2ex
-          zip -r ../../v2ex.qx-plugin . -j
-      - name: Generate index.json
-        run: |
-          SHA256=$(sha256sum v2ex.qx-plugin | cut -d' ' -f1)
-          SIZE=$(stat --format=%s v2ex.qx-plugin)
-          DATE=$(date -u +%Y-%m-%d)
-          cat > index.json <<EOF
-          {
-            "schema_version": 1,
-            "plugins": [
-              {
-                "id": "v2ex",
-                "name": "V2EX",
-                "version": "1.0.0",
-                "description": "Browse V2EX latest and hot topics — search, navigate, open in browser",
-                "download_url": "https://raw.githubusercontent.com/mcxen/qx-plugins/main/v2ex.qx-plugin",
-                "size_bytes": $SIZE,
-                "checksum_sha256": "$SHA256",
-                "required_permissions": ["v2ex_fetch_topics", "v2ex_search_topics", "open-url", "showToast"],
-                "updated_at": "$DATE",
-                "author": "mcx",
-                "min_app_version": "0.2.0"
-              }
-            ]
-          }
-          EOF
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+      - name: Install dependencies
+        run: npm ci
+      - name: Package plugins and generate index
+        run: npm run package:plugins
       - name: Commit and push
-        env:
-          GH_TOKEN: ${{ secrets.BOT_PAT }}
         run: |
           git config user.name "Qx Bot"
           git config user.email "bot@qx.app"
-          git add v2ex.qx-plugin index.json
+          git add '*.qx-plugin' index.json
           if git diff --cached --quiet; then
             echo "No changes"
           else
-            git commit -m "Auto-package V2EX plugin [skip ci]"
+            git commit -m "Auto-package Qx plugins [skip ci]"
             git push
           fi

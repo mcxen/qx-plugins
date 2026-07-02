@@ -1,0 +1,110 @@
+name: Convert Raycast Extension
+
+on:
+  issues:
+    types: [opened, edited, reopened]
+  issue_comment:
+    types: [created]
+  workflow_dispatch:
+    inputs:
+      raycast_url:
+        description: Raycast extension tree URL
+        required: true
+        type: string
+
+jobs:
+  convert:
+    if: |
+      github.event_name == 'workflow_dispatch' ||
+      (github.event_name == 'issues' && startsWith(github.event.issue.title, '[convert]')) ||
+      (github.event_name == 'issue_comment' && startsWith(github.event.comment.body, '/convert') && startsWith(github.event.issue.title, '[convert]'))
+    runs-on: macos-latest
+    permissions:
+      issues: write
+      contents: write
+    concurrency:
+      group: raycast-convert-${{ github.event.issue.number || github.run_id }}
+      cancel-in-progress: false
+    steps:
+      - name: Checkout marketplace
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Extract Raycast URL
+        id: parse
+        env:
+          DISPATCH_URL: ${{ inputs.raycast_url }}
+          ISSUE_TITLE: ${{ github.event.issue.title }}
+          ISSUE_BODY: ${{ github.event.issue.body }}
+          COMMENT_BODY: ${{ github.event.comment.body }}
+        run: |
+          TEXT="$(printf '%s\n%s\n%s\n%s\n' "$DISPATCH_URL" "$ISSUE_TITLE" "$ISSUE_BODY" "$COMMENT_BODY")"
+          URL="$(printf '%s\n' "$TEXT" | perl -ne 'if (m{https://github\.com/raycast/extensions/tree/[A-Za-z0-9._/-]+/extensions/[A-Za-z0-9._-]+}) { print $&; exit }')"
+          if [ -z "$URL" ]; then
+            echo "No valid Raycast extension URL found."
+            echo "Expected: https://github.com/raycast/extensions/tree/<commit>/extensions/<extension-name>"
+            exit 1
+          fi
+          echo "url=$URL" >> "$GITHUB_OUTPUT"
+
+      - name: Convert extension
+        id: convert
+        timeout-minutes: 10
+        run: |
+          npm run convert:raycast-url -- "${{ steps.parse.outputs.url }}" --out dist/raycast-converted --package --publish
+
+      - name: Commit converted plugin
+        id: commit
+        run: |
+          git config user.name "Qx Bot"
+          git config user.email "bot@qx.app"
+          git add "src/${{ steps.convert.outputs.plugin_id }}" "${{ steps.convert.outputs.archive }}" index.json
+          if git diff --cached --quiet; then
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+            echo "No marketplace changes to commit."
+          else
+            git commit -m "Convert Raycast ${{ steps.convert.outputs.plugin_id }} plugin"
+            git pull --rebase origin main
+            git push
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Comment success
+        if: github.event_name != 'workflow_dispatch' && success()
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const pluginId = '${{ steps.convert.outputs.plugin_id }}';
+            const archive = '${{ steps.convert.outputs.archive }}';
+            const changed = '${{ steps.commit.outputs.changed }}' === 'true';
+            await github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: [
+                `Conversion complete for \`${pluginId}\`.`,
+                changed ? 'The marketplace index was updated and pushed to `main`.' : 'The marketplace already contained the same converted output.',
+                '',
+                `Download: https://raw.githubusercontent.com/${context.repo.owner}/${context.repo.repo}/main/${archive}`
+              ].join('\n')
+            });
+
+      - name: Comment failure
+        if: github.event_name != 'workflow_dispatch' && failure()
+        uses: actions/github-script@v7
+        with:
+          script: |
+            await github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: 'Raycast conversion failed. Check the workflow run logs for the exact error and edit the issue or comment `/convert` to retry.'
+            });
