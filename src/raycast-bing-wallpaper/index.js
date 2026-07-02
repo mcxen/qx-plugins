@@ -12766,6 +12766,8 @@ __export(set_bing_wallpaper_exports, {
 
 // qx-virtual:@raycast/api
 var import_react = __toESM(require_react());
+var defaultPreferenceValues = { "layout": "Grid", "columns": "5", "applyTo": "every", "downloadDirectory": "~/Downloads", "downloadSize": "raw", "autoDownload": false, "includeDownloadedWallpapers": true, "refreshInterval": "30" };
+var defaultEnvironmentSupportPath = "/qx-plugin-files/raycast-bing-wallpaper";
 function runtime() {
   return globalThis.__qxRaycastRuntime;
 }
@@ -12834,11 +12836,11 @@ async function openExtensionPreferences() {
   runtime()?.context?.showToast?.("Preferences are managed in Qx Extensions settings.");
 }
 function getPreferenceValues() {
-  return runtime()?.preferences || {};
+  return runtime()?.preferences || defaultPreferenceValues;
 }
 var environment = {
   get supportPath() {
-    return runtime()?.supportPath || "/tmp";
+    return runtime()?.supportPath || defaultEnvironmentSupportPath;
   },
   get assetsPath() {
     return runtime()?.assetsPath || "";
@@ -12887,13 +12889,20 @@ function useNavigation() {
   };
 }
 function ActionPanel({ children }) {
-  return import_react.default.createElement("div", { "data-raycast-actions": true, style: { display: "none" } }, children);
+  return import_react.default.createElement("div", { "data-raycast-actions": true, className: "qx-raycast-actions-inline" }, children);
 }
 ActionPanel.Section = function ActionPanelSection({ children }) {
   return import_react.default.createElement(import_react.default.Fragment, null, children);
 };
 function Action(props) {
-  return import_react.default.createElement("button", { type: "button", onClick: props.onAction }, props.title || "Action");
+  return import_react.default.createElement("button", {
+    type: "button",
+    className: "qx-raycast-action-button",
+    onClick: (event) => {
+      event?.stopPropagation?.();
+      if (typeof props.onAction === "function") void Promise.resolve(props.onAction());
+    }
+  }, props.title || "Action");
 }
 Action.OpenInBrowser = function ActionOpenInBrowser(props) {
   return import_react.default.createElement(Action, { ...props, onAction: () => open(props.url), title: props.title || "Open in Browser" });
@@ -12921,11 +12930,15 @@ function SearchInput({ placeholder }) {
 function ItemShell({ title, subtitle, icon, accessories, actions, children, image }) {
   const action = firstAction(actions);
   return import_react.default.createElement(
-    "button",
+    "div",
     {
-      type: "button",
+      role: "button",
+      tabIndex: 0,
       className: "qx-raycast-item",
-      onClick: () => runAction(action)
+      onClick: () => runAction(action),
+      onKeyDown: (event) => {
+        if (event.key === "Enter" || event.key === " ") runAction(action);
+      }
     },
     image ? import_react.default.createElement("img", { className: "qx-raycast-thumb", src: typeof image === "string" ? image : image?.source || image }) : import_react.default.createElement("span", { className: "qx-raycast-icon" }, textOf(icon)),
     import_react.default.createElement(
@@ -12935,7 +12948,8 @@ function ItemShell({ title, subtitle, icon, accessories, actions, children, imag
       subtitle ? import_react.default.createElement("small", null, textOf(subtitle)) : null,
       children
     ),
-    accessories ? import_react.default.createElement("span", { className: "qx-raycast-accessory" }, textOf(Array.isArray(accessories) ? accessories[0] : accessories)) : null
+    accessories ? import_react.default.createElement("span", { className: "qx-raycast-accessory" }, textOf(Array.isArray(accessories) ? accessories[0] : accessories)) : null,
+    actions
   );
 }
 function List(props) {
@@ -14055,7 +14069,7 @@ function injectRaycastStyles() {
   if (document.getElementById("qx-raycast-shim-style")) return;
   const style = document.createElement("style");
   style.id = "qx-raycast-shim-style";
-  style.textContent = '\n    html,body,#root{margin:0;width:100%;height:100%;background:transparent;color:var(--qx-text-primary,#111);font:13px -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;}\n    .qx-raycast-view{box-sizing:border-box;height:100%;display:flex;flex-direction:column;gap:10px;padding:14px;overflow:hidden;}\n    .qx-raycast-search{height:34px;border:1px solid var(--qx-border-1,#ddd);border-radius:7px;background:var(--qx-bg-component-1,#fff);color:inherit;padding:0 10px;font:inherit;outline:none;}\n    .qx-raycast-list{display:flex;flex-direction:column;gap:4px;overflow:auto;min-height:0;}\n    .qx-raycast-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(148px,1fr));gap:10px;overflow:auto;min-height:0;}\n    .qx-raycast-section{display:contents;}\n    .qx-raycast-section h2{grid-column:1/-1;margin:10px 0 2px;color:var(--qx-text-tertiary,#777);font-size:11px;text-transform:uppercase;letter-spacing:.08em;}\n    .qx-raycast-item{min-width:0;display:flex;align-items:center;gap:10px;border:0;border-radius:7px;background:transparent;color:inherit;text-align:left;padding:8px;cursor:pointer;font:inherit;}\n    .qx-raycast-grid .qx-raycast-item{display:flex;flex-direction:column;align-items:stretch;padding:0;overflow:hidden;background:var(--qx-bg-component-1,#fff);border:1px solid var(--qx-border-1,#ddd);}\n    .qx-raycast-item:hover{background:var(--qx-bg-component-2,#f5f5f5);}\n    .qx-raycast-thumb{width:100%;aspect-ratio:16/9;object-fit:cover;background:var(--qx-bg-component-2,#eee);}\n    .qx-raycast-list .qx-raycast-thumb{width:52px;height:34px;border-radius:5px;flex:0 0 auto;}\n    .qx-raycast-icon{width:22px;min-height:22px;display:inline-flex;align-items:center;justify-content:center;color:var(--qx-text-tertiary,#777);}\n    .qx-raycast-item-main{min-width:0;display:flex;flex-direction:column;gap:2px;padding:6px;}\n    .qx-raycast-item-main strong,.qx-raycast-item-main small{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}\n    .qx-raycast-item-main small,.qx-raycast-accessory{color:var(--qx-text-secondary,#666);}\n    .qx-raycast-loading,.qx-raycast-empty,.qx-raycast-detail{padding:18px;color:var(--qx-text-secondary,#666);overflow:auto;}\n  ';
+  style.textContent = '\n    html,body,#root{margin:0;width:100%;height:100%;background:transparent;color:var(--qx-text-primary,#111);font:13px -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;}\n    .qx-raycast-view{box-sizing:border-box;height:100%;display:flex;flex-direction:column;gap:10px;padding:14px;overflow:hidden;}\n    .qx-raycast-search{height:34px;border:1px solid var(--qx-border-1,#ddd);border-radius:7px;background:var(--qx-bg-component-1,#fff);color:inherit;padding:0 10px;font:inherit;outline:none;}\n    .qx-raycast-list{display:flex;flex-direction:column;gap:4px;overflow:auto;min-height:0;}\n    .qx-raycast-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(148px,1fr));gap:10px;overflow:auto;min-height:0;}\n    .qx-raycast-section{display:contents;}\n    .qx-raycast-section h2{grid-column:1/-1;margin:10px 0 2px;color:var(--qx-text-tertiary,#777);font-size:11px;text-transform:uppercase;letter-spacing:.08em;}\n    .qx-raycast-item{min-width:0;display:flex;align-items:center;gap:10px;border:0;border-radius:7px;background:transparent;color:inherit;text-align:left;padding:8px;cursor:pointer;font:inherit;}\n    .qx-raycast-grid .qx-raycast-item{display:flex;flex-direction:column;align-items:stretch;padding:0;overflow:hidden;background:var(--qx-bg-component-1,#fff);border:1px solid var(--qx-border-1,#ddd);}\n    .qx-raycast-item:hover{background:var(--qx-bg-component-2,#f5f5f5);}\n    .qx-raycast-thumb{width:100%;aspect-ratio:16/9;object-fit:cover;background:var(--qx-bg-component-2,#eee);}\n    .qx-raycast-list .qx-raycast-thumb{width:52px;height:34px;border-radius:5px;flex:0 0 auto;}\n    .qx-raycast-icon{width:22px;min-height:22px;display:inline-flex;align-items:center;justify-content:center;color:var(--qx-text-tertiary,#777);}\n    .qx-raycast-item-main{min-width:0;display:flex;flex-direction:column;gap:2px;padding:6px;}\n    .qx-raycast-item-main strong,.qx-raycast-item-main small{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}\n    .qx-raycast-item-main small,.qx-raycast-accessory{color:var(--qx-text-secondary,#666);}\n    .qx-raycast-loading,.qx-raycast-empty,.qx-raycast-detail{padding:18px;color:var(--qx-text-secondary,#666);overflow:auto;}\n    .qx-raycast-actions-inline{display:flex;align-items:center;gap:6px;flex-wrap:wrap;padding:4px 6px 4px 0;}\n    .qx-raycast-action-button{border:1px solid var(--qx-border-1,#ddd);background:var(--qx-bg-component-1,#fff);color:inherit;border-radius:6px;padding:4px 7px;font:inherit;font-size:11px;cursor:pointer;}\n    .qx-raycast-action-button:hover{background:var(--qx-bg-component-2,#f5f5f5);}\n  ';
   document.head.appendChild(style);
 }
 var commandModules = {
@@ -14076,6 +14090,7 @@ async function invokeCommand(name, container, context) {
   const mod = commandModules[name] || commandModules[Object.keys(commandModules)[0]];
   if (!mod) throw new Error("Command not bundled: " + name);
   const component = mod.default || mod.Command || mod;
+  const mode = commandModes[name] || "view";
   const cache2 = /* @__PURE__ */ new Map();
   globalThis.__qxRaycastRuntime = {
     context,
@@ -14089,6 +14104,11 @@ async function invokeCommand(name, container, context) {
     setSearch: () => {
     }
   };
+  if (mode === "view") {
+    const element = import_react6.default.isValidElement(component) ? component : import_react6.default.createElement(component);
+    renderElement(container, element);
+    return;
+  }
   const result = typeof component === "function" ? await component({}) : component;
   if (import_react6.default.isValidElement(result)) {
     renderElement(container, result);
