@@ -1,10 +1,10 @@
 #!/usr/bin/env node
 import { mkdir, readFile, readdir, rm, stat, utimes, writeFile } from "node:fs/promises";
-import { createReadStream, existsSync } from "node:fs";
+import { createReadStream, createWriteStream, existsSync } from "node:fs";
 import crypto from "node:crypto";
 import path from "node:path";
-import { spawnSync } from "node:child_process";
 import { fileURLToPath } from "node:url";
+import yazl from "yazl";
 
 const scriptDir = path.dirname(fileURLToPath(import.meta.url));
 const repoRoot = path.resolve(scriptDir, "..");
@@ -54,15 +54,21 @@ async function packagePlugin(pluginDir, archivePath) {
   }
   const fixedTime = new Date("2000-01-01T00:00:00Z");
   await Promise.all(files.map((file) => utimes(path.join(pluginDir, file), fixedTime, fixedTime)));
-  const result = spawnSync("zip", ["-q", "-X", archivePath, "-@"], {
-    cwd: pluginDir,
-    encoding: "utf8",
-    input: `${files.join("\n")}\n`,
-    stdio: ["pipe", "inherit", "inherit"],
+  await new Promise((resolve, reject) => {
+    const zipfile = new yazl.ZipFile();
+    const output = createWriteStream(archivePath);
+    output.on("close", resolve);
+    output.on("error", reject);
+    zipfile.outputStream.on("error", reject);
+    zipfile.outputStream.pipe(output);
+    for (const file of files) {
+      zipfile.addFile(path.join(pluginDir, file), file, {
+        mtime: fixedTime,
+        mode: 0o100644,
+      });
+    }
+    zipfile.end();
   });
-  if (result.status !== 0) {
-    throw new Error(`zip failed for ${pluginDir}`);
-  }
 }
 
 async function pluginDirs() {
