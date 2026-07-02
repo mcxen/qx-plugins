@@ -8,7 +8,7 @@
       "description": "Get, set, auto-switch Bing wallpapers to explore the world.",
       "download_url": "https://raw.githubusercontent.com/mcxen/qx-plugins/main/raycast-bing-wallpaper.qx-plugin",
       "size_bytes": 12390548,
-      "checksum_sha256": "9c9a83c47612c29396530594fb9c4034c461eb45b2297c2e9c82f13f999a87c0",
+      "checksum_sha256": "790fa8ac51c3291b54d67e43fa12852fad8958dc9ad53c16bfc7d096db1b898c",
       "required_permissions": [
         "http",
         "open-url",
@@ -32,7 +32,7 @@
       "description": "Browse V2EX topics, notifications, and replies with token support",
       "download_url": "https://raw.githubusercontent.com/mcxen/qx-plugins/main/v2ex.qx-plugin",
       "size_bytes": 18445,
-      "checksum_sha256": "884deeb99f2340b578672c03a99f0dde2ab9e68a73b6c8aef980229aa386eb5d",
+      "checksum_sha256": "173a6080422b2ff7c813bbbdd1dcf4c30bf93f021583d67693c3333f11cd584b",
       "required_permissions": [
         "v2ex_fetch_topics",
         "v2ex_search_topics",
