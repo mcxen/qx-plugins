@@ -18,7 +18,7 @@ jobs:
       github.event_name == 'workflow_dispatch' ||
       (github.event_name == 'issues' && startsWith(github.event.issue.title, '[convert]')) ||
       (github.event_name == 'issue_comment' && startsWith(github.event.comment.body, '/convert') && startsWith(github.event.issue.title, '[convert]'))
-    runs-on: macos-latest
+    runs-on: ubuntu-latest
     permissions:
       issues: write
       contents: write
