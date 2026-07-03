@@ -672,8 +672,15 @@ export function useNavigation() {
   };
 }
 
+function actionPanelVisible() {
+  return runtime()?.context?.display?.raycastActionPanel !== false;
+}
+
 export function ActionPanel({ children }) {
-  return React.createElement("div", { "data-raycast-actions": true, className: "qx-raycast-actions-inline" }, children);
+  return React.createElement("div", {
+    "data-raycast-actions": true,
+    className: cx("qx-raycast-actions-inline", actionPanelVisible() ? null : "is-hidden"),
+  }, children);
 }
 ActionPanel.Section = function ActionPanelSection({ children }) {
   return React.createElement(React.Fragment, null, children);
@@ -1015,9 +1022,14 @@ function raycastShimStyles() {
     .qx-raycast-item-main strong,.qx-raycast-item-main small{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
     .qx-raycast-item-main small,.qx-raycast-accessory{color:var(--qx-text-secondary,#666);}
     .qx-raycast-loading,.qx-raycast-empty,.qx-raycast-detail{padding:18px;color:var(--qx-text-secondary,#666);overflow:auto;}
-    .qx-raycast-actions-inline{display:flex;align-items:center;gap:6px;flex-wrap:wrap;padding:4px 6px 4px 0;}
+    .qx-raycast-actions-inline{display:flex;align-items:center;justify-content:flex-end;gap:6px;flex:0 1 min(42%,360px);margin-left:auto;min-width:0;max-width:min(42%,360px);overflow:hidden;padding:4px 6px 4px 0;}
+    .qx-raycast-actions-inline.is-hidden{display:none;}
     .qx-raycast-action-button{border:1px solid var(--qx-border-1,#ddd);background:var(--qx-bg-component-1,#fff);color:inherit;border-radius:6px;padding:4px 7px;font:inherit;font-size:11px;cursor:pointer;}
+    .qx-raycast-action-button{min-width:0;max-width:120px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
     .qx-raycast-action-button:hover{background:var(--qx-bg-component-2,#f5f5f5);}
+    .qx-raycast-grid .qx-raycast-actions-inline{margin-left:0;max-width:100%;width:100%;justify-content:flex-start;padding:0 8px 8px;}
+    :root[data-qx-raycast-action-panel="hidden"] .qx-raycast-actions-inline{display:none;}
+    @media (max-width: 680px){.qx-raycast-actions-inline{display:none;}}
   `;
   return String.raw`
 function injectRaycastStyles() {

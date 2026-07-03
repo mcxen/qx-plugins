@@ -16,6 +16,11 @@ extension, converts it into a Qx plugin, writes it to `src/<plugin-id>/`,
 packages `<plugin-id>.qx-plugin`, updates `index.json`, pushes the result to
 `main`, and comments with the raw download URL.
 
+Converted Raycast `ActionPanel` items are rendered as compact right-side
+buttons by default. Qx exposes a host preference at Settings -> Extensions ->
+Installed -> Display to hide them, and the converted UI automatically hides
+those buttons first when the plugin panel becomes narrow.
+
 You can retry an issue conversion by commenting:
 
 ```text
