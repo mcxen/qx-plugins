@@ -1,0 +1,112 @@
+{
+  "id": "raycast-calendar",
+  "name": "Quick Calendar",
+  "version": "1.0.0",
+  "description": "View calendar month-by-month",
+  "author": "fuksman",
+  "icon": "command-icon.png",
+  "screenshots": [
+    "calendar-1.png",
+    "calendar-2.png"
+  ],
+  "platforms": [
+    "macos",
+    "windows"
+  ],
+  "keywords": [],
+  "preferences": [
+    {
+      "id": "weekStart",
+      "label": "First Day of Week",
+      "type": "select",
+      "required": true,
+      "default": "1",
+      "description": "First Day of Week",
+      "options": [
+        {
+          "label": "Monday",
+          "value": "1"
+        },
+        {
+          "label": "Sunday",
+          "value": "0"
+        }
+      ]
+    },
+    {
+      "id": "showWeeks",
+      "label": "Week numbers",
+      "type": "boolean",
+      "required": true,
+      "default": true,
+      "description": "Indicated if it is necessary to show week numbers"
+    },
+    {
+      "id": "viewMode",
+      "label": "View Mode",
+      "type": "select",
+      "required": false,
+      "default": "1",
+      "description": "View Mode",
+      "options": [
+        {
+          "label": "Compact",
+          "value": "0"
+        },
+        {
+          "label": "Wide",
+          "value": "1"
+        }
+      ]
+    }
+  ],
+  "permissions": [
+    "http",
+    "open-url",
+    "clipboard"
+  ],
+  "entry": "index.js",
+  "commands": [
+    {
+      "name": "index",
+      "title": "Quick Calendar",
+      "description": "Shows calendar for a month",
+      "icon": "command-icon.png",
+      "keywords": [],
+      "mode": "view"
+    }
+  ],
+  "panel": {
+    "title": "Quick Calendar",
+    "icon": "command-icon.png",
+    "keywords": []
+  },
+  "raycast": {
+    "source": "calendar",
+    "compatible": "generic-shim",
+    "sourceCommands": [
+      "index"
+    ],
+    "sourceTools": [],
+    "platformCompatibility": {
+      "macos": {
+        "status": "supported",
+        "features": [
+          "Raycast UI",
+          "Clipboard"
+        ],
+        "degraded": []
+      },
+      "windows": {
+        "status": "supported",
+        "features": [
+          "Raycast UI",
+          "Clipboard"
+        ],
+        "degraded": [],
+        "unsupported": [],
+        "notes": []
+      }
+    }
+  }
+}

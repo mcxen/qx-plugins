@@ -21,6 +21,11 @@ buttons by default. Qx exposes a host preference at Settings -> Extensions ->
 Installed -> Display to hide them, and the converted UI automatically hides
 those buttons first when the plugin panel becomes narrow.
 
+If an extension declares regular npm dependencies, the converter installs its
+production dependencies in the temporary checkout with lifecycle scripts
+disabled. React and React DOM are always resolved from the converter runtime so
+converted extensions do not load a second React copy.
+
 You can retry an issue conversion by commenting:
 
 ```text
