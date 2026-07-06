@@ -26,6 +26,23 @@
       "min_app_version": "0.4.28"
     },
     {
+      "id": "external-display-control",
+      "name": "External Display Control",
+      "version": "1.0.0",
+      "description": "View external monitor DDC/CI details and adjust brightness from Qx.",
+      "download_url": "https://raw.githubusercontent.com/mcxen/qx-plugins/main/external-display-control.qx-plugin",
+      "size_bytes": 20204,
+      "checksum_sha256": "f24abb8867f3a39ce7aaf135caa9268b03ef72bf438d5ee03e5aacc471622e4a",
+      "required_permissions": [
+        "external-displays",
+        "invoke:qx_external_displays_set_control",
+        "open-url"
+      ],
+      "updated_at": "2026-07-06",
+      "author": "mcx",
+      "min_app_version": "0.4.28"
+    },
+    {
       "id": "raycast-calendar",
       "name": "Quick Calendar",
       "version": "1.0.0",

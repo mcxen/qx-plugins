@@ -1,0 +1,45 @@
+{
+  "id": "external-display-control",
+  "name": "External Display Control",
+  "version": "1.0.0",
+  "description": "View external monitor DDC/CI details and adjust brightness from Qx.",
+  "author": "mcx",
+  "icon": "",
+  "platforms": ["macos"],
+  "keywords": [
+    "display",
+    "monitor",
+    "brightness",
+    "ddc",
+    "external monitor",
+    "显示器",
+    "外接显示器",
+    "亮度"
+  ],
+  "permissions": [
+    "external-displays",
+    "invoke:qx_external_displays_set_control",
+    "open-url"
+  ],
+  "entry": "index.js",
+  "commands": [
+    {
+      "name": "open-displays",
+      "title": "External Display Control",
+      "description": "View external monitor parameters and adjust DDC/CI brightness.",
+      "keywords": ["display", "monitor", "brightness", "ddc", "显示器", "亮度"]
+    },
+    {
+      "name": "install-help",
+      "title": "External Display Control: Install DDC CLI",
+      "description": "Open the m1ddc GitHub project used by this plugin.",
+      "keywords": ["m1ddc", "ddcctl", "install", "github"]
+    }
+  ],
+  "panel": {
+    "title": "External Display Control",
+    "icon": "",
+    "keywords": ["display", "monitor", "brightness", "ddc", "显示器", "亮度"]
+  },
+  "min_app_version": "0.4.28"
+}
