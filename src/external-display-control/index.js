@@ -1,5 +1,4 @@
 const M1DDC_URL = "https://github.com/waydabber/m1ddc";
-const DDCCTL_URL = "https://github.com/kfix/ddcctl";
 
 function escapeHtml(value) {
   return String(value ?? "")
@@ -289,15 +288,36 @@ function renderEmpty(body, state, message) {
     </div>
   `;
   const actions = body.querySelector(".display-install-actions");
-  const m1 = button("m1ddc", "github", "primary");
-  const ddcctl = button("ddcctl", "externalLink");
-  m1.onclick = () => state.context.openUrl(M1DDC_URL);
-  ddcctl.onclick = () => state.context.openUrl(DDCCTL_URL);
+  const installDriver = async (driver, buttonElement) => {
+    if (state.loading) return;
+    state.loading = true;
+    buttonElement.disabled = true;
+    buttonElement.classList.add("is-loading");
+    state.status.textContent = `Installing ${driver} with Homebrew...`;
+    try {
+      await invoke(state.context, "qx_external_displays_install_driver", {
+        req: { driver },
+      });
+      state.status.textContent = `${driver} installed. Detecting displays...`;
+      state.loading = false;
+      await state.refresh();
+    } catch (error) {
+      state.status.innerHTML = `<span class="display-error">${escapeHtml(String(error))}</span>`;
+    } finally {
+      state.loading = false;
+      buttonElement.disabled = false;
+      buttonElement.classList.remove("is-loading");
+    }
+  };
+  const m1 = button("Install m1ddc", "github", "primary");
+  const ddcctl = button("Install ddcctl", "externalLink");
+  m1.onclick = () => installDriver("m1ddc", m1);
+  ddcctl.onclick = () => installDriver("ddcctl", ddcctl);
   actions.append(m1, ddcctl);
 }
 
 function renderPanel(container, context) {
-  const state = { context, driver: null, status: null, refreshButton: null, loading: false };
+  const state = { context, driver: null, status: null, refreshButton: null, loading: false, refresh: null };
   container.innerHTML = STYLES + `
     <div class="display-root">
       <div class="display-topbar">
@@ -348,6 +368,7 @@ function renderPanel(container, context) {
     }
   }
 
+  state.refresh = refresh;
   state.refreshButton.onclick = refresh;
   helpButton.onclick = () => context.openUrl(M1DDC_URL);
   refresh();
