@@ -8,7 +8,7 @@
       "description": "Get, set, auto-switch Bing wallpapers to explore the world. (Raycast-compatible external plugin)",
       "download_url": "https://raw.githubusercontent.com/mcxen/qx-plugins/main/raycast-bing-wallpaper.qx-plugin",
       "size_bytes": 12414660,
-      "checksum_sha256": "0f91b2e1c0693aabaf728b8615bf4e8a722ec083702a9387a80bf1ea5ad67f67",
+      "checksum_sha256": "f621daaff0f077712d6bc750c49407b2a1fc902da2748868fb3c44f630e0d1d8",
       "required_permissions": [
         "http",
         "open-url",
@@ -32,7 +32,7 @@
       "description": "View external monitor DDC/CI details and adjust brightness from Qx.",
       "download_url": "https://raw.githubusercontent.com/mcxen/qx-plugins/main/external-display-control.qx-plugin",
       "size_bytes": 21271,
-      "checksum_sha256": "32ac01f0a42f7b40af3f70ff77a864678bfa68269234ba3cb666b6d1b43fe63d",
+      "checksum_sha256": "fafd14f683ea5aa01bb26e1d849429c98147fae5c825afab0e8690319376d7fa",
       "required_permissions": [
         "external-displays",
         "invoke:qx_external_displays_set_control",
@@ -50,7 +50,7 @@
       "description": "View calendar month-by-month",
       "download_url": "https://raw.githubusercontent.com/mcxen/qx-plugins/main/raycast-calendar.qx-plugin",
       "size_bytes": 3477396,
-      "checksum_sha256": "069450801d1a55a1ccb0521246f5ad9f98982b0d6a9bb908cd89ce75378d221f",
+      "checksum_sha256": "dadc776186900e9468cc0d1653049f1c2be61c260f0312f0063df9e2871bf7dc",
       "required_permissions": [
         "http",
         "open-url",
@@ -67,7 +67,7 @@
       "description": "Browse V2EX topics, notifications, and replies with token support",
       "download_url": "https://raw.githubusercontent.com/mcxen/qx-plugins/main/v2ex.qx-plugin",
       "size_bytes": 19407,
-      "checksum_sha256": "3ff5964c8d3719b4edfcf369f360017585e29491ab917cb7aab7a720a835dbde",
+      "checksum_sha256": "1e78eda2b549cce88c39495bf1968352b018c72d9b8f512192fa42ae38d94a98",
       "required_permissions": [
         "invoke:v2ex_fetch_topics",
         "invoke:v2ex_search_topics",
