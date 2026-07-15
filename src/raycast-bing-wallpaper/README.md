@@ -1,30 +1,20 @@
 # Bing Wallpaper
 
-Native Qx plugin for browsing and setting Bing daily wallpapers.
+External Qx plugin converted from the Raycast extension `bing-wallpaper`.
 
-## Features
+Requires **Qx ≥ 0.5.18** for binary HTTP downloads (`arrayBuffer` / `bodyBase64`).
 
-- Browse recent Bing wallpapers in a grid
-- Set any wallpaper as the desktop background (all desktops)
-- Download images to `~/Downloads`
-- Background commands:
-  - **Auto Random Bing Wallpaper** (every 5 minutes when enabled)
-  - **Auto Switch Bing Wallpaper** (latest image, every 30 minutes when enabled)
+## Capabilities used from the Qx host
 
-## How it works
+- `http` — JSON metadata and image bytes
+- `plugin_file_*` — local wallpaper cache under plugin data
+- `plugin_run_applescript` — set desktop picture via System Events
+- Raycast API shim (`@raycast/api`) provided by the converter runtime
 
-Wallpaper metadata is loaded through Qx `http` permission from Bing's public
-`HPImageArchive` API. Image bytes are downloaded with `curl` via
-`plugin_run_applescript`, then applied with System Events. This avoids the
-host text-only HTTP body path that broke the earlier Raycast conversion.
+## Source
 
-## Permissions
+```
+https://github.com/raycast/extensions/tree/bf7fe09a27513c3d80ad02cfc7b152af1cc2c284/extensions/bing-wallpaper
+```
 
-- `http` — fetch wallpaper metadata
-- `open-url` — open copyright / info links
-- `invoke:plugin_run_applescript` — download images and set wallpaper
-
-## macOS note
-
-Setting the desktop picture may require granting **Automation** access for Qx
-to control System Events the first time you set a wallpaper.
+Commands: set-bing-wallpaper, auto-random-bing-wallpaper, auto-switch-bing-wallpaper

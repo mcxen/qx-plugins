@@ -4,19 +4,26 @@
     {
       "id": "raycast-bing-wallpaper",
       "name": "Bing Wallpaper",
-      "version": "1.1.0",
-      "description": "Browse Bing daily wallpapers and set them as your desktop background.",
+      "version": "1.2.0",
+      "description": "Get, set, auto-switch Bing wallpapers to explore the world. (Raycast-compatible external plugin)",
       "download_url": "https://raw.githubusercontent.com/mcxen/qx-plugins/main/raycast-bing-wallpaper.qx-plugin",
-      "size_bytes": 1941882,
-      "checksum_sha256": "88f8844e64c40a43201d432ce432372c7e458dec60b7aa2c2fea9619bc6d0ac6",
+      "size_bytes": 12414660,
+      "checksum_sha256": "0f91b2e1c0693aabaf728b8615bf4e8a722ec083702a9387a80bf1ea5ad67f67",
       "required_permissions": [
         "http",
         "open-url",
-        "invoke:plugin_run_applescript"
+        "clipboard",
+        "invoke:plugin_run_applescript",
+        "invoke:plugin_file_read_base64",
+        "invoke:plugin_file_exists",
+        "invoke:plugin_file_ensure_dir",
+        "invoke:plugin_file_write_base64",
+        "invoke:plugin_file_empty_dir",
+        "invoke:plugin_file_list"
       ],
       "updated_at": "2026-07-15",
       "author": "koinzhang",
-      "min_app_version": "0.4.28"
+      "min_app_version": "0.5.18"
     },
     {
       "id": "external-display-control",

@@ -1,52 +1,241 @@
 {
   "id": "raycast-bing-wallpaper",
   "name": "Bing Wallpaper",
-  "version": "1.1.0",
-  "description": "Browse Bing daily wallpapers and set them as your desktop background.",
+  "version": "1.2.0",
+  "description": "Get, set, auto-switch Bing wallpapers to explore the world. (Raycast-compatible external plugin)",
   "author": "koinzhang",
   "icon": "extension-icon.png",
-  "screenshots": [],
-  "platforms": [
-    "macos"
+  "screenshots": [
+    "bing-wallpaper-1.png",
+    "bing-wallpaper-2.png",
+    "bing-wallpaper-3.png"
   ],
-  "keywords": [
-    "bing",
-    "wallpaper",
-    "desktop",
-    "background",
-    "壁纸",
-    "必应"
+  "platforms": [
+    "macos",
+    "windows"
+  ],
+  "keywords": [],
+  "preferences": [
+    {
+      "id": "layout",
+      "label": "Wallpaper Layout",
+      "type": "select",
+      "required": false,
+      "default": "Grid",
+      "description": "Set the layout of the wallpaper items.",
+      "options": [
+        {
+          "label": "Grid",
+          "value": "Grid"
+        },
+        {
+          "label": "List",
+          "value": "List"
+        }
+      ]
+    },
+    {
+      "id": "columns",
+      "label": "Wallpaper Item Coloums",
+      "type": "select",
+      "required": false,
+      "default": "5",
+      "description": "Set the number of columns of the wallpaper items. (Only works with Grid layout)",
+      "options": [
+        {
+          "label": "1",
+          "value": "1"
+        },
+        {
+          "label": "2",
+          "value": "2"
+        },
+        {
+          "label": "3",
+          "value": "3"
+        },
+        {
+          "label": "4",
+          "value": "4"
+        },
+        {
+          "label": "5",
+          "value": "5"
+        },
+        {
+          "label": "6",
+          "value": "6"
+        },
+        {
+          "label": "7",
+          "value": "7"
+        },
+        {
+          "label": "8",
+          "value": "8"
+        }
+      ]
+    },
+    {
+      "id": "applyTo",
+      "label": "Apply Wallpaper To",
+      "type": "select",
+      "required": false,
+      "default": "every",
+      "description": "Apply the wallpaper to which monitor. Valid only when you are using an extended monitor.",
+      "options": [
+        {
+          "label": "Current Monitor",
+          "value": "current"
+        },
+        {
+          "label": "Every Monitor",
+          "value": "every"
+        }
+      ]
+    },
+    {
+      "id": "downloadDirectory",
+      "label": "Download Directory",
+      "type": "string",
+      "required": false,
+      "default": "~/Downloads",
+      "description": "Directory of files to download wallpapers"
+    },
+    {
+      "id": "downloadSize",
+      "label": "Download Size",
+      "type": "select",
+      "required": false,
+      "default": "raw",
+      "description": "The size of the wallpaper to download. Default is Original.",
+      "options": [
+        {
+          "label": "Original",
+          "value": "raw"
+        },
+        {
+          "label": "Full",
+          "value": "full"
+        },
+        {
+          "label": "Regular",
+          "value": "regular"
+        },
+        {
+          "label": "Small",
+          "value": "small"
+        }
+      ]
+    },
+    {
+      "id": "autoDownload",
+      "label": "Advanced Prefernences",
+      "type": "boolean",
+      "required": false,
+      "default": false,
+      "description": "Automatically download all wallpapers to directory (default is /Users/Username/Downloads) when you enter the extension."
+    },
+    {
+      "id": "includeDownloadedWallpapers",
+      "label": "Include Downloaded Wallpapers",
+      "type": "boolean",
+      "required": false,
+      "default": true,
+      "description": "Include downloaded wallpapers in the Set Bing Wallpaper and Random Bing Wallpaper command."
+    },
+    {
+      "id": "refreshInterval",
+      "label": "Wallpaper Item Coloums",
+      "type": "select",
+      "required": false,
+      "default": "30",
+      "description": "Set the refresh interval for the random wallpaper.",
+      "options": [
+        {
+          "label": "5m",
+          "value": "5"
+        },
+        {
+          "label": "10m",
+          "value": "10"
+        },
+        {
+          "label": "30m",
+          "value": "30"
+        },
+        {
+          "label": "1h",
+          "value": "60"
+        },
+        {
+          "label": "2h",
+          "value": "120"
+        },
+        {
+          "label": "3h",
+          "value": "180"
+        },
+        {
+          "label": "6h",
+          "value": "360"
+        },
+        {
+          "label": "9h",
+          "value": "540"
+        },
+        {
+          "label": "12h",
+          "value": "720"
+        },
+        {
+          "label": "18h",
+          "value": "1080"
+        },
+        {
+          "label": "24h",
+          "value": "1440"
+        }
+      ]
+    }
   ],
   "permissions": [
     "http",
     "open-url",
-    "invoke:plugin_run_applescript"
+    "clipboard",
+    "invoke:plugin_run_applescript",
+    "invoke:plugin_file_read_base64",
+    "invoke:plugin_file_exists",
+    "invoke:plugin_file_ensure_dir",
+    "invoke:plugin_file_write_base64",
+    "invoke:plugin_file_empty_dir",
+    "invoke:plugin_file_list"
   ],
   "entry": "index.js",
   "commands": [
     {
       "name": "set-bing-wallpaper",
       "title": "Set Bing Wallpaper",
-      "description": "Browse and set Bing wallpapers.",
+      "description": "Get, set, auto-download Bing wallpapers to explore the world.",
       "icon": "bing-wallpaper-icon.png",
-      "keywords": ["bing", "wallpaper", "壁纸"],
+      "keywords": [],
       "mode": "view"
     },
     {
       "name": "auto-random-bing-wallpaper",
       "title": "Auto Random Bing Wallpaper",
-      "description": "Auto-switch a random Bing wallpaper on an interval.",
+      "description": "Auto-switch random Bing wallpapers to desktop intervally.",
       "icon": "random-wallpaper-icon.png",
-      "keywords": ["random", "wallpaper", "auto"],
+      "keywords": [],
       "mode": "no-view",
       "interval": "5m"
     },
     {
       "name": "auto-switch-bing-wallpaper",
       "title": "Auto Switch Bing Wallpaper",
-      "description": "Auto-switch to the latest Bing wallpaper on an interval.",
+      "description": "Auto-switch latest Bing wallpapers to desktop every day (refresh every 3 hours).",
       "icon": "auto-switch-wallpaper-icon.png",
-      "keywords": ["latest", "wallpaper", "auto"],
+      "keywords": [],
       "mode": "no-view",
       "interval": "30m"
     }
@@ -54,7 +243,53 @@
   "panel": {
     "title": "Bing Wallpaper",
     "icon": "extension-icon.png",
-    "keywords": ["bing", "wallpaper", "壁纸"]
+    "keywords": []
   },
-  "min_app_version": "0.4.28"
+  "raycast": {
+    "source": "bing-wallpaper",
+    "compatible": "generic-shim",
+    "sourceCommands": [
+      "set-bing-wallpaper",
+      "auto-random-bing-wallpaper",
+      "auto-switch-bing-wallpaper"
+    ],
+    "sourceTools": [],
+    "platformCompatibility": {
+      "macos": {
+        "status": "supported",
+        "features": [
+          "Raycast UI",
+          "HTTP fetch",
+          "LocalStorage / Cache",
+          "File cache",
+          "Open URL/file",
+          "Background interval",
+          "AppleScript automation",
+          "Finder reveal"
+        ],
+        "degraded": []
+      },
+      "windows": {
+        "status": "partial",
+        "features": [
+          "Raycast UI",
+          "HTTP fetch",
+          "LocalStorage / Cache",
+          "File cache",
+          "Open URL/file",
+          "Background interval"
+        ],
+        "degraded": [
+          "showInFinder -> open target path"
+        ],
+        "unsupported": [
+          "AppleScript wallpaper setter"
+        ],
+        "notes": [
+          "This can become Windows-compatible after mapping the script to automation.wallpaper.setImage(path)."
+        ]
+      }
+    }
+  },
+  "min_app_version": "0.5.18"
 }
