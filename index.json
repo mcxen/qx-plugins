@@ -8,7 +8,7 @@
       "description": "Get, set, auto-switch Bing wallpapers to explore the world. (Raycast-compatible external plugin)",
       "download_url": "https://raw.githubusercontent.com/mcxen/qx-plugins/main/raycast-bing-wallpaper.qx-plugin",
       "size_bytes": 12414660,
-      "checksum_sha256": "0f91b2e1c0693aabaf728b8615bf4e8a722ec083702a9387a80bf1ea5ad67f67",
+      "checksum_sha256": "f621daaff0f077712d6bc750c49407b2a1fc902da2748868fb3c44f630e0d1d8",
       "required_permissions": [
         "http",
         "open-url",
