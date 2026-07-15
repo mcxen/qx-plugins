@@ -8,7 +8,7 @@
       "description": "Browse Bing daily wallpapers and set them as your desktop background.",
       "download_url": "https://raw.githubusercontent.com/mcxen/qx-plugins/main/raycast-bing-wallpaper.qx-plugin",
       "size_bytes": 1941882,
-      "checksum_sha256": "df02e9f7e3d2db2f6a6ad564e6b531b5ff087674a7ff567cea415c8f54da3dbe",
+      "checksum_sha256": "88f8844e64c40a43201d432ce432372c7e458dec60b7aa2c2fea9619bc6d0ac6",
       "required_permissions": [
         "http",
         "open-url",
