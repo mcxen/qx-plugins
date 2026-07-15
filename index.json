@@ -8,7 +8,7 @@
       "description": "Get, set, auto-switch Bing wallpapers to explore the world. (Raycast-compatible external plugin)",
       "download_url": "https://raw.githubusercontent.com/mcxen/qx-plugins/main/raycast-bing-wallpaper.qx-plugin",
       "size_bytes": 12414660,
-      "checksum_sha256": "f621daaff0f077712d6bc750c49407b2a1fc902da2748868fb3c44f630e0d1d8",
+      "checksum_sha256": "0f91b2e1c0693aabaf728b8615bf4e8a722ec083702a9387a80bf1ea5ad67f67",
       "required_permissions": [
         "http",
         "open-url",
@@ -28,57 +28,56 @@
     {
       "id": "external-display-control",
       "name": "External Display Control",
-      "version": "1.0.0",
+      "version": "1.0.1",
       "description": "View external monitor DDC/CI details and adjust brightness from Qx.",
       "download_url": "https://raw.githubusercontent.com/mcxen/qx-plugins/main/external-display-control.qx-plugin",
-      "size_bytes": 21044,
-      "checksum_sha256": "4e7295dc6490158b25118e2032dc5aefe49d4f08b7014cd966a62a31aa73411b",
+      "size_bytes": 21271,
+      "checksum_sha256": "32ac01f0a42f7b40af3f70ff77a864678bfa68269234ba3cb666b6d1b43fe63d",
       "required_permissions": [
         "external-displays",
         "invoke:qx_external_displays_set_control",
         "open-url",
         "invoke:qx_external_displays_install_driver"
       ],
-      "updated_at": "2026-07-08",
+      "updated_at": "2026-07-15",
       "author": "mcx",
       "min_app_version": "0.4.61"
     },
     {
       "id": "raycast-calendar",
       "name": "Quick Calendar",
-      "version": "1.0.0",
+      "version": "1.1.0",
       "description": "View calendar month-by-month",
       "download_url": "https://raw.githubusercontent.com/mcxen/qx-plugins/main/raycast-calendar.qx-plugin",
-      "size_bytes": 3470453,
-      "checksum_sha256": "e253bcb7ef2467fcf9916ff41cc1ca42fbeb4fdab3d91a0ebefec8538e9f21f4",
+      "size_bytes": 3477396,
+      "checksum_sha256": "069450801d1a55a1ccb0521246f5ad9f98982b0d6a9bb908cd89ce75378d221f",
       "required_permissions": [
         "http",
         "open-url",
         "clipboard"
       ],
-      "updated_at": "2026-07-03",
+      "updated_at": "2026-07-15",
       "author": "fuksman",
       "min_app_version": "0.4.28"
     },
     {
       "id": "v2ex",
       "name": "V2EX",
-      "version": "2.0.0",
+      "version": "2.0.1",
       "description": "Browse V2EX topics, notifications, and replies with token support",
       "download_url": "https://raw.githubusercontent.com/mcxen/qx-plugins/main/v2ex.qx-plugin",
-      "size_bytes": 18445,
-      "checksum_sha256": "173a6080422b2ff7c813bbbdd1dcf4c30bf93f021583d67693c3333f11cd584b",
+      "size_bytes": 19407,
+      "checksum_sha256": "3ff5964c8d3719b4edfcf369f360017585e29491ab917cb7aab7a720a835dbde",
       "required_permissions": [
-        "v2ex_fetch_topics",
-        "v2ex_search_topics",
-        "v2ex_fetch_node_topics",
-        "v2ex_fetch_topic_replies",
-        "v2ex_fetch_token_info",
-        "v2ex_fetch_notifications",
-        "open-url",
-        "showToast"
+        "invoke:v2ex_fetch_topics",
+        "invoke:v2ex_search_topics",
+        "invoke:v2ex_fetch_node_topics",
+        "invoke:v2ex_fetch_topic_replies",
+        "invoke:v2ex_fetch_token_info",
+        "invoke:v2ex_fetch_notifications",
+        "open-url"
       ],
-      "updated_at": "2026-07-03",
+      "updated_at": "2026-07-15",
       "author": "mcx",
       "min_app_version": "0.4.28"
     }

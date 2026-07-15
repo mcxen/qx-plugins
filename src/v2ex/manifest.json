@@ -1,20 +1,26 @@
 {
   "id": "v2ex",
   "name": "V2EX",
-  "version": "2.0.0",
+  "version": "2.0.1",
   "description": "Browse V2EX topics, notifications, and replies with token support",
   "author": "mcx",
   "icon": "",
-  "keywords": ["v2ex", "forum", "topics", "tech", "社区", "帖子"],
+  "keywords": [
+    "v2ex",
+    "forum",
+    "topics",
+    "tech",
+    "\u793e\u533a",
+    "\u5e16\u5b50"
+  ],
   "permissions": [
-    "v2ex_fetch_topics",
-    "v2ex_search_topics",
-    "v2ex_fetch_node_topics",
-    "v2ex_fetch_topic_replies",
-    "v2ex_fetch_token_info",
-    "v2ex_fetch_notifications",
-    "open-url",
-    "showToast"
+    "invoke:v2ex_fetch_topics",
+    "invoke:v2ex_search_topics",
+    "invoke:v2ex_fetch_node_topics",
+    "invoke:v2ex_fetch_topic_replies",
+    "invoke:v2ex_fetch_token_info",
+    "invoke:v2ex_fetch_notifications",
+    "open-url"
   ],
   "preferences": [
     {
@@ -39,24 +45,54 @@
       "name": "open-v2ex",
       "title": "Open V2EX",
       "description": "Browse latest and hot V2EX topics",
-      "keywords": ["v2ex", "forum", "topics", "tech", "探索", "最新", "热门"]
+      "keywords": [
+        "v2ex",
+        "forum",
+        "topics",
+        "tech",
+        "\u63a2\u7d22",
+        "\u6700\u65b0",
+        "\u70ed\u95e8"
+      ]
     },
     {
       "name": "view-notifications",
       "title": "View Notifications",
       "description": "View your V2EX notifications (requires token)",
-      "keywords": ["v2ex", "notifications", "通知", "消息"]
+      "keywords": [
+        "v2ex",
+        "notifications",
+        "\u901a\u77e5",
+        "\u6d88\u606f"
+      ]
     },
     {
       "name": "view-token",
       "title": "View Token Info",
       "description": "Check your V2EX API token status (requires token)",
-      "keywords": ["v2ex", "token", "令牌"]
+      "keywords": [
+        "v2ex",
+        "token",
+        "\u4ee4\u724c"
+      ]
     }
   ],
   "panel": {
     "title": "V2EX",
     "icon": "",
-    "keywords": ["v2ex", "forum", "topics", "tech", "社区", "帖子"]
-  }
+    "keywords": [
+      "v2ex",
+      "forum",
+      "topics",
+      "tech",
+      "\u793e\u533a",
+      "\u5e16\u5b50"
+    ]
+  },
+  "min_app_version": "0.4.28",
+  "platforms": [
+    "macos",
+    "windows"
+  ],
+  "screenshots": []
 }

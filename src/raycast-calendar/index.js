@@ -1,3 +1,4 @@
+if(typeof globalThis.Buffer==="undefined"){globalThis.Buffer={from(v){if(v instanceof ArrayBuffer)return new Uint8Array(v);if(ArrayBuffer.isView(v))return new Uint8Array(v.buffer.slice(v.byteOffset,v.byteOffset+v.byteLength));return new TextEncoder().encode(String(v||""));}};}
 var __create = Object.create;
 var __defProp = Object.defineProperty;
 var __getOwnPropDesc = Object.getOwnPropertyDescriptor;
@@ -12803,6 +12804,111 @@ function SearchInput({ placeholder }) {
     onChange: (event) => runtime()?.setSearch?.(event.target.value)
   });
 }
+function markdownInline(value, keyPrefix = "i") {
+  const text = String(value ?? "");
+  const parts = [];
+  const pattern = new RegExp("(\\*\\*([^*]+)\\*\\*|\\x60([^\\x60]+)\\x60|\\[([^\\]]+)\\]\\((https?:\\/\\/[^)\\s]+)\\))", "g");
+  let index = 0;
+  let key = 0;
+  for (const match of text.matchAll(pattern)) {
+    if (match.index > index) parts.push(text.slice(index, match.index));
+    if (match[2] !== void 0) {
+      parts.push(import_react.default.createElement("strong", { key: keyPrefix + "-b-" + key++ }, match[2]));
+    } else if (match[3] !== void 0) {
+      parts.push(import_react.default.createElement("code", { key: keyPrefix + "-c-" + key++ }, match[3]));
+    } else if (match[4] !== void 0 && match[5] !== void 0) {
+      parts.push(import_react.default.createElement("a", {
+        key: keyPrefix + "-a-" + key++,
+        href: match[5],
+        target: "_blank",
+        rel: "noreferrer"
+      }, match[4]));
+    }
+    index = match.index + match[0].length;
+  }
+  if (index < text.length) parts.push(text.slice(index));
+  return parts.length ? parts : text;
+}
+function isTableRow(line) {
+  const trimmed = String(line || "").trim();
+  return trimmed.startsWith("|") && trimmed.endsWith("|") && trimmed.includes("|");
+}
+function isTableSeparator(line) {
+  return /^\s*\|?\s*:?-{3,}:?\s*(\|\s*:?-{3,}:?\s*)+\|?\s*$/.test(String(line || ""));
+}
+function tableCells(line) {
+  let value = String(line || "").trim();
+  if (value.startsWith("|")) value = value.slice(1);
+  if (value.endsWith("|")) value = value.slice(0, -1);
+  return value.split("|").map((cell) => cell.trim());
+}
+function renderMarkdown(markdown) {
+  const lines = String(markdown || "").replace(/\r\n?/g, "\n").split("\n");
+  const blocks = [];
+  const codeFence = String.fromCharCode(96, 96, 96);
+  let i = 0;
+  while (i < lines.length) {
+    const line = lines[i];
+    if (!line.trim()) {
+      i += 1;
+      continue;
+    }
+    const trimmed = line.trim();
+    if (trimmed.startsWith(codeFence)) {
+      const code = [];
+      i += 1;
+      while (i < lines.length && !lines[i].trim().startsWith(codeFence)) code.push(lines[i++]);
+      if (i < lines.length) i += 1;
+      blocks.push(import_react.default.createElement(
+        "pre",
+        { key: "md-" + blocks.length, className: "qx-raycast-md-code" },
+        import_react.default.createElement("code", null, code.join("\n"))
+      ));
+      continue;
+    }
+    const heading = line.match(/^(#{1,6})\s+(.+)$/);
+    if (heading) {
+      const level = Math.min(heading[1].length, 3);
+      blocks.push(import_react.default.createElement("h" + level, { key: "md-" + blocks.length }, markdownInline(heading[2], "h" + i)));
+      i += 1;
+      continue;
+    }
+    if (isTableRow(line) && isTableSeparator(lines[i + 1])) {
+      const header = tableCells(line);
+      i += 2;
+      const rows = [];
+      while (i < lines.length && isTableRow(lines[i])) rows.push(tableCells(lines[i++]));
+      blocks.push(import_react.default.createElement(
+        "table",
+        { key: "md-" + blocks.length, className: "qx-raycast-md-table" },
+        import_react.default.createElement(
+          "thead",
+          null,
+          import_react.default.createElement("tr", null, header.map((cell, cellIndex) => import_react.default.createElement("th", { key: cellIndex }, markdownInline(cell, "th" + cellIndex))))
+        ),
+        import_react.default.createElement("tbody", null, rows.map((row, rowIndex) => import_react.default.createElement("tr", { key: rowIndex }, row.map((cell, cellIndex) => import_react.default.createElement("td", { key: cellIndex }, markdownInline(cell, "td" + rowIndex + "-" + cellIndex))))))
+      ));
+      continue;
+    }
+    if (/^\s*[-*]\s+/.test(line)) {
+      const items = [];
+      while (i < lines.length && /^\s*[-*]\s+/.test(lines[i])) {
+        items.push(lines[i].replace(/^\s*[-*]\s+/, ""));
+        i += 1;
+      }
+      blocks.push(import_react.default.createElement("ul", { key: "md-" + blocks.length }, items.map((item, itemIndex) => import_react.default.createElement("li", { key: itemIndex }, markdownInline(item, "li" + itemIndex)))));
+      continue;
+    }
+    const paragraph = [line.trim()];
+    i += 1;
+    while (i < lines.length && lines[i].trim() && !/^#{1,6}\s+/.test(lines[i]) && !lines[i].trim().startsWith(codeFence) && !(isTableRow(lines[i]) && isTableSeparator(lines[i + 1])) && !/^\s*[-*]\s+/.test(lines[i])) {
+      paragraph.push(lines[i].trim());
+      i += 1;
+    }
+    blocks.push(import_react.default.createElement("p", { key: "md-" + blocks.length }, markdownInline(paragraph.join(" "), "p" + i)));
+  }
+  return import_react.default.createElement("div", { className: "qx-raycast-md" }, blocks);
+}
 function ItemShell({ title, subtitle, icon, accessories, actions, children, image }) {
   const action = firstAction(actions);
   return import_react.default.createElement(
@@ -12853,7 +12959,7 @@ function Detail(props) {
     import_react.default.createElement(
       "div",
       { className: "qx-raycast-detail-content" },
-      props.markdown ? import_react.default.createElement("pre", null, props.markdown) : props.children
+      props.markdown ? renderMarkdown(props.markdown) : props.children
     ),
     props.actions || null
   );
@@ -12932,9 +13038,9 @@ var init_api = __esm({
   }
 });
 
-// ../../../../../private/var/folders/ng/zj6dzdcj0vx8chjb0yp1t4740000gn/T/qx-raycast-url-Grq2Ga/repo/extensions/calendar/node_modules/calendar/lib/calendar.js
+// ../../../../../private/tmp/raycast-ext-for-qx/extensions/calendar/node_modules/calendar/lib/calendar.js
 var require_calendar = __commonJS({
-  "../../../../../private/var/folders/ng/zj6dzdcj0vx8chjb0yp1t4740000gn/T/qx-raycast-url-Grq2Ga/repo/extensions/calendar/node_modules/calendar/lib/calendar.js"(exports) {
+  "../../../../../private/tmp/raycast-ext-for-qx/extensions/calendar/node_modules/calendar/lib/calendar.js"(exports) {
     exports.version = "0.1.0";
     var CalendarException = function CalendarException2(message) {
       this.message = message;
@@ -13012,10 +13118,10 @@ var require_calendar = __commonJS({
   }
 });
 
-// ../../../../../private/var/folders/ng/zj6dzdcj0vx8chjb0yp1t4740000gn/T/qx-raycast-url-Grq2Ga/repo/extensions/calendar/node_modules/weeknumber/src/index.js
+// ../../../../../private/tmp/raycast-ext-for-qx/extensions/calendar/node_modules/weeknumber/src/index.js
 var MINUTE, WEEK, tzDiff, weekNumber, weekNumberSun;
 var init_src = __esm({
-  "../../../../../private/var/folders/ng/zj6dzdcj0vx8chjb0yp1t4740000gn/T/qx-raycast-url-Grq2Ga/repo/extensions/calendar/node_modules/weeknumber/src/index.js"() {
+  "../../../../../private/tmp/raycast-ext-for-qx/extensions/calendar/node_modules/weeknumber/src/index.js"() {
     MINUTE = 6e4;
     WEEK = 6048e5;
     tzDiff = (first, second) => (first.getTimezoneOffset() - second.getTimezoneOffset()) * MINUTE;
@@ -13241,7 +13347,7 @@ ${table}`);
 }
 var import_react2, import_calendar, import_jsx_runtime, days, weekStart, showWeeks, viewMode, currentMonth;
 var init_src2 = __esm({
-  "../../../../../private/var/folders/ng/zj6dzdcj0vx8chjb0yp1t4740000gn/T/qx-raycast-url-Grq2Ga/repo/extensions/calendar/src/index.tsx"() {
+  "../../../../../private/tmp/raycast-ext-for-qx/extensions/calendar/src/index.tsx"() {
     "use strict";
     init_api();
     import_react2 = __toESM(require_react());
@@ -13262,11 +13368,24 @@ var init_src2 = __esm({
 // qx-raycast-entry
 var import_react3 = __toESM(require_react());
 var import_client = __toESM(require_client());
+
+// qx-virtual:buffer
+var Buffer2 = {
+  from(value) {
+    if (value instanceof ArrayBuffer) return new Uint8Array(value);
+    if (ArrayBuffer.isView(value)) return new Uint8Array(value.buffer.slice(value.byteOffset, value.byteOffset + value.byteLength));
+    return new TextEncoder().encode(String(value || ""));
+  }
+};
+if (typeof globalThis.Buffer === "undefined") globalThis.Buffer = Buffer2;
+
+// qx-raycast-entry
+if (typeof globalThis.Buffer === "undefined") globalThis.Buffer = Buffer2;
 function injectRaycastStyles() {
   if (document.getElementById("qx-raycast-shim-style")) return;
   const style = document.createElement("style");
   style.id = "qx-raycast-shim-style";
-  style.textContent = '\n    html,body,#root{margin:0;width:100%;height:100%;background:transparent;color:var(--qx-text-primary,#111);font:13px -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;}\n    .qx-raycast-view{box-sizing:border-box;height:100%;display:flex;flex-direction:column;gap:10px;padding:14px;overflow:hidden;}\n    .qx-raycast-search{height:34px;border:1px solid var(--qx-border-1,#ddd);border-radius:7px;background:var(--qx-bg-component-1,#fff);color:inherit;padding:0 10px;font:inherit;outline:none;}\n    .qx-raycast-list{display:flex;flex-direction:column;gap:4px;overflow:auto;min-height:0;}\n    .qx-raycast-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(148px,1fr));gap:10px;overflow:auto;min-height:0;}\n    .qx-raycast-section{display:contents;}\n    .qx-raycast-section h2{grid-column:1/-1;margin:10px 0 2px;color:var(--qx-text-tertiary,#777);font-size:11px;text-transform:uppercase;letter-spacing:.08em;}\n    .qx-raycast-item{min-width:0;display:flex;align-items:center;gap:10px;border:0;border-radius:7px;background:transparent;color:inherit;text-align:left;padding:8px;cursor:pointer;font:inherit;}\n    .qx-raycast-grid .qx-raycast-item{display:flex;flex-direction:column;align-items:stretch;padding:0;overflow:hidden;background:var(--qx-bg-component-1,#fff);border:1px solid var(--qx-border-1,#ddd);}\n    .qx-raycast-item:hover{background:var(--qx-bg-component-2,#f5f5f5);}\n    .qx-raycast-thumb{width:100%;aspect-ratio:16/9;object-fit:cover;background:var(--qx-bg-component-2,#eee);}\n    .qx-raycast-list .qx-raycast-thumb{width:52px;height:34px;border-radius:5px;flex:0 0 auto;}\n    .qx-raycast-icon{width:22px;min-height:22px;display:inline-flex;align-items:center;justify-content:center;color:var(--qx-text-tertiary,#777);}\n    .qx-raycast-item-main{min-width:0;display:flex;flex-direction:column;gap:2px;padding:6px;}\n    .qx-raycast-item-main strong,.qx-raycast-item-main small{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}\n    .qx-raycast-item-main small,.qx-raycast-accessory{color:var(--qx-text-secondary,#666);}\n    .qx-raycast-loading,.qx-raycast-empty,.qx-raycast-detail{padding:18px;color:var(--qx-text-secondary,#666);overflow:auto;}\n    .qx-raycast-detail{box-sizing:border-box;height:100%;}\n    .qx-raycast-detail-content pre{margin:0;white-space:pre-wrap;font:inherit;color:var(--qx-text-primary,#111);}\n    .qx-raycast-actions-inline{display:flex;align-items:center;justify-content:flex-end;gap:6px;flex:0 1 min(42%,360px);margin-left:auto;min-width:0;max-width:min(42%,360px);overflow:hidden;padding:4px 6px 4px 0;}\n    .qx-raycast-actions-inline.is-hidden{display:none;}\n    .qx-raycast-action-button{border:1px solid var(--qx-border-1,#ddd);background:var(--qx-bg-component-1,#fff);color:inherit;border-radius:6px;padding:4px 7px;font:inherit;font-size:11px;cursor:pointer;}\n    .qx-raycast-action-button{min-width:0;max-width:120px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}\n    .qx-raycast-action-button:hover{background:var(--qx-bg-component-2,#f5f5f5);}\n    .qx-raycast-grid .qx-raycast-actions-inline{margin-left:0;max-width:100%;width:100%;justify-content:flex-start;padding:0 8px 8px;}\n    .qx-raycast-detail > .qx-raycast-actions-inline{justify-content:flex-start;margin:12px 0 0;max-width:100%;padding:0;overflow:visible;}\n    :root[data-qx-raycast-action-panel="hidden"] .qx-raycast-actions-inline{display:none;}\n    @media (max-width: 680px){.qx-raycast-actions-inline{display:none;}}\n  ';
+  style.textContent = '\n    html,body,#root{margin:0;width:100%;height:100%;background:transparent;color:var(--qx-text-primary,#111);font:13px -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;}\n    .qx-raycast-view{box-sizing:border-box;height:100%;display:flex;flex-direction:column;gap:10px;padding:14px;overflow:hidden;}\n    .qx-raycast-search{height:34px;border:1px solid var(--qx-border-1,#ddd);border-radius:7px;background:var(--qx-bg-component-1,#fff);color:inherit;padding:0 10px;font:inherit;outline:none;}\n    .qx-raycast-list{display:flex;flex-direction:column;gap:4px;overflow:auto;min-height:0;}\n    .qx-raycast-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(148px,1fr));gap:10px;overflow:auto;min-height:0;}\n    .qx-raycast-section{display:contents;}\n    .qx-raycast-section h2{grid-column:1/-1;margin:10px 0 2px;color:var(--qx-text-tertiary,#777);font-size:11px;text-transform:uppercase;letter-spacing:.08em;}\n    .qx-raycast-item{min-width:0;display:flex;align-items:center;gap:10px;border:0;border-radius:7px;background:transparent;color:inherit;text-align:left;padding:8px;cursor:pointer;font:inherit;}\n    .qx-raycast-grid .qx-raycast-item{display:flex;flex-direction:column;align-items:stretch;padding:0;overflow:hidden;background:var(--qx-bg-component-1,#fff);border:1px solid var(--qx-border-1,#ddd);}\n    .qx-raycast-item:hover{background:var(--qx-bg-component-2,#f5f5f5);}\n    .qx-raycast-thumb{width:100%;aspect-ratio:16/9;object-fit:cover;background:var(--qx-bg-component-2,#eee);}\n    .qx-raycast-list .qx-raycast-thumb{width:52px;height:34px;border-radius:5px;flex:0 0 auto;}\n    .qx-raycast-icon{width:22px;min-height:22px;display:inline-flex;align-items:center;justify-content:center;color:var(--qx-text-tertiary,#777);}\n    .qx-raycast-item-main{min-width:0;display:flex;flex-direction:column;gap:2px;padding:6px;}\n    .qx-raycast-item-main strong,.qx-raycast-item-main small{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}\n    .qx-raycast-item-main small,.qx-raycast-accessory{color:var(--qx-text-secondary,#666);}\n    .qx-raycast-loading,.qx-raycast-empty,.qx-raycast-detail{padding:18px;color:var(--qx-text-secondary,#666);overflow:auto;}\n    .qx-raycast-detail{box-sizing:border-box;height:100%;}\n    .qx-raycast-md{color:var(--qx-text-primary,#111);line-height:1.45;max-width:100%;overflow:auto;}\n    .qx-raycast-md h1,.qx-raycast-md h2,.qx-raycast-md h3{margin:0 0 10px;color:var(--qx-text-primary,#111);line-height:1.2;}\n    .qx-raycast-md h1{font-size:22px;}.qx-raycast-md h2{font-size:18px;}.qx-raycast-md h3{font-size:15px;}\n    .qx-raycast-md p{margin:0 0 10px;}.qx-raycast-md ul{margin:0 0 10px 18px;padding:0;}\n    .qx-raycast-md code{font-family:ui-monospace,SFMono-Regular,SF Mono,Menlo,Consolas,monospace;background:var(--qx-bg-component-2,#f5f5f5);border-radius:4px;padding:1px 4px;}\n    .qx-raycast-md pre{margin:0 0 12px;white-space:pre-wrap;color:var(--qx-text-primary,#111);font:12px ui-monospace,SFMono-Regular,SF Mono,Menlo,Consolas,monospace;background:var(--qx-bg-component-1,#fff);border:1px solid var(--qx-border-1,#ddd);border-radius:7px;padding:10px;overflow:auto;}\n    .qx-raycast-md-table{border-collapse:collapse;width:max-content;max-width:100%;margin:0 0 12px;font-variant-numeric:tabular-nums;}\n    .qx-raycast-md-table th,.qx-raycast-md-table td{border:1px solid var(--qx-border-1,#ddd);padding:5px 8px;text-align:center;white-space:nowrap;}\n    .qx-raycast-md-table th{background:var(--qx-bg-component-2,#f5f5f5);font-weight:650;}\n    .qx-raycast-md a{color:var(--qx-accent,#2563eb);text-decoration:none;}.qx-raycast-md a:hover{text-decoration:underline;}\n    .qx-raycast-actions-inline{display:flex;align-items:center;justify-content:flex-end;gap:6px;flex:0 1 min(42%,360px);margin-left:auto;min-width:0;max-width:min(42%,360px);overflow:hidden;padding:4px 6px 4px 0;}\n    .qx-raycast-actions-inline.is-hidden{display:none;}\n    .qx-raycast-action-button{border:1px solid var(--qx-border-1,#ddd);background:var(--qx-bg-component-1,#fff);color:inherit;border-radius:6px;padding:4px 7px;font:inherit;font-size:11px;cursor:pointer;}\n    .qx-raycast-action-button{min-width:0;max-width:120px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}\n    .qx-raycast-action-button:hover{background:var(--qx-bg-component-2,#f5f5f5);}\n    .qx-raycast-grid .qx-raycast-actions-inline{margin-left:0;max-width:100%;width:100%;justify-content:flex-start;padding:0 8px 8px;}\n    .qx-raycast-detail > .qx-raycast-actions-inline{justify-content:flex-start;margin:12px 0 0;max-width:100%;padding:0;overflow:visible;}\n    :root[data-qx-raycast-action-panel="hidden"] .qx-raycast-actions-inline{display:none;}\n    @media (max-width: 680px){.qx-raycast-actions-inline{display:none;}}\n  ';
   document.head.appendChild(style);
 }
 var commandLoaders = {
