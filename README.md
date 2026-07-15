@@ -106,7 +106,12 @@ time — only the packaged archive on `mcxen/qx-plugins` is downloaded.
   when updating to a newer Raycast source commit.
 - **Hand-edit** only for native plugins (`v2ex`, `external-display-control`)
   or tiny post-convert manifest tweaks (`min_app_version`, keywords, version).
-- Prefer fixing **Qx host + converter** over bespoke forks of Raycast ports.
+- Prefer fixing **Qx host + converter** over bespoke forks of Raycast ports
+  (SOLID: open for extension via host ports; do not fork each plugin).
+
+Design rules for host/converter contracts live in the Qx tree:
+`docs/architecture-principles.md` (abstraction + SOLID). Keep marketplace
+README abstract (what / why / which version), not a dump of esbuild internals.
 
 ## Manifest conventions
 
