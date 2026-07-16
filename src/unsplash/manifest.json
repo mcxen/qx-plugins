@@ -1,0 +1,147 @@
+{
+  "id": "unsplash",
+  "name": "Unsplash",
+  "version": "1.0.0",
+  "description": "Search Unsplash photos, download, and set desktop wallpaper. Ported for Qx (Access Key API; likes/OAuth not included).",
+  "author": "qx (ported from Raycast unsplash)",
+  "icon": "icon.png",
+  "screenshots": [
+    "unsplash-1.png",
+    "unsplash-2.png"
+  ],
+  "platforms": [
+    "macos",
+    "windows"
+  ],
+  "keywords": [
+    "unsplash",
+    "wallpaper",
+    "photo",
+    "image",
+    "background",
+    "壁纸",
+    "图片"
+  ],
+  "permissions": [
+    "http",
+    "open-url",
+    "notifications",
+    "clipboard",
+    "cli",
+    "invoke:plugin_run_applescript",
+    "invoke:plugin_file_write_base64",
+    "invoke:plugin_file_ensure_dir",
+    "invoke:plugin_file_exists"
+  ],
+  "preferences": [
+    {
+      "id": "accessKey",
+      "label": "Access Key",
+      "type": "password",
+      "required": true,
+      "default": "",
+      "description": "Unsplash API Access Key from https://unsplash.com/oauth/applications (Client-ID)."
+    },
+    {
+      "id": "downloadSize",
+      "label": "Download Size",
+      "type": "select",
+      "required": false,
+      "default": "full",
+      "description": "Image size for download and wallpaper.",
+      "options": [
+        { "label": "Raw", "value": "raw" },
+        { "label": "Full", "value": "full" },
+        { "label": "Regular", "value": "regular" },
+        { "label": "Small", "value": "small" }
+      ]
+    },
+    {
+      "id": "downloadDir",
+      "label": "Download Directory",
+      "type": "string",
+      "required": false,
+      "default": "~/Downloads",
+      "description": "Folder for saved images (~ expanded via /qx-home)."
+    },
+    {
+      "id": "wallpaperDir",
+      "label": "Wallpaper Cache Directory",
+      "type": "string",
+      "required": false,
+      "default": "~/Pictures/Unsplash",
+      "description": "Where wallpapers are stored before applying."
+    },
+    {
+      "id": "applyTo",
+      "label": "Apply Wallpaper To",
+      "type": "select",
+      "required": false,
+      "default": "every",
+      "description": "macOS: which desktop(s) to set (AppleScript). Windows: best-effort via PowerShell.",
+      "options": [
+        { "label": "Every Monitor", "value": "every" },
+        { "label": "Current Monitor", "value": "current" }
+      ]
+    }
+  ],
+  "entry": "index.js",
+  "commands": [
+    {
+      "name": "open-search",
+      "title": "Unsplash: Search Photos",
+      "description": "Open Unsplash photo search panel",
+      "keywords": ["unsplash", "wallpaper", "photo", "search"]
+    },
+    {
+      "name": "set-random-wallpaper",
+      "title": "Unsplash: Set Random Wallpaper",
+      "description": "Download a random Unsplash photo and set as wallpaper",
+      "keywords": ["unsplash", "random", "wallpaper"],
+      "mode": "no-view",
+      "interval": "1d"
+    }
+  ],
+  "panel": {
+    "title": "Unsplash",
+    "icon": "icon.png",
+    "keywords": ["unsplash", "wallpaper", "photos"]
+  },
+  "min_app_version": "0.5.26",
+  "raycast": {
+    "source": "unsplash",
+    "compatible": "native-ports",
+    "sourceCommit": "01edf86b41e63f42e4dc21cf5554a3f5e1180613",
+    "sourceUrl": "https://github.com/raycast/extensions/tree/01edf86b41e63f42e4dc21cf5554a3f5e1180613/extensions/unsplash",
+    "platformCompatibility": {
+      "macos": {
+        "status": "supported",
+        "features": [
+          "Search photos (Access Key)",
+          "Download to folder",
+          "Set wallpaper (AppleScript)",
+          "Copy links",
+          "Daily random wallpaper command"
+        ],
+        "degraded": [
+          "Liked images require OAuth (not ported)"
+        ],
+        "unsupported": [
+          "Full Unsplash OAuth / likes"
+        ]
+      },
+      "windows": {
+        "status": "partial",
+        "features": [
+          "Search / download / open URL"
+        ],
+        "degraded": [
+          "Wallpaper set uses PowerShell best-effort"
+        ],
+        "unsupported": [
+          "OAuth likes"
+        ]
+      }
+    }
+  }
+}
