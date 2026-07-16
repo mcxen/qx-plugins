@@ -1,7 +1,21 @@
 # Qx Plugins Marketplace — Agent Guide
 
 > For AI agents and maintainers working in **this repo** (`mcxen/qx-plugins`).  
-> Host app rules live in the Qx repo `AGENTS.md` / `public/doc/plugin-*.md`.
+> Host author handbook (ports, panel, cache, Esc):  
+> **https://github.com/mcxen/qx/blob/main/public/doc/plugin-development-guide.md**  
+> Host module inventory (built-in vs plugin ports):  
+> **https://github.com/mcxen/qx/blob/main/docs/module-port-inventory.md**  
+> Host app coding rules: Qx repo `AGENTS.md`.
+
+## Legacy package compatibility
+
+| Artifact | Required to install? | Notes |
+|----------|----------------------|--------|
+| `manifest.json` + entry | **Yes** | Unchanged |
+| `AGENTS.md` | **No** | Recommended for Agent maintenance; old zips without it still install |
+| `manifest.panel` | **Only if** users open a panel tab | Command-only / island-only packages remain valid without panel |
+
+Do **not** reject marketplace entries solely for missing AGENTS.md.
 
 ## Repo purpose
 
