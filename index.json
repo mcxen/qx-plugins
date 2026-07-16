@@ -8,7 +8,7 @@
       "description": "Get, set, auto-switch Bing wallpapers to explore the world.",
       "download_url": "https://raw.githubusercontent.com/mcxen/qx-plugins/main/raycast-bing-wallpaper.qx-plugin",
       "size_bytes": 12436599,
-      "checksum_sha256": "9905aed4822624cc7ee00b9f3ea314da1f2aa95d6286b7bb178aa77d8d971729",
+      "checksum_sha256": "0300ecfa6685ffe0bcd4754ca4492baa8c6f333d6921d77121f06d3a262e92f7",
       "required_permissions": [
         "http",
         "open-url",
@@ -49,7 +49,7 @@
       "description": "View external monitor DDC/CI details and adjust brightness from Qx.",
       "download_url": "https://raw.githubusercontent.com/mcxen/qx-plugins/main/external-display-control.qx-plugin",
       "size_bytes": 21271,
-      "checksum_sha256": "32ac01f0a42f7b40af3f70ff77a864678bfa68269234ba3cb666b6d1b43fe63d",
+      "checksum_sha256": "fafd14f683ea5aa01bb26e1d849429c98147fae5c825afab0e8690319376d7fa",
       "required_permissions": [
         "external-displays",
         "invoke:qx_external_displays_set_control",
@@ -67,7 +67,7 @@
       "description": "View calendar month-by-month",
       "download_url": "https://raw.githubusercontent.com/mcxen/qx-plugins/main/raycast-calendar.qx-plugin",
       "size_bytes": 3496829,
-      "checksum_sha256": "3bb896467aa6cbbda8d729dd15970fa618e3fd8fb6e34f2a5e1eb16361bf3196",
+      "checksum_sha256": "a49eaf93b62e3f0059f113dc7902edc8a64043f485e96beeb5f63712f777deaf",
       "required_permissions": [
         "http",
         "open-url",
@@ -84,7 +84,7 @@
       "description": "Search Unsplash photos, download, and set desktop wallpaper. Ported for Qx (Access Key API; likes/OAuth not included).",
       "download_url": "https://raw.githubusercontent.com/mcxen/qx-plugins/main/unsplash.qx-plugin",
       "size_bytes": 6345901,
-      "checksum_sha256": "9684350c00a9a1dd14a354abb12d471a927df1903f37595bd6280ba1a33a763b",
+      "checksum_sha256": "49b6892813c6c4167d8896b824548d0705cf3cb68ee1ab64194de8c651f84ff3",
       "required_permissions": [
         "http",
         "open-url",
@@ -107,7 +107,7 @@
       "description": "Browse V2EX topics, notifications, and replies with token support",
       "download_url": "https://raw.githubusercontent.com/mcxen/qx-plugins/main/v2ex.qx-plugin",
       "size_bytes": 19407,
-      "checksum_sha256": "3ff5964c8d3719b4edfcf369f360017585e29491ab917cb7aab7a720a835dbde",
+      "checksum_sha256": "1e78eda2b549cce88c39495bf1968352b018c72d9b8f512192fa42ae38d94a98",
       "required_permissions": [
         "invoke:v2ex_fetch_topics",
         "invoke:v2ex_search_topics",
