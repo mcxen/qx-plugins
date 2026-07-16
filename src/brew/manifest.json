@@ -1,0 +1,111 @@
+{
+  "id": "brew",
+  "name": "Brew",
+  "version": "1.0.0",
+  "description": "Search, inspect, upgrade and uninstall Homebrew formulae & casks (macOS). Uses Qx context.cli.",
+  "author": "qx (ported from Raycast brew by nhojb et al.)",
+  "icon": "icon.png",
+  "screenshots": [
+    "brew-1.png",
+    "brew-2.png"
+  ],
+  "platforms": [
+    "macos"
+  ],
+  "keywords": [
+    "brew",
+    "homebrew",
+    "formula",
+    "cask",
+    "package",
+    "install",
+    "upgrade",
+    "macos"
+  ],
+  "permissions": [
+    "cli",
+    "notifications",
+    "open-url"
+  ],
+  "preferences": [
+    {
+      "id": "brewPath",
+      "label": "Brew executable",
+      "type": "string",
+      "required": false,
+      "default": "",
+      "description": "Optional absolute path to brew. Empty = auto-detect (/opt/homebrew/bin/brew, /usr/local/bin/brew, PATH)."
+    }
+  ],
+  "entry": "index.js",
+  "commands": [
+    {
+      "name": "open-brew",
+      "title": "Brew",
+      "description": "Open Homebrew manager panel",
+      "keywords": [
+        "brew",
+        "homebrew",
+        "installed",
+        "packages"
+      ]
+    },
+    {
+      "name": "brew-outdated",
+      "title": "Brew: Outdated",
+      "description": "Show outdated formulae & casks",
+      "keywords": [
+        "brew",
+        "outdated",
+        "upgrade"
+      ]
+    },
+    {
+      "name": "brew-upgrade-all",
+      "title": "Brew: Upgrade All Outdated",
+      "description": "Run brew upgrade for all outdated packages",
+      "keywords": [
+        "brew",
+        "upgrade"
+      ]
+    }
+  ],
+  "panel": {
+    "title": "Brew",
+    "icon": "icon.png",
+    "keywords": [
+      "brew",
+      "homebrew",
+      "cask"
+    ]
+  },
+  "min_app_version": "0.5.26",
+  "raycast": {
+    "source": "brew",
+    "compatible": "native-cli-port",
+    "sourceCommit": "a1f6fad4defba0d8c07a4c3e411edc7779702e4c",
+    "sourceUrl": "https://github.com/raycast/extensions/tree/a1f6fad4defba0d8c07a4c3e411edc7779702e4c/extensions/brew",
+    "platformCompatibility": {
+      "macos": {
+        "status": "supported",
+        "features": [
+          "context.cli",
+          "Homebrew list/info/search/outdated/upgrade/uninstall",
+          "Panel UI"
+        ],
+        "degraded": [],
+        "unsupported": [
+          "Raycast menu-bar services command",
+          "Full Raycast metadata panel parity"
+        ]
+      },
+      "windows": {
+        "status": "unsupported",
+        "features": [],
+        "unsupported": [
+          "Homebrew is macOS-only in this packaging"
+        ]
+      }
+    }
+  }
+}
