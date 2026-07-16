@@ -1,0 +1,92 @@
+{
+  "id": "qxgh",
+  "name": "QxGH",
+  "version": "1.2.1",
+  "description": "QxGH — watch GitHub Actions and Releases from public github.com pages (no REST API). Business-only workbench UI.",
+  "author": "mcx",
+  "icon": "",
+  "keywords": [
+    "qxgh",
+    "github",
+    "gh",
+    "actions",
+    "ci",
+    "cd",
+    "workflow",
+    "release",
+    "进度",
+    "构建",
+    "发布"
+  ],
+  "permissions": [
+    "http",
+    "open-url",
+    "notifications",
+    "island"
+  ],
+  "preferences": [
+    {
+      "id": "repos",
+      "label": "Repositories",
+      "type": "string",
+      "required": false,
+      "default": "mcxen/qx\nmcxen/qx-plugins",
+      "description": "Public owner/repo — one per line. Reads github.com HTML (no API token)."
+    },
+    {
+      "id": "pollSeconds",
+      "label": "Poll interval (seconds)",
+      "type": "string",
+      "required": false,
+      "default": "45",
+      "description": "Auto-refresh while the panel is open. 0 disables polling."
+    },
+    {
+      "id": "cacheMinutes",
+      "label": "Cache minutes",
+      "type": "string",
+      "required": false,
+      "default": "2",
+      "description": "SWR: treat cached Actions/Releases as fresh for this many minutes."
+    },
+    {
+      "id": "islandWatch",
+      "label": "Island for in-progress runs",
+      "type": "boolean",
+      "required": false,
+      "default": true,
+      "description": "Show external QxIsland when a watched repo has a running/queued workflow."
+    }
+  ],
+  "entry": "index.js",
+  "commands": [
+    {
+      "name": "open-qxgh",
+      "title": "QxGH",
+      "description": "Open the QxGH Actions & Releases panel",
+      "keywords": ["qxgh", "github", "actions", "ci", "release", "进度"]
+    },
+    {
+      "name": "refresh-qxgh",
+      "title": "Refresh QxGH",
+      "description": "Force refresh Actions and Releases for pinned repos",
+      "keywords": ["qxgh", "github", "refresh", "ci"]
+    },
+    {
+      "name": "qxgh-status",
+      "title": "QxGH CI Summary",
+      "description": "Toast a short summary of latest runs",
+      "keywords": ["qxgh", "github", "status", "summary"]
+    },
+    {
+      "name": "qxgh-watch-island",
+      "title": "QxGH Watch on Island",
+      "description": "Pin the hottest in-progress run on the external island",
+      "keywords": ["qxgh", "github", "island", "watch"]
+    }
+  ],
+  "panel": {
+    "title": "QxGH",
+    "keywords": ["qxgh", "github", "actions", "releases", "ci", "gh"]
+  }
+}
