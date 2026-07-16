@@ -32,7 +32,7 @@
       "description": "Search, inspect, upgrade and uninstall Homebrew formulae & casks (macOS). Uses Qx context.cli.",
       "download_url": "https://raw.githubusercontent.com/mcxen/qx-plugins/main/brew.qx-plugin",
       "size_bytes": 4097210,
-      "checksum_sha256": "3d57106f3a679803a87f18993831e99f050d4e434c37addaaecc0f57efec985a",
+      "checksum_sha256": "373f4e14a9a3888156131ecb42ee285aa08fc441ea80ef050a8ac4f99396791f",
       "required_permissions": [
         "cli",
         "notifications",
