@@ -1,8 +1,8 @@
 {
   "id": "v2ex",
   "name": "V2EX",
-  "version": "2.0.1",
-  "description": "Browse V2EX topics, notifications, and replies with token support",
+  "version": "2.1.0",
+  "description": "Browse V2EX latest/hot topics with disk cache (stale-while-revalidate). Notifications & nodes need a token.",
   "author": "mcx",
   "icon": "",
   "keywords": [
@@ -10,17 +10,21 @@
     "forum",
     "topics",
     "tech",
-    "\u793e\u533a",
-    "\u5e16\u5b50"
+    "社区",
+    "帖子",
+    "热门",
+    "最新"
   ],
   "permissions": [
+    "http",
+    "open-url",
+    "notifications",
     "invoke:v2ex_fetch_topics",
     "invoke:v2ex_search_topics",
     "invoke:v2ex_fetch_node_topics",
     "invoke:v2ex_fetch_topic_replies",
     "invoke:v2ex_fetch_token_info",
-    "invoke:v2ex_fetch_notifications",
-    "open-url"
+    "invoke:v2ex_fetch_notifications"
   ],
   "preferences": [
     {
@@ -28,7 +32,7 @@
       "label": "Access Token",
       "type": "password",
       "required": false,
-      "description": "V2EX API v2 token. Go to https://v2ex.com/settings/tokens to create one."
+      "description": "V2EX API v2 token for nodes / notifications. Create at https://v2ex.com/settings/tokens"
     },
     {
       "id": "nodes",
@@ -36,7 +40,15 @@
       "type": "string",
       "required": false,
       "default": "programmer create share ideas apple jobs qna",
-      "description": "Node names for 'Topics By Node', separated by spaces."
+      "description": "Space-separated node names for the Nodes tab (requires token)."
+    },
+    {
+      "id": "cacheTtlMinutes",
+      "label": "List cache (minutes)",
+      "type": "string",
+      "required": false,
+      "default": "3",
+      "description": "How long latest/hot lists are considered fresh. Stale cache is still shown while refreshing."
     }
   ],
   "entry": "index.js",
@@ -45,54 +57,39 @@
       "name": "open-v2ex",
       "title": "Open V2EX",
       "description": "Browse latest and hot V2EX topics",
-      "keywords": [
-        "v2ex",
-        "forum",
-        "topics",
-        "tech",
-        "\u63a2\u7d22",
-        "\u6700\u65b0",
-        "\u70ed\u95e8"
-      ]
+      "keywords": ["v2ex", "forum", "topics", "tech", "探索", "最新", "热门"]
+    },
+    {
+      "name": "view-hot",
+      "title": "V2EX Hot",
+      "description": "Open V2EX hot topics",
+      "keywords": ["v2ex", "hot", "热门"]
+    },
+    {
+      "name": "view-latest",
+      "title": "V2EX Latest",
+      "description": "Open V2EX latest topics",
+      "keywords": ["v2ex", "latest", "最新"]
     },
     {
       "name": "view-notifications",
       "title": "View Notifications",
       "description": "View your V2EX notifications (requires token)",
-      "keywords": [
-        "v2ex",
-        "notifications",
-        "\u901a\u77e5",
-        "\u6d88\u606f"
-      ]
+      "keywords": ["v2ex", "notifications", "通知", "消息"]
     },
     {
       "name": "view-token",
       "title": "View Token Info",
       "description": "Check your V2EX API token status (requires token)",
-      "keywords": [
-        "v2ex",
-        "token",
-        "\u4ee4\u724c"
-      ]
+      "keywords": ["v2ex", "token", "令牌"]
     }
   ],
   "panel": {
     "title": "V2EX",
     "icon": "",
-    "keywords": [
-      "v2ex",
-      "forum",
-      "topics",
-      "tech",
-      "\u793e\u533a",
-      "\u5e16\u5b50"
-    ]
+    "keywords": ["v2ex", "forum", "topics", "tech", "社区", "帖子"]
   },
-  "min_app_version": "0.4.28",
-  "platforms": [
-    "macos",
-    "windows"
-  ],
+  "min_app_version": "0.5.18",
+  "platforms": ["macos", "windows"],
   "screenshots": []
 }
