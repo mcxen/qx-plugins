@@ -1,7 +1,7 @@
 {
   "id": "raycast-calendar",
   "name": "Quick Calendar",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "description": "View calendar month-by-month",
   "author": "fuksman",
   "icon": "command-icon.png",
@@ -13,12 +13,7 @@
     "macos",
     "windows"
   ],
-  "keywords": [
-    "calendar",
-    "month",
-    "\u65e5\u671f",
-    "\u65e5\u5386"
-  ],
+  "keywords": [],
   "preferences": [
     {
       "id": "weekStart",
@@ -113,6 +108,5 @@
         "notes": []
       }
     }
-  },
-  "min_app_version": "0.4.28"
+  }
 }

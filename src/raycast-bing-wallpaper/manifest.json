@@ -1,8 +1,8 @@
 {
   "id": "raycast-bing-wallpaper",
   "name": "Bing Wallpaper",
-  "version": "1.2.0",
-  "description": "Get, set, auto-switch Bing wallpapers to explore the world. (Raycast-compatible external plugin)",
+  "version": "1.4.0",
+  "description": "Get, set, auto-switch Bing wallpapers to explore the world.",
   "author": "koinzhang",
   "icon": "extension-icon.png",
   "screenshots": [
@@ -149,7 +149,7 @@
       "label": "Wallpaper Item Coloums",
       "type": "select",
       "required": false,
-      "default": "30",
+      "default": "1440",
       "description": "Set the refresh interval for the random wallpaper.",
       "options": [
         {
@@ -224,20 +224,20 @@
     {
       "name": "auto-random-bing-wallpaper",
       "title": "Auto Random Bing Wallpaper",
-      "description": "Auto-switch random Bing wallpapers to desktop intervally.",
+      "description": "Set a random Bing wallpaper automatically once per day.",
       "icon": "random-wallpaper-icon.png",
       "keywords": [],
       "mode": "no-view",
-      "interval": "5m"
+      "interval": "1d"
     },
     {
       "name": "auto-switch-bing-wallpaper",
       "title": "Auto Switch Bing Wallpaper",
-      "description": "Auto-switch latest Bing wallpapers to desktop every day (refresh every 3 hours).",
+      "description": "Set the latest Bing wallpaper automatically once per day.",
       "icon": "auto-switch-wallpaper-icon.png",
       "keywords": [],
       "mode": "no-view",
-      "interval": "30m"
+      "interval": "1d"
     }
   ],
   "panel": {
@@ -290,6 +290,5 @@
         ]
       }
     }
-  },
-  "min_app_version": "0.5.18"
+  }
 }

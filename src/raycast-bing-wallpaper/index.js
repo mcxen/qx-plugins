@@ -12727,23 +12727,229 @@ function textOf(value) {
   if (value == null) return "";
   if (typeof value === "string") return value;
   if (typeof value === "number" || typeof value === "boolean") return String(value);
-  return value.title || value.name || value.text || "";
+  if (typeof value === "object") {
+    if (value.title != null) return String(value.title);
+    if (value.name != null) return String(value.name);
+    if (value.text != null) return String(value.text);
+    if (value.tooltip != null) return String(value.tooltip);
+  }
+  return "";
 }
-function firstAction(node) {
-  const children = import_react.default.Children.toArray(node?.props?.children);
-  for (const child of children) {
-    if (!import_react.default.isValidElement(child)) continue;
-    if (child.type === Action) return child;
-    const nested = firstAction(child);
-    if (nested) return nested;
+function mediaSource(value) {
+  if (value == null || value === false) return "";
+  if (typeof value === "string" || typeof value === "number") return String(value);
+  if (typeof value === "object") {
+    if (typeof value.source === "string") return value.source;
+    if (value.source && typeof value.source === "object") {
+      return value.source.light || value.source.dark || value.source.raw || "";
+    }
+    if (typeof value.fileIcon === "string") return value.fileIcon;
+  }
+  return "";
+}
+function expandNode(node, depth = 0) {
+  if (!import_react.default.isValidElement(node) || depth > 10) return node;
+  const type = node.type;
+  if (typeof type !== "function") return node;
+  if (type === Action || type === ActionPanel || type === ActionPanel.Section) return node;
+  try {
+    const rendered = type(node.props || {});
+    return expandNode(rendered, depth + 1);
+  } catch {
+    return node;
+  }
+}
+function normalizeActionElement(node) {
+  if (!import_react.default.isValidElement(node)) return null;
+  if (node.type === Action) return node;
+  try {
+    const rendered = expandNode(node);
+    if (import_react.default.isValidElement(rendered) && rendered.type === Action) return rendered;
+  } catch {
   }
   return null;
 }
-function runAction(action) {
-  const handler = action?.props?.onAction;
-  if (typeof handler === "function") {
-    void Promise.resolve(handler());
+function collectActions(node, result = []) {
+  if (node == null || node === false) return result;
+  if (Array.isArray(node)) {
+    for (const child of node) collectActions(child, result);
+    return result;
   }
+  if (!import_react.default.isValidElement(node)) return result;
+  const expanded = expandNode(node);
+  if (import_react.default.isValidElement(expanded) && expanded !== node) {
+    return collectActions(expanded, result);
+  }
+  if (node.type === Action) {
+    if (typeof node.props?.onAction === "function") result.push(node);
+    return result;
+  }
+  if (typeof node.type === "function" && node.type !== ActionPanel && node.type !== ActionPanel.Section) {
+    try {
+      const rendered = node.type(node.props || {});
+      collectActions(rendered, result);
+      return result;
+    } catch {
+    }
+  }
+  const children = import_react.default.Children.toArray(node.props?.children);
+  for (const child of children) collectActions(child, result);
+  return result;
+}
+function actionTitle(action) {
+  return textOf(action?.props?.title) || action?.props?.title || "Action";
+}
+function runAction(action) {
+  const resolved = normalizeActionElement(action) || action;
+  const handler = resolved?.props?.onAction;
+  if (typeof handler === "function") {
+    void Promise.resolve(handler()).catch((error) => {
+      console.error("[qx-raycast] action failed", error);
+      runtime()?.context?.showToast?.("Action failed: " + String(error?.message || error));
+    });
+  }
+}
+function shortcutMatches(event, shortcut) {
+  if (!shortcut || !shortcut.key) return false;
+  const key = String(shortcut.key).toLowerCase();
+  const eventKey = String(event.key || "").toLowerCase();
+  if (eventKey !== key && event.code?.toLowerCase() !== "key" + key) return false;
+  const mods = new Set((shortcut.modifiers || []).map((m) => String(m).toLowerCase()));
+  const wantMeta = mods.has("cmd") || mods.has("command") || mods.has("super") || mods.has("meta");
+  const wantCtrl = mods.has("ctrl") || mods.has("control");
+  const wantAlt = mods.has("alt") || mods.has("option");
+  const wantShift = mods.has("shift");
+  const isMac = /mac/i.test(String(navigator.platform || "") + String(navigator.userAgent || ""));
+  if (wantMeta) {
+    if (isMac ? !event.metaKey : !event.ctrlKey && !event.metaKey) return false;
+  } else if (event.metaKey) return false;
+  if (wantCtrl !== !!event.ctrlKey && !(wantMeta && !isMac && event.ctrlKey)) {
+    if (wantCtrl !== !!event.ctrlKey) return false;
+  }
+  if (wantAlt !== !!event.altKey) return false;
+  if (wantShift !== !!event.shiftKey) return false;
+  return true;
+}
+function ensureKeyboardNav() {
+  if (globalThis.__qxRaycastKeyNavInstalled) return;
+  globalThis.__qxRaycastKeyNavInstalled = true;
+  window.addEventListener("keydown", (event) => {
+    const target = event.target;
+    const tag = String(target?.tagName || "").toLowerCase();
+    const isEditable = tag === "input" || tag === "textarea" || target?.isContentEditable;
+    const items = Array.from(document.querySelectorAll("[data-qx-raycast-item]"));
+    if (!items.length) return;
+    let selected = document.querySelector("[data-qx-raycast-item].is-selected");
+    if (!selected) {
+      selected = items[0];
+      selected.classList.add("is-selected");
+      selected.setAttribute("aria-selected", "true");
+    }
+    const index = Math.max(0, items.indexOf(selected));
+    const selectAt = (nextIndex) => {
+      const next = items[Math.max(0, Math.min(items.length - 1, nextIndex))];
+      if (!next) return;
+      items.forEach((el) => {
+        el.classList.remove("is-selected");
+        el.setAttribute("aria-selected", "false");
+      });
+      next.classList.add("is-selected");
+      next.setAttribute("aria-selected", "true");
+      next.focus({ preventScroll: true });
+      next.scrollIntoView({ block: "nearest" });
+      updateActionDock(next);
+    };
+    if (!isEditable && (event.key === "ArrowDown" || event.key === "ArrowRight")) {
+      event.preventDefault();
+      selectAt(index + 1);
+      return;
+    }
+    if (!isEditable && (event.key === "ArrowUp" || event.key === "ArrowLeft")) {
+      event.preventDefault();
+      selectAt(index - 1);
+      return;
+    }
+    if (!isEditable && event.key === "Home") {
+      event.preventDefault();
+      selectAt(0);
+      return;
+    }
+    if (!isEditable && event.key === "End") {
+      event.preventDefault();
+      selectAt(items.length - 1);
+      return;
+    }
+    if (!isEditable && event.key === "Enter") {
+      event.preventDefault();
+      const primaryId = selected.getAttribute("data-primary-action");
+      if (primaryId && runtime()?.actionHandlers?.has(primaryId)) {
+        runtime().actionHandlers.get(primaryId)();
+      } else {
+        selected.click();
+      }
+      return;
+    }
+    const actionIds = String(selected.getAttribute("data-action-ids") || "").split(",").filter(Boolean);
+    for (const id of actionIds) {
+      const meta = runtime()?.actionMeta?.get(id);
+      if (!meta?.shortcut) continue;
+      if (shortcutMatches(event, meta.shortcut)) {
+        event.preventDefault();
+        event.stopPropagation();
+        runtime()?.actionHandlers?.get(id)?.();
+        return;
+      }
+    }
+  }, true);
+}
+function updateActionDock(itemEl) {
+  let dock = document.getElementById("qx-raycast-action-dock");
+  if (!dock) {
+    dock = document.createElement("div");
+    dock.id = "qx-raycast-action-dock";
+    dock.className = "qx-raycast-action-dock";
+    document.body.appendChild(dock);
+  }
+  const ids = String(itemEl?.getAttribute("data-action-ids") || "").split(",").filter(Boolean);
+  dock.innerHTML = "";
+  if (!ids.length) {
+    dock.classList.add("is-empty");
+    return;
+  }
+  dock.classList.remove("is-empty");
+  for (const id of ids) {
+    const meta = runtime()?.actionMeta?.get(id);
+    if (!meta) continue;
+    const btn = document.createElement("button");
+    btn.type = "button";
+    btn.className = "qx-raycast-action-button";
+    btn.textContent = meta.title || "Action";
+    btn.addEventListener("click", (event) => {
+      event.preventDefault();
+      event.stopPropagation();
+      runtime()?.actionHandlers?.get(id)?.();
+    });
+    dock.appendChild(btn);
+  }
+}
+function registerActionHandlers(actions) {
+  const rt = runtime();
+  if (!rt) return [];
+  if (!rt.actionHandlers) rt.actionHandlers = /* @__PURE__ */ new Map();
+  if (!rt.actionMeta) rt.actionMeta = /* @__PURE__ */ new Map();
+  const ids = [];
+  for (const action of actions) {
+    const resolved = normalizeActionElement(action) || action;
+    if (!resolved || typeof resolved.props?.onAction !== "function") continue;
+    const id = "act-" + Math.random().toString(36).slice(2, 10);
+    const title = actionTitle(resolved);
+    const shortcut = resolved.props.shortcut || null;
+    const handler = () => runAction(resolved);
+    rt.actionHandlers.set(id, handler);
+    rt.actionMeta.set(id, { title, shortcut });
+    ids.push(id);
+  }
+  return ids;
 }
 async function showToast(input, title, message) {
   const toast = typeof input === "object" ? { ...input } : { style: input, title: String(title || ""), message: String(message || "") };
@@ -12775,9 +12981,19 @@ function getPreferenceValues() {
 function useNavigation() {
   return {
     push(element) {
-      runtime()?.render?.(element);
+      const rt = runtime();
+      if (!rt) return;
+      if (!rt.navStack) rt.navStack = [];
+      if (rt.currentElement) rt.navStack.push(rt.currentElement);
+      rt.currentElement = element;
+      rt.render?.(element);
     },
     pop() {
+      const rt = runtime();
+      if (!rt?.navStack?.length) return;
+      const previous = rt.navStack.pop();
+      rt.currentElement = previous;
+      rt.render?.(previous);
     }
   };
 }
@@ -12794,17 +13010,28 @@ function Action(props) {
   return import_react.default.createElement("button", {
     type: "button",
     className: "qx-raycast-action-button",
+    title: props.title || "Action",
     onClick: (event) => {
       event?.stopPropagation?.();
-      if (typeof props.onAction === "function") void Promise.resolve(props.onAction());
+      if (typeof props.onAction === "function") {
+        void Promise.resolve(props.onAction()).catch((error) => {
+          console.error("[qx-raycast] action failed", error);
+          runtime()?.context?.showToast?.("Action failed: " + String(error?.message || error));
+        });
+      }
     }
   }, props.title || "Action");
 }
-function SearchInput({ placeholder }) {
+function SearchInput({ placeholder, value, onChange }) {
   return import_react.default.createElement("input", {
     className: "qx-raycast-search",
     placeholder: placeholder || "Search",
-    onChange: (event) => runtime()?.setSearch?.(event.target.value)
+    value,
+    onChange: (event) => {
+      const next = event.target.value;
+      onChange?.(next);
+      runtime()?.setSearch?.(next);
+    }
   });
 }
 function markdownInline(value, keyPrefix = "i") {
@@ -12845,6 +13072,60 @@ function tableCells(line) {
   if (value.endsWith("|")) value = value.slice(0, -1);
   return value.split("|").map((cell) => cell.trim());
 }
+function LocalImage({ src, className, alt }) {
+  const [resolved, setResolved] = import_react.default.useState(() => {
+    const value = String(src || "");
+    if (!value) return "";
+    if (/^(https?:|data:|blob:|asset:)/i.test(value)) return value;
+    return "";
+  });
+  import_react.default.useEffect(() => {
+    let cancelled = false;
+    let objectUrl = "";
+    const value = String(src || "");
+    if (!value) {
+      setResolved("");
+      return void 0;
+    }
+    if (/^(https?:|data:|blob:|asset:)/i.test(value)) {
+      setResolved(value);
+      return void 0;
+    }
+    const mem2 = globalThis.__qxRaycastFsMem;
+    const key = value.replace(/\/+/g, "/").replace(/\/$/, "") || "/";
+    if (mem2?.has?.(key)) {
+      try {
+        const data = mem2.get(key);
+        const bytes = data instanceof Uint8Array ? data : data instanceof ArrayBuffer ? new Uint8Array(data) : new TextEncoder().encode(String(data ?? ""));
+        objectUrl = URL.createObjectURL(new Blob([bytes]));
+        setResolved(objectUrl);
+        return () => {
+          if (objectUrl) URL.revokeObjectURL(objectUrl);
+        };
+      } catch {
+      }
+    }
+    (async () => {
+      try {
+        const b64 = await runtime()?.context?.qx?.invokeRust?.("plugin_file_read_base64", { path: value });
+        if (cancelled || !b64) return;
+        const binary = atob(String(b64));
+        const out = new Uint8Array(binary.length);
+        for (let i = 0; i < binary.length; i++) out[i] = binary.charCodeAt(i);
+        objectUrl = URL.createObjectURL(new Blob([out]));
+        if (!cancelled) setResolved(objectUrl);
+      } catch {
+        if (!cancelled) setResolved("");
+      }
+    })();
+    return () => {
+      cancelled = true;
+      if (objectUrl) URL.revokeObjectURL(objectUrl);
+    };
+  }, [src]);
+  if (!resolved) return import_react.default.createElement("div", { className: className || "qx-raycast-thumb", "aria-hidden": true });
+  return import_react.default.createElement("img", { className, src: resolved, alt: alt || "" });
+}
 function renderMarkdown(markdown) {
   const lines = String(markdown || "").replace(/\r\n?/g, "\n").split("\n");
   const blocks = [];
@@ -12857,6 +13138,17 @@ function renderMarkdown(markdown) {
       continue;
     }
     const trimmed = line.trim();
+    const htmlImg = trimmed.match(/^<img\s+[^>]*src=["']([^"']+)["'][^>]*\/?\s*>$/i);
+    if (htmlImg) {
+      blocks.push(import_react.default.createElement(LocalImage, {
+        key: "md-" + blocks.length,
+        className: "qx-raycast-md-image",
+        src: htmlImg[1],
+        alt: ""
+      }));
+      i += 1;
+      continue;
+    }
     if (trimmed.startsWith(codeFence)) {
       const code = [];
       i += 1;
@@ -12873,6 +13165,17 @@ function renderMarkdown(markdown) {
     if (heading) {
       const level = Math.min(heading[1].length, 3);
       blocks.push(import_react.default.createElement("h" + level, { key: "md-" + blocks.length }, markdownInline(heading[2], "h" + i)));
+      i += 1;
+      continue;
+    }
+    const mdImage = trimmed.match(/^!\[([^\]]*)\]\(([^)]+)\)$/);
+    if (mdImage) {
+      blocks.push(import_react.default.createElement(LocalImage, {
+        key: "md-" + blocks.length,
+        className: "qx-raycast-md-image",
+        src: mdImage[2],
+        alt: mdImage[1] || ""
+      }));
       i += 1;
       continue;
     }
@@ -12912,20 +13215,52 @@ function renderMarkdown(markdown) {
   }
   return import_react.default.createElement("div", { className: "qx-raycast-md" }, blocks);
 }
-function ItemShell({ title, subtitle, icon, accessories, actions, children, image }) {
-  const action = firstAction(actions);
+function ItemShell({ title, subtitle, icon, accessories, actions, children, image, id }) {
+  ensureKeyboardNav();
+  const itemId = String(id || title || Math.random());
+  const actionList = import_react.default.useMemo(() => collectActions(actions), [actions]);
+  const primary = actionList[0] || null;
+  const actionIds = import_react.default.useMemo(() => registerActionHandlers(actionList), [actionList]);
+  const imageSrc = mediaSource(image);
+  const iconSrc = mediaSource(icon);
   return import_react.default.createElement(
     "div",
     {
-      role: "button",
+      role: "option",
       tabIndex: 0,
+      "data-qx-raycast-item": itemId,
+      "data-primary-action": actionIds[0] || "",
+      "data-action-ids": actionIds.join(","),
+      "aria-selected": "false",
       className: "qx-raycast-item",
-      onClick: () => runAction(action),
+      onClick: (event) => {
+        if (event.target?.closest?.(".qx-raycast-action-button")) return;
+        document.querySelectorAll("[data-qx-raycast-item].is-selected").forEach((el) => {
+          el.classList.remove("is-selected");
+          el.setAttribute("aria-selected", "false");
+        });
+        event.currentTarget.classList.add("is-selected");
+        event.currentTarget.setAttribute("aria-selected", "true");
+        updateActionDock(event.currentTarget);
+        runAction(primary);
+      },
+      onFocus: (event) => {
+        document.querySelectorAll("[data-qx-raycast-item].is-selected").forEach((el) => {
+          el.classList.remove("is-selected");
+          el.setAttribute("aria-selected", "false");
+        });
+        event.currentTarget.classList.add("is-selected");
+        event.currentTarget.setAttribute("aria-selected", "true");
+        updateActionDock(event.currentTarget);
+      },
       onKeyDown: (event) => {
-        if (event.key === "Enter" || event.key === " ") runAction(action);
+        if (event.key === "Enter") {
+          event.preventDefault();
+          runAction(primary);
+        }
       }
     },
-    image ? import_react.default.createElement("img", { className: "qx-raycast-thumb", src: typeof image === "string" ? image : image?.source || image }) : import_react.default.createElement("span", { className: "qx-raycast-icon" }, textOf(icon)),
+    imageSrc ? import_react.default.createElement(LocalImage, { className: "qx-raycast-thumb", src: imageSrc, alt: textOf(title) }) : iconSrc ? import_react.default.createElement(LocalImage, { className: "qx-raycast-thumb qx-raycast-thumb-icon", src: iconSrc, alt: "" }) : import_react.default.createElement("span", { className: "qx-raycast-icon" }, textOf(icon) || "\u{1F5BC}"),
     import_react.default.createElement(
       "span",
       { className: "qx-raycast-item-main" },
@@ -12934,28 +13269,119 @@ function ItemShell({ title, subtitle, icon, accessories, actions, children, imag
       children
     ),
     accessories ? import_react.default.createElement("span", { className: "qx-raycast-accessory" }, textOf(Array.isArray(accessories) ? accessories[0] : accessories)) : null,
-    actions
+    // Always keep a compact action strip for the card so Download/Preview work
+    // even when the global ActionPanel preference hides inline rows.
+    actionList.length ? import_react.default.createElement("div", {
+      className: "qx-raycast-item-actions",
+      onClick: (event) => event.stopPropagation()
+    }, actionList.slice(0, 4).map((action, index) => {
+      const resolved = normalizeActionElement(action) || action;
+      return import_react.default.createElement("button", {
+        key: actionIds[index] || index,
+        type: "button",
+        className: "qx-raycast-action-button",
+        onClick: (event) => {
+          event.stopPropagation();
+          runAction(resolved);
+        }
+      }, actionTitle(resolved));
+    })) : null,
+    // Keep original ActionPanel tree for compatibility, but hide visually if we
+    // already rendered item actions.
+    actionList.length ? null : actions
   );
 }
+function collectSearchText(node, parts = []) {
+  if (node == null || node === false) return parts;
+  if (typeof node === "string" || typeof node === "number") {
+    parts.push(String(node));
+    return parts;
+  }
+  if (Array.isArray(node)) {
+    for (const child of node) collectSearchText(child, parts);
+    return parts;
+  }
+  if (!import_react.default.isValidElement(node)) return parts;
+  const props = node.props || {};
+  if (props.title) parts.push(textOf(props.title));
+  if (props.subtitle) parts.push(textOf(props.subtitle));
+  if (props.children) collectSearchText(props.children, parts);
+  return parts;
+}
+function filterChildrenBySearch(children, query) {
+  const q = String(query || "").trim().toLowerCase();
+  if (!q) return children;
+  return import_react.default.Children.toArray(children).filter((child) => {
+    if (!import_react.default.isValidElement(child)) return true;
+    if (child.type === List.Section || child.type === Grid.Section) {
+      const filtered = filterChildrenBySearch(child.props.children, q);
+      return import_react.default.Children.count(filtered) > 0;
+    }
+    const hay = collectSearchText(child).join(" ").toLowerCase();
+    return hay.includes(q);
+  }).map((child) => {
+    if (!import_react.default.isValidElement(child)) return child;
+    if (child.type === List.Section || child.type === Grid.Section) {
+      return import_react.default.cloneElement(child, {
+        children: filterChildrenBySearch(child.props.children, q)
+      });
+    }
+    return child;
+  });
+}
 function List(props) {
+  const [query, setQuery] = import_react.default.useState("");
+  import_react.default.useEffect(() => {
+    ensureKeyboardNav();
+  }, []);
+  const children = filterChildrenBySearch(props.children, props.onSearchTextChange ? "" : query);
   return import_react.default.createElement(
     "div",
     { className: "qx-raycast-view" },
-    import_react.default.createElement(SearchInput, { placeholder: props.searchBarPlaceholder }),
+    import_react.default.createElement(SearchInput, {
+      placeholder: props.searchBarPlaceholder,
+      onChange: (value) => {
+        setQuery(value);
+        props.onSearchTextChange?.(value);
+      }
+    }),
     props.isLoading ? import_react.default.createElement("div", { className: "qx-raycast-loading" }, "Loading...") : null,
-    import_react.default.createElement("div", { className: "qx-raycast-list" }, props.children)
+    import_react.default.createElement("div", { className: "qx-raycast-list", role: "listbox" }, children)
   );
 }
 function Grid(props) {
+  const [query, setQuery] = import_react.default.useState("");
+  import_react.default.useEffect(() => {
+    ensureKeyboardNav();
+  }, []);
+  const columns2 = Number(props.columns) > 0 ? Number(props.columns) : void 0;
+  const children = filterChildrenBySearch(props.children, props.onSearchTextChange ? "" : query);
   return import_react.default.createElement(
     "div",
     { className: "qx-raycast-view" },
-    import_react.default.createElement(SearchInput, { placeholder: props.searchBarPlaceholder }),
+    import_react.default.createElement(SearchInput, {
+      placeholder: props.searchBarPlaceholder,
+      onChange: (value) => {
+        setQuery(value);
+        props.onSearchTextChange?.(value);
+      }
+    }),
     props.isLoading ? import_react.default.createElement("div", { className: "qx-raycast-loading" }, "Loading...") : null,
-    import_react.default.createElement("div", { className: "qx-raycast-grid" }, props.children)
+    import_react.default.createElement("div", {
+      className: "qx-raycast-grid",
+      role: "listbox",
+      style: columns2 ? { gridTemplateColumns: "repeat(" + columns2 + ", minmax(0, 1fr))" } : void 0
+    }, children)
   );
 }
 function Detail(props) {
+  import_react.default.useEffect(() => {
+    const actions = collectActions(props.actions);
+    const ids = registerActionHandlers(actions);
+    const fake = document.createElement("div");
+    fake.setAttribute("data-action-ids", ids.join(","));
+    updateActionDock(fake);
+  }, [props.actions]);
   return import_react.default.createElement(
     "div",
     { className: "qx-raycast-detail" },
@@ -12971,7 +13397,7 @@ var import_react, defaultPreferenceValues, defaultEnvironmentSupportPath, Icon, 
 var init_api = __esm({
   "qx-virtual:@raycast/api"() {
     import_react = __toESM(require_react());
-    defaultPreferenceValues = { "layout": "Grid", "columns": "5", "applyTo": "every", "downloadDirectory": "~/Downloads", "downloadSize": "raw", "autoDownload": false, "includeDownloadedWallpapers": true, "refreshInterval": "30" };
+    defaultPreferenceValues = { "layout": "Grid", "columns": "5", "applyTo": "every", "downloadDirectory": "~/Downloads", "downloadSize": "raw", "autoDownload": false, "includeDownloadedWallpapers": true, "refreshInterval": "1440" };
     defaultEnvironmentSupportPath = "/qx-plugin-files/raycast-bing-wallpaper";
     Icon = {
       Info: "info",
@@ -12982,7 +13408,17 @@ var init_api = __esm({
       Gear: "gear",
       Link: "link",
       Trash: "trash",
-      XMarkCircle: "x"
+      XMarkCircle: "x",
+      ChevronDown: "\u2193",
+      ChevronUp: "\u2191",
+      ChevronLeft: "\u2190",
+      ChevronRight: "\u2192",
+      Finder: "finder",
+      Repeat: "repeat",
+      MagnifyingGlass: "search",
+      Globe: "globe",
+      ArrowClockwise: "refresh",
+      Sidebar: "sidebar"
     };
     Toast = {
       Style: {
@@ -13002,6 +13438,8 @@ var init_api = __esm({
         return runtime()?.activeCommand || "index";
       },
       get launchType() {
+        const value = runtime()?.launchType || globalThis.__qxRaycastLaunchType;
+        if (value === LaunchType.Background || value === "background") return LaunchType.Background;
         return LaunchType.UserInitiated;
       }
     };
@@ -13012,20 +13450,53 @@ var init_api = __esm({
     Cache = class {
       constructor(options = {}) {
         this.namespace = options.namespace || "default";
+        this.capacity = options.capacity;
+      }
+      storageKey(key) {
+        const plugin = runtime()?.supportPath || defaultEnvironmentSupportPath || "qx";
+        return "qx:raycast-cache:" + plugin + ":" + this.namespace + ":" + key;
       }
       key(key) {
         return "raycast-cache:" + this.namespace + ":" + key;
       }
       get(key) {
-        return runtime()?.cache?.get(this.key(key));
+        const memKey = this.key(key);
+        const mem2 = runtime()?.cache?.get(memKey);
+        if (mem2 != null) return mem2;
+        try {
+          const raw = globalThis.localStorage?.getItem(this.storageKey(key));
+          if (raw == null) return void 0;
+          runtime()?.cache?.set(memKey, raw);
+          return raw;
+        } catch {
+          return void 0;
+        }
       }
       set(key, value) {
-        runtime()?.cache?.set(this.key(key), value);
+        const memKey = this.key(key);
+        const text = value == null ? "" : String(value);
+        runtime()?.cache?.set(memKey, text);
+        try {
+          globalThis.localStorage?.setItem(this.storageKey(key), text);
+        } catch {
+        }
       }
       remove(key) {
-        runtime()?.cache?.delete(this.key(key));
+        const memKey = this.key(key);
+        runtime()?.cache?.delete(memKey);
+        try {
+          globalThis.localStorage?.removeItem(this.storageKey(key));
+        } catch {
+        }
       }
       clear() {
+        const prefix = "raycast-cache:" + this.namespace + ":";
+        const cache2 = runtime()?.cache;
+        if (cache2 && typeof cache2.keys === "function") {
+          for (const k of [...cache2.keys()]) {
+            if (String(k).startsWith(prefix)) cache2.delete(k);
+          }
+        }
       }
     };
     Clipboard = {
@@ -13048,8 +13519,11 @@ var init_api = __esm({
       return import_react.default.createElement(Action, { ...props, onAction: () => Clipboard.copy(props.content), title: props.title || "Copy" });
     };
     Action.Push = function ActionPush(props) {
-      const nav = useNavigation();
-      return import_react.default.createElement(Action, { ...props, onAction: () => nav.push(props.target), title: props.title || "Open" });
+      return import_react.default.createElement(Action, {
+        ...props,
+        onAction: () => useNavigation().push(props.target),
+        title: props.title || "Open"
+      });
     };
     List.Item = function ListItem(props) {
       return import_react.default.createElement(ItemShell, props);
@@ -13071,6 +13545,10 @@ var init_api = __esm({
     List.Dropdown.Item = function ListDropdownItem() {
       return null;
     };
+    List.Item.Detail = function ListItemDetail(props) {
+      if (props.markdown) return import_react.default.createElement("div", { className: "qx-raycast-item-detail" }, renderMarkdown(props.markdown));
+      return import_react.default.createElement("div", { className: "qx-raycast-item-detail" }, props.children || null);
+    };
     Grid.Item = function GridItem(props) {
       return import_react.default.createElement(ItemShell, { ...props, image: props.content });
     };
@@ -13085,7 +13563,7 @@ var init_api = __esm({
 // raycast-source/bing-wallpaper/src/types/preferences.ts
 var layout, columns, applyTo, downloadSize, downloadDirectory, autoDownload, includeDownloadedWallpapers, refreshInterval;
 var init_preferences = __esm({
-  "../../../../../private/var/folders/ng/zj6dzdcj0vx8chjb0yp1t4740000gn/T/qx-raycast-url-oY0Fl6/repo/extensions/bing-wallpaper/src/types/preferences.ts"() {
+  "../../../../../private/var/folders/ng/zj6dzdcj0vx8chjb0yp1t4740000gn/T/qx-raycast-url-OYia2Z/repo/extensions/bing-wallpaper/src/types/preferences.ts"() {
     "use strict";
     init_api();
     ({ layout, columns, applyTo, downloadSize, downloadDirectory, autoDownload, includeDownloadedWallpapers } = getPreferenceValues());
@@ -13128,7 +13606,7 @@ var init_node_fetch = __esm({
 // raycast-source/bing-wallpaper/src/utils/bing-wallpaper-utils.ts
 var buildBingWallpapersURL, buildBingImageURL, buildCopyrightURL, getPictureName;
 var init_bing_wallpaper_utils = __esm({
-  "../../../../../private/var/folders/ng/zj6dzdcj0vx8chjb0yp1t4740000gn/T/qx-raycast-url-oY0Fl6/repo/extensions/bing-wallpaper/src/utils/bing-wallpaper-utils.ts"() {
+  "../../../../../private/var/folders/ng/zj6dzdcj0vx8chjb0yp1t4740000gn/T/qx-raycast-url-OYia2Z/repo/extensions/bing-wallpaper/src/utils/bing-wallpaper-utils.ts"() {
     "use strict";
     buildBingWallpapersURL = (wallpaperDate = 0, count = 8) => {
       return `https://www.bing.com/HPImageArchive.aspx?format=js&idx=${wallpaperDate}&n=${count}&pid=hp&uhd=1&uhdwidth=3840&uhdheight=2160`;
@@ -13228,7 +13706,9 @@ function existsSync(path) {
 function pathExistsSync(path) {
   const value = normalizePath(path);
   if (existsSync(value)) return true;
+  if (dirListCache.has(value)) return true;
   if (value.startsWith("/qx-plugin-files/")) return true;
+  if (value === "/qx-home" || value.startsWith("/qx-home/")) return true;
   return [...mem.keys()].some((key) => key.startsWith(value + "/"));
 }
 async function pathExists(path) {
@@ -13245,9 +13725,18 @@ async function pathExists(path) {
 function readdirSync(dir) {
   const folder = normalizePath(dir);
   const names = /* @__PURE__ */ new Set();
+  if (dirListCache.has(folder)) {
+    for (const name of dirListCache.get(folder)) names.add(name);
+  }
   for (const key of mem.keys()) {
     if (dirname(key) === folder) names.add(basename(key));
   }
+  void runtime2()?.context?.qx?.invokeRust?.("plugin_file_list", { path: folder }).then((list) => {
+    if (Array.isArray(list) && typeof globalThis.__qxRaycastFsHydrate === "function") {
+      globalThis.__qxRaycastFsHydrate(folder, list);
+    }
+  }).catch(() => {
+  });
   return [...names];
 }
 async function emptydir(dir) {
@@ -13312,11 +13801,26 @@ async function writeJson(path, value, options) {
   const spaces = options?.spaces ?? 2;
   return writeFile(path, JSON.stringify(value, null, spaces));
 }
-var mem, dirs, mkdirp, fs_extra_default;
+var mem, dirs, dirListCache, mkdirp, fs_extra_default;
 var init_fs_extra = __esm({
   "qx-virtual:fs-extra"() {
     mem = /* @__PURE__ */ new Map();
     dirs = /* @__PURE__ */ new Set(["/"]);
+    dirListCache = /* @__PURE__ */ new Map();
+    globalThis.__qxRaycastFsMem = mem;
+    globalThis.__qxRaycastFsDirs = dirs;
+    globalThis.__qxRaycastFsDirList = dirListCache;
+    globalThis.__qxRaycastFsHydrate = function hydrateDir(dir, names) {
+      const folder = String(dir || "").replace(/\/+/g, "/").replace(/\/$/, "") || "/";
+      dirs.add(folder);
+      let current = folder;
+      while (current && current !== "/") {
+        const slash = current.lastIndexOf("/");
+        current = slash <= 0 ? "/" : current.slice(0, slash);
+        dirs.add(current);
+      }
+      if (Array.isArray(names)) dirListCache.set(folder, names.map(String));
+    };
     mkdirp = ensureDir;
     fs_extra_default = { existsSync, pathExistsSync, pathExists, readdirSync, emptydir, ensureDir, mkdirp, writeFile, writeFileSync, readFile, readFileSync, readJson, writeJson };
   }
@@ -13345,7 +13849,7 @@ var init_os = __esm({
 // raycast-source/bing-wallpaper/src/utils/constants.ts
 var WallpaperTag, wallpaperTags, wallpaperImageExtension;
 var init_constants = __esm({
-  "../../../../../private/var/folders/ng/zj6dzdcj0vx8chjb0yp1t4740000gn/T/qx-raycast-url-oY0Fl6/repo/extensions/bing-wallpaper/src/utils/constants.ts"() {
+  "../../../../../private/var/folders/ng/zj6dzdcj0vx8chjb0yp1t4740000gn/T/qx-raycast-url-OYia2Z/repo/extensions/bing-wallpaper/src/utils/constants.ts"() {
     "use strict";
     WallpaperTag = /* @__PURE__ */ ((WallpaperTag2) => {
       WallpaperTag2["ALL"] = "All";
@@ -13380,7 +13884,7 @@ var init_path = __esm({
 // raycast-source/bing-wallpaper/src/utils/script-utils.ts
 var scriptSetWallpaper;
 var init_script_utils = __esm({
-  "../../../../../private/var/folders/ng/zj6dzdcj0vx8chjb0yp1t4740000gn/T/qx-raycast-url-oY0Fl6/repo/extensions/bing-wallpaper/src/utils/script-utils.ts"() {
+  "../../../../../private/var/folders/ng/zj6dzdcj0vx8chjb0yp1t4740000gn/T/qx-raycast-url-OYia2Z/repo/extensions/bing-wallpaper/src/utils/script-utils.ts"() {
     "use strict";
     init_preferences();
     scriptSetWallpaper = (path) => {
@@ -13492,7 +13996,7 @@ function getDownloadedBingWallpapers() {
 }
 var cachePath, isEmpty, buildCachePath, setOnlineWallpaper, setLocalWallpaper, getPicturesDirectory;
 var init_common_utils = __esm({
-  "../../../../../private/var/folders/ng/zj6dzdcj0vx8chjb0yp1t4740000gn/T/qx-raycast-url-oY0Fl6/repo/extensions/bing-wallpaper/src/utils/common-utils.ts"() {
+  "../../../../../private/var/folders/ng/zj6dzdcj0vx8chjb0yp1t4740000gn/T/qx-raycast-url-OYia2Z/repo/extensions/bing-wallpaper/src/utils/common-utils.ts"() {
     "use strict";
     init_api();
     init_fs_extra();
@@ -13581,7 +14085,7 @@ var init_common_utils = __esm({
 // raycast-source/bing-wallpaper/src/hooks/hooks.ts
 var import_react2, getBingWallpapers, autoDownloadWallpapers;
 var init_hooks = __esm({
-  "../../../../../private/var/folders/ng/zj6dzdcj0vx8chjb0yp1t4740000gn/T/qx-raycast-url-oY0Fl6/repo/extensions/bing-wallpaper/src/hooks/hooks.ts"() {
+  "../../../../../private/var/folders/ng/zj6dzdcj0vx8chjb0yp1t4740000gn/T/qx-raycast-url-OYia2Z/repo/extensions/bing-wallpaper/src/hooks/hooks.ts"() {
     "use strict";
     init_node_fetch();
     init_bing_wallpaper_utils();
@@ -13699,7 +14203,7 @@ function ActionOpenExtensionPreferences() {
 }
 var import_jsx_runtime;
 var init_action_open_extension_preferences = __esm({
-  "../../../../../private/var/folders/ng/zj6dzdcj0vx8chjb0yp1t4740000gn/T/qx-raycast-url-oY0Fl6/repo/extensions/bing-wallpaper/src/components/action-open-extension-preferences.tsx"() {
+  "../../../../../private/var/folders/ng/zj6dzdcj0vx8chjb0yp1t4740000gn/T/qx-raycast-url-OYia2Z/repo/extensions/bing-wallpaper/src/components/action-open-extension-preferences.tsx"() {
     "use strict";
     init_api();
     import_jsx_runtime = __toESM(require_jsx_runtime());
@@ -13729,7 +14233,7 @@ function ListEmptyView2(props) {
 }
 var import_jsx_runtime2;
 var init_list_empty_view = __esm({
-  "../../../../../private/var/folders/ng/zj6dzdcj0vx8chjb0yp1t4740000gn/T/qx-raycast-url-oY0Fl6/repo/extensions/bing-wallpaper/src/components/list-empty-view.tsx"() {
+  "../../../../../private/var/folders/ng/zj6dzdcj0vx8chjb0yp1t4740000gn/T/qx-raycast-url-OYia2Z/repo/extensions/bing-wallpaper/src/components/list-empty-view.tsx"() {
     "use strict";
     init_api();
     init_action_open_extension_preferences();
@@ -13829,7 +14333,7 @@ function PreviewBingWallpaper(props) {
 }
 var import_react3, import_jsx_runtime3;
 var init_preview_bing_wallpaper = __esm({
-  "../../../../../private/var/folders/ng/zj6dzdcj0vx8chjb0yp1t4740000gn/T/qx-raycast-url-oY0Fl6/repo/extensions/bing-wallpaper/src/preview-bing-wallpaper.tsx"() {
+  "../../../../../private/var/folders/ng/zj6dzdcj0vx8chjb0yp1t4740000gn/T/qx-raycast-url-OYia2Z/repo/extensions/bing-wallpaper/src/preview-bing-wallpaper.tsx"() {
     "use strict";
     init_api();
     import_react3 = __toESM(require_react());
@@ -13943,7 +14447,7 @@ function ActionsOnlineBingWallpaper(props) {
 }
 var import_jsx_runtime4;
 var init_actions_online_bing_wallpaper = __esm({
-  "../../../../../private/var/folders/ng/zj6dzdcj0vx8chjb0yp1t4740000gn/T/qx-raycast-url-oY0Fl6/repo/extensions/bing-wallpaper/src/components/actions-online-bing-wallpaper.tsx"() {
+  "../../../../../private/var/folders/ng/zj6dzdcj0vx8chjb0yp1t4740000gn/T/qx-raycast-url-OYia2Z/repo/extensions/bing-wallpaper/src/components/actions-online-bing-wallpaper.tsx"() {
     "use strict";
     init_api();
     init_common_utils();
@@ -14029,7 +14533,7 @@ function ActionsDownloadedBingWallpaper(props) {
 }
 var import_jsx_runtime5;
 var init_actions_downloaded_bing_wallpaper = __esm({
-  "../../../../../private/var/folders/ng/zj6dzdcj0vx8chjb0yp1t4740000gn/T/qx-raycast-url-oY0Fl6/repo/extensions/bing-wallpaper/src/components/actions-downloaded-bing-wallpaper.tsx"() {
+  "../../../../../private/var/folders/ng/zj6dzdcj0vx8chjb0yp1t4740000gn/T/qx-raycast-url-OYia2Z/repo/extensions/bing-wallpaper/src/components/actions-downloaded-bing-wallpaper.tsx"() {
     "use strict";
     init_api();
     init_action_open_extension_preferences();
@@ -14119,7 +14623,7 @@ ${bingImage.copyright}`
 }
 var import_react4, import_jsx_runtime6;
 var init_wallpaper_list_layout = __esm({
-  "../../../../../private/var/folders/ng/zj6dzdcj0vx8chjb0yp1t4740000gn/T/qx-raycast-url-oY0Fl6/repo/extensions/bing-wallpaper/src/components/wallpaper-list-layout.tsx"() {
+  "../../../../../private/var/folders/ng/zj6dzdcj0vx8chjb0yp1t4740000gn/T/qx-raycast-url-OYia2Z/repo/extensions/bing-wallpaper/src/components/wallpaper-list-layout.tsx"() {
     "use strict";
     init_api();
     import_react4 = __toESM(require_react());
@@ -14198,7 +14702,7 @@ function WallpaperGridLayout(props) {
 }
 var import_react5, import_jsx_runtime7;
 var init_wallpaper_grid_layout = __esm({
-  "../../../../../private/var/folders/ng/zj6dzdcj0vx8chjb0yp1t4740000gn/T/qx-raycast-url-oY0Fl6/repo/extensions/bing-wallpaper/src/components/wallpaper-grid-layout.tsx"() {
+  "../../../../../private/var/folders/ng/zj6dzdcj0vx8chjb0yp1t4740000gn/T/qx-raycast-url-OYia2Z/repo/extensions/bing-wallpaper/src/components/wallpaper-grid-layout.tsx"() {
     "use strict";
     init_api();
     import_react5 = __toESM(require_react());
@@ -14238,7 +14742,7 @@ function CommonDirectory() {
 }
 var import_jsx_runtime8;
 var init_set_bing_wallpaper = __esm({
-  "../../../../../private/var/folders/ng/zj6dzdcj0vx8chjb0yp1t4740000gn/T/qx-raycast-url-oY0Fl6/repo/extensions/bing-wallpaper/src/set-bing-wallpaper.tsx"() {
+  "../../../../../private/var/folders/ng/zj6dzdcj0vx8chjb0yp1t4740000gn/T/qx-raycast-url-OYia2Z/repo/extensions/bing-wallpaper/src/set-bing-wallpaper.tsx"() {
     "use strict";
     init_preferences();
     init_hooks();
@@ -14260,7 +14764,7 @@ function recordRefresh() {
 }
 var cache, ONE_MINUTE, KEY_LAST_REFRESH;
 var init_refresh_record = __esm({
-  "../../../../../private/var/folders/ng/zj6dzdcj0vx8chjb0yp1t4740000gn/T/qx-raycast-url-oY0Fl6/repo/extensions/bing-wallpaper/src/utils/refresh-record.ts"() {
+  "../../../../../private/var/folders/ng/zj6dzdcj0vx8chjb0yp1t4740000gn/T/qx-raycast-url-OYia2Z/repo/extensions/bing-wallpaper/src/utils/refresh-record.ts"() {
     "use strict";
     init_preferences();
     init_api();
@@ -14278,7 +14782,7 @@ __export(auto_random_bing_wallpaper_exports, {
 });
 var auto_random_bing_wallpaper_default, getRandomWallpaper;
 var init_auto_random_bing_wallpaper = __esm({
-  "../../../../../private/var/folders/ng/zj6dzdcj0vx8chjb0yp1t4740000gn/T/qx-raycast-url-oY0Fl6/repo/extensions/bing-wallpaper/src/auto-random-bing-wallpaper.ts"() {
+  "../../../../../private/var/folders/ng/zj6dzdcj0vx8chjb0yp1t4740000gn/T/qx-raycast-url-OYia2Z/repo/extensions/bing-wallpaper/src/auto-random-bing-wallpaper.ts"() {
     "use strict";
     init_node_fetch();
     init_bing_wallpaper_utils();
@@ -14356,7 +14860,7 @@ __export(auto_switch_bing_wallpaper_exports, {
 });
 var auto_switch_bing_wallpaper_default, getLatestWallpaper;
 var init_auto_switch_bing_wallpaper = __esm({
-  "../../../../../private/var/folders/ng/zj6dzdcj0vx8chjb0yp1t4740000gn/T/qx-raycast-url-oY0Fl6/repo/extensions/bing-wallpaper/src/auto-switch-bing-wallpaper.ts"() {
+  "../../../../../private/var/folders/ng/zj6dzdcj0vx8chjb0yp1t4740000gn/T/qx-raycast-url-OYia2Z/repo/extensions/bing-wallpaper/src/auto-switch-bing-wallpaper.ts"() {
     "use strict";
     init_node_fetch();
     init_bing_wallpaper_utils();
@@ -14415,7 +14919,7 @@ function injectRaycastStyles() {
   if (document.getElementById("qx-raycast-shim-style")) return;
   const style = document.createElement("style");
   style.id = "qx-raycast-shim-style";
-  style.textContent = '\n    html,body,#root{margin:0;width:100%;height:100%;background:transparent;color:var(--qx-text-primary,#111);font:13px -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;}\n    .qx-raycast-view{box-sizing:border-box;height:100%;display:flex;flex-direction:column;gap:10px;padding:14px;overflow:hidden;}\n    .qx-raycast-search{height:34px;border:1px solid var(--qx-border-1,#ddd);border-radius:7px;background:var(--qx-bg-component-1,#fff);color:inherit;padding:0 10px;font:inherit;outline:none;}\n    .qx-raycast-list{display:flex;flex-direction:column;gap:4px;overflow:auto;min-height:0;}\n    .qx-raycast-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(148px,1fr));gap:10px;overflow:auto;min-height:0;}\n    .qx-raycast-section{display:contents;}\n    .qx-raycast-section h2{grid-column:1/-1;margin:10px 0 2px;color:var(--qx-text-tertiary,#777);font-size:11px;text-transform:uppercase;letter-spacing:.08em;}\n    .qx-raycast-item{min-width:0;display:flex;align-items:center;gap:10px;border:0;border-radius:7px;background:transparent;color:inherit;text-align:left;padding:8px;cursor:pointer;font:inherit;}\n    .qx-raycast-grid .qx-raycast-item{display:flex;flex-direction:column;align-items:stretch;padding:0;overflow:hidden;background:var(--qx-bg-component-1,#fff);border:1px solid var(--qx-border-1,#ddd);}\n    .qx-raycast-item:hover{background:var(--qx-bg-component-2,#f5f5f5);}\n    .qx-raycast-thumb{width:100%;aspect-ratio:16/9;object-fit:cover;background:var(--qx-bg-component-2,#eee);}\n    .qx-raycast-list .qx-raycast-thumb{width:52px;height:34px;border-radius:5px;flex:0 0 auto;}\n    .qx-raycast-icon{width:22px;min-height:22px;display:inline-flex;align-items:center;justify-content:center;color:var(--qx-text-tertiary,#777);}\n    .qx-raycast-item-main{min-width:0;display:flex;flex-direction:column;gap:2px;padding:6px;}\n    .qx-raycast-item-main strong,.qx-raycast-item-main small{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}\n    .qx-raycast-item-main small,.qx-raycast-accessory{color:var(--qx-text-secondary,#666);}\n    .qx-raycast-loading,.qx-raycast-empty,.qx-raycast-detail{padding:18px;color:var(--qx-text-secondary,#666);overflow:auto;}\n    .qx-raycast-detail{box-sizing:border-box;height:100%;}\n    .qx-raycast-md{color:var(--qx-text-primary,#111);line-height:1.45;max-width:100%;overflow:auto;}\n    .qx-raycast-md h1,.qx-raycast-md h2,.qx-raycast-md h3{margin:0 0 10px;color:var(--qx-text-primary,#111);line-height:1.2;}\n    .qx-raycast-md h1{font-size:22px;}.qx-raycast-md h2{font-size:18px;}.qx-raycast-md h3{font-size:15px;}\n    .qx-raycast-md p{margin:0 0 10px;}.qx-raycast-md ul{margin:0 0 10px 18px;padding:0;}\n    .qx-raycast-md code{font-family:ui-monospace,SFMono-Regular,SF Mono,Menlo,Consolas,monospace;background:var(--qx-bg-component-2,#f5f5f5);border-radius:4px;padding:1px 4px;}\n    .qx-raycast-md pre{margin:0 0 12px;white-space:pre-wrap;color:var(--qx-text-primary,#111);font:12px ui-monospace,SFMono-Regular,SF Mono,Menlo,Consolas,monospace;background:var(--qx-bg-component-1,#fff);border:1px solid var(--qx-border-1,#ddd);border-radius:7px;padding:10px;overflow:auto;}\n    .qx-raycast-md-table{border-collapse:collapse;width:max-content;max-width:100%;margin:0 0 12px;font-variant-numeric:tabular-nums;}\n    .qx-raycast-md-table th,.qx-raycast-md-table td{border:1px solid var(--qx-border-1,#ddd);padding:5px 8px;text-align:center;white-space:nowrap;}\n    .qx-raycast-md-table th{background:var(--qx-bg-component-2,#f5f5f5);font-weight:650;}\n    .qx-raycast-md a{color:var(--qx-accent,#2563eb);text-decoration:none;}.qx-raycast-md a:hover{text-decoration:underline;}\n    .qx-raycast-actions-inline{display:flex;align-items:center;justify-content:flex-end;gap:6px;flex:0 1 min(42%,360px);margin-left:auto;min-width:0;max-width:min(42%,360px);overflow:hidden;padding:4px 6px 4px 0;}\n    .qx-raycast-actions-inline.is-hidden{display:none;}\n    .qx-raycast-action-button{border:1px solid var(--qx-border-1,#ddd);background:var(--qx-bg-component-1,#fff);color:inherit;border-radius:6px;padding:4px 7px;font:inherit;font-size:11px;cursor:pointer;}\n    .qx-raycast-action-button{min-width:0;max-width:120px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}\n    .qx-raycast-action-button:hover{background:var(--qx-bg-component-2,#f5f5f5);}\n    .qx-raycast-grid .qx-raycast-actions-inline{margin-left:0;max-width:100%;width:100%;justify-content:flex-start;padding:0 8px 8px;}\n    .qx-raycast-detail > .qx-raycast-actions-inline{justify-content:flex-start;margin:12px 0 0;max-width:100%;padding:0;overflow:visible;}\n    :root[data-qx-raycast-action-panel="hidden"] .qx-raycast-actions-inline{display:none;}\n    @media (max-width: 680px){.qx-raycast-actions-inline{display:none;}}\n  ';
+  style.textContent = '\n    html,body,#root{margin:0;width:100%;height:100%;background:transparent;color:var(--qx-text-primary,#111);font:13px -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;}\n    .qx-raycast-view{box-sizing:border-box;height:100%;display:flex;flex-direction:column;gap:10px;padding:14px;overflow:hidden;}\n    .qx-raycast-search{height:34px;border:1px solid var(--qx-border-1,#ddd);border-radius:7px;background:var(--qx-bg-component-1,#fff);color:inherit;padding:0 10px;font:inherit;outline:none;}\n    .qx-raycast-list{display:flex;flex-direction:column;gap:4px;overflow:auto;min-height:0;}\n    .qx-raycast-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(148px,1fr));gap:10px;overflow:auto;min-height:0;}\n    .qx-raycast-section{display:contents;}\n    .qx-raycast-section h2{grid-column:1/-1;margin:10px 0 2px;color:var(--qx-text-tertiary,#777);font-size:11px;text-transform:uppercase;letter-spacing:.08em;}\n    .qx-raycast-view{padding-bottom:52px;}\n    .qx-raycast-item{min-width:0;display:flex;align-items:center;gap:10px;border:0;border-radius:7px;background:transparent;color:inherit;text-align:left;padding:8px;cursor:pointer;font:inherit;outline:none;}\n    .qx-raycast-grid .qx-raycast-item{display:flex;flex-direction:column;align-items:stretch;padding:0;overflow:hidden;background:var(--qx-bg-component-1,#fff);border:1px solid var(--qx-border-1,#ddd);}\n    .qx-raycast-item:hover{background:var(--qx-bg-component-2,#f5f5f5);}\n    .qx-raycast-item.is-selected,.qx-raycast-item:focus{background:var(--qx-bg-component-2,#f0f4ff);box-shadow:inset 0 0 0 1px var(--qx-accent,#2563eb);}\n    .qx-raycast-grid .qx-raycast-item.is-selected,.qx-raycast-grid .qx-raycast-item:focus{box-shadow:0 0 0 2px var(--qx-accent,#2563eb);}\n    .qx-raycast-thumb{width:100%;aspect-ratio:16/9;object-fit:cover;background:var(--qx-bg-component-2,#eee);display:block;}\n    .qx-raycast-list .qx-raycast-thumb,.qx-raycast-thumb-icon{width:52px;height:34px;border-radius:5px;flex:0 0 auto;}\n    .qx-raycast-icon{width:22px;min-height:22px;display:inline-flex;align-items:center;justify-content:center;color:var(--qx-text-tertiary,#777);}\n    .qx-raycast-item-main{min-width:0;display:flex;flex-direction:column;gap:2px;padding:6px;}\n    .qx-raycast-item-main strong,.qx-raycast-item-main small{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}\n    .qx-raycast-item-main small,.qx-raycast-accessory{color:var(--qx-text-secondary,#666);}\n    .qx-raycast-item-actions{display:flex;flex-wrap:wrap;gap:4px;padding:0 8px 8px;width:100%;box-sizing:border-box;}\n    .qx-raycast-list .qx-raycast-item-actions{width:auto;flex:0 0 auto;padding:0;margin-left:auto;}\n    .qx-raycast-loading,.qx-raycast-empty,.qx-raycast-detail{padding:18px;color:var(--qx-text-secondary,#666);overflow:auto;}\n    .qx-raycast-detail{box-sizing:border-box;height:100%;padding-bottom:60px;}\n    .qx-raycast-md{color:var(--qx-text-primary,#111);line-height:1.45;max-width:100%;overflow:auto;}\n    .qx-raycast-md h1,.qx-raycast-md h2,.qx-raycast-md h3{margin:0 0 10px;color:var(--qx-text-primary,#111);line-height:1.2;}\n    .qx-raycast-md h1{font-size:22px;}.qx-raycast-md h2{font-size:18px;}.qx-raycast-md h3{font-size:15px;}\n    .qx-raycast-md p{margin:0 0 10px;}.qx-raycast-md ul{margin:0 0 10px 18px;padding:0;}\n    .qx-raycast-md-image{display:block;width:100%;max-height:420px;object-fit:contain;border-radius:8px;background:var(--qx-bg-component-2,#eee);margin:0 0 12px;}\n    .qx-raycast-md code{font-family:ui-monospace,SFMono-Regular,SF Mono,Menlo,Consolas,monospace;background:var(--qx-bg-component-2,#f5f5f5);border-radius:4px;padding:1px 4px;}\n    .qx-raycast-md pre{margin:0 0 12px;white-space:pre-wrap;color:var(--qx-text-primary,#111);font:12px ui-monospace,SFMono-Regular,SF Mono,Menlo,Consolas,monospace;background:var(--qx-bg-component-1,#fff);border:1px solid var(--qx-border-1,#ddd);border-radius:7px;padding:10px;overflow:auto;}\n    .qx-raycast-md-table{border-collapse:collapse;width:max-content;max-width:100%;margin:0 0 12px;font-variant-numeric:tabular-nums;}\n    .qx-raycast-md-table th,.qx-raycast-md-table td{border:1px solid var(--qx-border-1,#ddd);padding:5px 8px;text-align:center;white-space:nowrap;}\n    .qx-raycast-md-table th{background:var(--qx-bg-component-2,#f5f5f5);font-weight:650;}\n    .qx-raycast-md a{color:var(--qx-accent,#2563eb);text-decoration:none;}.qx-raycast-md a:hover{text-decoration:underline;}\n    .qx-raycast-actions-inline{display:flex;align-items:center;justify-content:flex-end;gap:6px;flex:0 1 min(42%,360px);margin-left:auto;min-width:0;max-width:min(42%,360px);overflow:hidden;padding:4px 6px 4px 0;}\n    .qx-raycast-actions-inline.is-hidden{display:none;}\n    .qx-raycast-action-button{border:1px solid var(--qx-border-1,#ddd);background:var(--qx-bg-component-1,#fff);color:inherit;border-radius:6px;padding:4px 7px;font:inherit;font-size:11px;cursor:pointer;min-width:0;max-width:140px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}\n    .qx-raycast-action-button:hover{background:var(--qx-bg-component-2,#f5f5f5);}\n    .qx-raycast-grid .qx-raycast-actions-inline{margin-left:0;max-width:100%;width:100%;justify-content:flex-start;padding:0 8px 8px;}\n    .qx-raycast-detail > .qx-raycast-actions-inline{justify-content:flex-start;margin:12px 0 0;max-width:100%;padding:0;overflow:visible;}\n    .qx-raycast-action-dock{position:fixed;left:0;right:0;bottom:0;z-index:20;display:flex;flex-wrap:wrap;gap:6px;padding:8px 12px;background:var(--qx-bg-component-1,rgba(255,255,255,.92));border-top:1px solid var(--qx-border-1,#ddd);backdrop-filter:blur(10px);}\n    .qx-raycast-action-dock.is-empty{display:none;}\n    :root[data-qx-raycast-action-panel="hidden"] .qx-raycast-actions-inline{display:none;}\n  ';
   document.head.appendChild(style);
 }
 var commandLoaders = {
@@ -14424,14 +14928,43 @@ var commandLoaders = {
   "auto-switch-bing-wallpaper": () => Promise.resolve().then(() => (init_auto_switch_bing_wallpaper(), auto_switch_bing_wallpaper_exports))
 };
 var commandModes = { "set-bing-wallpaper": "view", "auto-random-bing-wallpaper": "no-view", "auto-switch-bing-wallpaper": "no-view" };
-var manifestCommands = [{ "name": "set-bing-wallpaper", "title": "Set Bing Wallpaper", "description": "Get, set, auto-download Bing wallpapers to explore the world.", "icon": "bing-wallpaper-icon.png", "keywords": [], "mode": "view" }, { "name": "auto-random-bing-wallpaper", "title": "Auto Random Bing Wallpaper", "description": "Auto-switch random Bing wallpapers to desktop intervally.", "icon": "random-wallpaper-icon.png", "keywords": [], "mode": "no-view", "interval": "5m" }, { "name": "auto-switch-bing-wallpaper", "title": "Auto Switch Bing Wallpaper", "description": "Auto-switch latest Bing wallpapers to desktop every day (refresh every 3 hours).", "icon": "auto-switch-wallpaper-icon.png", "keywords": [], "mode": "no-view", "interval": "30m" }];
-var preferences = { "layout": "Grid", "columns": "5", "applyTo": "every", "downloadDirectory": "~/Downloads", "downloadSize": "raw", "autoDownload": false, "includeDownloadedWallpapers": true, "refreshInterval": "30" };
+var manifestCommands = [{ "name": "set-bing-wallpaper", "title": "Set Bing Wallpaper", "description": "Get, set, auto-download Bing wallpapers to explore the world.", "icon": "bing-wallpaper-icon.png", "keywords": [], "mode": "view" }, { "name": "auto-random-bing-wallpaper", "title": "Auto Random Bing Wallpaper", "description": "Auto-switch random Bing wallpapers to desktop intervally.", "icon": "random-wallpaper-icon.png", "keywords": [], "mode": "no-view", "interval": "1d" }, { "name": "auto-switch-bing-wallpaper", "title": "Auto Switch Bing Wallpaper", "description": "Auto-switch latest Bing wallpapers to desktop every day (refresh every 3 hours).", "icon": "auto-switch-wallpaper-icon.png", "keywords": [], "mode": "no-view", "interval": "1d" }];
+var preferences = { "layout": "Grid", "columns": "5", "applyTo": "every", "downloadDirectory": "~/Downloads", "downloadSize": "raw", "autoDownload": false, "includeDownloadedWallpapers": true, "refreshInterval": "1440" };
 var root = null;
 var loadedCommandModules = /* @__PURE__ */ new Map();
 function renderElement(container, element) {
   injectRaycastStyles();
   if (!root) root = (0, import_client.createRoot)(container);
+  if (globalThis.__qxRaycastRuntime) {
+    globalThis.__qxRaycastRuntime.currentElement = element;
+  }
   root.render(element || import_react6.default.createElement("div", { className: "qx-raycast-empty" }, "No view"));
+}
+async function hydrateFilesystem(context, preferences2) {
+  const dirs2 = /* @__PURE__ */ new Set([
+    "/qx-plugin-files/raycast-bing-wallpaper",
+    "/qx-home/Downloads"
+  ]);
+  const downloadDirectory2 = String(preferences2?.downloadDirectory || "");
+  if (downloadDirectory2.startsWith("~/")) {
+    dirs2.add("/qx-home/" + downloadDirectory2.slice(2));
+  } else if (downloadDirectory2.startsWith("/qx-home/") || downloadDirectory2.startsWith("/qx-plugin-files/")) {
+    dirs2.add(downloadDirectory2);
+  } else if (downloadDirectory2.startsWith("~")) {
+    dirs2.add("/qx-home");
+  }
+  for (const dir of dirs2) {
+    try {
+      const names = await context?.qx?.invokeRust?.("plugin_file_list", { path: dir });
+      if (typeof globalThis.__qxRaycastFsHydrate === "function") {
+        globalThis.__qxRaycastFsHydrate(dir, Array.isArray(names) ? names : []);
+      }
+    } catch {
+      if (typeof globalThis.__qxRaycastFsHydrate === "function") {
+        globalThis.__qxRaycastFsHydrate(dir, []);
+      }
+    }
+  }
 }
 async function loadPreferences(context) {
   const next = { ...preferences };
@@ -14453,21 +14986,31 @@ async function loadCommandModule(name) {
   }
   return loadedCommandModules.get(key);
 }
-async function invokeCommand(name, container, context) {
+async function invokeCommand(name, container, context, options = {}) {
   const mode = commandModes[name] || "view";
-  const cache2 = /* @__PURE__ */ new Map();
+  if (!globalThis.__qxRaycastSharedCache) globalThis.__qxRaycastSharedCache = /* @__PURE__ */ new Map();
+  const cache2 = globalThis.__qxRaycastSharedCache;
+  const preferences2 = await loadPreferences(context);
+  const launchType = options.launchType || globalThis.__qxRaycastLaunchType || (mode === "no-view" ? "background" : "userInitiated");
+  globalThis.__qxRaycastLaunchType = launchType;
   globalThis.__qxRaycastRuntime = {
     context,
-    preferences: await loadPreferences(context),
+    preferences: preferences2,
     activeCommand: name,
     cache: cache2,
+    launchType,
     supportPath: "/qx-plugin-files/raycast-bing-wallpaper",
     assetsPath: "",
     homeDirectory: "/qx-home",
+    navStack: [],
+    currentElement: null,
+    actionHandlers: /* @__PURE__ */ new Map(),
+    actionMeta: /* @__PURE__ */ new Map(),
     render: (element) => renderElement(container, element),
     setSearch: () => {
     }
   };
+  await hydrateFilesystem(context, preferences2);
   const mod = await loadCommandModule(name);
   const component = mod.default || mod.Command || mod;
   if (mode === "view") {
@@ -14485,13 +15028,15 @@ async function invokeCommand(name, container, context) {
 var entry_default = {
   commands: manifestCommands.map((command) => ({
     ...command,
-    async run(context) {
+    async run(context, runOptions = {}) {
       const mode = commandModes[command.name] || "view";
       const hidden = document.createElement("div");
       hidden.style.display = "none";
       document.body.appendChild(hidden);
       try {
-        await invokeCommand(command.name, hidden, context);
+        await invokeCommand(command.name, hidden, context, {
+          launchType: runOptions.launchType || (mode === "no-view" ? "background" : "userInitiated")
+        });
         if (mode === "view") context.showToast("Open " + command.title + " from the plugin panel.");
       } finally {
         hidden.remove();
@@ -14502,7 +15047,7 @@ var entry_default = {
     title: "Bing Wallpaper",
     render(container, context) {
       const firstView = manifestCommands.find((command) => (commandModes[command.name] || "view") === "view") || manifestCommands[0];
-      return invokeCommand(firstView.name, container, context);
+      return invokeCommand(firstView.name, container, context, { launchType: "userInitiated" });
     },
     destroy() {
       if (root) {
