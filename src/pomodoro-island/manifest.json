@@ -1,8 +1,8 @@
 {
   "id": "pomodoro-island",
   "name": "Pomodoro Island",
-  "version": "1.0.0",
-  "description": "A focused Pomodoro timer that stays visible and interactive in the external QxIsland.",
+  "version": "1.1.0",
+  "description": "Pomodoro timer with control panel and interactive external QxIsland.",
   "author": "mcx",
   "icon": "icon.svg",
   "platforms": ["macos", "windows"],
@@ -53,6 +53,11 @@
       "keywords": ["pomodoro", "stop", "reset", "停止"]
     }
   ],
+  "panel": {
+    "title": "Pomodoro",
+    "icon": "icon.svg",
+    "keywords": ["pomodoro", "timer", "focus", "番茄钟", "专注"]
+  },
   "min_app_version": "0.5.32",
   "screenshots": []
 }

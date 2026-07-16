@@ -1,11 +1,24 @@
 # Pomodoro Island
 
-A Qx Pomodoro timer built to demonstrate the permission-gated external QxIsland display.
+Pomodoro timer for Qx: **control panel** + search commands + external **QxIsland**.
 
-- Start a focus session or short break from Launcher.
-- See real remaining time and progress in the island.
-- Pause/resume directly from the island action.
-- Stop and dismiss from Launcher.
+## Features
 
-Requires Qx 0.5.32 or newer. Enable **Settings → Appearance → External Island Display**
-to keep the timer visible while the main Qx window is hidden.
+- Focus / short-break sessions (configurable minutes)
+- Pause, resume, stop
+- Interactive island progress + notifications on complete
+- In-app control panel (open from Extensions)
+
+## Fix (v1.1.0)
+
+Earlier builds only exported **commands** (island-only). Opening the plugin tab
+showed **Panel not registered**. v1.1.0 adds `manifest.panel` + `panel.render`.
+
+## Agent docs
+
+See **`AGENTS.md`** in this package for architecture and maintenance checklist.
+
+## Permissions
+
+- `island`
+- `notifications`
