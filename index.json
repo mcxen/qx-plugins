@@ -4,11 +4,11 @@
     {
       "id": "raycast-bing-wallpaper",
       "name": "Bing Wallpaper",
-      "version": "1.4.0",
+      "version": "1.4.1",
       "description": "Get, set, auto-switch Bing wallpapers to explore the world.",
       "download_url": "https://raw.githubusercontent.com/mcxen/qx-plugins/main/raycast-bing-wallpaper.qx-plugin",
-      "size_bytes": 12436599,
-      "checksum_sha256": "0300ecfa6685ffe0bcd4754ca4492baa8c6f333d6921d77121f06d3a262e92f7",
+      "size_bytes": 12438631,
+      "checksum_sha256": "88ac4c2aa1afb37d997e80b2538a2276130f510d7e879a11291ba54ea352afc1",
       "required_permissions": [
         "http",
         "open-url",
@@ -19,7 +19,8 @@
         "invoke:plugin_file_ensure_dir",
         "invoke:plugin_file_write_base64",
         "invoke:plugin_file_empty_dir",
-        "invoke:plugin_file_list"
+        "invoke:plugin_file_list",
+        "system"
       ],
       "updated_at": "2026-07-16",
       "author": "koinzhang",
@@ -28,11 +29,11 @@
     {
       "id": "brew",
       "name": "Brew",
-      "version": "1.0.0",
+      "version": "1.0.1",
       "description": "Search, inspect, upgrade and uninstall Homebrew formulae & casks (macOS). Uses Qx context.cli.",
       "download_url": "https://raw.githubusercontent.com/mcxen/qx-plugins/main/brew.qx-plugin",
-      "size_bytes": 4097210,
-      "checksum_sha256": "373f4e14a9a3888156131ecb42ee285aa08fc441ea80ef050a8ac4f99396791f",
+      "size_bytes": 4097944,
+      "checksum_sha256": "ad6a7f5ab7ffb92dcf1d6a256298c7ef8dcab395b7e701f40bbbacb66f749e25",
       "required_permissions": [
         "cli",
         "notifications",
@@ -49,7 +50,7 @@
       "description": "View external monitor DDC/CI details and adjust brightness from Qx.",
       "download_url": "https://raw.githubusercontent.com/mcxen/qx-plugins/main/external-display-control.qx-plugin",
       "size_bytes": 21271,
-      "checksum_sha256": "fafd14f683ea5aa01bb26e1d849429c98147fae5c825afab0e8690319376d7fa",
+      "checksum_sha256": "32ac01f0a42f7b40af3f70ff77a864678bfa68269234ba3cb666b6d1b43fe63d",
       "required_permissions": [
         "external-displays",
         "invoke:qx_external_displays_set_control",
@@ -61,13 +62,29 @@
       "min_app_version": "0.4.61"
     },
     {
+      "id": "pomodoro-island",
+      "name": "Pomodoro Island",
+      "version": "1.0.0",
+      "description": "A focused Pomodoro timer that stays visible and interactive in the external QxIsland.",
+      "download_url": "https://raw.githubusercontent.com/mcxen/qx-plugins/main/pomodoro-island.qx-plugin",
+      "size_bytes": 7050,
+      "checksum_sha256": "1b2200e996c54c53e805d1154f731c35576fae3437c7c95dcd6e811f5e5fd657",
+      "required_permissions": [
+        "island",
+        "notifications"
+      ],
+      "updated_at": "2026-07-16",
+      "author": "mcx",
+      "min_app_version": "0.5.32"
+    },
+    {
       "id": "raycast-calendar",
       "name": "Quick Calendar",
       "version": "1.2.0",
       "description": "View calendar month-by-month",
       "download_url": "https://raw.githubusercontent.com/mcxen/qx-plugins/main/raycast-calendar.qx-plugin",
       "size_bytes": 3496829,
-      "checksum_sha256": "a49eaf93b62e3f0059f113dc7902edc8a64043f485e96beeb5f63712f777deaf",
+      "checksum_sha256": "3bb896467aa6cbbda8d729dd15970fa618e3fd8fb6e34f2a5e1eb16361bf3196",
       "required_permissions": [
         "http",
         "open-url",
@@ -80,11 +97,11 @@
     {
       "id": "unsplash",
       "name": "Unsplash",
-      "version": "1.0.0",
+      "version": "1.0.1",
       "description": "Search Unsplash photos, download, and set desktop wallpaper. Ported for Qx (Access Key API; likes/OAuth not included).",
       "download_url": "https://raw.githubusercontent.com/mcxen/qx-plugins/main/unsplash.qx-plugin",
-      "size_bytes": 6345901,
-      "checksum_sha256": "49b6892813c6c4167d8896b824548d0705cf3cb68ee1ab64194de8c651f84ff3",
+      "size_bytes": 6346490,
+      "checksum_sha256": "33170cd9311282002edba30a9ee88c92f28553ce2ffa4743330aa0c9c3f62c02",
       "required_permissions": [
         "http",
         "open-url",
@@ -107,7 +124,7 @@
       "description": "Browse V2EX topics, notifications, and replies with token support",
       "download_url": "https://raw.githubusercontent.com/mcxen/qx-plugins/main/v2ex.qx-plugin",
       "size_bytes": 19407,
-      "checksum_sha256": "1e78eda2b549cce88c39495bf1968352b018c72d9b8f512192fa42ae38d94a98",
+      "checksum_sha256": "3ff5964c8d3719b4edfcf369f360017585e29491ab917cb7aab7a720a835dbde",
       "required_permissions": [
         "invoke:v2ex_fetch_topics",
         "invoke:v2ex_search_topics",

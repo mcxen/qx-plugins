@@ -1,7 +1,7 @@
 {
   "id": "raycast-bing-wallpaper",
   "name": "Bing Wallpaper",
-  "version": "1.4.0",
+  "version": "1.4.1",
   "description": "Get, set, auto-switch Bing wallpapers to explore the world.",
   "author": "koinzhang",
   "icon": "extension-icon.png",
@@ -209,7 +209,8 @@
     "invoke:plugin_file_ensure_dir",
     "invoke:plugin_file_write_base64",
     "invoke:plugin_file_empty_dir",
-    "invoke:plugin_file_list"
+    "invoke:plugin_file_list",
+    "system"
   ],
   "entry": "index.js",
   "commands": [

@@ -1,0 +1,58 @@
+{
+  "id": "pomodoro-island",
+  "name": "Pomodoro Island",
+  "version": "1.0.0",
+  "description": "A focused Pomodoro timer that stays visible and interactive in the external QxIsland.",
+  "author": "mcx",
+  "icon": "icon.svg",
+  "platforms": ["macos", "windows"],
+  "keywords": ["pomodoro", "timer", "focus", "productivity", "番茄钟", "专注", "灵动岛"],
+  "permissions": ["island", "notifications"],
+  "entry": "index.js",
+  "preferences": [
+    {
+      "id": "focusMinutes",
+      "label": "Focus minutes",
+      "type": "number",
+      "required": false,
+      "default": 25,
+      "description": "Length of a focus session in minutes."
+    },
+    {
+      "id": "shortBreakMinutes",
+      "label": "Short break minutes",
+      "type": "number",
+      "required": false,
+      "default": 5,
+      "description": "Length of a short break in minutes."
+    }
+  ],
+  "commands": [
+    {
+      "name": "start-focus",
+      "title": "Pomodoro: Start Focus",
+      "description": "Start a focus timer in the external QxIsland.",
+      "keywords": ["pomodoro", "focus", "timer", "番茄钟", "专注"]
+    },
+    {
+      "name": "start-short-break",
+      "title": "Pomodoro: Start Short Break",
+      "description": "Start a short break in the external QxIsland.",
+      "keywords": ["pomodoro", "break", "timer", "休息"]
+    },
+    {
+      "name": "toggle-pomodoro",
+      "title": "Pomodoro: Pause or Resume",
+      "description": "Pause or resume the active Pomodoro timer.",
+      "keywords": ["pomodoro", "pause", "resume", "暂停", "继续"]
+    },
+    {
+      "name": "stop-pomodoro",
+      "title": "Pomodoro: Stop",
+      "description": "Stop the timer and dismiss its island display.",
+      "keywords": ["pomodoro", "stop", "reset", "停止"]
+    }
+  ],
+  "min_app_version": "0.5.32",
+  "screenshots": []
+}

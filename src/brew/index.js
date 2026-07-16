@@ -277,7 +277,9 @@ function createState(container, context) {
     loading: false,
     error: "",
     brewPath: "",
+    dead: false,
     _searchTimer: 0,
+    _reloadGen: 0,
 
     applyFilter() {
       const q = state.query.trim().toLowerCase();
@@ -292,6 +294,8 @@ function createState(container, context) {
     },
 
     async reload() {
+      if (state.dead) return;
+      const gen = ++state._reloadGen;
       state.loading = true;
       state.error = "";
       render(container, context, state);
@@ -301,6 +305,7 @@ function createState(container, context) {
         } catch {
           state.brewPath = "";
         }
+        if (state.dead || gen !== state._reloadGen) return;
         if (state.tab === "search") {
           state.items = await searchBrew(context, state.query);
         } else if (state.tab === "outdated") {
@@ -308,12 +313,15 @@ function createState(container, context) {
         } else {
           state.items = await loadInstalled(context);
         }
+        if (state.dead || gen !== state._reloadGen) return;
         state.applyFilter();
       } catch (error) {
+        if (state.dead || gen !== state._reloadGen) return;
         state.items = [];
         state.filtered = [];
         state.error = String(error?.message || error);
       } finally {
+        if (state.dead || gen !== state._reloadGen) return;
         state.loading = false;
         render(container, context, state);
       }
@@ -460,6 +468,7 @@ export default {
 
   panel: {
     title: "Brew",
+    // Host renderPanel times out if this awaits brew (often >5s). Paint UI and load async.
     async render(container, context) {
       if (!context.cli?.run) {
         container.innerHTML =
@@ -467,9 +476,17 @@ export default {
         return;
       }
       const state = createState(container, context);
-      await state.reload();
+      container.__bwState = state;
+      // First paint ("Running brew…") happens inside reload; do not await the CLI.
+      void state.reload();
     },
     destroy(container) {
+      const state = container.__bwState;
+      if (state) {
+        state.dead = true;
+        clearTimeout(state._searchTimer);
+        container.__bwState = undefined;
+      }
       container.innerHTML = "";
     },
   },

@@ -12966,14 +12966,79 @@ async function showToast(input, title, message) {
 async function showHUD(message) {
   runtime()?.context?.showToast?.(String(message || ""));
 }
+function isLocalFilesystemTarget(target) {
+  const raw = String(target || "").trim();
+  if (!raw) return false;
+  if (/^https?:\/\//i.test(raw) || /^mailto:/i.test(raw)) return false;
+  if (/^file:\/\//i.test(raw)) return true;
+  if (raw.startsWith("/") || raw.startsWith("~") || raw.startsWith("/qx-")) return true;
+  if (/^[A-Za-z]:[\\/]/.test(raw) || raw.startsWith("\\\\")) return true;
+  return false;
+}
+function normalizeFilesystemPath(target) {
+  let raw = String(target || "").trim();
+  if (/^file:\/\//i.test(raw)) {
+    try {
+      raw = decodeURIComponent(raw.replace(/^file:\/\//i, ""));
+      if (/^\/[A-Za-z]:\//.test(raw)) raw = raw.slice(1);
+    } catch {
+      raw = raw.replace(/^file:\/\//i, "");
+    }
+  }
+  if (raw.startsWith("~/")) {
+    const home = runtime()?.homeDirectory || "/qx-home";
+    raw = home.replace(/\/$/, "") + raw.slice(1);
+  }
+  return raw;
+}
 async function open(target) {
-  return runtime()?.context?.openUrl?.(String(target || ""));
+  const value = String(target || "").trim();
+  if (!value) return;
+  const ctx = runtime()?.context;
+  if (isLocalFilesystemTarget(value)) {
+    const path = normalizeFilesystemPath(value);
+    if (typeof ctx?.system?.openPath === "function") {
+      try {
+        await ctx.system.openPath(path);
+        return;
+      } catch (error) {
+        console.warn("[qx-raycast] openPath failed, falling back", error);
+      }
+    }
+    return ctx?.openUrl?.(path.startsWith("file:") ? path : "file://" + path);
+  }
+  return ctx?.openUrl?.(value);
 }
 async function showInFinder(target) {
-  return runtime()?.context?.openUrl?.(String(target || ""));
+  const value = String(target || "").trim();
+  if (!value) return;
+  const ctx = runtime()?.context;
+  const path = normalizeFilesystemPath(value);
+  if (typeof ctx?.system?.revealPath === "function") {
+    try {
+      await ctx.system.revealPath(path);
+      return;
+    } catch (error) {
+      console.warn("[qx-raycast] revealPath failed, falling back to open", error);
+    }
+  }
+  return open(path);
 }
 async function openExtensionPreferences() {
-  runtime()?.context?.showToast?.("Preferences are managed in Qx Extensions settings.");
+  const rt = runtime();
+  const pluginId = rt?.pluginId || rt?.context?.pluginId || "";
+  try {
+    parent.postMessage(
+      {
+        type: "qx:plugin:open-preferences",
+        pluginId,
+        runtimeId: rt?.runtimeId || globalThis.__qxPluginRuntimeId || "",
+      },
+      "*",
+    );
+    return;
+  } catch {}
+  rt?.context?.showToast?.("Open Settings → Extensions to configure this plugin.");
 }
 function getPreferenceValues() {
   return runtime()?.preferences || defaultPreferenceValues;

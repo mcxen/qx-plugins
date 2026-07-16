@@ -314,23 +314,31 @@ function createState(container, context) {
     loading: false,
     error: "",
     keyHint: true,
+    dead: false,
+    _loadGen: 0,
 
     async load(append = false) {
+      if (state.dead) return;
+      const gen = ++state._loadGen;
       state.loading = true;
       state.error = "";
       render(container, context, state);
       try {
         await getAccessKey(context);
+        if (state.dead || gen !== state._loadGen) return;
         state.keyHint = true;
         const { results, totalPages } = await searchPhotos(context, state.query, state.page);
+        if (state.dead || gen !== state._loadGen) return;
         state.totalPages = totalPages;
         state.results = append ? state.results.concat(results) : results;
         if (!append) state.selected = 0;
       } catch (e) {
+        if (state.dead || gen !== state._loadGen) return;
         if (!append) state.results = [];
         state.error = String(e?.message || e);
         state.keyHint = !/Access Key/i.test(state.error);
       } finally {
+        if (state.dead || gen !== state._loadGen) return;
         state.loading = false;
         render(container, context, state);
       }
@@ -438,6 +446,7 @@ export default {
 
   panel: {
     title: "Unsplash",
+    // Host renderPanel times out if this awaits network I/O. Paint UI and load async.
     async render(container, context) {
       if (!context.http?.fetch) {
         container.innerHTML =
@@ -445,9 +454,15 @@ export default {
         return;
       }
       const state = createState(container, context);
-      await state.load();
+      container.__usState = state;
+      void state.load();
     },
     destroy(container) {
+      const state = container.__usState;
+      if (state) {
+        state.dead = true;
+        container.__usState = undefined;
+      }
       container.innerHTML = "";
     },
   },
