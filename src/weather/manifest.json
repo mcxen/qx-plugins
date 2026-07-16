@@ -1,0 +1,90 @@
+{
+  "id": "weather",
+  "name": "Weather",
+  "version": "1.0.0",
+  "description": "Current conditions and multi-day forecast via Open-Meteo (or OpenWeatherMap). Cached for fast reopen.",
+  "author": "mcx",
+  "icon": "",
+  "keywords": [
+    "weather",
+    "forecast",
+    "temperature",
+    "天气",
+    "气温",
+    "预报"
+  ],
+  "permissions": [
+    "http",
+    "open-url",
+    "notifications",
+    "invoke:fetch_weather",
+    "invoke:fetch_weather_for_location",
+    "invoke:get_cached_weather",
+    "invoke:get_cached_weather_for_location",
+    "invoke:detect_location"
+  ],
+  "preferences": [
+    {
+      "id": "locations",
+      "label": "Locations",
+      "type": "string",
+      "required": false,
+      "default": "",
+      "description": "Cities or lat,lon — one per line (or comma-separated). Leave empty for auto IP location."
+    },
+    {
+      "id": "units",
+      "label": "Temperature units",
+      "type": "string",
+      "required": false,
+      "default": "celsius",
+      "description": "celsius or fahrenheit"
+    },
+    {
+      "id": "provider",
+      "label": "Provider",
+      "type": "string",
+      "required": false,
+      "default": "open-meteo",
+      "description": "open-meteo (free) or openweathermap (needs API key)"
+    },
+    {
+      "id": "apiKey",
+      "label": "OpenWeatherMap API key",
+      "type": "password",
+      "required": false,
+      "description": "Only for provider=openweathermap"
+    },
+    {
+      "id": "cacheMinutes",
+      "label": "Cache minutes",
+      "type": "string",
+      "required": false,
+      "default": "30",
+      "description": "How long plugin-local cache is treated as fresh"
+    }
+  ],
+  "entry": "index.js",
+  "commands": [
+    {
+      "name": "open-weather",
+      "title": "Weather",
+      "description": "Open the weather panel",
+      "keywords": ["weather", "forecast", "温度", "天气"]
+    },
+    {
+      "name": "refresh-weather",
+      "title": "Refresh Weather",
+      "description": "Force refresh weather data",
+      "keywords": ["weather", "refresh", "刷新"]
+    }
+  ],
+  "panel": {
+    "title": "Weather",
+    "icon": "",
+    "keywords": ["weather", "forecast", "天气", "气温"]
+  },
+  "min_app_version": "0.5.18",
+  "platforms": ["macos", "windows"],
+  "screenshots": []
+}

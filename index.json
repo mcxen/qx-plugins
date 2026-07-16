@@ -139,6 +139,28 @@
       "updated_at": "2026-07-16",
       "author": "mcx",
       "min_app_version": "0.5.18"
+    },
+    {
+      "id": "weather",
+      "name": "Weather",
+      "version": "1.0.0",
+      "description": "Current conditions and multi-day forecast via Open-Meteo (or OpenWeatherMap). Cached for fast reopen.",
+      "download_url": "https://raw.githubusercontent.com/mcxen/qx-plugins/main/weather.qx-plugin",
+      "size_bytes": 22648,
+      "checksum_sha256": "c15651a1d0460fe404388a4e7a46286f39731b7988d29a7ccb26cc392b65927b",
+      "required_permissions": [
+        "http",
+        "open-url",
+        "notifications",
+        "invoke:fetch_weather",
+        "invoke:fetch_weather_for_location",
+        "invoke:get_cached_weather",
+        "invoke:get_cached_weather_for_location",
+        "invoke:detect_location"
+      ],
+      "updated_at": "2026-07-16",
+      "author": "mcx",
+      "min_app_version": "0.5.18"
     }
   ]
 }
