@@ -2,7 +2,7 @@
 
 Watch **GitHub Actions** and **Releases** for public repos you pin in preferences.
 
-**Module mode: business-only** — host `context.ui` workbench.  
+**Module mode: business-only** — declarative `context.ui` Workbench with structured list/detail/actions.
 **Data: public HTML only** — `github.com/.../actions` and `.../releases` (no REST API).
 
 ## Setup

@@ -12,16 +12,20 @@
 
 ## Module mode: **business-only** + **public HTML**
 
-Do **not** hand-roll CSS/DOM chrome. Panel UI must go through:
+Do **not** hand-roll CSS/DOM chrome. Panel UI must use the host renderer:
 
 ```js
-context.ui.mountWorkbench(container, state, handlers)
+context.ui.mountWorkbench(state, handlers)
 ```
 
 Do **not** call `api.github.com`. Data sources only:
 
 - `https://github.com/{owner}/{repo}/actions`
 - `https://github.com/{owner}/{repo}/releases`
+
+List items provide structured `detail` and `actions`; Workbench never accepts HTML.
+The hottest active run is projected through the Workbench `island` field so Qx
+chooses docked vs floating placement from user settings.
 
 ## Layout
 

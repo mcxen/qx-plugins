@@ -1,8 +1,8 @@
 {
   "id": "pomodoro-island",
   "name": "Pomodoro Island",
-  "version": "1.1.0",
-  "description": "Pomodoro timer with control panel and interactive external QxIsland.",
+  "version": "1.4.0",
+  "description": "Declarative Workbench reference plugin with persistent background timing, history, Qx-rendered actions, and docked or floating QxIsland.",
   "author": "mcx",
   "icon": "icon.svg",
   "platforms": ["macos", "windows"],
@@ -51,6 +51,14 @@
       "title": "Pomodoro: Stop",
       "description": "Stop the timer and dismiss its island display.",
       "keywords": ["pomodoro", "stop", "reset", "停止"]
+    },
+    {
+      "name": "pomodoro-heartbeat",
+      "title": "Pomodoro: Background Heartbeat",
+      "description": "Reconcile the persisted timer while its Workbench is closed.",
+      "mode": "no-view",
+      "interval": "5s",
+      "keywords": ["pomodoro", "background", "timer"]
     }
   ],
   "panel": {
@@ -58,6 +66,6 @@
     "icon": "icon.svg",
     "keywords": ["pomodoro", "timer", "focus", "番茄钟", "专注"]
   },
-  "min_app_version": "0.5.32",
+  "min_app_version": "0.5.37",
   "screenshots": []
 }

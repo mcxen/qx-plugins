@@ -63,6 +63,11 @@ function decodeEntities(s) {
     .replace(/&nbsp;/g, " ");
 }
 
+function attr(tag, name) {
+  const re = new RegExp("\\b" + name + "\\s*=\\s*[\"']([^\"']*)[\"']", "i");
+  return re.exec(tag)?.[1] || "";
+}
+
 function parseRepos(raw) {
   return Array.from(
     new Set(
@@ -111,17 +116,18 @@ async function fetchPage(context, url) {
 function parseActionsHtml(html, repo) {
   const runs = [];
   const seen = new Set();
-  const re =
-    /<a\s+href="(\/[^"]+\/actions\/runs\/(\d+))"[^>]*aria-label="([^"]+)"[^>]*>/gi;
+  const re = /<a\b[^>]*>/gi;
   let m;
   while ((m = re.exec(html)) !== null) {
-    const path = m[1];
-    const id = m[2];
+    const path = attr(m[0], "href");
+    const id = /\/actions\/runs\/(\d+)/i.exec(path)?.[1];
+    const ariaLabel = attr(m[0], "aria-label");
+    if (!id || !ariaLabel || !/^\//.test(path)) continue;
     if (seen.has(id)) continue;
     if (path.includes("/workflow")) continue;
     seen.add(id);
 
-    const label = decodeEntities(m[3]).replace(/\s+/g, " ").trim();
+    const label = decodeEntities(ariaLabel).replace(/\s+/g, " ").trim();
     // "failed:  Run 59 of Windows Compatibility. [ImgBot] Optimize images"
     // "completed successfully:  Run 112 of Release Desktop Clients. v0.5.36: …"
     // "currently running: …" / "queued: …"
@@ -203,15 +209,16 @@ function parseReleasesHtml(html, repo) {
   const releases = [];
   const seen = new Set();
   // <a href="/owner/repo/releases/tag/v0.5.36" ...>v0.5.36</a>
-  const re =
-    /<a\s+href="(\/[^"]+\/releases\/tag\/([^"#?]+))"[^>]*class="[^"]*Link--primary[^"]*"[^>]*>\s*([^<]+?)\s*<\/a>/gi;
+  const re = /<a\b[^>]*href=["'](\/[^"'#?]+\/releases\/tag\/([^"'#?]+))["'][^>]*>[\s\S]*?<\/a>/gi;
   let m;
   while ((m = re.exec(html)) !== null) {
     const path = m[1];
     const tag = decodeEntities(decodeURIComponent(m[2]));
     if (seen.has(tag)) continue;
     seen.add(tag);
-    const name = decodeEntities(m[3]).trim() || tag;
+    const name = decodeEntities(
+      m[0].replace(/^[\s\S]*?>|<\/a>[\s\S]*$/gi, "").replace(/<[^>]+>/g, ""),
+    ).trim() || tag;
 
     const window = html.slice(Math.max(0, m.index - 400), m.index + 2200);
     const isLatest = /Label--success[^>]*>\s*Latest/i.test(window) || /\/releases\/latest/.test(window.slice(0, 500));
@@ -433,6 +440,17 @@ async function publishIsland(context, run, enabled) {
   }
 }
 
+function islandForRun(run, enabled) {
+  if (!enabled || !run) return null;
+  return {
+    primary: String(run.repo),
+    secondary: `${run.displayTitle || run.name} · ${run.status}`,
+    progress: run.progress?.percent ?? (run.status === "queued" ? 8 : 45),
+    tone: "neutral",
+    action: { label: "Refresh", command: "refresh-qxgh" },
+  };
+}
+
 // ── Map → workbench ────────────────────────────────────────────────────────
 
 function runIcon(status, conclusion) {
@@ -461,7 +479,7 @@ function runToItem(run) {
   ]
     .filter(Boolean)
     .join(" · ");
-  return {
+  const item = {
     id: `run:${run.repo}:${run.id}`,
     title: run.displayTitle || run.name,
     subtitle: sub,
@@ -471,13 +489,27 @@ function runToItem(run) {
     progress: run.progress?.percent,
     raw: run,
   };
+  item.detail = {
+    title: run.displayTitle,
+    subtitle: `${run.repo} · ${run.name}`,
+    fields: [
+      { label: "Status", value: run.status, tone: runTone(run.status, run.conclusion) },
+      { label: "Conclusion", value: run.conclusion || "—" },
+      { label: "Run", value: run.runNumber != null ? `#${run.runNumber}` : "—" },
+      { label: "Duration", value: run.duration || "—" },
+      { label: "Updated", value: run.updatedAt || "—" },
+      { label: "Source", value: "public HTML page" },
+    ],
+  };
+  item.actions = [{ id: "open-item", label: "Open Run", primary: true, kbd: "Enter" }];
+  return item;
 }
 
 function releaseToItem(rel) {
   const flags = [];
   if (rel.latest) flags.push("latest");
   if (rel.prerelease) flags.push("pre");
-  return {
+  const item = {
     id: `rel:${rel.repo}:${rel.tag}`,
     title: rel.name || rel.tag,
     subtitle: [rel.repo, rel.tag, flags.join(", "), relativeTime(rel.publishedAt)].filter(Boolean).join(" · "),
@@ -486,41 +518,24 @@ function releaseToItem(rel) {
     tone: "success",
     raw: rel,
   };
+  item.detail = {
+    title: rel.name || rel.tag,
+    subtitle: `${rel.repo} · ${rel.tag}`,
+    fields: [
+      { label: "Latest", value: rel.latest ? "yes" : "no", tone: rel.latest ? "success" : "neutral" },
+      { label: "Prerelease", value: rel.prerelease ? "yes" : "no" },
+      { label: "Published", value: rel.publishedAt || "—" },
+      { label: "Source", value: "public HTML page" },
+    ],
+  };
+  item.actions = [{ id: "open-item", label: "Open Release", primary: true, kbd: "Enter" }];
+  return item;
 }
 
 function filterByQuery(items, query) {
   const q = String(query || "").trim().toLowerCase();
   if (!q) return items;
   return items.filter((it) => `${it.title} ${it.subtitle} ${it.badge}`.toLowerCase().includes(q));
-}
-
-function detailFor(context, item) {
-  const raw = item?.raw;
-  if (!raw) return `<div class="qx-wb-empty">Select a run or release</div>`;
-  if (raw.kind === "run") {
-    return context.ui.renderKeyValue({
-      Title: raw.displayTitle,
-      Workflow: raw.name,
-      Repo: raw.repo,
-      Status: raw.status,
-      Conclusion: raw.conclusion || "—",
-      Run: raw.runNumber != null ? `#${raw.runNumber}` : "—",
-      Duration: raw.duration || "—",
-      Updated: raw.updatedAt || "—",
-      Source: "public HTML page",
-      URL: raw.htmlUrl || "—",
-    });
-  }
-  return context.ui.renderKeyValue({
-    Name: raw.name,
-    Tag: raw.tag,
-    Repo: raw.repo,
-    Latest: raw.latest ? "yes" : "no",
-    Prerelease: raw.prerelease ? "yes" : "no",
-    Published: raw.publishedAt || "—",
-    Source: "public HTML page",
-    URL: raw.htmlUrl || "—",
-  });
 }
 
 // ── Panel ──────────────────────────────────────────────────────────────────
@@ -534,6 +549,8 @@ function renderPanel(container, context) {
   let bundle = null;
   let loading = true;
   let pollTimer = null;
+  let loadSequence = 0;
+  let islandEnabled = true;
 
   const paint = () => {
     if (destroyed || !context.ui?.mountWorkbench) return;
@@ -544,12 +561,19 @@ function renderPanel(container, context) {
     else if (tab === "releases") items = releases.map(releaseToItem);
     else items = [...runs.map(runToItem), ...releases.map(releaseToItem)];
     items = filterByQuery(items, query);
+    if (selectedId && !items.some((item) => item.id === selectedId)) {
+      selectedId = items[0]?.id || null;
+      selectedItem = items[0] || null;
+    }
+    if (!selectedId && items[0]) {
+      selectedId = items[0].id;
+      selectedItem = items[0];
+    }
 
     let meta = loading && !bundle ? "Loading pages…" : summaryLine(bundle || { runs: [] });
     if (bundle?.fromCache) meta += ` · cached ${ageLabel(bundle.savedAt)}`;
 
     context.ui.mountWorkbench(
-      container,
       {
         title: "QxGH",
         meta,
@@ -562,15 +586,15 @@ function renderPanel(container, context) {
           { id: "releases", label: `Releases (${releases.length})`, active: tab === "releases" },
           { id: "both", label: "Both", active: tab === "both" },
         ],
-        toolbar: [
-          { id: "refresh", label: "Refresh", primary: true },
-          { id: "open-web", label: "Open page" },
-          { id: "open-item", label: "Open" },
-          { id: "island", label: "Island" },
+        actions: [
+          { id: "refresh", label: "Refresh", primary: !selectedItem },
+          { id: "open-web", label: "Open Repository Page" },
+          { id: "island", label: "Show Active Run on Island" },
         ],
         items,
         selectedId,
-        detailHtml: detailFor(context, selectedItem),
+        detail: selectedItem?.detail,
+        island: islandForRun(pickHottestRun(bundle?.runs || []), islandEnabled),
         emptyText: loading ? "Loading GitHub pages…" : "No items — check repos in preferences",
       },
       {
@@ -589,7 +613,7 @@ function renderPanel(container, context) {
           selectedItem = item;
           paint();
         },
-        onToolbar: (id) => {
+        onAction: (id) => {
           if (id === "refresh") {
             void reload({ force: true });
             return;
@@ -620,25 +644,22 @@ function renderPanel(container, context) {
 
   async function reload({ force = false } = {}) {
     if (destroyed) return;
+    const sequence = ++loadSequence;
     loading = true;
     paint();
     try {
+      islandEnabled = await prefBool(context, "islandWatch", true);
       let result = await loadBundle(context, { force });
-      if (destroyed) return;
+      if (destroyed || sequence !== loadSequence) return;
 
       if (result._needsRefresh && !force) {
         bundle = result;
         loading = true;
         paint();
-        void publishIsland(
-          context,
-          pickHottestRun(result.runs),
-          await prefBool(context, "islandWatch", true),
-        );
         try {
           result = await fetchAll(context, { repos: result.repos });
         } catch (err) {
-          if (destroyed) return;
+          if (destroyed || sequence !== loadSequence) return;
           bundle = { ...result, error: String(err.message || err) };
           loading = false;
           paint();
@@ -646,7 +667,7 @@ function renderPanel(container, context) {
         }
       }
 
-      if (destroyed) return;
+      if (destroyed || sequence !== loadSequence) return;
       bundle = result;
       loading = false;
       if (selectedId) {
@@ -658,13 +679,8 @@ function renderPanel(container, context) {
         if (!selectedItem) selectedId = null;
       }
       paint();
-      void publishIsland(
-        context,
-        pickHottestRun(bundle.runs),
-        await prefBool(context, "islandWatch", true),
-      );
     } catch (err) {
-      if (destroyed) return;
+      if (destroyed || sequence !== loadSequence) return;
       bundle = {
         runs: [],
         releases: [],

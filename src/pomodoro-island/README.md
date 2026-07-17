@@ -1,18 +1,29 @@
 # Pomodoro Island
 
-Pomodoro timer for Qx: **control panel** + search commands + external **QxIsland**.
+Pomodoro timer and reference implementation for Qx's declarative **Workbench**.
 
 ## Features
 
 - Focus / short-break sessions (configurable minutes)
-- Pause, resume, stop
-- Interactive island progress + notifications on complete
-- In-app control panel (open from Extensions)
+- Persistent focus/break history in the left list
+- Structured current/history detail rendered by Qx on the right
+- Actions rendered once by Qx (primary button, context panel, Cmd/Ctrl+K)
+- Interactive island progress rendered docked or in the external floating island
+- No plugin-authored CSS or panel DOM
 
-## Fix (v1.1.0)
+## Workbench template (v1.4.0)
 
-Earlier builds only exported **commands** (island-only). Opening the plugin tab
-showed **Panel not registered**. v1.1.0 adds `manifest.panel` + `panel.render`.
+The plugin publishes business data through `context.ui.mountWorkbench(state, handlers)`.
+Use it as the marketplace template for list/detail,
+manifest-command Actions, persistent cross-runtime state and island projection.
+
+The persisted `endsAt` deadline and manifest `pomodoro-heartbeat` background
+command keep the timer valid after the Workbench closes, across sleep/wake and
+after runtime recovery. The open panel only refreshes presentation data.
+
+The island publishes `countdown.endsAt` plus a host-owned `pause` / `play`
+action icon. Qx renders the same live timer and compact capsule control in both
+the docked and floating island without per-second plugin UI updates.
 
 ## Agent docs
 
