@@ -1,7 +1,7 @@
 {
   "id": "qxgh",
   "name": "QxGH",
-  "version": "1.3.1",
+  "version": "1.3.2",
   "description": "QxGH \u2014 watch GitHub Actions and Releases from public github.com pages (no REST API). Business-only workbench UI.",
   "author": "mcx",
   "icon": "",
@@ -120,5 +120,5 @@
       "gh"
     ]
   },
-  "min_app_version": "0.5.37"
+  "min_app_version": "0.5.38"
 }

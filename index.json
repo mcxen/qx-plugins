@@ -64,18 +64,18 @@
     {
       "id": "pomodoro-island",
       "name": "Pomodoro Island",
-      "version": "1.4.0",
+      "version": "1.4.1",
       "description": "Declarative Workbench reference plugin with persistent background timing, history, Qx-rendered actions, and docked or floating QxIsland.",
       "download_url": "https://raw.githubusercontent.com/mcxen/qx-plugins/main/pomodoro-island.qx-plugin",
       "size_bytes": 23711,
-      "checksum_sha256": "2f6739b87fe2b4ab2b63e1a98788fb488c6ea1c08df73039ccc0861a21db2b9a",
+      "checksum_sha256": "27fdaef41ea405574749a2ac087991ab38b23db148ca8b87c833e9af804c1f69",
       "required_permissions": [
         "island",
         "notifications"
       ],
       "updated_at": "2026-07-17",
       "author": "mcx",
-      "min_app_version": "0.5.37"
+      "min_app_version": "0.5.38"
     },
     {
       "id": "raycast-calendar",
@@ -97,11 +97,11 @@
     {
       "id": "qxgh",
       "name": "QxGH",
-      "version": "1.3.1",
+      "version": "1.3.2",
       "description": "QxGH — watch GitHub Actions and Releases from public github.com pages (no REST API). Business-only workbench UI.",
       "download_url": "https://raw.githubusercontent.com/mcxen/qx-plugins/main/qxgh.qx-plugin",
       "size_bytes": 30992,
-      "checksum_sha256": "0ea3a85cc7585b2984c73915c730c901400f67cfde94f5682556933c17eb83f5",
+      "checksum_sha256": "ef988b5a1503a89dffbb0547e15cfc5bec2843564c4984d61b35ececdfc5b70c",
       "required_permissions": [
         "http",
         "open-url",
@@ -110,7 +110,7 @@
       ],
       "updated_at": "2026-07-17",
       "author": "mcx",
-      "min_app_version": "0.5.37"
+      "min_app_version": "0.5.38"
     },
     {
       "id": "unsplash",
