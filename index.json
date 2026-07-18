@@ -67,8 +67,8 @@
       "version": "1.4.2",
       "description": "Declarative Workbench reference plugin with persistent background timing, history, Qx-rendered actions, and docked or floating QxIsland.",
       "download_url": "https://raw.githubusercontent.com/mcxen/qx-plugins/main/pomodoro-island.qx-plugin",
-      "size_bytes": 25352,
-      "checksum_sha256": "4aa6930c1a1e3157c997b82e1ba2601b6f9c9faf87d99a0927f46c8f0cd6c5da",
+      "size_bytes": 25477,
+      "checksum_sha256": "e79f2e91468aee101877ad7643eb0d341d5c395348d7265c8b1381dfe6dbeaa2",
       "required_permissions": [
         "island",
         "notifications"
@@ -101,14 +101,14 @@
       "description": "QxGH — watch GitHub Actions and Releases from public github.com pages (no REST API). Business-only workbench UI.",
       "download_url": "https://raw.githubusercontent.com/mcxen/qx-plugins/main/qxgh.qx-plugin",
       "size_bytes": 30992,
-      "checksum_sha256": "ef988b5a1503a89dffbb0547e15cfc5bec2843564c4984d61b35ececdfc5b70c",
+      "checksum_sha256": "c0362b0ca04c88df3db676c159e0f0acd36b8a11c14f0e0fdd8e7352e94c38db",
       "required_permissions": [
         "http",
         "open-url",
         "notifications",
         "island"
       ],
-      "updated_at": "2026-07-17",
+      "updated_at": "2026-07-18",
       "author": "mcx",
       "min_app_version": "0.5.38"
     },
