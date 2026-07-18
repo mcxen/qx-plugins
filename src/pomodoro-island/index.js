@@ -324,6 +324,7 @@ function historyItem(entry) {
   const completed = entry.outcome === "completed";
   return {
     id: String(entry.id),
+    kind: entry.kind === "break" ? "break" : "focus",
     title: kindLabel(entry.kind),
     subtitle: `${formatDate(entry.startedAt)} · ${formatRemaining(entry.elapsedMs || 0)}`,
     badge: completed ? "completed" : entry.outcome || "stopped",
@@ -350,17 +351,47 @@ function historyItem(entry) {
   };
 }
 
+function activeItem(state, historyCount) {
+  if (state.phase === "idle") return null;
+  const phase = phaseLabel(state.phase);
+  const tone = state.phase === "complete"
+    ? "success"
+    : state.phase === "paused"
+      ? "warning"
+      : "accent";
+  return {
+    id: `current:${state.sessionId || state.kind}`,
+    kind: state.kind,
+    title: kindLabel(state.kind),
+    subtitle: `${formatRemaining(currentRemaining(state))} · ${phase}`,
+    badge: phase,
+    icon: state.kind === "break" ? "☕" : "◉",
+    tone,
+    progress: progressFor(state),
+    detail: currentDetail(state, historyCount),
+    raw: { current: true, state },
+  };
+}
+
 function currentDetail(state, historyCount) {
   const remaining = currentRemaining(state);
+  const body = state.phase === "running"
+    ? "Focus is running. You can pause or stop it from Actions, the bottom bar, or the QxIsland."
+    : state.phase === "paused"
+      ? "The timer is paused. Resume it from Actions or the QxIsland when you are ready."
+      : state.phase === "complete"
+        ? "This session is complete. Start another focus round or take a short break."
+        : "Start a focus round from Actions to begin timing.";
   return {
     title: kindLabel(state.kind),
     subtitle: `${formatRemaining(remaining)} · ${phaseLabel(state.phase)}`,
-    body: "The panel publishes pure business data. Qx owns the list, detail, keyboard navigation, Actions and island surfaces.",
+    body,
     fields: [
       { label: "State", value: phaseLabel(state.phase), tone: state.phase === "complete" ? "success" : state.phase === "paused" ? "warning" : "accent" },
       { label: "Remaining", value: formatRemaining(remaining) },
       { label: "Progress", value: `${Math.round(progressFor(state))}%` },
       { label: "History", value: historyCount },
+      { label: "Started", value: formatDate(state.startedAt) },
       { label: "Island", value: state.phase === "idle" ? "Hidden" : "Docked / floating by Qx settings" },
     ],
   };
@@ -394,12 +425,17 @@ function renderPanel(container, context) {
   let query = "";
   let tab = "all";
   let pollTimer = null;
+  let activeItemId = null;
 
   const visibleHistory = () => {
     const normalizedQuery = query.trim().toLowerCase();
-    return history
+    const current = activeItem(state, history.length);
+    const rows = [
+      ...(current ? [current] : []),
+      ...history.map(historyItem),
+    ];
+    return rows
       .filter((entry) => tab === "all" || entry.kind === tab)
-      .map(historyItem)
       .filter((item) => !normalizedQuery || `${item.title} ${item.subtitle} ${item.badge}`.toLowerCase().includes(normalizedQuery));
   };
 
@@ -456,6 +492,11 @@ function renderPanel(container, context) {
     if (destroyed) return;
     state = nextState;
     history = nextHistory;
+    const nextActiveItemId = activeItem(nextState, nextHistory.length)?.id || null;
+    if (nextActiveItemId !== activeItemId) {
+      activeItemId = nextActiveItemId;
+      selectedId = nextActiveItemId || (selectedId?.startsWith("current:") ? null : selectedId);
+    }
     paint();
   };
 
