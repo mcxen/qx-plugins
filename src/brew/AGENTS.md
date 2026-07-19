@@ -1,6 +1,6 @@
 # Brew — Agent Guide
 
-CLI-first macOS plugin: `context.cli` + list panel.
+CLI-first macOS plugin: `context.cli` + host Workbench list/detail panel.
 
 ## Surfaces
 
@@ -16,6 +16,7 @@ CLI-first macOS plugin: `context.cli` + list panel.
 1. `manifest.panel` + `export.panel` present.
 2. `panel.render` returns quickly; brew JSON loads async.
 3. Prefer `context.cli.run` argv over `ai-bash`.
+4. Keep the panel business-only: publish tabs/list/detail/Actions through `mountWorkbench`; do not restore custom DOM chrome.
 
 ## Checklist
 

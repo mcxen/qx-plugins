@@ -21,6 +21,11 @@ Do **not** reject marketplace entries solely for missing AGENTS.md.
 
 Ship installable **`.qx-plugin`** archives + **`index.json`** marketplace index consumed by Qx Settings → Extensions → Browse.
 
+The Raycast converter is frozen and unmaintained. Keep its code for historical
+experiments only. Maintained marketplace plugins must be rebuilt from upstream
+source against Qx `context.*`, Workbench, Actions, and Island protocols; do not
+publish new converter-generated plugins.
+
 ```text
 qx-plugins/
 ├── AGENTS.md                 # this file

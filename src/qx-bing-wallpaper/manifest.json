@@ -1,0 +1,81 @@
+{
+  "id": "qx-bing-wallpaper",
+  "name": "Qx Bing Wallpaper",
+  "version": "2.0.2",
+  "description": "Browse Bing's daily images in a native Qx Gallery, then download or set them as wallpaper.",
+  "author": "Qx",
+  "icon": "extension-icon.png",
+  "screenshots": [
+    "bing-wallpaper-1.png",
+    "bing-wallpaper-2.png",
+    "bing-wallpaper-3.png"
+  ],
+  "platforms": ["macos", "windows"],
+  "keywords": ["bing", "wallpaper", "gallery", "daily image", "壁纸", "图库", "必应"],
+  "permissions": [
+    "http",
+    "open-url",
+    "clipboard",
+    "system",
+    "island",
+    "invoke:plugin_file_write_base64",
+    "invoke:plugin_file_ensure_dir"
+  ],
+  "preferences": [
+    {
+      "id": "applyTo",
+      "label": "Apply Wallpaper To",
+      "type": "select",
+      "required": false,
+      "default": "every",
+      "description": "macOS: apply to every desktop or only the current desktop.",
+      "options": [
+        { "label": "Every Desktop", "value": "every" },
+        { "label": "Current Desktop", "value": "current" }
+      ]
+    },
+    {
+      "id": "downloadDirectory",
+      "label": "Download Directory",
+      "type": "string",
+      "required": false,
+      "default": "~/Downloads",
+      "description": "Folder used by the Download action."
+    }
+  ],
+  "entry": "index.js",
+  "commands": [
+    {
+      "name": "open-gallery",
+      "title": "Qx Bing Wallpaper",
+      "description": "Browse Bing daily wallpapers in the Qx Gallery.",
+      "icon": "bing-wallpaper-icon.png",
+      "keywords": ["bing", "wallpaper", "gallery", "必应", "壁纸", "图库"],
+      "mode": "view"
+    },
+    {
+      "name": "set-random-wallpaper",
+      "title": "Set Random Bing Wallpaper",
+      "description": "Set a random recent Bing wallpaper once per day.",
+      "icon": "random-wallpaper-icon.png",
+      "keywords": ["random", "bing", "wallpaper"],
+      "mode": "no-view",
+      "interval": "1d"
+    },
+    {
+      "name": "set-latest-wallpaper",
+      "title": "Set Latest Bing Wallpaper",
+      "description": "Set the latest Bing wallpaper once per day.",
+      "icon": "auto-switch-wallpaper-icon.png",
+      "keywords": ["latest", "bing", "wallpaper"],
+      "mode": "no-view",
+      "interval": "1d"
+    }
+  ],
+  "panel": {
+    "title": "Qx Bing Wallpaper",
+    "icon": "extension-icon.png",
+    "keywords": ["bing", "wallpaper", "gallery", "必应", "壁纸", "图库"]
+  },
+  "min_app_version": "0.5.44"
+}

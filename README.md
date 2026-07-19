@@ -2,6 +2,8 @@
 
 Qx plugin marketplace source and index.
 
+> Raycast 转换器代码暂时保留但已冻结、不维护。市场中的正式插件统一从上游源代码出发，使用 Qx `context.*`、Workbench、Actions 和 Island 协议重新开发；不要发布新的自动转换产物。
+
 Users install plugins from this repository via Qx Settings → Extensions /
 Marketplace. Each entry in `index.json` points at a GitHub raw `.qx-plugin`
 archive on `main`:
@@ -21,18 +23,20 @@ index.json                # marketplace catalog (checksums, permissions, min ver
 
 | Plugin | Kind | Notes |
 |--------|------|--------|
-| `raycast-bing-wallpaper` | Raycast generic convert | Needs **Qx ≥ 0.5.18** (binary HTTP / `arrayBuffer`) |
+| `qx-bing-wallpaper` | Native Workbench Gallery | Qx-owned Bing gallery and wallpaper actions |
 | `raycast-calendar` | Raycast generic convert | UI calendar; works on Qx ≥ 0.4.28 |
 | `external-display-control` | Native | DDC/CI brightness; macOS, needs Qx ≥ 0.4.61 |
 | `v2ex` | Native | Host `v2ex_*` commands |
 
-## Convert a Raycast extension (GitHub issue)
+## Legacy Raycast converter（Frozen）
+
+以下流程仅保留用于历史研究和一次性实验，不作为市场发布路径，也不承诺适配新的 Raycast API。
 
 Open an issue whose title starts with `[convert]` and include a Raycast
 extension tree URL:
 
 ```text
-[convert] https://github.com/raycast/extensions/tree/<commit>/extensions/bing-wallpaper
+[convert] https://github.com/raycast/extensions/tree/<commit>/extensions/<extension-name>
 ```
 
 The `Convert Raycast Extension` workflow:
@@ -83,7 +87,7 @@ bundle that talks to Qx host RPC. Important host capabilities:
 
 | Capability | Why |
 |------------|-----|
-| `context.http.fetch` + **`arrayBuffer()` / `bodyBase64`** | Image/binary downloads (Bing Wallpaper). Requires **Qx ≥ 0.5.18**. |
+| `context.http.fetch` + **`arrayBuffer()` / `bodyBase64`** | Image and other binary downloads. |
 | `Buffer` global (converter banner + shim) | Many Raycast sources call `Buffer.from` |
 | `plugin_file_*` | Durable cache under `/qx-plugin-files/<id>` |
 | `plugin_run_applescript` | Desktop wallpaper, Finder automation (macOS) |
@@ -100,14 +104,12 @@ Qx Marketplace reads `manifest.screenshots` and shows them in Installed /
 details. Assets are **not** fetched live from `raycast/extensions` at install
 time — only the packaged archive on `mcxen/qx-plugins` is downloaded.
 
-## When to re-convert vs hand-edit
+## Maintained plugin policy
 
-- **Re-convert** after converter/shim fixes (Buffer, ActionPanel, fetch), or
-  when updating to a newer Raycast source commit.
-- **Hand-edit** only for native plugins (`v2ex`, `external-display-control`)
-  or tiny post-convert manifest tweaks (`min_app_version`, keywords, version).
-- Prefer fixing **Qx host + converter** over bespoke forks of Raycast ports
-  (SOLID: open for extension via host ports; do not fork each plugin).
+- 阅读上游扩展源代码，保留业务意图，不保留 Raycast runtime/shim 结构。
+- 共享能力先补 Qx host port，再由插件直接使用稳定的 `context.*` 协议。
+- UI 优先发布声明式 Workbench 数据；复杂内容才使用 custom panel。
+- 不再以 re-convert 作为升级或修复路径。
 
 Design rules for host/converter contracts live in the Qx tree:
 `docs/architecture-principles.md` (abstraction + SOLID). Keep marketplace

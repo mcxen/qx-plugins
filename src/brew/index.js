@@ -1,29 +1,24 @@
-/**
- * Qx marketplace plugin: Brew (macOS).
- * Host protocol: context.cli (permission "cli").
- */
+/** Qx Brew — native Workbench list/detail plugin. */
 
-function esc(value) {
-  return String(value ?? "")
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;")
-    .replace(/"/g, "&quot;");
+function zh() {
+  return /^(zh-CN|zh-Hans|zh-SG|zh-MY|zh$)/i.test(String(navigator.language || ""));
+}
+
+function text(en, cn) {
+  return zh() ? cn : en;
 }
 
 async function resolveBrew(context) {
   const preferred = String((await context.getPreference("brewPath")) || "").trim();
-  if (preferred) {
-    const hit = await context.cli.which(preferred);
-    if (hit) return hit;
-    // Absolute path may not be "which"-able if custom; try as program directly.
-    return preferred;
-  }
+  if (preferred) return (await context.cli.which(preferred)) || preferred;
   for (const candidate of ["brew", "/opt/homebrew/bin/brew", "/usr/local/bin/brew"]) {
     const hit = await context.cli.which(candidate);
     if (hit) return hit;
   }
-  throw new Error("Homebrew not found. Install from https://brew.sh or set Brew executable in preferences.");
+  throw new Error(text(
+    "Homebrew not found. Install it from brew.sh or set the executable in preferences.",
+    "未找到 Homebrew。请从 brew.sh 安装，或在插件设置中指定可执行文件。",
+  ));
 }
 
 async function brewRun(context, args, timeoutMs = 120_000) {
@@ -33,63 +28,64 @@ async function brewRun(context, args, timeoutMs = 120_000) {
     args,
     timeoutMs,
     env: {
-      // Non-interactive Homebrew
       HOMEBREW_NO_AUTO_UPDATE: "1",
       HOMEBREW_NO_ENV_HINTS: "1",
       HOMEBREW_NO_ANALYTICS: "1",
     },
   });
-  if (result.timedOut) {
-    throw new Error(`brew ${args.join(" ")} timed out`);
-  }
-  // brew often prints warnings to stderr while still exiting 0
+  if (result.timedOut) throw new Error(`brew ${args.join(" ")} timed out`);
   if (result.status !== 0) {
-    const msg = (result.stderr || result.stdout || `exit ${result.status}`).trim();
-    throw new Error(msg.slice(0, 500));
+    throw new Error((result.stderr || result.stdout || `exit ${result.status}`).trim().slice(0, 500));
   }
   return result;
 }
 
+function itemKey(item) {
+  return `${item.kind}:${item.id}`;
+}
+
 function normalizeInstalled(json) {
-  const formulae = (json.formulae || []).map((f) => ({
-    id: f.name,
-    name: f.full_name || f.name,
+  const formulae = (json.formulae || []).map((item) => ({
+    id: item.name,
+    name: item.full_name || item.name,
     kind: "formula",
-    version: (f.installed && f.installed[0] && f.installed[0].version) || f.versions?.stable || "",
-    desc: f.desc || "",
-    homepage: f.homepage || "",
-    outdated: Boolean(f.outdated),
+    version: item.installed?.[0]?.version || item.versions?.stable || "",
+    current: item.versions?.stable || "",
+    desc: item.desc || "",
+    homepage: item.homepage || "",
+    outdated: Boolean(item.outdated),
   }));
-  const casks = (json.casks || []).map((c) => ({
-    id: c.token || c.name,
-    name: c.token || c.name,
+  const casks = (json.casks || []).map((item) => ({
+    id: item.token || item.name,
+    name: item.token || item.name,
     kind: "cask",
-    version: c.installed || c.version || "",
-    desc: c.desc || "",
-    homepage: c.homepage || "",
-    outdated: Boolean(c.outdated),
+    version: item.installed || item.version || "",
+    current: item.version || "",
+    desc: item.desc || "",
+    homepage: item.homepage || "",
+    outdated: Boolean(item.outdated),
   }));
   return [...formulae, ...casks].sort((a, b) => a.name.localeCompare(b.name));
 }
 
 function normalizeOutdated(json) {
-  const formulae = (json.formulae || []).map((f) => ({
-    id: f.name,
-    name: f.name,
+  const formulae = (json.formulae || []).map((item) => ({
+    id: item.name,
+    name: item.name,
     kind: "formula",
-    version: (f.installed_versions || []).join(", "),
-    current: f.current_version || "",
-    desc: "outdated formula",
+    version: (item.installed_versions || []).join(", "),
+    current: item.current_version || "",
+    desc: text("Outdated formula", "可更新的 Formula"),
     homepage: "",
     outdated: true,
   }));
-  const casks = (json.casks || []).map((c) => ({
-    id: c.name,
-    name: c.name,
+  const casks = (json.casks || []).map((item) => ({
+    id: item.name,
+    name: item.name,
     kind: "cask",
-    version: (c.installed_versions || []).join(", "),
-    current: c.current_version || "",
-    desc: "outdated cask",
+    version: (item.installed_versions || []).join(", "),
+    current: item.current_version || "",
+    desc: text("Outdated cask", "可更新的 Cask"),
     homepage: "",
     outdated: true,
   }));
@@ -97,8 +93,11 @@ function normalizeOutdated(json) {
 }
 
 async function loadInstalled(context) {
-  const result = await brewRun(context, ["info", "--json=v2", "--installed"], 180_000);
-  return normalizeInstalled(JSON.parse(result.stdout || "{}"));
+  return normalizeInstalled(JSON.parse((await brewRun(
+    context,
+    ["info", "--json=v2", "--installed"],
+    180_000,
+  )).stdout || "{}"));
 }
 
 async function loadOutdated(context) {
@@ -106,18 +105,13 @@ async function loadOutdated(context) {
   try {
     return normalizeOutdated(JSON.parse(result.stdout || "{}"));
   } catch {
-    // Fallback: plain names
-    const names = (result.stdout || "")
-      .split("\n")
-      .map((l) => l.trim())
-      .filter(Boolean);
-    return names.map((name) => ({
+    return (result.stdout || "").split("\n").map((line) => line.trim()).filter(Boolean).map((name) => ({
       id: name,
       name,
       kind: "formula",
       version: "",
       current: "",
-      desc: "outdated",
+      desc: text("Outdated", "可更新"),
       homepage: "",
       outdated: true,
     }));
@@ -125,304 +119,232 @@ async function loadOutdated(context) {
 }
 
 async function searchBrew(context, query) {
-  const q = String(query || "").trim();
-  if (!q) return [];
+  const value = String(query || "").trim();
+  if (!value) return [];
   const [formulaeOut, casksOut] = await Promise.all([
-    brewRun(context, ["search", "--formulae", q], 60_000).catch(() => ({ stdout: "" })),
-    brewRun(context, ["search", "--casks", q], 60_000).catch(() => ({ stdout: "" })),
+    brewRun(context, ["search", "--formulae", value], 60_000).catch(() => ({ stdout: "" })),
+    brewRun(context, ["search", "--casks", value], 60_000).catch(() => ({ stdout: "" })),
   ]);
-  const formulae = (formulaeOut.stdout || "")
-    .split("\n")
-    .map((l) => l.trim())
-    .filter(Boolean)
+  const mapHits = (stdout, kind) => (stdout || "").split("\n").map((line) => line.trim()).filter(Boolean)
     .map((name) => ({
       id: name,
       name,
-      kind: "formula",
+      kind,
       version: "",
-      desc: "search hit",
-      homepage: `https://formulae.brew.sh/formula/${encodeURIComponent(name)}`,
+      current: "",
+      desc: text("Search result", "搜索结果"),
+      homepage: `https://formulae.brew.sh/${kind}/${encodeURIComponent(name)}`,
       outdated: false,
       remote: true,
     }));
-  const casks = (casksOut.stdout || "")
-    .split("\n")
-    .map((l) => l.trim())
-    .filter(Boolean)
-    .map((name) => ({
-      id: name,
-      name,
-      kind: "cask",
-      version: "",
-      desc: "search hit",
-      homepage: `https://formulae.brew.sh/cask/${encodeURIComponent(name)}`,
-      outdated: false,
-      remote: true,
-    }));
-  return [...formulae, ...casks];
+  return [...mapHits(formulaeOut.stdout, "formula"), ...mapHits(casksOut.stdout, "cask")];
 }
 
-function styles() {
-  return `
-    .bw{box-sizing:border-box;height:100%;display:flex;flex-direction:column;gap:8px;padding:12px;font:13px -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;color:var(--qx-text-primary,#111);}
-    .bw *{box-sizing:border-box;}
-    .bw-bar{display:flex;gap:6px;flex-wrap:wrap;align-items:center;}
-    .bw-bar input{flex:1;min-width:120px;height:32px;border:1px solid var(--qx-border-1,#ddd);border-radius:7px;padding:0 10px;background:var(--qx-bg-component-1,#fff);color:inherit;font:inherit;}
-    .bw-bar button,.bw-act{height:30px;border:1px solid var(--qx-border-1,#ddd);border-radius:7px;background:var(--qx-bg-component-1,#fff);color:inherit;padding:0 10px;font:inherit;cursor:pointer;}
-    .bw-bar button.is-on{border-color:var(--qx-accent,#2563eb);background:color-mix(in srgb,var(--qx-accent,#2563eb) 12%,transparent);}
-    .bw-meta{color:var(--qx-text-secondary,#666);font-size:12px;}
-    .bw-err{color:var(--qx-danger,#b91c1c);white-space:pre-wrap;font-size:12px;}
-    .bw-list{flex:1;min-height:0;overflow:auto;display:flex;flex-direction:column;gap:4px;}
-    .bw-row{display:grid;grid-template-columns:1fr auto;gap:8px;align-items:center;padding:8px 10px;border-radius:8px;border:1px solid transparent;text-align:left;background:transparent;color:inherit;font:inherit;cursor:pointer;}
-    .bw-row:hover{background:var(--qx-bg-component-2,#f5f5f5);}
-    .bw-row.is-sel{border-color:var(--qx-accent,#2563eb);background:color-mix(in srgb,var(--qx-accent,#2563eb) 8%,transparent);}
-    .bw-row strong{display:block;}
-    .bw-row small{color:var(--qx-text-secondary,#666);}
-    .bw-kind{font-size:10px;text-transform:uppercase;letter-spacing:.06em;color:var(--qx-text-tertiary,#888);border:1px solid var(--qx-border-1,#ddd);border-radius:4px;padding:2px 5px;}
-    .bw-actions{display:flex;gap:6px;flex-wrap:wrap;}
-  `;
-}
-
-function render(container, context, state) {
-  const items = state.filtered;
-  const selected = items[state.selected] || null;
-  const rows = items
-    .map((item, index) => {
-      const ver = item.current
-        ? `${item.version || "?"} → ${item.current}`
-        : item.version || "";
-      return `<button type="button" class="bw-row${index === state.selected ? " is-sel" : ""}" data-i="${index}">
-        <span>
-          <strong>${esc(item.name)}</strong>
-          <small>${esc(item.desc || "")}${ver ? ` · ${esc(ver)}` : ""}</small>
-        </span>
-        <span class="bw-kind">${esc(item.kind)}${item.outdated ? " · outdated" : ""}</span>
-      </button>`;
-    })
-    .join("");
-
-  container.innerHTML = `
-    <style>${styles()}</style>
-    <div class="bw">
-      <div class="bw-bar">
-        <button type="button" data-tab="installed" class="${state.tab === "installed" ? "is-on" : ""}">Installed</button>
-        <button type="button" data-tab="outdated" class="${state.tab === "outdated" ? "is-on" : ""}">Outdated</button>
-        <button type="button" data-tab="search" class="${state.tab === "search" ? "is-on" : ""}">Search</button>
-        <input data-q placeholder="${state.tab === "search" ? "Search formulae & casks…" : "Filter…"}" value="${esc(state.query)}" />
-        <button type="button" data-act="refresh">Refresh</button>
-      </div>
-      <div class="bw-meta">${state.loading ? "Running brew…" : `${items.length} packages`}${state.brewPath ? ` · ${esc(state.brewPath)}` : ""}</div>
-      ${state.error ? `<div class="bw-err">${esc(state.error)}</div>` : ""}
-      <div class="bw-list">${rows || `<div class="bw-meta">No packages</div>`}</div>
-      <div class="bw-actions">
-        <button type="button" data-act="upgrade" ${!selected || selected.remote ? "disabled" : ""}>Upgrade</button>
-        <button type="button" data-act="upgrade-all" ${state.tab !== "outdated" ? "disabled" : ""}>Upgrade all outdated</button>
-        <button type="button" data-act="install" ${!selected?.remote ? "disabled" : ""}>Install</button>
-        <button type="button" data-act="uninstall" ${!selected || selected.remote ? "disabled" : ""}>Uninstall</button>
-        <button type="button" data-act="open" ${!selected ? "disabled" : ""}>Homepage</button>
-      </div>
-    </div>
-  `;
-
-  const q = container.querySelector("[data-q]");
-  q?.addEventListener("input", () => {
-    state.query = q.value;
-    if (state.tab === "search") {
-      // debounce search
-      clearTimeout(state._searchTimer);
-      state._searchTimer = setTimeout(() => state.reload(), 350);
-    } else {
-      state.applyFilter();
-      render(container, context, state);
-    }
-  });
-  q?.addEventListener("keydown", (e) => {
-    if (e.key === "Enter" && state.tab === "search") {
-      e.preventDefault();
-      state.reload();
-    }
-  });
-
-  container.querySelectorAll("[data-tab]").forEach((btn) => {
-    btn.addEventListener("click", () => {
-      state.tab = btn.getAttribute("data-tab");
-      state.query = "";
-      state.selected = 0;
-      state.reload();
-    });
-  });
-
-  container.querySelectorAll(".bw-row").forEach((row) => {
-    row.addEventListener("click", () => {
-      state.selected = Number(row.getAttribute("data-i"));
-      render(container, context, state);
-    });
-  });
-
-  container.querySelector('[data-act="refresh"]')?.addEventListener("click", () => state.reload());
-  container.querySelector('[data-act="upgrade"]')?.addEventListener("click", () => state.upgradeSelected());
-  container.querySelector('[data-act="upgrade-all"]')?.addEventListener("click", () => state.upgradeAll());
-  container.querySelector('[data-act="install"]')?.addEventListener("click", () => state.installSelected());
-  container.querySelector('[data-act="uninstall"]')?.addEventListener("click", () => state.uninstallSelected());
-  container.querySelector('[data-act="open"]')?.addEventListener("click", () => state.openHomepage());
-}
-
-function createState(container, context) {
+function createPanel(context) {
   const state = {
     tab: "installed",
     query: "",
     items: [],
-    filtered: [],
-    selected: 0,
-    loading: false,
-    error: "",
+    selectedId: null,
+    loading: true,
+    error: null,
+    busy: null,
     brewPath: "",
     dead: false,
-    _searchTimer: 0,
-    _reloadGen: 0,
+    reloadGeneration: 0,
+    searchTimer: null,
+  };
 
-    applyFilter() {
-      const q = state.query.trim().toLowerCase();
-      state.filtered = !q
-        ? state.items
-        : state.items.filter(
-            (item) =>
-              item.name.toLowerCase().includes(q) ||
-              String(item.desc || "").toLowerCase().includes(q),
-          );
-      if (state.selected >= state.filtered.length) state.selected = 0;
-    },
+  const visibleItems = () => {
+    if (state.tab === "search") return state.items;
+    const query = state.query.trim().toLocaleLowerCase();
+    return query
+      ? state.items.filter((item) => `${item.name} ${item.desc || ""}`.toLocaleLowerCase().includes(query))
+      : state.items;
+  };
 
-    async reload() {
-      if (state.dead) return;
-      const gen = ++state._reloadGen;
-      state.loading = true;
-      state.error = "";
-      render(container, context, state);
-      try {
-        try {
-          state.brewPath = await resolveBrew(context);
-        } catch {
-          state.brewPath = "";
-        }
-        if (state.dead || gen !== state._reloadGen) return;
+  const selected = () => visibleItems().find((item) => itemKey(item) === state.selectedId) || visibleItems()[0];
+
+  const paint = () => {
+    if (state.dead) return;
+    const items = visibleItems();
+    if (items.length && !items.some((item) => itemKey(item) === state.selectedId)) {
+      state.selectedId = itemKey(items[0]);
+    }
+    const busy = Boolean(state.busy);
+    context.ui.mountWorkbench({
+      title: "Brew",
+      layout: { kind: "list" },
+      query: state.query,
+      queryPlaceholder: state.tab === "search"
+        ? text("Search formulae and casks…", "搜索 Formula 与 Cask…")
+        : text("Filter packages…", "筛选软件包…"),
+      tabs: [
+        { id: "installed", label: text("Installed", "已安装"), active: state.tab === "installed" },
+        { id: "outdated", label: text("Outdated", "可更新"), active: state.tab === "outdated" },
+        { id: "search", label: text("Search", "搜索"), active: state.tab === "search" },
+      ],
+      loading: state.loading,
+      error: state.error,
+      meta: `${items.length} ${text("packages", "个软件包")}${state.brewPath ? ` · ${state.brewPath}` : ""}`,
+      emptyText: state.tab === "search" && !state.query
+        ? text("Type to search Homebrew", "输入内容搜索 Homebrew")
+        : text("No packages", "没有软件包"),
+      selectedId: state.selectedId,
+      items: items.map((item) => ({
+        id: itemKey(item),
+        title: item.name,
+        subtitle: item.desc || item.version,
+        icon: item.kind === "cask" ? "◆" : "◇",
+        badge: item.outdated ? text("Outdated", "可更新") : item.kind,
+        tone: item.outdated ? "warning" : "neutral",
+        detail: {
+          title: item.name,
+          subtitle: item.desc,
+          fields: [
+            { label: text("Type", "类型"), value: item.kind },
+            { label: text("Installed", "已安装版本"), value: item.version || "—" },
+            { label: text("Latest", "最新版本"), value: item.current || "—" },
+            { label: text("Status", "状态"), value: item.remote
+              ? text("Available", "可安装")
+              : item.outdated ? text("Update available", "有可用更新") : text("Installed", "已安装") },
+          ],
+        },
+        actions: item.remote ? [
+          { id: "install", label: text("Install", "安装"), primary: true, disabled: busy },
+          { id: "homepage", label: text("Open Homepage", "打开主页"), disabled: busy },
+        ] : [
+          { id: "upgrade", label: text("Upgrade", "更新"), primary: item.outdated, disabled: busy },
+          { id: "homepage", label: text("Open Homepage", "打开主页"), primary: !item.outdated, disabled: busy },
+          { id: "uninstall", label: text("Uninstall", "卸载"), tone: "danger", disabled: busy },
+        ],
+      })),
+      actions: [
+        { id: "refresh", label: text("Refresh", "刷新"), disabled: busy },
+        { id: "upgrade-all", label: text("Upgrade All Outdated", "更新全部可更新项"), disabled: busy || state.tab !== "outdated" },
+      ],
+      island: state.busy ? { primary: "Brew", secondary: state.busy, tone: "neutral" } : null,
+    }, {
+      onQuery(value) {
+        state.query = value;
+        paint();
         if (state.tab === "search") {
-          state.items = await searchBrew(context, state.query);
-        } else if (state.tab === "outdated") {
-          state.items = await loadOutdated(context);
-        } else {
-          state.items = await loadInstalled(context);
+          if (state.searchTimer != null) context.clearTimeout(state.searchTimer);
+          state.searchTimer = context.setTimeout(() => void reload(), 350);
         }
-        if (state.dead || gen !== state._reloadGen) return;
-        state.applyFilter();
-      } catch (error) {
-        if (state.dead || gen !== state._reloadGen) return;
+      },
+      onTab(id) {
+        if (!["installed", "outdated", "search"].includes(id)) return;
+        state.tab = id;
+        state.query = "";
         state.items = [];
-        state.filtered = [];
-        state.error = String(error?.message || error);
-      } finally {
-        if (state.dead || gen !== state._reloadGen) return;
-        state.loading = false;
-        render(container, context, state);
-      }
-    },
+        state.selectedId = null;
+        void reload();
+      },
+      onSelect(id) {
+        state.selectedId = id;
+        paint();
+      },
+      onAction(id) {
+        void runAction(id);
+      },
+    });
+  };
 
-    selectedItem() {
-      return state.filtered[state.selected] || null;
-    },
+  const reload = async () => {
+    if (state.dead) return;
+    const generation = ++state.reloadGeneration;
+    state.loading = true;
+    state.error = null;
+    paint();
+    try {
+      state.brewPath = await resolveBrew(context);
+      if (state.dead || generation !== state.reloadGeneration) return;
+      state.items = state.tab === "search"
+        ? await searchBrew(context, state.query)
+        : state.tab === "outdated"
+          ? await loadOutdated(context)
+          : await loadInstalled(context);
+      if (state.dead || generation !== state.reloadGeneration) return;
+      state.selectedId = state.items[0] ? itemKey(state.items[0]) : null;
+    } catch (error) {
+      if (state.dead || generation !== state.reloadGeneration) return;
+      state.items = [];
+      state.error = String(error?.message || error);
+    } finally {
+      if (state.dead || generation !== state.reloadGeneration) return;
+      state.loading = false;
+      paint();
+    }
+  };
 
-    async upgradeSelected() {
-      const item = state.selectedItem();
-      if (!item || item.remote) return;
-      state.loading = true;
-      state.error = "";
-      render(container, context, state);
-      try {
-        await brewRun(context, ["upgrade", item.id], 600_000);
-        context.showToast(`Upgraded ${item.name}`);
-        await state.reload();
-      } catch (error) {
-        state.error = String(error?.message || error);
-        state.loading = false;
-        render(container, context, state);
-      }
-    },
+  const runBusy = async (label, task) => {
+    if (state.busy) return;
+    state.busy = label;
+    state.error = null;
+    paint();
+    try {
+      await task();
+    } catch (error) {
+      state.error = String(error?.message || error);
+      context.showToast(state.error);
+    } finally {
+      state.busy = null;
+      paint();
+    }
+  };
 
-    async upgradeAll() {
-      const ok = globalThis.confirm ? globalThis.confirm("Run brew upgrade for all outdated packages?") : true;
-      if (!ok) return;
-      state.loading = true;
-      state.error = "";
-      render(container, context, state);
-      try {
+  const confirmAction = async (label) => {
+    const answer = await context.prompt(`${label} ${text("Type YES to continue.", "输入 YES 继续。")}`, "");
+    return answer === "YES";
+  };
+
+  const homepage = async (item) => {
+    const url = item.homepage || `https://formulae.brew.sh/${item.kind}/${encodeURIComponent(item.id)}`;
+    await context.openUrl(url);
+  };
+
+  const runAction = async (id) => {
+    const item = selected();
+    if (id === "refresh") return reload();
+    if (id === "homepage" && item) return homepage(item);
+    if (id === "upgrade-all") {
+      if (!(await confirmAction(text("Upgrade all outdated packages?", "更新全部可更新软件包？")))) return;
+      return runBusy(text("Upgrading packages…", "正在更新软件包…"), async () => {
         await brewRun(context, ["upgrade"], 600_000);
-        context.showToast("brew upgrade finished");
-        state.tab = "outdated";
-        await state.reload();
-      } catch (error) {
-        state.error = String(error?.message || error);
-        state.loading = false;
-        render(container, context, state);
-      }
-    },
-
-    async installSelected() {
-      const item = state.selectedItem();
-      if (!item?.remote) return;
-      const ok = globalThis.confirm ? globalThis.confirm(`Install ${item.kind} ${item.name}?`) : true;
-      if (!ok) return;
-      state.loading = true;
-      state.error = "";
-      render(container, context, state);
-      try {
-        const args = item.kind === "cask" ? ["install", "--cask", item.id] : ["install", item.id];
-        await brewRun(context, args, 600_000);
-        context.showToast(`Installed ${item.name}`);
+        context.showToast(text("Homebrew upgrade finished", "Homebrew 更新完成"));
+        await reload();
+      });
+    }
+    if (!item) return;
+    if (id === "upgrade") {
+      return runBusy(`${text("Upgrading", "正在更新")} ${item.name}…`, async () => {
+        await brewRun(context, ["upgrade", item.id], 600_000);
+        context.showToast(`${text("Upgraded", "已更新")} ${item.name}`);
+        await reload();
+      });
+    }
+    if (id === "install") {
+      if (!(await confirmAction(`${text("Install", "安装")} ${item.name}?`))) return;
+      return runBusy(`${text("Installing", "正在安装")} ${item.name}…`, async () => {
+        await brewRun(context, item.kind === "cask" ? ["install", "--cask", item.id] : ["install", item.id], 600_000);
+        context.showToast(`${text("Installed", "已安装")} ${item.name}`);
         state.tab = "installed";
         state.query = "";
-        await state.reload();
-      } catch (error) {
-        state.error = String(error?.message || error);
-        state.loading = false;
-        render(container, context, state);
-      }
-    },
-
-    async uninstallSelected() {
-      const item = state.selectedItem();
-      if (!item || item.remote) return;
-      const ok = globalThis.confirm ? globalThis.confirm(`Uninstall ${item.name}?`) : true;
-      if (!ok) return;
-      state.loading = true;
-      state.error = "";
-      render(container, context, state);
-      try {
-        const args =
-          item.kind === "cask" ? ["uninstall", "--cask", item.id] : ["uninstall", item.id];
-        await brewRun(context, args, 300_000);
-        context.showToast(`Uninstalled ${item.name}`);
-        await state.reload();
-      } catch (error) {
-        state.error = String(error?.message || error);
-        state.loading = false;
-        render(container, context, state);
-      }
-    },
-
-    async openHomepage() {
-      const item = state.selectedItem();
-      if (!item) return;
-      let url = item.homepage;
-      if (!url) {
-        url =
-          item.kind === "cask"
-            ? `https://formulae.brew.sh/cask/${encodeURIComponent(item.id)}`
-            : `https://formulae.brew.sh/formula/${encodeURIComponent(item.id)}`;
-      }
-      await context.openUrl(url);
-    },
+        await reload();
+      });
+    }
+    if (id === "uninstall") {
+      if (!(await confirmAction(`${text("Uninstall", "卸载")} ${item.name}?`))) return;
+      return runBusy(`${text("Uninstalling", "正在卸载")} ${item.name}…`, async () => {
+        await brewRun(context, item.kind === "cask" ? ["uninstall", "--cask", item.id] : ["uninstall", item.id], 300_000);
+        context.showToast(`${text("Uninstalled", "已卸载")} ${item.name}`);
+        await reload();
+      });
+    }
   };
-  return state;
+
+  return { state, paint, reload };
 }
 
 export default {
@@ -431,7 +353,7 @@ export default {
       name: "open-brew",
       title: "Brew",
       async run(context) {
-        context.showToast("Open Brew from the plugin panel (search Brew).");
+        context.showToast(text("Open Brew from Extensions", "请从扩展中打开 Brew"));
       },
     },
     {
@@ -440,9 +362,9 @@ export default {
       async run(context) {
         try {
           const items = await loadOutdated(context);
-          context.showToast(
-            items.length ? `${items.length} outdated package(s)` : "All packages up to date",
-          );
+          context.showToast(items.length
+            ? `${items.length} ${text("outdated packages", "个软件包可更新")}`
+            : text("All packages are up to date", "全部软件包均为最新版本"));
         } catch (error) {
           context.showToast(String(error?.message || error));
         }
@@ -452,40 +374,38 @@ export default {
       name: "brew-upgrade-all",
       title: "Brew: Upgrade All Outdated",
       async run(context) {
-        const ok = globalThis.confirm
-          ? globalThis.confirm("Run brew upgrade for all outdated packages?")
-          : true;
-        if (!ok) return;
+        const answer = await context.prompt(text(
+          "Upgrade all outdated packages? Type YES to continue.",
+          "更新全部可更新软件包？输入 YES 继续。",
+        ), "");
+        if (answer !== "YES") return;
         try {
           await brewRun(context, ["upgrade"], 600_000);
-          context.showToast("brew upgrade finished");
+          context.showToast(text("Homebrew upgrade finished", "Homebrew 更新完成"));
         } catch (error) {
           context.showToast(String(error?.message || error));
         }
       },
     },
   ],
-
   panel: {
     title: "Brew",
-    // Host renderPanel times out if this awaits brew (often >5s). Paint UI and load async.
-    async render(container, context) {
-      if (!context.cli?.run) {
-        container.innerHTML =
-          '<div style="padding:16px;color:var(--qx-danger)">This host has no context.cli. Requires Qx ≥ 0.5.26 and permission "cli".</div>';
+    render(container, context) {
+      if (!context.ui?.mountWorkbench || !context.cli?.run) {
+        container.textContent = text("Qx 0.5.39 or newer is required.", "需要 Qx 0.5.39 或更高版本。");
         return;
       }
-      const state = createState(container, context);
-      container.__bwState = state;
-      // First paint ("Running brew…") happens inside reload; do not await the CLI.
-      void state.reload();
+      const panel = createPanel(context);
+      container.__qxBrewPanel = panel;
+      panel.paint();
+      void panel.reload();
     },
     destroy(container) {
-      const state = container.__bwState;
-      if (state) {
-        state.dead = true;
-        clearTimeout(state._searchTimer);
-        container.__bwState = undefined;
+      const panel = container.__qxBrewPanel;
+      if (panel) {
+        panel.state.dead = true;
+        panel.state.reloadGeneration += 1;
+        container.__qxBrewPanel = null;
       }
       container.innerHTML = "";
     },

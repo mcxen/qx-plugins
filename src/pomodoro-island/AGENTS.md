@@ -36,6 +36,10 @@ src/pomodoro-island/
 8. Island publishes absolute `countdown.endsAt` (or paused `remainingMs`) and host-owned `pause/play` action icons; never push countdown text every second.
 9. Timer intervals use **`context.setInterval` / `clearInterval`** only for completion detection; the heartbeat owns recovery/completion and Qx owns smooth countdown presentation.
 10. Island is best-effort and uses the same state object through the Workbench `island` field or `context.island` while the panel is closed.
+11. Completion makes the opposite phase the primary next action (focus → break, break → focus); repeating the same phase remains secondary.
+12. Manifest command actions refresh persisted state through `onCommandComplete`; the open panel may repaint its deadline once per second but must not poll persistent storage every second.
+13. A running timer publishes `activity: "pulse"`; paused/complete states remove it. Activity DOM/CSS, reduced motion, action busy state, and winner transitions are Qx responsibilities.
+14. The plugin never publishes an open route. Qx binds the floating “Open Qx” control to `plugin:pomodoro-island` from the authenticated plugin session.
 
 ## Permissions
 
@@ -52,6 +56,8 @@ src/pomodoro-island/
 - [ ] Start focus → close panel → timer/history continue; reopen and verify remaining time
 - [ ] Sleep/wake or reload runtime → heartbeat reconciles expired deadline once
 - [ ] Docked island ticks; enable External Island Display and verify float
+- [ ] Running shows host `pulse`; paused freezes countdown without activity; complete shows 100% success
+- [ ] Floating “Open Qx” returns to the Pomodoro Workbench
 - [ ] Pause/Stop from panel Actions, Cmd/Ctrl+K, search and island action
 
 ## Do not

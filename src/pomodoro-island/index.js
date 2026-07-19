@@ -77,6 +77,18 @@ function kindLabel(kind) {
   return kind === "break" ? "Short break" : "Focus session";
 }
 
+function nextKind(kind) {
+  return kind === "break" ? "focus" : "break";
+}
+
+function startCommand(kind) {
+  return kind === "break" ? "start-short-break" : "start-focus";
+}
+
+function startLabel(kind) {
+  return kind === "break" ? "Start Short Break" : "Start Focus";
+}
+
 function phaseLabel(phase) {
   if (phase === "running") return "In progress";
   if (phase === "paused") return "Paused";
@@ -134,14 +146,15 @@ async function appendHistory(context, state, outcome, endedAt = Date.now()) {
 function islandModel(state) {
   if (state.phase === "idle") return null;
   if (state.phase === "complete") {
+    const recommendedKind = nextKind(state.kind);
     return {
       primary: `${kindLabel(state.kind)} complete`,
-      secondary: "Ready for the next round",
+      secondary: recommendedKind === "break" ? "Take a short break" : "Ready to focus again",
       progress: 100,
       tone: "success",
       action: {
-        label: "Again",
-        command: state.kind === "break" ? "start-short-break" : "start-focus",
+        label: recommendedKind === "break" ? "Start break" : "Start focus",
+        command: startCommand(recommendedKind),
         icon: "play",
       },
     };
@@ -149,6 +162,9 @@ function islandModel(state) {
   return {
     primary: kindLabel(state.kind),
     secondary: phaseLabel(state.phase),
+    // Qx owns the animation and reduced-motion fallback. The absolute
+    // countdown remains the timer truth and also drives the progress overlay.
+    activity: state.phase === "running" ? "pulse" : undefined,
     countdown: state.phase === "paused"
       ? {
           remainingMs: currentRemaining(state),
@@ -279,7 +295,7 @@ async function toggle(context) {
   runtimeContext = context;
   const state = await readState(context);
   if (state.phase === "idle" || state.phase === "complete") {
-    await start(context, state.kind);
+    await start(context, state.phase === "complete" ? nextKind(state.kind) : state.kind);
     return;
   }
   if (state.phase === "running") {
@@ -398,8 +414,9 @@ function currentDetail(state, historyCount) {
 }
 
 function panelActions(state, hasHistory) {
-  const actions = state.phase === "running" || state.phase === "paused"
-    ? [
+  let actions;
+  if (state.phase === "running" || state.phase === "paused") {
+    actions = [
         {
           id: "toggle",
           label: state.phase === "paused" ? "Resume" : "Pause",
@@ -408,11 +425,29 @@ function panelActions(state, hasHistory) {
           kbd: "Enter",
         },
         { id: "stop", label: "Stop", command: "stop-pomodoro", tone: "danger" },
-      ]
-    : [
+      ];
+  } else if (state.phase === "complete") {
+    const recommendedKind = nextKind(state.kind);
+    actions = [
+      {
+        id: `next:${recommendedKind}`,
+        label: startLabel(recommendedKind),
+        command: startCommand(recommendedKind),
+        primary: true,
+        kbd: "Enter",
+      },
+      {
+        id: `again:${state.kind}`,
+        label: state.kind === "break" ? "Repeat Short Break" : "Repeat Focus",
+        command: startCommand(state.kind),
+      },
+    ];
+  } else {
+    actions = [
         { id: "focus", label: "Start Focus", command: "start-focus", primary: true, kbd: "Enter" },
         { id: "break", label: "Start Short Break", command: "start-short-break" },
       ];
+  }
   if (hasHistory) actions.push({ id: "clear-history", label: "Clear History", tone: "danger" });
   return actions;
 }
@@ -482,6 +517,7 @@ function renderPanel(container, context) {
         context.showToast("Pomodoro history cleared");
         paint();
       },
+      onCommandComplete: () => void refresh(),
       onBackgroundPoll: () => void refresh(),
     });
   };
@@ -502,7 +538,9 @@ function renderPanel(container, context) {
 
   paint();
   void refresh();
-  pollTimer = context.setInterval(() => void refresh(), 750);
+  pollTimer = context.setInterval(() => {
+    if (state.phase === "running") paint();
+  }, 1000);
 
   return () => {
     destroyed = true;

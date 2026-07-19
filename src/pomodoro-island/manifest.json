@@ -1,8 +1,8 @@
 {
   "id": "pomodoro-island",
   "name": "Pomodoro Island",
-  "version": "1.4.2",
-  "description": "Declarative Workbench reference plugin with persistent background timing, history, Qx-rendered actions, and docked or floating QxIsland.",
+  "version": "1.6.0",
+  "description": "Reference plugin for declarative Workbench and the structured QxIsland session protocol, with persistent background timing and history.",
   "author": "mcx",
   "icon": "icon.svg",
   "platforms": ["macos", "windows"],
@@ -31,19 +31,19 @@
     {
       "name": "start-focus",
       "title": "Pomodoro: Start Focus",
-      "description": "Start a focus timer in the external QxIsland.",
+      "description": "Start a focus timer in the Qx-managed island.",
       "keywords": ["pomodoro", "focus", "timer", "番茄钟", "专注"]
     },
     {
       "name": "start-short-break",
       "title": "Pomodoro: Start Short Break",
-      "description": "Start a short break in the external QxIsland.",
+      "description": "Start a short break in the Qx-managed island.",
       "keywords": ["pomodoro", "break", "timer", "休息"]
     },
     {
       "name": "toggle-pomodoro",
       "title": "Pomodoro: Pause or Resume",
-      "description": "Pause or resume the active Pomodoro timer.",
+      "description": "Pause or resume the timer; after completion, start the recommended next phase.",
       "keywords": ["pomodoro", "pause", "resume", "暂停", "继续"]
     },
     {
@@ -66,6 +66,6 @@
     "icon": "icon.svg",
     "keywords": ["pomodoro", "timer", "focus", "番茄钟", "专注"]
   },
-  "min_app_version": "0.5.38",
+  "min_app_version": "0.5.43",
   "screenshots": []
 }
