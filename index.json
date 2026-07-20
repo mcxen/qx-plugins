@@ -115,7 +115,7 @@
       "description": "Native Qx Workbench for system identity, CPU and memory, storage, network, power, and processes on macOS and Windows.",
       "download_url": "https://raw.githubusercontent.com/mcxen/qx-plugins/main/sysinfo.qx-plugin",
       "size_bytes": 16715,
-      "checksum_sha256": "7fcd77529e904148b6a10f16ee15ade9fbc80a6a897fab6e087139201d56a5e4",
+      "checksum_sha256": "315386b54a09ee12b1ec8d0adabd76dc99254c1e8c92234999ec84540e494509",
       "required_permissions": [
         "system",
         "system-stats",
