@@ -109,6 +109,25 @@
       "min_app_version": "0.5.38"
     },
     {
+      "id": "sysinfo",
+      "name": "Sysinfo",
+      "version": "1.0.0",
+      "description": "Native Qx Workbench for system identity, CPU and memory, storage, network, power, and processes on macOS and Windows.",
+      "download_url": "https://raw.githubusercontent.com/mcxen/qx-plugins/main/sysinfo.qx-plugin",
+      "size_bytes": 16715,
+      "checksum_sha256": "7fcd77529e904148b6a10f16ee15ade9fbc80a6a897fab6e087139201d56a5e4",
+      "required_permissions": [
+        "system",
+        "system-stats",
+        "system-info",
+        "processes",
+        "invoke:qx_system_information_kill_process"
+      ],
+      "updated_at": "2026-07-20",
+      "author": "Qx",
+      "min_app_version": "0.6.0"
+    },
+    {
       "id": "unsplash",
       "name": "Unsplash",
       "version": "1.1.1",

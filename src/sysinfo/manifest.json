@@ -1,0 +1,43 @@
+{
+  "id": "sysinfo",
+  "name": "Sysinfo",
+  "version": "1.0.0",
+  "description": "Native Qx Workbench for system identity, CPU and memory, storage, network, power, and processes on macOS and Windows.",
+  "author": "Qx",
+  "icon": "icon.svg",
+  "keywords": [
+    "system",
+    "sysinfo",
+    "cpu",
+    "memory",
+    "storage",
+    "network",
+    "processes",
+    "系统",
+    "性能"
+  ],
+  "permissions": [
+    "system",
+    "system-stats",
+    "system-info",
+    "processes",
+    "invoke:qx_system_information_kill_process"
+  ],
+  "entry": "index.js",
+  "commands": [
+    {
+      "name": "open-sysinfo",
+      "title": "Sysinfo",
+      "description": "Open the native system information Workbench",
+      "keywords": ["system", "cpu", "memory", "storage", "network", "系统信息"]
+    }
+  ],
+  "panel": {
+    "title": "Sysinfo",
+    "icon": "icon.svg",
+    "keywords": ["system", "monitor", "processes", "系统", "性能"]
+  },
+  "min_app_version": "0.6.0",
+  "platforms": ["macos", "windows"],
+  "screenshots": []
+}
