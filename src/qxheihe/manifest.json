@@ -1,7 +1,7 @@
 {
   "id": "qxheihe",
   "name": "QxHeihe 小黑盒",
-  "version": "1.2.0",
+  "version": "1.2.1",
   "description": "浏览小黑盒社区推荐内容，在 Qx 内查看正文、多图、帖子信息与登录评论。",
   "author": "mcx",
   "icon": "icon.svg",
@@ -30,9 +30,9 @@
     {
       "id": "commentCookie",
       "label": "评论登录 Cookie",
-      "type": "password",
+      "type": "string",
       "required": false,
-      "description": "可选。粘贴小黑盒网页版完整 Cookie 后可读取评论；仅用于评论请求，不写入帖子缓存。"
+      "description": "可选。粘贴小黑盒网页版完整 Cookie 后可读取评论；普通文本展示，仅用于评论请求，不写入帖子缓存。"
     },
     {
       "id": "cacheTtlMinutes",

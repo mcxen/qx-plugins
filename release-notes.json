@@ -63,6 +63,14 @@
     ],
     "qxheihe": [
       {
+        "version": "1.2.1",
+        "published_at": "2026-07-23",
+        "notes_localizations": {
+          "en": "Changed the optional comment Cookie to plain text and added the article share URL as the full-detail request source.",
+          "zh-CN": "评论 Cookie 改为普通文本输入，并以文章分享链接作为完整详情请求来源。"
+        }
+      },
+      {
         "version": "1.2.0",
         "published_at": "2026-07-23",
         "notes_localizations": {

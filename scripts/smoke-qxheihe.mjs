@@ -36,6 +36,7 @@ function jsonResponse(value) {
 async function mockFetch(url, options = {}) {
   if (String(url).includes("/bbs/web/link/detail")) {
     const id = new URL(url).searchParams.get("link_id");
+    assert.match(String(options.headers?.Referer || ""), /xiaoheihe\.cn\/app\/bbs\/link\//);
     return jsonResponse({
       status: "ok",
       result: {

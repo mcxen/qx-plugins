@@ -171,11 +171,11 @@
     {
       "id": "qxheihe",
       "name": "QxHeihe 小黑盒",
-      "version": "1.2.0",
+      "version": "1.2.1",
       "description": "浏览小黑盒社区推荐内容，在 Qx 内查看正文、多图、帖子信息与登录评论。",
       "download_url": "https://raw.githubusercontent.com/mcxen/qx-plugins/main/qxheihe.qx-plugin",
-      "size_bytes": 32556,
-      "checksum_sha256": "1fc2f68fc316de7235aa8ebdcce1a0eea5b8263d4eb6b54fe212cac5c582daf1",
+      "size_bytes": 32997,
+      "checksum_sha256": "cbd7461c3241622c2dda24d0a16375fd01d5f7d70ca894671847b0c2f497536b",
       "required_permissions": [
         "http",
         "open-url"
@@ -184,6 +184,14 @@
       "author": "mcx",
       "min_app_version": "0.6.16",
       "releases": [
+        {
+          "version": "1.2.1",
+          "published_at": "2026-07-23",
+          "notes_localizations": {
+            "en": "Changed the optional comment Cookie to plain text and added the article share URL as the full-detail request source.",
+            "zh-CN": "评论 Cookie 改为普通文本输入，并以文章分享链接作为完整详情请求来源。"
+          }
+        },
         {
           "version": "1.2.0",
           "published_at": "2026-07-23",

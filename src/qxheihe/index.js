@@ -572,7 +572,14 @@ function createPanel(container, context) {
     paint();
     try {
       const cookie = await preference(context, "commentCookie", "");
-      const detailRequest = fetchJson(context, `${DETAIL_URL}?link_id=${encodeURIComponent(key)}`);
+      // The public detail endpoint is the stable equivalent of opening the
+      // share page: it returns the complete structured link.text without
+      // executing the captcha-protected website SPA.
+      const detailRequest = fetchJson(
+        context,
+        `${DETAIL_URL}?link_id=${encodeURIComponent(key)}`,
+        { Referer: postUrl(post) },
+      );
       const commentRequest = cookie
         ? fetchJson(
             context,
