@@ -180,6 +180,7 @@ function createPanelState(context) {
         detail: {
           title: imageTitle(image),
           subtitle: imageCredit(image),
+          image: { url: imageUrl(image, "full"), alt: imageTitle(image), fit: "contain" },
           fields: [
             { label: text("Date", "日期"), value: image.startdate || "—" },
             { label: text("Resolution", "分辨率"), value: "3840 × 2160" },

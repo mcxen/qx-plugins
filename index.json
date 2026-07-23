@@ -72,11 +72,11 @@
     {
       "id": "qx-bing-wallpaper",
       "name": "Qx Bing Wallpaper",
-      "version": "2.0.2",
+      "version": "2.0.3",
       "description": "Browse Bing's daily images in a native Qx Gallery, then download or set them as wallpaper.",
       "download_url": "https://raw.githubusercontent.com/mcxen/qx-plugins/main/qx-bing-wallpaper.qx-plugin",
-      "size_bytes": 11768916,
-      "checksum_sha256": "49e41c09094a81cdc4c2daf6e87ac69e74d53f0a17999830190f452d04765717",
+      "size_bytes": 11769007,
+      "checksum_sha256": "cc5c556360694a48419aa16e9be5c174fdeba57cff2f3446bc85748ef9c745ac",
       "required_permissions": [
         "http",
         "open-url",
@@ -111,11 +111,11 @@
     {
       "id": "qxpicture",
       "name": "Qxpicture",
-      "version": "0.1.0",
+      "version": "0.1.1",
       "description": "Browse random image APIs, save images, copy them, and set desktop wallpaper.",
       "download_url": "https://raw.githubusercontent.com/mcxen/qx-plugins/main/qxpicture.qx-plugin",
-      "size_bytes": 42097,
-      "checksum_sha256": "98af720324c00bde4ef00f8338a553e45fb8f7d7a46974e4bffe52d63f8f59ab",
+      "size_bytes": 100059,
+      "checksum_sha256": "3300753e289e0c082a334869ef04dc858d28a7338363a5ffabe879ccbf369f11",
       "required_permissions": [
         "storage",
         "http",
