@@ -18,8 +18,15 @@ https://raw.githubusercontent.com/mcxen/qx-plugins/main/<plugin-id>.qx-plugin
 src/<plugin-id>/          # plugin source (manifest + entry + assets)
 scripts/                  # convert + package tooling
 index.json                # marketplace catalog (checksums, permissions, min version)
+release-notes.json        # localized, newest-first App Store-style version history
 <plugin-id>.qx-plugin     # packaged zip archives published for download
 ```
+
+Every published manifest version must have a matching entry in
+`release-notes.json`. Packaging fails when the current version has no release
+note, then emits the newest 30 entries as `index.json.plugins[].releases`.
+Historical entries are descriptive only; they do not claim that an old archive
+is still downloadable.
 
 | Plugin | Kind | Notes |
 |--------|------|--------|

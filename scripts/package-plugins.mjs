@@ -6,6 +6,10 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 import yazl from "yazl";
 
+// ZIP stores a DOS timestamp without timezone. Pin the process timezone so
+// local packaging and GitHub Actions produce byte-identical archives.
+process.env.TZ = "UTC";
+
 const scriptDir = path.dirname(fileURLToPath(import.meta.url));
 const repoRoot = path.resolve(scriptDir, "..");
 const sourceRoot = path.join(repoRoot, "src");
@@ -84,6 +88,10 @@ async function pluginDirs() {
 async function main() {
   await mkdir(repoRoot, { recursive: true });
   const previous = await readJson(path.join(repoRoot, "index.json"), { schema_version: 1, plugins: [] });
+  const releaseCatalog = await readJson(
+    path.join(repoRoot, "release-notes.json"),
+    { schema_version: 1, plugins: {} },
+  );
   const previousById = new Map((previous.plugins || []).map((entry) => [entry.id, entry]));
   const plugins = [];
   const packaged = [];
@@ -101,6 +109,30 @@ async function main() {
     const checksum = await sha256(archivePath);
     const size = (await stat(archivePath)).size;
     const previousEntry = previousById.get(id);
+    const declaredReleases = releaseCatalog.plugins?.[id];
+    if (!Array.isArray(declaredReleases)) {
+      throw new Error(`release-notes.json has no release history for ${id}`);
+    }
+    const releaseByVersion = new Map();
+    for (const release of previousEntry?.releases || []) {
+      if (release?.version) releaseByVersion.set(release.version, release);
+    }
+    for (const release of declaredReleases) {
+      if (release?.version) releaseByVersion.set(release.version, release);
+    }
+    const currentRelease = releaseByVersion.get(manifest.version);
+    if (!currentRelease) {
+      throw new Error(`release-notes.json has no entry for ${id} v${manifest.version}`);
+    }
+    const releases = [
+      currentRelease,
+      ...declaredReleases.filter((release) => release.version !== manifest.version),
+      ...[...releaseByVersion.values()].filter(
+        (release) =>
+          release.version !== manifest.version
+          && !declaredReleases.some((declared) => declared.version === release.version),
+      ),
+    ].slice(0, 30);
     const updatedAt = previousEntry?.checksum_sha256 === checksum
       ? previousEntry.updated_at || today
       : today;
@@ -117,6 +149,7 @@ async function main() {
       updated_at: updatedAt,
       author: manifest.author || "",
       min_app_version: manifest.min_app_version || manifest.minAppVersion || previousEntry?.min_app_version || "0.4.28",
+      releases,
     });
     packaged.push({ id, archive: archiveName, size_bytes: size, checksum_sha256: checksum });
   }
