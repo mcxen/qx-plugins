@@ -1,0 +1,62 @@
+{
+  "id": "qxpicture",
+  "name": "Qxpicture",
+  "names": {
+    "zh-CN": "Qxpicture 随机图片",
+    "en": "Qxpicture"
+  },
+  "version": "0.1.0",
+  "description": "Browse random image APIs, save images, copy them, and set desktop wallpaper.",
+  "descriptions": {
+    "zh-CN": "浏览随机图片 API，保存或复制图片，并设置桌面壁纸。",
+    "en": "Browse random image APIs, save images, copy them, and set desktop wallpaper."
+  },
+  "author": "Qx",
+  "platforms": ["macos", "windows"],
+  "keywords": ["random image", "wallpaper", "picture", "api", "随机图片", "壁纸"],
+  "permissions": [
+    "storage",
+    "http",
+    "cli",
+    "system",
+    "clipboard",
+    "notifications",
+    "invoke:plugin_file_ensure_dir",
+    "invoke:plugin_file_write_base64",
+    "invoke:clipboard_write_image_file"
+  ],
+  "parameter_schema": {
+    "storageField": "sources[].params",
+    "item": {
+      "key": { "type": "text", "required": true },
+      "value": { "type": "text", "required": false },
+      "type": {
+        "type": "select",
+        "default": "text",
+        "options": ["text", "number", "select"]
+      },
+      "options": {
+        "type": "array",
+        "item": {
+          "label": { "type": "text" },
+          "value": { "type": "text" }
+        }
+      }
+    },
+    "transports": ["query", "json-body"]
+  },
+  "entry": "index.js",
+  "commands": [
+    {
+      "name": "open",
+      "title": "Open Qxpicture",
+      "description": "Browse random image APIs",
+      "keywords": ["random", "image", "wallpaper", "api", "随机图片"]
+    }
+  ],
+  "panel": {
+    "title": "Qxpicture",
+    "keywords": ["random image", "wallpaper", "api", "随机图片", "壁纸"]
+  },
+  "min_app_version": "0.6.12"
+}
