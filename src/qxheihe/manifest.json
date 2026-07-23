@@ -1,0 +1,56 @@
+{
+  "id": "qxheihe",
+  "name": "QxHeihe 小黑盒",
+  "version": "1.0.0",
+  "description": "浏览小黑盒社区推荐内容，在 Qx 内查看正文、多图与帖子信息。",
+  "author": "mcx",
+  "icon": "icon.svg",
+  "keywords": [
+    "小黑盒",
+    "黑盒",
+    "heybox",
+    "heihe",
+    "community",
+    "社区",
+    "游戏",
+    "帖子"
+  ],
+  "permissions": [
+    "http",
+    "open-url"
+  ],
+  "preferences": [
+    {
+      "id": "feedUrl",
+      "label": "Feed API URL",
+      "type": "string",
+      "required": false,
+      "description": "可选。小黑盒接口签名失效时，可粘贴新的完整 feeds URL；留空使用插件内置地址。"
+    },
+    {
+      "id": "cacheTtlMinutes",
+      "label": "列表缓存（分钟）",
+      "type": "string",
+      "required": false,
+      "default": "5",
+      "description": "缓存仍会优先显示，随后在后台刷新。"
+    }
+  ],
+  "entry": "index.js",
+  "commands": [
+    {
+      "name": "open-qxheihe",
+      "title": "打开 QxHeihe 小黑盒",
+      "description": "浏览小黑盒社区推荐帖子",
+      "keywords": ["小黑盒", "heybox", "社区", "帖子", "游戏"]
+    }
+  ],
+  "panel": {
+    "title": "QxHeihe 小黑盒",
+    "icon": "icon.svg",
+    "keywords": ["小黑盒", "heybox", "社区", "帖子", "游戏"]
+  },
+  "min_app_version": "0.6.15",
+  "platforms": ["macos", "windows"],
+  "screenshots": []
+}
