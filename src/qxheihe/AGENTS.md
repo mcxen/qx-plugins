@@ -16,7 +16,8 @@
 3. Paint cache before awaiting a network refresh.
 4. Full post detail loads only after selection and updates the same item id.
 5. Publish structured `detail.images`; do not draw a custom image viewer.
-6. Comments are not fetched because the official endpoint requires login.
+6. Public detail must not depend on comment login. Comments may use the optional
+   password preference `commentCookie`; never persist it inside community cache.
 7. Keep the feed URL configurable because its upstream request parameters may change.
 8. Keep rebuildable keys synchronized with `manifest.storage.cacheTargets`.
 9. Cache values use a top-level `savedAt` envelope for host retention cleanup.

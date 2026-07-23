@@ -8,6 +8,7 @@
 
 const DEFAULT_FEED_URL = "https://api.xiaoheihe.cn/bbs/app/feeds?app=heybox&os_type=web&x_app=heybox_website&x_client_type=web&x_os_type=iOS&x_client_version=&client_type=web&web_version=3.0&version=999.0.4&hkey=D1D1P32&_time=1784804927&nonce=54097B81FDE24D170636FC99637DD0C0&pull=0&offset=0&dw=604";
 const DETAIL_URL = "https://api.xiaoheihe.cn/bbs/web/link/detail";
+const COMMENT_URL = "https://api.xiaoheihe.cn/bbs/web/link/comment/list";
 const LEGACY_CACHE_KEY = "qxheihe.feed.v1";
 const CACHE_KEY = "cache.community.v2";
 const DEFAULT_TTL_MS = 5 * 60 * 1000;
@@ -136,13 +137,14 @@ function responseJson(response) {
   return response.json();
 }
 
-async function fetchJson(context, url) {
+async function fetchJson(context, url, headers = {}) {
   const response = await context.http.fetch(url, {
     method: "GET",
     timeoutMs: 30_000,
     headers: {
       Accept: "application/json",
       "User-Agent": "Mozilla/5.0 QxHeihe/1.0",
+      ...headers,
     },
   });
   const payload = await responseJson(response);
@@ -150,6 +152,78 @@ async function fetchJson(context, url) {
     throw new Error(payload?.msg || copy("The API rejected the request", "接口拒绝了请求"));
   }
   return payload.result || {};
+}
+
+function commentText(comment) {
+  const raw = comment?.text ?? comment?.content ?? comment?.description ?? comment?.body;
+  if (typeof raw !== "string") return cleanText(raw);
+  try {
+    const blocks = JSON.parse(raw);
+    if (Array.isArray(blocks)) {
+      return blocks.map((block) => cleanText(block?.text || block?.content)).filter(Boolean).join("\n");
+    }
+  } catch {
+    // Plain text and HTML comments are both common.
+  }
+  return cleanText(raw);
+}
+
+function commentRows(result) {
+  const candidates = [
+    result?.comments,
+    result?.comment_list,
+    result?.list,
+    result?.rows,
+    result?.data,
+  ];
+  return candidates.find(Array.isArray) || [];
+}
+
+function commentAuthor(comment) {
+  return cleanText(
+    comment?.user?.username
+      || comment?.user?.nickname
+      || comment?.username
+      || comment?.nickname
+      || copy("Anonymous", "匿名用户"),
+  );
+}
+
+function commentReplies(comment) {
+  const rows = [
+    comment?.replies,
+    comment?.reply_list,
+    comment?.children,
+    comment?.sub_comments,
+  ].find(Array.isArray) || [];
+  return rows.slice(0, 5).map((reply) => {
+    const author = commentAuthor(reply);
+    const target = commentAuthor(reply?.reply_to || reply?.to_user || {});
+    const prefix = target && target !== copy("Anonymous", "匿名用户")
+      ? `${author} → ${target}`
+      : author;
+    return `${prefix}：${commentText(reply)}`;
+  }).filter((line) => !line.endsWith("："));
+}
+
+function parseComments(result) {
+  return commentRows(result).slice(0, 20).map((comment, index) => {
+    const floor = Number(comment?.floor || comment?.floor_num || comment?.index);
+    const created = Number(comment?.create_at || comment?.created_at || comment?.time);
+    const likes = Number(comment?.like_num || comment?.up || comment?.award_num || 0);
+    const meta = [
+      Number.isFinite(floor) && floor > 0 ? `#${floor}` : `#${index + 1}`,
+      created > 0 ? formatTime(created) : "",
+      likes > 0 ? `${compactNumber(likes)} ♥` : "",
+    ].filter(Boolean).join(" · ");
+    const replies = commentReplies(comment);
+    return {
+      title: `${commentAuthor(comment)} · ${meta}`,
+      body: [commentText(comment), ...replies.map((reply) => `↳ ${reply}`)]
+        .filter(Boolean)
+        .join("\n\n"),
+    };
+  }).filter((section) => section.body);
 }
 
 async function preference(context, id, fallback = "") {
@@ -326,11 +400,31 @@ function createPanel(container, context) {
     }));
     const body = cached?.body || cleanText(post.description);
     const topic = postTopic(post, cached?.topics);
+    const sections = post.hashtags?.length ? [{
+      title: copy("Tags", "标签"),
+      body: post.hashtags.map((tag) => `#${tag.name}`).join("  "),
+    }] : [];
+    if (cached?.commentSections?.length) {
+      sections.push({
+        title: copy(
+          `Comments (${cached.commentSections.length} loaded)`,
+          `评论区（已加载 ${cached.commentSections.length} 条）`,
+        ),
+        body: cached.commentsTruncated
+          ? copy("Showing the first 20 comments. Open Xiaoheihe to continue.", "当前展示前 20 条，更多评论请在小黑盒中查看。")
+          : undefined,
+      }, ...cached.commentSections);
+    } else if (cached?.commentNotice) {
+      sections.push({
+        title: copy("Comments", "评论区"),
+        body: cached.commentNotice,
+      });
+    }
     return {
       title: postTitle(post),
       subtitle: `${post.user?.username || copy("Unknown author", "未知作者")} · ${topic} · ${formatTime(post.create_at)}`,
       status: state.detailLoading.has(id)
-        ? { state: "loading", label: copy("Loading full post…", "正在加载完整帖子…") }
+        ? { state: "loading", label: copy("Loading post and comments…", "正在加载正文与评论…") }
         : cached?.error
           ? { state: "error", error: cached.error }
           : undefined,
@@ -343,10 +437,7 @@ function createPanel(container, context) {
         { label: copy("Comments", "评论"), value: Number(post.comment_num || 0) },
         { label: copy("Published", "发布时间"), value: formatTime(post.create_at) },
       ],
-      sections: post.hashtags?.length ? [{
-        title: copy("Tags", "标签"),
-        body: post.hashtags.map((tag) => `#${tag.name}`).join("  "),
-      }] : [],
+      sections,
     };
   }
 
@@ -374,6 +465,9 @@ function createPanel(container, context) {
       }, {
         id: `${isRead ? "unread" : "read"}:${post.linkid}`,
         label: isRead ? copy("Mark Unread", "标为未读") : copy("Mark Read", "标为已读"),
+      }, {
+        id: `open-comments:${post.linkid}`,
+        label: copy("Open Comments on Xiaoheihe", "在小黑盒中查看评论"),
       }],
     };
   }
@@ -457,6 +551,10 @@ function createPanel(container, context) {
               || state.all.find((post) => String(post.linkid) === String(item?.id))
               || selectedPost();
             if (target) void context.openUrl(postUrl(target));
+          } else if (id.startsWith("open-comments:")) {
+            const postId = id.slice("open-comments:".length);
+            const target = state.all.find((post) => String(post.linkid) === postId) || selectedPost();
+            if (target) void context.openUrl(postUrl(target));
           }
         },
       });
@@ -466,20 +564,51 @@ function createPanel(container, context) {
   async function loadDetail(id) {
     const key = String(id || "");
     const previous = state.details.get(key);
-    if (!key || (previous && !previous.error) || state.detailLoading.has(key)) return;
+    if (!key || (previous && !previous.error && previous.commentsResolved) || state.detailLoading.has(key)) return;
     const post = state.all.find((entry) => String(entry.linkid) === key);
     if (!post) return;
     const generation = state.generation;
     state.detailLoading.add(key);
     paint();
     try {
-      const result = await fetchJson(context, `${DETAIL_URL}?link_id=${encodeURIComponent(key)}`);
+      const cookie = await preference(context, "commentCookie", "");
+      const detailRequest = fetchJson(context, `${DETAIL_URL}?link_id=${encodeURIComponent(key)}`);
+      const commentRequest = cookie
+        ? fetchJson(
+            context,
+            `${COMMENT_URL}?link_id=${encodeURIComponent(key)}&offset=0&limit=20`,
+            { Cookie: cookie, Referer: postUrl(post) },
+          ).then((result) => ({ result })).catch((error) => ({ error }))
+        : Promise.resolve({ skipped: true });
+      const [result, commentOutcome] = await Promise.all([detailRequest, commentRequest]);
       if (state.dead || generation !== state.generation) return;
       const link = { ...post, ...(result.link || {}) };
       const parsed = parseDetailContent(link);
+      const commentSections = commentOutcome.result ? parseComments(commentOutcome.result) : [];
+      let commentNotice = "";
+      if (commentOutcome.skipped) {
+        commentNotice = copy(
+          "Xiaoheihe requires login for comments. Add your Xiaoheihe Cookie in plugin preferences, or open the post in Xiaoheihe.",
+          "小黑盒评论接口要求登录。可在插件设置中填写小黑盒 Cookie，或前往小黑盒查看评论。",
+        );
+      } else if (commentOutcome.error) {
+        commentNotice = copy(
+          `Comments unavailable: ${message(commentOutcome.error)}`,
+          `评论暂不可用：${message(commentOutcome.error)}`,
+        );
+      } else if (!commentSections.length) {
+        commentNotice = Number(link.comment_num || post.comment_num || 0) > 0
+          ? copy("No readable comments were returned. The login may have expired.", "未返回可读取的评论，登录信息可能已失效。")
+          : copy("No comments yet.", "暂无评论。");
+      }
       state.details.set(key, {
         ...parsed,
         topics: Array.isArray(result.topics) ? result.topics : post.topics,
+        commentSections,
+        commentsResolved: true,
+        commentsTruncated: commentSections.length >= 20
+          || Number(link.comment_num || post.comment_num || 0) > commentSections.length,
+        commentNotice,
         savedAt: Date.now(),
       });
       await persistCache();
@@ -555,6 +684,7 @@ function createPanel(container, context) {
       if (!state.dead && generation === state.generation) {
         state.loading = false;
         paint();
+        if (state.selectedId) void loadDetail(state.selectedId);
       }
     }
   }

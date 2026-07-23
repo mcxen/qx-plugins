@@ -12,6 +12,67 @@ let handlers = null;
 let updates = 0;
 let openedUrl = "";
 
+const posts = Array.from({ length: 6 }, (_, index) => ({
+  linkid: String(1000 + index),
+  title: `Post ${index + 1}`,
+  description: `Summary ${index + 1}`,
+  create_at: 1_784_804_927 + index,
+  comment_num: 2,
+  link_award_num: index,
+  user: { username: `author-${index + 1}` },
+  topics: [{ name: "Games" }],
+  imgs: [`https://images.example.test/${index + 1}.jpg`],
+  share_url: `https://www.xiaoheihe.cn/app/bbs/link/${1000 + index}`,
+}));
+
+function jsonResponse(value) {
+  return {
+    ok: true,
+    status: 200,
+    json: async () => value,
+  };
+}
+
+async function mockFetch(url, options = {}) {
+  if (String(url).includes("/bbs/web/link/detail")) {
+    const id = new URL(url).searchParams.get("link_id");
+    return jsonResponse({
+      status: "ok",
+      result: {
+        link: {
+          ...posts.find((post) => post.linkid === id),
+          text: JSON.stringify([
+            { type: "text", text: `<b>Full body ${id}</b>` },
+            { type: "img", url: `https://images.example.test/detail-${id}.jpg` },
+          ]),
+        },
+        topics: [{ name: "Games" }],
+      },
+    });
+  }
+  if (String(url).includes("/bbs/web/link/comment/list")) {
+    assert.match(String(options.headers?.Cookie || ""), /session=smoke/);
+    return jsonResponse({
+      status: "ok",
+      result: {
+        comments: [{
+          floor: 1,
+          create_at: 1_784_804_999,
+          like_num: 3,
+          text: "First comment",
+          user: { username: "commenter" },
+          replies: [{ text: "Reply", user: { username: "reply-user" } }],
+        }],
+      },
+    });
+  }
+  const offset = Number(new URL(url).searchParams.get("offset") || 0);
+  return jsonResponse({
+    status: "ok",
+    result: { links: offset > 0 ? posts.slice(4) : posts.slice(0, 5) },
+  });
+}
+
 const controller = {
   update(patch) {
     snapshot = { ...(snapshot || {}), ...patch };
@@ -24,7 +85,7 @@ const controller = {
 };
 
 const context = {
-  http: { fetch: (url, options) => fetch(url, options) },
+  http: { fetch: mockFetch },
   storage: {
     persist: {
       get: (key) => persisted.get(key) || null,
@@ -38,7 +99,9 @@ const context = {
       return controller;
     },
   },
-  getPreference: () => "",
+  getPreference(id) {
+    return id === "commentCookie" ? "session=smoke" : "";
+  },
   openUrl(url) {
     openedUrl = url;
   },
@@ -59,15 +122,15 @@ async function waitFor(predicate, label, timeoutMs = 15_000) {
 await waitFor(() => snapshot && !snapshot.loading && snapshot.items?.length, "feed");
 assert.ok(snapshot.items.length >= 5);
 assert.ok(snapshot.items.every((item) => item.id && item.detail));
-
-const selected = snapshot.items.find((item) => item.detail.images?.length > 1) || snapshot.items[0];
-handlers.onSelect(selected.id);
 await waitFor(
-  () => snapshot.items.find((item) => item.id === selected.id)?.detail?.status?.state !== "loading",
-  "post detail",
+  () => snapshot.items[0]?.detail?.sections?.some((section) => /评论区/.test(section.title || "")),
+  "initial post detail and comments",
 );
+const selected = snapshot.items[0];
+handlers.onSelect(selected.id);
 const detailed = snapshot.items.find((item) => item.id === selected.id);
 assert.ok(detailed.detail.body || detailed.detail.images?.length);
+assert.ok(detailed.detail.sections.some((section) => /commenter/.test(section.title || "")));
 assert.doesNotMatch(detailed.badge, /未读/);
 const cache = persisted.get("cache.community.v2");
 assert.ok(cache.posts.length >= 5);
@@ -113,4 +176,4 @@ assert.equal(snapshot.items.length, 0);
 assert.equal(persisted.get("cache.community.v2").posts.length, 0);
 plugin.panel.destroy(expiredContainer);
 
-console.log(`QxHeihe smoke ok: updates=${updates}, detailImages=${detailed.detail.images?.length || 0}, offlineCache=true, retentionCleanup=true`);
+console.log(`QxHeihe smoke ok: updates=${updates}, detailImages=${detailed.detail.images?.length || 0}, comments=true, offlineCache=true, retentionCleanup=true`);

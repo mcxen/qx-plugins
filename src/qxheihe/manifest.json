@@ -1,8 +1,8 @@
 {
   "id": "qxheihe",
   "name": "QxHeihe 小黑盒",
-  "version": "1.1.0",
-  "description": "浏览小黑盒社区推荐内容，在 Qx 内查看正文、多图与帖子信息。",
+  "version": "1.2.0",
+  "description": "浏览小黑盒社区推荐内容，在 Qx 内查看正文、多图、帖子信息与登录评论。",
   "author": "mcx",
   "icon": "icon.svg",
   "keywords": [
@@ -26,6 +26,13 @@
       "type": "string",
       "required": false,
       "description": "可选。小黑盒接口签名失效时，可粘贴新的完整 feeds URL；留空使用插件内置地址。"
+    },
+    {
+      "id": "commentCookie",
+      "label": "评论登录 Cookie",
+      "type": "password",
+      "required": false,
+      "description": "可选。粘贴小黑盒网页版完整 Cookie 后可读取评论；仅用于评论请求，不写入帖子缓存。"
     },
     {
       "id": "cacheTtlMinutes",
@@ -53,7 +60,7 @@
       {
         "id": "community",
         "label": "QxHeihe 社区缓存",
-        "description": "帖子列表、详情图片索引和短期已读状态；默认保留 7 天，可在插件设置中改为 3 天。",
+        "description": "帖子列表、正文、评论和短期已读状态；默认保留 7 天，可在插件设置中改为 3 天；不包含登录 Cookie。",
         "keys": [
           "qxheihe.feed.v1",
           "cache.community.v2"
