@@ -24,7 +24,7 @@ index.json                # marketplace catalog (checksums, permissions, min ver
 | Plugin | Kind | Notes |
 |--------|------|--------|
 | `qx-bing-wallpaper` | Native Workbench Gallery | Qx-owned Bing gallery and wallpaper actions |
-| `qxheihe` | Native Workbench List | Xiaoheihe community feed with async multi-image detail |
+| `qxheihe` | Native Workbench List | Xiaoheihe community feed, read state, managed retention and async multi-image detail |
 | `qxpicture` | Native Workbench List | Configurable random-image APIs with adaptive detail media |
 | `raycast-calendar` | Raycast generic convert | UI calendar; works on Qx ≥ 0.4.28 |
 | `external-display-control` | Native | DDC/CI brightness; macOS, needs Qx ≥ 0.4.61 |

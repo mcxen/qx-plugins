@@ -1,7 +1,7 @@
 {
   "name": "qx-plugins",
   "private": true,
-  "version": "1.1.0",
+  "version": "1.1.1",
   "type": "module",
   "scripts": {
     "convert:raycast": "node scripts/convert-raycast-extension.mjs",

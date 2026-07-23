@@ -7,7 +7,7 @@
 | Workbench panel | Community list, search, master-detail and multi-image preview |
 | Command | Launcher entry |
 | HTTP | Xiaoheihe feed and public post detail |
-| Persist storage | Stale-while-revalidate feed cache |
+| Persist storage | SWR feed/detail/read cache with 3/7-day pruning |
 
 ## Invariants
 
@@ -18,6 +18,9 @@
 5. Publish structured `detail.images`; do not draw a custom image viewer.
 6. Comments are not fetched because the official endpoint requires login.
 7. Keep the feed URL configurable because its upstream request parameters may change.
+8. Keep rebuildable keys synchronized with `manifest.storage.cacheTargets`.
+9. Cache values use a top-level `savedAt` envelope for host retention cleanup.
+10. Reading a post writes `readAt` once; reopening it must not indefinitely extend retention.
 
 ## Permissions
 
@@ -30,3 +33,4 @@
 - [ ] Run syntax check and package all plugins.
 - [ ] Reinstall the archive into `~/.qx/plugins/qxheihe`.
 - [ ] Smoke-test cache, refresh, selection, detail and multi-image preview.
+- [ ] Smoke-test offline second open, read state, retention pruning and host cache declaration.

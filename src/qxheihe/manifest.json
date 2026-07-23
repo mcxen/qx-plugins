@@ -1,7 +1,7 @@
 {
   "id": "qxheihe",
   "name": "QxHeihe 小黑盒",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "浏览小黑盒社区推荐内容，在 Qx 内查看正文、多图与帖子信息。",
   "author": "mcx",
   "icon": "icon.svg",
@@ -34,8 +34,34 @@
       "required": false,
       "default": "5",
       "description": "缓存仍会优先显示，随后在后台刷新。"
+    },
+    {
+      "id": "retentionDays",
+      "label": "缓存自动清理",
+      "type": "select",
+      "required": false,
+      "default": "7",
+      "description": "帖子、详情和已读状态超过保留期后自动删除。",
+      "options": [
+        { "label": "3 天", "value": "3" },
+        { "label": "7 天", "value": "7" }
+      ]
     }
   ],
+  "storage": {
+    "cacheTargets": [
+      {
+        "id": "community",
+        "label": "QxHeihe 社区缓存",
+        "description": "帖子列表、详情图片索引和短期已读状态；默认保留 7 天，可在插件设置中改为 3 天。",
+        "keys": [
+          "qxheihe.feed.v1",
+          "cache.community.v2"
+        ],
+        "retentionDays": 7
+      }
+    ]
+  },
   "entry": "index.js",
   "commands": [
     {
@@ -50,7 +76,7 @@
     "icon": "icon.svg",
     "keywords": ["小黑盒", "heybox", "社区", "帖子", "游戏"]
   },
-  "min_app_version": "0.6.15",
+  "min_app_version": "0.6.16",
   "platforms": ["macos", "windows"],
   "screenshots": []
 }

@@ -111,18 +111,18 @@
     {
       "id": "qxheihe",
       "name": "QxHeihe 小黑盒",
-      "version": "1.0.0",
+      "version": "1.1.0",
       "description": "浏览小黑盒社区推荐内容，在 Qx 内查看正文、多图与帖子信息。",
       "download_url": "https://raw.githubusercontent.com/mcxen/qx-plugins/main/qxheihe.qx-plugin",
-      "size_bytes": 20792,
-      "checksum_sha256": "ea5ff33806ea06938f70ae8cd0dff77eddbe1dccea62278f27b14d11112cdaa9",
+      "size_bytes": 26595,
+      "checksum_sha256": "844873b7f352a9ec87400918eb067522bce8130838c382c0bd3acd42778b1a85",
       "required_permissions": [
         "http",
         "open-url"
       ],
       "updated_at": "2026-07-23",
       "author": "mcx",
-      "min_app_version": "0.6.15"
+      "min_app_version": "0.6.16"
     },
     {
       "id": "qxpicture",
