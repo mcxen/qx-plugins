@@ -6,12 +6,13 @@
  * with the official structured post detail.
  */
 
-const DEFAULT_FEED_URL = "https://api.xiaoheihe.cn/bbs/app/feeds?app=heybox&os_type=web&x_app=heybox_website&x_client_type=web&x_os_type=iOS&x_client_version=&client_type=web&web_version=3.0&version=999.0.4&hkey=D1D1P32&_time=1784804927&nonce=54097B81FDE24D170636FC99637DD0C0&pull=0&offset=0&dw=604";
+const DEFAULT_FEED_URL = "https://api.xiaoheihe.cn/bbs/app/feeds?app=heybox&os_type=web&x_app=heybox_website&x_client_type=web&x_os_type=Mac&x_client_version=&client_type=web&web_version=3.0&version=999.0.4&pull=0&offset=0&dw=604";
 const DETAIL_URL = "https://api.xiaoheihe.cn/bbs/web/link/detail";
 const COMMENT_URL = "https://api.xiaoheihe.cn/bbs/web/link/comment/list";
 const LEGACY_CACHE_KEY = "qxheihe.feed.v1";
 const CACHE_KEY = "cache.community.v2";
 const DEFAULT_TTL_MS = 5 * 60 * 1000;
+const SIGN_ALPHABET = "AB45STUVWZEFGJ6CH01D237IXYPQRKLMN89";
 
 function isChinese() {
   return (navigator.languages || [navigator.language || ""])
@@ -68,6 +69,154 @@ function uniqueHttps(values) {
       seen.add(value);
       return true;
     });
+}
+
+function leftRotate(value, shift) {
+  return ((value << shift) | (value >>> (32 - shift))) >>> 0;
+}
+
+/**
+ * Small dependency-free MD5 implementation. Xiaoheihe signs only an ASCII
+ * twenty-character seed, so byte conversion deliberately stays narrow.
+ */
+function md5Ascii(value) {
+  const input = String(value);
+  const bitLength = input.length * 8;
+  const totalLength = Math.ceil((input.length + 9) / 64) * 64;
+  const bytes = new Uint8Array(totalLength);
+  for (let index = 0; index < input.length; index += 1) {
+    bytes[index] = input.charCodeAt(index) & 0xff;
+  }
+  bytes[input.length] = 0x80;
+  const view = new DataView(bytes.buffer);
+  view.setUint32(totalLength - 8, bitLength >>> 0, true);
+  view.setUint32(totalLength - 4, Math.floor(bitLength / 0x100000000), true);
+
+  const shifts = [
+    7, 12, 17, 22, 7, 12, 17, 22, 7, 12, 17, 22, 7, 12, 17, 22,
+    5, 9, 14, 20, 5, 9, 14, 20, 5, 9, 14, 20, 5, 9, 14, 20,
+    4, 11, 16, 23, 4, 11, 16, 23, 4, 11, 16, 23, 4, 11, 16, 23,
+    6, 10, 15, 21, 6, 10, 15, 21, 6, 10, 15, 21, 6, 10, 15, 21,
+  ];
+  const constants = Array.from(
+    { length: 64 },
+    (_, index) => Math.floor(Math.abs(Math.sin(index + 1)) * 0x100000000) >>> 0,
+  );
+  let a0 = 0x67452301;
+  let b0 = 0xefcdab89;
+  let c0 = 0x98badcfe;
+  let d0 = 0x10325476;
+
+  for (let offset = 0; offset < totalLength; offset += 64) {
+    const words = Array.from({ length: 16 }, (_, index) =>
+      view.getUint32(offset + index * 4, true)
+    );
+    let a = a0;
+    let b = b0;
+    let c = c0;
+    let d = d0;
+    for (let index = 0; index < 64; index += 1) {
+      let f;
+      let wordIndex;
+      if (index < 16) {
+        f = (b & c) | (~b & d);
+        wordIndex = index;
+      } else if (index < 32) {
+        f = (d & b) | (~d & c);
+        wordIndex = (5 * index + 1) % 16;
+      } else if (index < 48) {
+        f = b ^ c ^ d;
+        wordIndex = (3 * index + 5) % 16;
+      } else {
+        f = c ^ (b | ~d);
+        wordIndex = (7 * index) % 16;
+      }
+      const previousD = d;
+      d = c;
+      c = b;
+      const sum = (a + f + constants[index] + words[wordIndex]) >>> 0;
+      b = (b + leftRotate(sum, shifts[index])) >>> 0;
+      a = previousD;
+    }
+    a0 = (a0 + a) >>> 0;
+    b0 = (b0 + b) >>> 0;
+    c0 = (c0 + c) >>> 0;
+    d0 = (d0 + d) >>> 0;
+  }
+
+  return [a0, b0, c0, d0].map((word) =>
+    [0, 8, 16, 24]
+      .map((shift) => ((word >>> shift) & 0xff).toString(16).padStart(2, "0"))
+      .join("")
+  ).join("");
+}
+
+function mapSignatureChars(value, end) {
+  const chars = SIGN_ALPHABET.slice(0, end);
+  return [...String(value)]
+    .map((character) => chars[character.charCodeAt(0) % chars.length])
+    .join("");
+}
+
+function xtime(value) {
+  return value & 128 ? ((value << 1) ^ 27) & 255 : value << 1;
+}
+
+function mix1(value) {
+  return xtime(value) ^ value;
+}
+
+function mix2(value) {
+  return mix1(xtime(value));
+}
+
+function mix3(value) {
+  return mix2(mix1(xtime(value)));
+}
+
+function mix4(value) {
+  return mix3(value) ^ mix2(value) ^ mix1(value);
+}
+
+function signatureTail(values) {
+  const output = [...values];
+  output[0] = mix4(values[0]) ^ mix3(values[1]) ^ mix2(values[2]) ^ mix1(values[3]);
+  output[1] = mix1(values[0]) ^ mix4(values[1]) ^ mix3(values[2]) ^ mix2(values[3]);
+  output[2] = mix2(values[0]) ^ mix1(values[1]) ^ mix4(values[2]) ^ mix3(values[3]);
+  output[3] = mix3(values[0]) ^ mix2(values[1]) ^ mix1(values[2]) ^ mix4(values[3]);
+  return output.reduce((sum, value) => sum + value, 0) % 100;
+}
+
+function heiheHkey(path, timestamp, nonce) {
+  const normalizedPath = `/${String(path).split("/").filter(Boolean).join("/")}/`;
+  const mapped = [
+    mapSignatureChars(timestamp + 1, -2),
+    mapSignatureChars(normalizedPath),
+    mapSignatureChars(nonce),
+  ];
+  let interleaved = "";
+  const length = Math.max(...mapped.map((value) => value.length));
+  for (let index = 0; index < length; index += 1) {
+    for (const value of mapped) {
+      if (index < value.length) interleaved += value[index];
+    }
+  }
+  const digest = md5Ascii(interleaved.slice(0, 20));
+  const prefix = mapSignatureChars(digest.slice(0, 5), -4);
+  const suffix = String(
+    signatureTail([...digest.slice(-6)].map((character) => character.charCodeAt(0))),
+  ).padStart(2, "0");
+  return `${prefix}${suffix}`;
+}
+
+function randomNonce() {
+  try {
+    const bytes = new Uint8Array(16);
+    globalThis.crypto.getRandomValues(bytes);
+    return [...bytes].map((value) => value.toString(16).padStart(2, "0")).join("").toUpperCase();
+  } catch {
+    return md5Ascii(`${Date.now()}:${Math.random()}:${Math.random()}`).toUpperCase();
+  }
 }
 
 function postUrl(post) {
@@ -295,10 +444,20 @@ function pruneCache(model, retentionDays) {
   };
 }
 
-function feedUrlAtOffset(base, offset) {
+function feedUrlAtOffset(base, offset, {
+  timestamp = Math.floor(Date.now() / 1000),
+  nonce = randomNonce(),
+} = {}) {
   const url = new URL(base);
+  url.searchParams.delete("hkey");
+  url.searchParams.delete("_time");
+  url.searchParams.delete("nonce");
   url.searchParams.set("offset", String(Math.max(0, offset)));
   url.searchParams.set("pull", offset > 0 ? "1" : "0");
+  url.searchParams.set("version", "999.0.4");
+  url.searchParams.set("_time", String(timestamp));
+  url.searchParams.set("nonce", nonce);
+  url.searchParams.set("hkey", heiheHkey(url.pathname, timestamp, nonce));
   return url.toString();
 }
 
@@ -766,3 +925,5 @@ const plugin = {
 };
 
 export default plugin;
+
+export { feedUrlAtOffset, heiheHkey };

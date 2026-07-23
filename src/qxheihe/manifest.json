@@ -1,7 +1,7 @@
 {
   "id": "qxheihe",
   "name": "QxHeihe 小黑盒",
-  "version": "1.2.1",
+  "version": "1.3.0",
   "description": "浏览小黑盒社区推荐内容，在 Qx 内查看正文、多图、帖子信息与登录评论。",
   "author": "mcx",
   "icon": "icon.svg",
@@ -22,10 +22,10 @@
   "preferences": [
     {
       "id": "feedUrl",
-      "label": "Feed API URL",
+      "label": "Feed API 基础地址",
       "type": "string",
       "required": false,
-      "description": "可选。小黑盒接口签名失效时，可粘贴新的完整 feeds URL；留空使用插件内置地址。"
+      "description": "可选。通常留空即可。支持粘贴旧的完整 feeds URL，插件会移除旧签名并在每次请求时重新生成。"
     },
     {
       "id": "commentCookie",

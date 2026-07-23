@@ -1,5 +1,5 @@
 import assert from "node:assert/strict";
-import plugin from "../src/qxheihe/index.js";
+import plugin, { heiheHkey } from "../src/qxheihe/index.js";
 
 Object.defineProperty(globalThis, "navigator", {
   configurable: true,
@@ -11,6 +11,7 @@ let snapshot = null;
 let handlers = null;
 let updates = 0;
 let openedUrl = "";
+const legacyFeedUrl = "https://api.xiaoheihe.cn/bbs/app/feeds?app=heybox&hkey=EXPIRED&_time=1&nonce=EXPIRED&dw=604";
 
 const posts = Array.from({ length: 6 }, (_, index) => ({
   linkid: String(1000 + index),
@@ -67,7 +68,17 @@ async function mockFetch(url, options = {}) {
       },
     });
   }
-  const offset = Number(new URL(url).searchParams.get("offset") || 0);
+  const feedUrl = new URL(url);
+  const timestamp = Number(feedUrl.searchParams.get("_time"));
+  const nonce = String(feedUrl.searchParams.get("nonce") || "");
+  assert.ok(Math.abs(Math.floor(Date.now() / 1000) - timestamp) <= 2);
+  assert.match(nonce, /^[A-F0-9]{32}$/);
+  assert.notEqual(nonce, "EXPIRED");
+  assert.equal(
+    feedUrl.searchParams.get("hkey"),
+    heiheHkey(feedUrl.pathname, timestamp, nonce),
+  );
+  const offset = Number(feedUrl.searchParams.get("offset") || 0);
   return jsonResponse({
     status: "ok",
     result: { links: offset > 0 ? posts.slice(4) : posts.slice(0, 5) },
@@ -101,6 +112,7 @@ const context = {
     },
   },
   getPreference(id) {
+    if (id === "feedUrl") return legacyFeedUrl;
     return id === "commentCookie" ? "session=smoke" : "";
   },
   openUrl(url) {

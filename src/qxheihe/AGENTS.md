@@ -18,7 +18,9 @@
 5. Publish structured `detail.images`; do not draw a custom image viewer.
 6. Public detail must not depend on comment login. Comments may use the optional
    plain-text preference `commentCookie`; never persist it inside community cache.
-7. Keep the feed URL configurable because its upstream request parameters may change.
+7. Sign every feed request immediately before dispatch. A configured legacy URL
+   may provide business parameters, but its `hkey`, `_time`, and `nonce` must
+   always be discarded and regenerated for refresh and pagination.
 8. Keep rebuildable keys synchronized with `manifest.storage.cacheTargets`.
 9. Cache values use a top-level `savedAt` envelope for host retention cleanup.
 10. Reading a post writes `readAt` once; reopening it must not indefinitely extend retention.

@@ -63,6 +63,14 @@
     ],
     "qxheihe": [
       {
+        "version": "1.3.0",
+        "published_at": "2026-07-23",
+        "notes_localizations": {
+          "en": "Replaced expiring captured feed URLs with live Xiaoheihe request signing for open, refresh, and pagination.",
+          "zh-CN": "使用小黑盒实时请求签名替代会过期的抓包 URL，覆盖首次加载、刷新与分页。"
+        }
+      },
+      {
         "version": "1.2.1",
         "published_at": "2026-07-23",
         "notes_localizations": {
