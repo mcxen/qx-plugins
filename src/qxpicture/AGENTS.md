@@ -14,6 +14,10 @@ Qx Workbench List/detail plugin for random image APIs.
 7. Image previews are restored from `qxpicture.image-cache.v1` on open;
    network fetch only runs on explicit **Refresh**.
 8. Download directory defaults to `~/Downloads` and is editable under Settings → General.
+9. Keep `mountWorkbench()` controller updates revisioned. Preserve cached media
+   while item/detail `status` reports asynchronous refresh state.
+10. Use host-owned adaptive detail media and zoom; do not inject a plugin lightbox
+    or host-selector CSS.
 
 ## Validation
 

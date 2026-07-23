@@ -479,105 +479,6 @@ async function writeImageCache(context, cache) {
   await context.storage.persist.set(IMAGE_CACHE_KEY, slim);
 }
 
-function openLightbox(container, src, alt) {
-  if (!container || !src) return;
-  closeLightbox(container);
-  const overlay = document.createElement("div");
-  overlay.className = "qxpicture-lightbox";
-  overlay.setAttribute("data-qxpicture-lightbox", "1");
-  overlay.tabIndex = -1;
-  const img = document.createElement("img");
-  img.src = src;
-  img.alt = alt || "";
-  overlay.appendChild(img);
-  const close = () => closeLightbox(container);
-  overlay.addEventListener("click", (event) => {
-    if (event.target === overlay) close();
-  });
-  const onKey = (event) => {
-    if (event.key === "Escape") {
-      event.preventDefault();
-      event.stopPropagation();
-      close();
-    }
-  };
-  overlay.__qxpictureOnKey = onKey;
-  window.addEventListener("keydown", onKey, true);
-  container.appendChild(overlay);
-  try { overlay.focus(); } catch { /* ignore */ }
-}
-
-function closeLightbox(container) {
-  const overlay = container?.querySelector?.("[data-qxpicture-lightbox]");
-  if (!overlay) return;
-  if (overlay.__qxpictureOnKey) {
-    window.removeEventListener("keydown", overlay.__qxpictureOnKey, true);
-  }
-  overlay.remove();
-}
-
-function ensurePluginChrome(container) {
-  if (!container || container.__qxpictureChrome) return;
-  container.__qxpictureChrome = true;
-  const style = document.createElement("style");
-  style.setAttribute("data-qxpicture-styles", "1");
-  style.textContent = `
-    .qxpicture-lightbox {
-      position: fixed;
-      inset: 0;
-      z-index: 2147483000;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      margin: 0;
-      padding: 16px;
-      background: rgba(0, 0, 0, 0.84);
-      cursor: zoom-out;
-    }
-    .qxpicture-lightbox img {
-      max-width: min(96vw, 1600px);
-      max-height: 92vh;
-      width: auto;
-      height: auto;
-      object-fit: contain;
-      border-radius: 8px;
-      box-shadow: 0 16px 48px rgba(0, 0, 0, 0.5);
-      cursor: default;
-      pointer-events: none;
-    }
-    /* Prevent stacked form selects from painting under the next row */
-    .qx-host-workbench select,
-    .qx-content-detail select,
-    .qx-plugin-detail select,
-    .qx-host-workbench [role="listbox"],
-    .qx-content-detail [data-radix-select-content],
-    .qx-host-workbench [data-state="open"] {
-      position: relative;
-      z-index: 40;
-    }
-    .qx-content-detail,
-    .qx-host-workbench-detail-only,
-    .qx-content-detail-scroll {
-      overflow: visible;
-    }
-    .qx-content-detail img,
-    .qx-host-workbench img {
-      cursor: zoom-in;
-    }
-  `;
-  container.appendChild(style);
-  container.addEventListener("click", (event) => {
-    const img = event.target && event.target.closest ? event.target.closest("img") : null;
-    if (!img || !img.src) return;
-    if (img.closest("[data-qxpicture-lightbox]")) return;
-    // Ignore tiny chrome icons if any.
-    if (img.naturalWidth > 0 && img.naturalWidth < 24) return;
-    event.preventDefault();
-    event.stopPropagation();
-    openLightbox(container, img.currentSrc || img.src, img.alt || "");
-  }, true);
-}
-
 function createPanel(context, container) {
   const state = {
     config: defaultConfig(),
@@ -587,15 +488,16 @@ function createPanel(context, container) {
     downloads: {},
     imageCache: {},
     loadingIds: new Set(),
+    sourceErrors: {},
     busy: null,
     error: null,
     dead: false,
     generation: 0,
+    revision: 0,
+    view: null,
     writeQueue: Promise.resolve(),
     cacheWriteQueue: Promise.resolve()
   };
-
-  if (container) ensurePluginChrome(container);
 
   const sourceById = (id = state.selectedId) => {
     if (id === GENERAL_SETTINGS_ID) return null;
@@ -633,7 +535,7 @@ function createPanel(context, container) {
     return state.writeQueue;
   };
 
-  /** Remounting the workbench on every keystroke steals focus — debounce soft updates. */
+  /** Avoid publishing a full declarative snapshot on every keystroke. */
   let softPaintTimer = null;
   const queueSoftPaint = (delayMs = 420) => {
     if (softPaintTimer) clearTimeout(softPaintTimer);
@@ -664,6 +566,12 @@ function createPanel(context, container) {
     const preview = state.previews[source.id];
     const ready = Boolean(state.downloads[source.id]);
     const loading = state.loadingIds.has(source.id);
+    const sourceError = state.sourceErrors[source.id];
+    const status = loading
+      ? { state: "loading", label: text("Loading image…", "正在加载图片…") }
+      : sourceError
+        ? { state: "error", label: text("Refresh failed", "刷新失败"), error: sourceError }
+        : undefined;
     const request = buildRequest(source);
     // Split preset into its own form block so the open dropdown is not stacked
     // under every parameter row (host form selects share one scroll region).
@@ -692,10 +600,19 @@ function createPanel(context, container) {
       subtitle: source.url,
       badge: source.type === "json" ? "JSON" : text("Image", "图片"),
       image: preview ? { url: preview, alt: source.name, fit: "cover" } : undefined,
+      status,
       detail: {
         title: source.name,
         subtitle: request.displayUrl,
-        image: preview ? { url: preview, alt: source.name, fit: "contain" } : undefined,
+        image: preview ? {
+          url: preview,
+          alt: source.name,
+          fit: "contain",
+          aspectRatio: "auto",
+          zoomable: true,
+          caption: source.url
+        } : undefined,
+        status,
         form: (presetControls.length || paramControls.length) ? {
           title: text("Parameter Controls", "参数调整"),
           description: text(
@@ -731,7 +648,6 @@ function createPanel(context, container) {
       },
       actions: [
         { id: "refresh", label: text("Refresh Image", "刷新图片"), primary: true, disabled: Boolean(state.busy) || loading },
-        { id: "preview", label: text("View Full Size", "查看大图"), disabled: !preview },
         { id: "save-preset", label: text("Save Parameter Preset", "保存参数预设"), disabled: Boolean(state.busy) || !(source.params || []).length },
         { id: "wallpaper", label: text("Set as Wallpaper", "设为壁纸"), disabled: Boolean(state.busy) || loading || !canUse },
         { id: "save", label: text("Save to Local", "保存到本地"), kbd: "CmdOrCtrl+S", disabled: Boolean(state.busy) || loading || !canUse },
@@ -980,8 +896,8 @@ function createPanel(context, container) {
     if (state.dead) return;
     ensureSelection();
     const browse = state.tab === "browse";
-    if (container) ensurePluginChrome(container);
-    context.ui.mountWorkbench({
+    const snapshot = {
+      revision: ++state.revision,
       title: "Qxpicture",
       layout: { kind: "list" },
       tabs: [
@@ -1009,7 +925,12 @@ function createPanel(context, container) {
       island: state.busy
         ? { primary: "Qxpicture", secondary: state.busy, activity: "spinner", tone: "neutral" }
         : null
-    }, {
+    };
+    if (state.view) {
+      state.view.update(snapshot);
+      return;
+    }
+    state.view = context.ui.mountWorkbench(snapshot, {
       onTab(id) {
         state.tab = id === "settings" ? "settings" : "browse";
         state.error = null;
@@ -1039,6 +960,7 @@ function createPanel(context, container) {
     if (!source || state.loadingIds.has(source.id)) return;
     const generation = state.generation;
     state.loadingIds.add(source.id);
+    delete state.sourceErrors[source.id];
     setError(null);
     paint();
     try {
@@ -1046,7 +968,10 @@ function createPanel(context, container) {
       if (state.dead || generation !== state.generation) return;
       rememberDownload(source.id, download);
     } catch (error) {
-      if (!state.dead && generation === state.generation) setError(error);
+      if (!state.dead && generation === state.generation) {
+        setError(error);
+        state.sourceErrors[source.id] = String(error?.message || error);
+      }
     } finally {
       state.loadingIds.delete(source.id);
       paint();
@@ -1317,15 +1242,6 @@ function createPanel(context, container) {
     context.showToast(text("Image copied", "图片已复制"));
   };
 
-  const previewCurrent = (source) => {
-    const preview = state.previews[source.id] || state.imageCache[source.id]?.preview;
-    if (!preview) {
-      throw new Error(text("No image to preview. Refresh first.", "没有可预览的图片，请先刷新。"));
-    }
-    if (container) openLightbox(container, preview, source.name);
-    else context.showToast(text("Preview unavailable", "无法打开预览"));
-  };
-
   const editSource = async (id, adding = false) => {
     const existing = adding ? null : sourceById(id);
     const name = await context.prompt(text("API name", "API 名称"), existing?.name || "");
@@ -1454,16 +1370,6 @@ function createPanel(context, container) {
       return withBusy(text("Saving preset…", "正在保存预设…"), () => savePreset(source));
     }
     if (id === "refresh") return refreshSource(source.id, { cacheBust: true });
-    if (id === "preview") {
-      try {
-        previewCurrent(source);
-      } catch (error) {
-        setError(error);
-        context.showToast(state.error);
-        paint();
-      }
-      return;
-    }
     if (id === "wallpaper") {
       return withBusy(text("Setting wallpaper…", "正在设置壁纸…"), () => setWallpaper(source));
     }
@@ -1503,10 +1409,9 @@ export default {
     title: "Qxpicture",
     render(container, context) {
       if (!context.ui?.mountWorkbench || !context.http?.fetch || !context.system?.setWallpaper) {
-        container.textContent = text("Qx 0.6.12 or newer is required.", "需要 Qx 0.6.12 或更高版本。");
+        container.textContent = text("Qx 0.6.13 or newer is required.", "需要 Qx 0.6.13 或更高版本。");
         return;
       }
-      ensurePluginChrome(container);
       const panel = createPanel(context, container);
       container.__qxpicture = panel;
       panel.paint();
@@ -1522,7 +1427,6 @@ export default {
         panel.state.generation += 1;
         container.__qxpicture = null;
       }
-      closeLightbox(container);
       container.innerHTML = "";
     }
   }

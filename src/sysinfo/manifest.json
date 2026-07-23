@@ -1,8 +1,8 @@
 {
   "id": "sysinfo",
   "name": "Sysinfo",
-  "version": "1.0.0",
-  "description": "Native Qx Workbench for system identity, CPU and memory, storage, network, power, and processes on macOS and Windows.",
+  "version": "1.2.1",
+  "description": "Native Qx System Monitor for CPU, memory, battery health, storage, network, and processes on macOS and Windows.",
   "author": "Qx",
   "icon": "icon.svg",
   "keywords": [
@@ -10,6 +10,8 @@
     "sysinfo",
     "cpu",
     "memory",
+    "battery",
+    "power",
     "storage",
     "network",
     "processes",
@@ -37,7 +39,7 @@
     "icon": "icon.svg",
     "keywords": ["system", "monitor", "processes", "系统", "性能"]
   },
-  "min_app_version": "0.6.0",
+  "min_app_version": "0.6.4",
   "platforms": ["macos", "windows"],
   "screenshots": []
 }

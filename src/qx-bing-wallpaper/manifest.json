@@ -1,7 +1,7 @@
 {
   "id": "qx-bing-wallpaper",
   "name": "Qx Bing Wallpaper",
-  "version": "2.0.3",
+  "version": "2.1.0",
   "description": "Browse Bing's daily images in a native Qx Gallery, then download or set them as wallpaper.",
   "author": "Qx",
   "icon": "extension-icon.png",
@@ -77,5 +77,5 @@
     "icon": "extension-icon.png",
     "keywords": ["bing", "wallpaper", "gallery", "必应", "壁纸", "图库"]
   },
-  "min_app_version": "0.5.44"
+  "min_app_version": "0.6.13"
 }

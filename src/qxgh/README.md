@@ -20,6 +20,13 @@ Watch **GitHub Actions** and **Releases** for public repos you pin in preference
 | QxGH CI Summary | Toast summary |
 | QxGH Watch on Island | Island for in-progress run |
 
+## Island control
+
+When an active run is using QxIsland, open the QxGH Actions menu and choose
+**Hide Active Run from Island**. QxGH dismisses its Island session immediately
+and keeps it hidden across panel polling/refreshes for the current panel session.
+Use **Show Active Run on Island** to restore it.
+
 ## Permissions
 
 `http` · `open-url` · `notifications` · `island`

@@ -144,8 +144,11 @@ function createPanelState(context) {
     error: null,
     stale: false,
     busy: null,
+    busyId: null,
     dead: false,
     loadGeneration: 0,
+    revision: 0,
+    view: null,
   };
 
   const selected = () => state.images.find((image) => imageId(image) === state.selectedId) || state.images[0];
@@ -159,7 +162,8 @@ function createPanelState(context) {
     if (visible.length && !visible.some((image) => imageId(image) === state.selectedId)) {
       state.selectedId = imageId(visible[0]);
     }
-    context.ui.mountWorkbench({
+    const snapshot = {
+      revision: ++state.revision,
       title: "Qx Bing Wallpaper",
       query: state.query,
       queryPlaceholder: text("Search wallpapers…", "搜索壁纸…"),
@@ -171,28 +175,43 @@ function createPanelState(context) {
         : text(`${visible.length} Bing wallpapers`, `${visible.length} 张 Bing 壁纸`),
       emptyText: text("No wallpapers", "没有壁纸"),
       selectedId: state.selectedId,
-      items: visible.map((image) => ({
-        id: imageId(image),
-        title: imageTitle(image),
-        subtitle: imageCredit(image),
-        badge: image.startdate || "",
-        image: { url: imageUrl(image, "thumb"), alt: imageTitle(image), fit: "cover" },
-        detail: {
-          title: imageTitle(image),
-          subtitle: imageCredit(image),
-          image: { url: imageUrl(image, "full"), alt: imageTitle(image), fit: "contain" },
-          fields: [
-            { label: text("Date", "日期"), value: image.startdate || "—" },
-            { label: text("Resolution", "分辨率"), value: "3840 × 2160" },
+      items: visible.map((image) => {
+        const id = imageId(image);
+        const title = imageTitle(image);
+        const credit = imageCredit(image);
+        const itemBusy = state.busyId === id;
+        return {
+          id,
+          title,
+          subtitle: credit,
+          badge: image.startdate || "",
+          image: { url: imageUrl(image, "thumb"), alt: title, fit: "cover" },
+          status: itemBusy ? { state: "loading", label: state.busy } : undefined,
+          detail: {
+            title,
+            subtitle: credit,
+            image: {
+              url: imageUrl(image, "uhd"),
+              alt: title,
+              fit: "contain",
+              aspectRatio: "auto",
+              zoomable: true,
+              caption: credit,
+            },
+            status: itemBusy ? { state: "loading", label: state.busy } : undefined,
+            fields: [
+              { label: text("Date", "日期"), value: image.startdate || "—" },
+              { label: text("Resolution", "分辨率"), value: "3840 × 2160" },
+            ],
+          },
+          actions: [
+            { id: "set", label: text("Set as Wallpaper", "设为壁纸"), primary: true, disabled: Boolean(state.busy) },
+            { id: "download", label: text("Download", "下载"), kbd: "CmdOrCtrl+D", disabled: Boolean(state.busy) },
+            { id: "copy", label: text("Copy Image Link", "复制图片链接"), disabled: Boolean(state.busy) },
+            { id: "open", label: text("Open Bing Source", "打开 Bing 来源"), disabled: Boolean(state.busy) },
           ],
-        },
-        actions: [
-          { id: "set", label: text("Set as Wallpaper", "设为壁纸"), primary: true },
-          { id: "download", label: text("Download", "下载"), kbd: "CmdOrCtrl+D" },
-          { id: "copy", label: text("Copy Image Link", "复制图片链接") },
-          { id: "open", label: text("Open Bing Source", "打开 Bing 来源") },
-        ],
-      })),
+        };
+      }),
       actions: [
         { id: "random", label: text("Set Random Wallpaper", "随机设置壁纸") },
         { id: "refresh", label: text("Refresh Gallery", "刷新图库") },
@@ -200,7 +219,12 @@ function createPanelState(context) {
       island: state.busy
         ? { primary: "Qx Bing Wallpaper", secondary: state.busy, tone: "neutral" }
         : null,
-    }, {
+    };
+    if (state.view) {
+      state.view.update(snapshot);
+      return;
+    }
+    state.view = context.ui.mountWorkbench(snapshot, {
       onQuery(value) {
         state.query = value;
         paint();
@@ -238,9 +262,10 @@ function createPanelState(context) {
     }
   };
 
-  const withBusy = async (label, task) => {
+  const withBusy = async (label, task, targetId = null) => {
     if (state.busy) return;
     state.busy = label;
+    state.busyId = targetId;
     state.error = null;
     paint();
     try {
@@ -250,6 +275,7 @@ function createPanelState(context) {
       context.showToast(state.error);
     } finally {
       state.busy = null;
+      state.busyId = null;
       paint();
     }
   };
@@ -263,7 +289,7 @@ function createPanelState(context) {
       if (random) await withBusy(text("Setting random wallpaper…", "正在设置随机壁纸…"), async () => {
         await applyWallpaper(context, random);
         context.showToast(text("Random wallpaper set", "随机壁纸设置成功"));
-      });
+      }, imageId(random));
       return;
     }
     if (!image) return;
@@ -271,12 +297,12 @@ function createPanelState(context) {
       await withBusy(text("Setting wallpaper…", "正在设置壁纸…"), async () => {
         await applyWallpaper(context, image);
         context.showToast(text("Wallpaper set", "壁纸设置成功"));
-      });
+      }, imageId(image));
     } else if (id === "download") {
       await withBusy(text("Downloading wallpaper…", "正在下载壁纸…"), async () => {
         const path = await saveWallpaper(context, image);
         context.showToast(`${text("Saved", "已保存")} ${path}`);
-      });
+      }, imageId(image));
     } else if (id === "copy") {
       await context.clipboard.write(imageUrl(image, "uhd"));
       context.showToast(text("Image link copied", "图片链接已复制"));

@@ -451,6 +451,14 @@ function islandForRun(run, enabled) {
   };
 }
 
+function islandToggleAction(run, enabled) {
+  const visible = Boolean(enabled && run);
+  return {
+    id: "toggle-island",
+    label: visible ? "Hide Active Run from Island" : "Show Active Run on Island",
+  };
+}
+
 // ── Map → workbench ────────────────────────────────────────────────────────
 
 function runIcon(status, conclusion) {
@@ -551,11 +559,13 @@ function renderPanel(container, context) {
   let pollTimer = null;
   let loadSequence = 0;
   let islandEnabled = true;
+  let islandOverride = null;
 
   const paint = () => {
     if (destroyed || !context.ui?.mountWorkbench) return;
     const runs = bundle?.runs || [];
     const releases = bundle?.releases || [];
+    const hottestRun = pickHottestRun(runs);
     let items = [];
     if (tab === "actions") items = runs.map(runToItem);
     else if (tab === "releases") items = releases.map(releaseToItem);
@@ -589,12 +599,12 @@ function renderPanel(container, context) {
         actions: [
           { id: "refresh", label: "Refresh", primary: !selectedItem },
           { id: "open-web", label: "Open Repository Page" },
-          { id: "island", label: "Show Active Run on Island" },
+          islandToggleAction(hottestRun, islandEnabled),
         ],
         items,
         selectedId,
         detail: selectedItem?.detail,
-        island: islandForRun(pickHottestRun(bundle?.runs || []), islandEnabled),
+        island: islandForRun(hottestRun, islandEnabled),
         emptyText: loading ? "Loading GitHub pages…" : "No items — check repos in preferences",
       },
       {
@@ -630,11 +640,19 @@ function renderPanel(container, context) {
             else context.showToast("Select an item first");
             return;
           }
-          if (id === "island") {
+          if (id === "toggle-island") {
+            const hot = pickHottestRun(bundle?.runs || []);
+            const nextIslandEnabled = !(islandEnabled && hot);
+            islandEnabled = nextIslandEnabled;
+            islandOverride = nextIslandEnabled;
+            paint();
             void (async () => {
-              const hot = pickHottestRun(bundle?.runs || []);
-              await publishIsland(context, hot, true);
-              context.showToast(hot ? `Watching ${hot.repo}` : "No in-progress runs");
+              await publishIsland(context, hot, nextIslandEnabled);
+              if (!nextIslandEnabled) {
+                context.showToast("QxGH removed from Island");
+              } else {
+                context.showToast(hot ? `Watching ${hot.repo}` : "No in-progress runs");
+              }
             })();
           }
         },
@@ -648,7 +666,8 @@ function renderPanel(container, context) {
     loading = true;
     paint();
     try {
-      islandEnabled = await prefBool(context, "islandWatch", true);
+      const preferenceEnabled = await prefBool(context, "islandWatch", true);
+      islandEnabled = islandOverride ?? preferenceEnabled;
       let result = await loadBundle(context, { force });
       if (destroyed || sequence !== loadSequence) return;
 
@@ -815,4 +834,4 @@ export default {
 };
 
 // Node smoke-test helpers (not used in iframe)
-export const __test = { parseActionsHtml, parseReleasesHtml };
+export const __test = { islandToggleAction, parseActionsHtml, parseReleasesHtml };

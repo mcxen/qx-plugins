@@ -29,6 +29,10 @@ paused, or complete. Selecting it exposes the live remaining time and the
 pause/resume/stop actions; historical sessions remain below it and keep their
 own replay action.
 
+The Workbench Actions menu also provides **Hide Timer from Island** / **Show
+Timer on Island**. Hiding only dismisses the Island projection; the timer and
+background heartbeat continue, and the choice persists across panel refreshes.
+
 Completion recommends the natural next phase: a completed focus session offers
 **Start Short Break**, while a completed break offers **Start Focus**. Repeating
 the same phase remains available from Actions instead of being the default.

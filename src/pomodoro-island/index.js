@@ -23,6 +23,7 @@ function defaultState() {
     startedAt: null,
     endsAt: null,
     sessionId: null,
+    islandVisible: true,
   };
 }
 
@@ -45,6 +46,7 @@ function normalizeState(value) {
     startedAt: Number.isFinite(Number(raw.startedAt)) ? Number(raw.startedAt) : null,
     endsAt: Number.isFinite(Number(raw.endsAt)) ? Number(raw.endsAt) : null,
     sessionId: raw.sessionId ? String(raw.sessionId) : null,
+    islandVisible: raw.islandVisible !== false,
   };
 }
 
@@ -144,7 +146,7 @@ async function appendHistory(context, state, outcome, endedAt = Date.now()) {
 }
 
 function islandModel(state) {
-  if (state.phase === "idle") return null;
+  if (state.phase === "idle" || state.islandVisible === false) return null;
   if (state.phase === "complete") {
     const recommendedKind = nextKind(state.kind);
     return {
@@ -286,6 +288,7 @@ async function start(context, kind) {
     startedAt: now,
     endsAt: now + durationMs,
     sessionId: `${now}-${isBreak ? "break" : "focus"}`,
+    islandVisible: true,
   });
   await publishIsland(context, state);
   armRuntimeTicker(context, state);
@@ -408,7 +411,12 @@ function currentDetail(state, historyCount) {
       { label: "Progress", value: `${Math.round(progressFor(state))}%` },
       { label: "History", value: historyCount },
       { label: "Started", value: formatDate(state.startedAt) },
-      { label: "Island", value: state.phase === "idle" ? "Hidden" : "Docked / floating by Qx settings" },
+      {
+        label: "Island",
+        value: state.phase === "idle" || state.islandVisible === false
+          ? "Hidden from Actions"
+          : "Docked / floating by Qx settings",
+      },
     ],
   };
 }
@@ -447,6 +455,14 @@ function panelActions(state, hasHistory) {
         { id: "focus", label: "Start Focus", command: "start-focus", primary: true, kbd: "Enter" },
         { id: "break", label: "Start Short Break", command: "start-short-break" },
       ];
+  }
+  if (state.phase !== "idle") {
+    actions.push({
+      id: "toggle-island",
+      label: state.islandVisible === false
+        ? "Show Timer on Island"
+        : "Hide Timer from Island",
+    });
   }
   if (hasHistory) actions.push({ id: "clear-history", label: "Clear History", tone: "danger" });
   return actions;
@@ -510,12 +526,25 @@ function renderPanel(container, context) {
         paint();
       },
       onAction: async (id) => {
-        if (id !== "clear-history") return;
-        await context.storage.persist.set(HISTORY_KEY, []);
-        history = [];
-        selectedId = null;
-        context.showToast("Pomodoro history cleared");
-        paint();
+        if (id === "toggle-island") {
+          state = await writeState(context, {
+            ...state,
+            islandVisible: state.islandVisible === false,
+          });
+          await publishIsland(context, state);
+          context.showToast(state.islandVisible === false
+            ? "Pomodoro hidden from Island"
+            : "Pomodoro shown on Island");
+          paint();
+          return;
+        }
+        if (id === "clear-history") {
+          await context.storage.persist.set(HISTORY_KEY, []);
+          history = [];
+          selectedId = null;
+          context.showToast("Pomodoro history cleared");
+          paint();
+        }
       },
       onCommandComplete: () => void refresh(),
       onBackgroundPoll: () => void refresh(),

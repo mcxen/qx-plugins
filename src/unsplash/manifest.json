@@ -1,7 +1,7 @@
 {
   "id": "unsplash",
   "name": "Unsplash",
-  "version": "1.1.1",
+  "version": "1.2.0",
   "description": "Search Unsplash photos, download, and set desktop wallpaper. Ported for Qx (Access Key API; likes/OAuth not included).",
   "author": "qx (ported from Raycast unsplash)",
   "icon": "icon.png",
@@ -106,7 +106,7 @@
     "icon": "icon.png",
     "keywords": ["unsplash", "wallpaper", "photos"]
   },
-  "min_app_version": "0.5.44",
+  "min_app_version": "0.6.13",
   "raycast": {
     "source": "unsplash",
     "compatible": "native-ports",

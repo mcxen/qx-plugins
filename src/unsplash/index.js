@@ -147,8 +147,11 @@ function createPanel(context) {
     loading: true,
     error: null,
     busy: null,
+    busyId: null,
     dead: false,
     generation: 0,
+    revision: 0,
+    view: null,
     searchTimer: null,
   };
 
@@ -160,7 +163,8 @@ function createPanel(context) {
       state.selectedId = state.results[0].id;
     }
     const busy = Boolean(state.busy);
-    context.ui.mountWorkbench({
+    const snapshot = {
+      revision: ++state.revision,
       title: "Unsplash",
       layout: { kind: "gallery", columns: 4, aspectRatio: "landscape" },
       query: state.query,
@@ -170,34 +174,52 @@ function createPanel(context) {
       meta: `${state.results.length} ${text("photos", "张图片")} · ${text("page", "第")} ${state.page}`,
       emptyText: text("No photos", "没有图片"),
       selectedId: state.selectedId,
-      items: state.results.map((photo) => ({
-        id: photo.id,
-        title: photo.description,
-        subtitle: photo.user,
-        image: { url: photo.thumb || photo.preview, alt: photo.description, fit: "cover" },
-        detail: {
+      items: state.results.map((photo) => {
+        const itemBusy = state.busyId === photo.id;
+        return {
+          id: photo.id,
           title: photo.description,
           subtitle: photo.user,
-          fields: [
-            { label: text("Photographer", "摄影师"), value: photo.user },
-            { label: text("Dimensions", "尺寸"), value: photo.width && photo.height ? `${photo.width} × ${photo.height}` : "—" },
+          image: { url: photo.thumb || photo.preview, alt: photo.description, fit: "cover" },
+          status: itemBusy ? { state: "loading", label: state.busy } : undefined,
+          detail: {
+            title: photo.description,
+            subtitle: photo.user,
+            image: {
+              url: photo.preview || photo.thumb,
+              alt: photo.description,
+              fit: "contain",
+              aspectRatio: "auto",
+              zoomable: true,
+              caption: photo.user,
+            },
+            status: itemBusy ? { state: "loading", label: state.busy } : undefined,
+            fields: [
+              { label: text("Photographer", "摄影师"), value: photo.user },
+              { label: text("Dimensions", "尺寸"), value: photo.width && photo.height ? `${photo.width} × ${photo.height}` : "—" },
+            ],
+          },
+          actions: [
+            { id: "wallpaper", label: text("Set as Wallpaper", "设为壁纸"), primary: true, disabled: busy },
+            { id: "download", label: text("Download", "下载"), kbd: "CmdOrCtrl+D", disabled: busy },
+            { id: "copy", label: text("Copy Photo Link", "复制图片链接"), disabled: busy },
+            { id: "open", label: text("Open on Unsplash", "在 Unsplash 打开"), disabled: busy },
+            { id: "photographer", label: text("Open Photographer", "打开摄影师主页"), disabled: busy || !photo.userLink },
           ],
-        },
-        actions: [
-          { id: "wallpaper", label: text("Set as Wallpaper", "设为壁纸"), primary: true, disabled: busy },
-          { id: "download", label: text("Download", "下载"), kbd: "CmdOrCtrl+D", disabled: busy },
-          { id: "copy", label: text("Copy Photo Link", "复制图片链接"), disabled: busy },
-          { id: "open", label: text("Open on Unsplash", "在 Unsplash 打开"), disabled: busy },
-          { id: "photographer", label: text("Open Photographer", "打开摄影师主页"), disabled: busy || !photo.userLink },
-        ],
-      })),
+        };
+      }),
       actions: [
         { id: "random", label: text("Random Photo", "随机图片"), disabled: busy },
         { id: "more", label: text("Load More", "加载更多"), disabled: busy || state.page >= state.totalPages },
         { id: "refresh", label: text("Refresh", "刷新"), disabled: busy },
       ],
       island: state.busy ? { primary: "Unsplash", secondary: state.busy, tone: "neutral" } : null,
-    }, {
+    };
+    if (state.view) {
+      state.view.update(snapshot);
+      return;
+    }
+    state.view = context.ui.mountWorkbench(snapshot, {
       onQuery(value) {
         state.query = value;
         paint();
@@ -258,9 +280,10 @@ function createPanel(context) {
     paint();
   };
 
-  const runBusy = async (label, task) => {
+  const runBusy = async (label, task, targetId = null) => {
     if (state.busy) return;
     state.busy = label;
+    state.busyId = targetId;
     state.error = null;
     paint();
     try {
@@ -270,6 +293,7 @@ function createPanel(context) {
       context.showToast(state.error);
     } finally {
       state.busy = null;
+      state.busyId = null;
       paint();
     }
   };
@@ -298,13 +322,13 @@ function createPanel(context) {
       return runBusy(text("Setting wallpaper…", "正在设置壁纸…"), async () => {
         await setWallpaper(context, photo);
         context.showToast(text("Wallpaper set", "壁纸设置成功"));
-      });
+      }, photo.id);
     }
     if (id === "download") {
       return runBusy(text("Downloading photo…", "正在下载图片…"), async () => {
         const path = await savePhoto(context, photo);
         context.showToast(`${text("Saved", "已保存")} ${path}`);
-      });
+      }, photo.id);
     }
     if (id === "copy") {
       await context.clipboard.write(photo.pageUrl);

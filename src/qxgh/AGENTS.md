@@ -26,6 +26,9 @@ Do **not** call `api.github.com`. Data sources only:
 List items provide structured `detail` and `actions`; Workbench never accepts HTML.
 The hottest active run is projected through the Workbench `island` field so Qx
 chooses docked vs floating placement from user settings.
+The Workbench Actions list must expose a Show/Hide Island toggle. A user dismissal
+must call `context.island.dismiss()` and suppress automatic panel polling from
+recreating the session until the user explicitly shows it again.
 
 ## Layout
 

@@ -40,6 +40,7 @@ src/pomodoro-island/
 12. Manifest command actions refresh persisted state through `onCommandComplete`; the open panel may repaint its deadline once per second but must not poll persistent storage every second.
 13. A running timer publishes `activity: "pulse"`; paused/complete states remove it. Activity DOM/CSS, reduced motion, action busy state, and winner transitions are Qx responsibilities.
 14. The plugin never publishes an open route. Qx binds the floating “Open Qx” control to `plugin:pomodoro-island` from the authenticated plugin session.
+15. The Workbench Actions list exposes a persisted Show/Hide Island toggle. Hiding dismisses only the projection; it must not pause or stop the timer, and heartbeat reconciliation must respect the hidden state.
 
 ## Permissions
 
@@ -59,6 +60,7 @@ src/pomodoro-island/
 - [ ] Running shows host `pulse`; paused freezes countdown without activity; complete shows 100% success
 - [ ] Floating “Open Qx” returns to the Pomodoro Workbench
 - [ ] Pause/Stop from panel Actions, Cmd/Ctrl+K, search and island action
+- [ ] Hide from panel Actions → timer keeps running and heartbeat does not re-show it; Show restores the same session
 
 ## Do not
 

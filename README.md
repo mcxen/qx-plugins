@@ -24,6 +24,7 @@ index.json                # marketplace catalog (checksums, permissions, min ver
 | Plugin | Kind | Notes |
 |--------|------|--------|
 | `qx-bing-wallpaper` | Native Workbench Gallery | Qx-owned Bing gallery and wallpaper actions |
+| `qxpicture` | Native Workbench List | Configurable random-image APIs with adaptive detail media |
 | `raycast-calendar` | Raycast generic convert | UI calendar; works on Qx ≥ 0.4.28 |
 | `external-display-control` | Native | DDC/CI brightness; macOS, needs Qx ≥ 0.4.61 |
 | `v2ex` | Native | Host `v2ex_*` commands |

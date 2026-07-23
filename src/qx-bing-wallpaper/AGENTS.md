@@ -8,6 +8,7 @@ Native Qx business plugin. Do not run it through the Raycast converter.
 - `set-random-wallpaper`: daily background command
 - `set-latest-wallpaper`: daily background command
 - Workbench Gallery: images, selection, structured details, item/panel Actions
+- Host-owned adaptive image detail + zoom Dialog; no iframe CSS/lightbox workaround
 - Persisted Bing archive cache
 
 ## Invariants
@@ -18,6 +19,8 @@ Native Qx business plugin. Do not run it through the Raycast converter.
 4. `panel.render` must publish loading state and return before network I/O completes.
 5. Background commands and the panel share data only through `context.storage.persist`.
 6. Do not add Raycast metadata, imports, shims, or converted bundles.
+7. Keep `mountWorkbench()` controller updates revisioned; item/detail loading uses
+   structured `status` and retains the current image.
 
 ## Permissions
 
