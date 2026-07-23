@@ -52,6 +52,94 @@ function relativeTime(iso) {
   return ageLabel(t);
 }
 
+function parseDurationSeconds(value) {
+  const text = String(value || "").toLowerCase();
+  let seconds = 0;
+  let matched = false;
+  const units = [
+    [/(\d+(?:\.\d+)?)\s*h(?:ours?)?/g, 3600],
+    [/(\d+(?:\.\d+)?)\s*m(?:in(?:utes?)?)?/g, 60],
+    [/(\d+(?:\.\d+)?)\s*s(?:ec(?:onds?)?)?/g, 1],
+  ];
+  for (const [pattern, multiplier] of units) {
+    for (const match of text.matchAll(pattern)) {
+      seconds += Number(match[1]) * multiplier;
+      matched = true;
+    }
+  }
+  return matched && Number.isFinite(seconds) ? Math.round(seconds) : 0;
+}
+
+function formatDurationSeconds(value) {
+  const total = Math.max(0, Math.round(Number(value) || 0));
+  const hours = Math.floor(total / 3600);
+  const minutes = Math.floor((total % 3600) / 60);
+  const seconds = total % 60;
+  if (hours) return `${hours}h ${minutes}m`;
+  if (minutes) return `${minutes}m ${seconds}s`;
+  return `${seconds}s`;
+}
+
+function median(values) {
+  if (!values.length) return 0;
+  const ordered = [...values].sort((a, b) => a - b);
+  const middle = Math.floor(ordered.length / 2);
+  return ordered.length % 2
+    ? ordered[middle]
+    : Math.round((ordered[middle - 1] + ordered[middle]) / 2);
+}
+
+function estimateRunProgress(run, runs, now = Date.now()) {
+  if (!isActiveRun(run)) return { ...run, progress: null };
+  if (run.status === "queued") {
+    return {
+      ...run,
+      progress: {
+        percent: 3,
+        estimated: true,
+        elapsedSeconds: 0,
+        totalSeconds: 0,
+        sampleCount: 0,
+      },
+    };
+  }
+
+  const usableHistory = (candidate) =>
+    candidate.id !== run.id
+    && candidate.repo === run.repo
+    && !isActiveRun(candidate)
+    && candidate.conclusion !== "cancelled"
+    && parseDurationSeconds(candidate.duration) >= 5;
+  const sameWorkflow = runs
+    .filter((candidate) => usableHistory(candidate) && candidate.name === run.name)
+    .slice(0, 8);
+  const repoHistory = runs.filter(usableHistory).slice(0, 12);
+  const history = sameWorkflow.length ? sameWorkflow : repoHistory;
+  const samples = history.map((candidate) => parseDurationSeconds(candidate.duration));
+  const historicalTotal = median(samples) || 10 * 60;
+  const startedAt = Date.parse(run.createdAt || run.updatedAt || "");
+  const elapsedSeconds = Number.isFinite(startedAt)
+    ? Math.max(0, Math.round((now - startedAt) / 1000))
+    : 0;
+  const effectiveTotal = Math.max(historicalTotal, elapsedSeconds / 0.92);
+  const percent = Math.max(4, Math.min(92, Math.round((elapsedSeconds / effectiveTotal) * 100)));
+  return {
+    ...run,
+    progress: {
+      percent,
+      estimated: true,
+      elapsedSeconds,
+      totalSeconds: historicalTotal,
+      sampleCount: samples.length,
+      scope: sameWorkflow.length ? "workflow" : samples.length ? "repository" : "fallback",
+    },
+  };
+}
+
+function estimateRuns(runs, now = Date.now()) {
+  return (runs || []).map((run) => estimateRunProgress(run, runs || [], now));
+}
+
 function decodeEntities(s) {
   return String(s ?? "")
     .replace(/&amp;/g, "&")
@@ -193,12 +281,47 @@ function parseActionsHtml(html, repo) {
       updatedAt: dt?.[1] || null,
       runNumber,
       duration: duration ? String(duration).trim() : "",
-      progress: isActiveStatus(status)
-        ? { done: 0, total: 1, percent: status === "queued" ? 8 : 45 }
-        : null,
+      progress: null,
       source: "html",
     });
   }
+  return runs;
+}
+
+function parseRunDurationHtml(html) {
+  const match = String(html || "").match(
+    /Total duration<\/span>[\s\S]{0,500}?(\d+h(?:\s*\d+m)?|\d+m(?:\s*\d+s)?|\d+\s*seconds?)/i,
+  );
+  return match?.[1] ? String(match[1]).replace(/\s+/g, " ").trim() : "";
+}
+
+async function hydrateRunDurations(context, runs, previousRuns = []) {
+  const previous = new Map(
+    previousRuns
+      .filter((run) => run?.id && run.duration)
+      .map((run) => [String(run.id), run.duration]),
+  );
+  for (const run of runs) {
+    if (!run.duration && previous.has(String(run.id))) {
+      run.duration = previous.get(String(run.id));
+    }
+  }
+  const candidates = runs
+    .filter((run) =>
+      !isActiveRun(run)
+      && run.conclusion !== "cancelled"
+      && !parseDurationSeconds(run.duration)
+      && run.htmlUrl
+    )
+    .slice(0, 8);
+  await Promise.all(candidates.map(async (run) => {
+    try {
+      const html = await fetchPage(context, run.htmlUrl);
+      run.duration = parseRunDurationHtml(html);
+    } catch {
+      // A missing duration sample must not fail the Actions list.
+    }
+  }));
   return runs;
 }
 
@@ -282,7 +405,7 @@ function isActiveRun(run) {
 
 // ── Load bundle ────────────────────────────────────────────────────────────
 
-async function fetchRepoBundle(context, full) {
+async function fetchRepoBundle(context, full, previousRuns = []) {
   const actionsUrl = `https://github.com/${full}/actions`;
   const releasesUrl = `https://github.com/${full}/releases`;
   const errors = [];
@@ -293,6 +416,11 @@ async function fetchRepoBundle(context, full) {
     const html = await fetchPage(context, actionsUrl);
     runs = parseActionsHtml(html, full);
     if (!runs.length) errors.push(`${full} actions: no runs parsed (page layout?)`);
+    else await hydrateRunDurations(
+      context,
+      runs,
+      previousRuns.filter((run) => run.repo === full),
+    );
   } catch (e) {
     errors.push(`${full} actions: ${e.message || e}`);
   }
@@ -308,7 +436,7 @@ async function fetchRepoBundle(context, full) {
   return { runs, releases, errors };
 }
 
-async function fetchAll(context, { repos }) {
+async function fetchAll(context, { repos, previousRuns = [] }) {
   if (!repos.length) {
     throw new Error("No repositories configured. Set owner/repo in plugin preferences.");
   }
@@ -317,7 +445,7 @@ async function fetchAll(context, { repos }) {
   const errors = [];
 
   for (const full of repos) {
-    const part = await fetchRepoBundle(context, full);
+    const part = await fetchRepoBundle(context, full, previousRuns);
     runs.push(...part.runs);
     releases.push(...part.releases);
     errors.push(...part.errors);
@@ -383,7 +511,7 @@ async function loadBundle(context, { force = false } = {}) {
     };
   }
 
-  return fetchAll(context, { repos });
+  return fetchAll(context, { repos, previousRuns: cached?.runs || [] });
 }
 
 function pickHottestRun(runs) {
@@ -424,8 +552,8 @@ async function publishIsland(context, run, enabled) {
   }
   const payload = {
     primary: String(run.repo),
-    secondary: `${run.displayTitle || run.name} · ${run.status}`,
-    progress: run.progress?.percent ?? (run.status === "queued" ? 8 : 45),
+    secondary: `${run.displayTitle || run.name} · ${run.progress?.estimated ? "estimated" : run.status}`,
+    progress: run.progress?.percent,
     tone: "neutral",
     activity: "bounce",
   };
@@ -444,8 +572,8 @@ function islandForRun(run, enabled) {
   if (!enabled || !run) return null;
   return {
     primary: String(run.repo),
-    secondary: `${run.displayTitle || run.name} · ${run.status}`,
-    progress: run.progress?.percent ?? (run.status === "queued" ? 8 : 45),
+    secondary: `${run.displayTitle || run.name} · ${run.progress?.estimated ? "estimated" : run.status}`,
+    progress: run.progress?.percent,
     tone: "neutral",
     action: { label: "Refresh", command: "refresh-qxgh" },
   };
@@ -479,10 +607,13 @@ function runTone(status, conclusion) {
 
 function runToItem(run) {
   const statusText = isActiveRun(run) ? run.status : run.conclusion || run.status || "";
+  const estimate = run.progress?.estimated && run.status !== "queued"
+    ? `estimated ${run.progress.percent}% · ${formatDurationSeconds(run.progress.elapsedSeconds)} / ~${formatDurationSeconds(run.progress.totalSeconds)}`
+    : "";
   const sub = [
     run.repo,
     run.name !== run.displayTitle ? run.name : "",
-    run.duration || "",
+    estimate || run.duration || "",
     relativeTime(run.updatedAt),
   ]
     .filter(Boolean)
@@ -504,7 +635,21 @@ function runToItem(run) {
       { label: "Status", value: run.status, tone: runTone(run.status, run.conclusion) },
       { label: "Conclusion", value: run.conclusion || "—" },
       { label: "Run", value: run.runNumber != null ? `#${run.runNumber}` : "—" },
-      { label: "Duration", value: run.duration || "—" },
+      {
+        label: isActiveRun(run) ? "Estimated progress" : "Duration",
+        value: run.progress?.estimated
+          ? run.status === "queued"
+            ? "Queued · estimate starts when running"
+            : `${run.progress.percent}% · ${formatDurationSeconds(run.progress.elapsedSeconds)} elapsed / ~${formatDurationSeconds(run.progress.totalSeconds)} expected`
+          : run.duration || "—",
+        tone: isActiveRun(run) ? "accent" : "neutral",
+      },
+      ...(run.progress?.estimated ? [{
+        label: "Estimate basis",
+        value: run.progress.sampleCount
+          ? `${run.progress.sampleCount} recent ${run.progress.scope} run${run.progress.sampleCount === 1 ? "" : "s"}`
+          : "Conservative 10-minute fallback",
+      }] : []),
       { label: "Updated", value: run.updatedAt || "—" },
       { label: "Source", value: "public HTML page" },
     ],
@@ -557,13 +702,14 @@ function renderPanel(container, context) {
   let bundle = null;
   let loading = true;
   let pollTimer = null;
+  let progressTimer = null;
   let loadSequence = 0;
   let islandEnabled = true;
   let islandOverride = null;
 
   const paint = () => {
     if (destroyed || !context.ui?.mountWorkbench) return;
-    const runs = bundle?.runs || [];
+    const runs = estimateRuns(bundle?.runs || []);
     const releases = bundle?.releases || [];
     const hottestRun = pickHottestRun(runs);
     let items = [];
@@ -571,23 +717,27 @@ function renderPanel(container, context) {
     else if (tab === "releases") items = releases.map(releaseToItem);
     else items = [...runs.map(runToItem), ...releases.map(releaseToItem)];
     items = filterByQuery(items, query);
-    if (selectedId && !items.some((item) => item.id === selectedId)) {
-      selectedId = items[0]?.id || null;
-      selectedItem = items[0] || null;
+    if (selectedId) {
+      selectedItem = items.find((item) => item.id === selectedId) || null;
+      if (!selectedItem) {
+        selectedId = items[0]?.id || null;
+        selectedItem = items[0] || null;
+      }
     }
     if (!selectedId && items[0]) {
       selectedId = items[0].id;
       selectedItem = items[0];
     }
 
-    let meta = loading && !bundle ? "Loading pages…" : summaryLine(bundle || { runs: [] });
+    let meta = loading && !bundle ? "Loading pages…" : summaryLine({ ...(bundle || {}), runs });
+    if (loading && bundle) meta += " · refreshing";
     if (bundle?.fromCache) meta += ` · cached ${ageLabel(bundle.savedAt)}`;
 
     context.ui.mountWorkbench(
       {
         title: "QxGH",
         meta,
-        loading,
+        loading: loading && !bundle,
         error: bundle?.error || null,
         query,
         queryPlaceholder: "Filter…",
@@ -597,7 +747,7 @@ function renderPanel(container, context) {
           { id: "both", label: "Both", active: tab === "both" },
         ],
         actions: [
-          { id: "refresh", label: "Refresh", primary: !selectedItem },
+          { id: "refresh", label: loading ? "Refreshing…" : "Refresh", primary: !selectedItem, disabled: loading },
           { id: "open-web", label: "Open Repository Page" },
           islandToggleAction(hottestRun, islandEnabled),
         ],
@@ -623,25 +773,26 @@ function renderPanel(container, context) {
           selectedItem = item;
           paint();
         },
-        onAction: (id) => {
+        onAction: (id, item) => {
+          const actionItem = item || selectedItem;
           if (id === "refresh") {
             void reload({ force: true });
             return;
           }
           if (id === "open-web") {
-            const full = selectedItem?.raw?.repo || bundle?.repos?.[0];
+            const full = actionItem?.raw?.repo || bundle?.repos?.[0];
             const path = tab === "releases" ? "releases" : "actions";
             if (full && context.openUrl) void context.openUrl(`https://github.com/${full}/${path}`);
             return;
           }
           if (id === "open-item") {
-            const url = selectedItem?.raw?.htmlUrl;
+            const url = actionItem?.raw?.htmlUrl;
             if (url && context.openUrl) void context.openUrl(url);
             else context.showToast("Select an item first");
             return;
           }
           if (id === "toggle-island") {
-            const hot = pickHottestRun(bundle?.runs || []);
+            const hot = pickHottestRun(estimateRuns(bundle?.runs || []));
             const nextIslandEnabled = !(islandEnabled && hot);
             islandEnabled = nextIslandEnabled;
             islandOverride = nextIslandEnabled;
@@ -676,7 +827,10 @@ function renderPanel(container, context) {
         loading = true;
         paint();
         try {
-          result = await fetchAll(context, { repos: result.repos });
+          result = await fetchAll(context, {
+            repos: result.repos,
+            previousRuns: result.runs || [],
+          });
         } catch (err) {
           if (destroyed || sequence !== loadSequence) return;
           bundle = { ...result, error: String(err.message || err) };
@@ -700,14 +854,16 @@ function renderPanel(container, context) {
       paint();
     } catch (err) {
       if (destroyed || sequence !== loadSequence) return;
-      bundle = {
-        runs: [],
-        releases: [],
-        repos: [],
-        error: String(err.message || err),
-        savedAt: Date.now(),
-        mode: "html",
-      };
+      bundle = bundle
+        ? { ...bundle, error: String(err.message || err), fromCache: true }
+        : {
+            runs: [],
+            releases: [],
+            repos: [],
+            error: String(err.message || err),
+            savedAt: Date.now(),
+            mode: "html",
+          };
       loading = false;
       paint();
     }
@@ -722,6 +878,10 @@ function renderPanel(container, context) {
     }
   })();
 
+  progressTimer = context.setInterval(() => {
+    if (!destroyed && pickHottestRun(bundle?.runs || [])) paint();
+  }, 5_000);
+
   void reload({ force: false });
 
   return () => {
@@ -733,6 +893,14 @@ function renderPanel(container, context) {
         /* ignore */
       }
       pollTimer = null;
+    }
+    if (progressTimer != null) {
+      try {
+        context.clearInterval(progressTimer);
+      } catch {
+        /* ignore */
+      }
+      progressTimer = null;
     }
   };
 }
@@ -757,7 +925,11 @@ export default {
         try {
           const b = await loadBundle(context, { force: true });
           context.showToast(summaryLine(b).slice(0, 120));
-          await publishIsland(context, pickHottestRun(b.runs), await prefBool(context, "islandWatch", true));
+          await publishIsland(
+            context,
+            pickHottestRun(estimateRuns(b.runs)),
+            await prefBool(context, "islandWatch", true),
+          );
         } catch (err) {
           context.showToast(String(err).slice(0, 120));
         }
@@ -769,7 +941,7 @@ export default {
       async run(context) {
         try {
           const b = await loadBundle(context, { force: false });
-          const hot = pickHottestRun(b.runs);
+          const hot = pickHottestRun(estimateRuns(b.runs));
           let msg = summaryLine(b);
           if (hot) msg = `${hot.repo}: ${hot.displayTitle || hot.name} · ${msg}`;
           context.showToast(msg.slice(0, 140));
@@ -784,7 +956,7 @@ export default {
       async run(context) {
         try {
           const b = await loadBundle(context, { force: true });
-          const hot = pickHottestRun(b.runs);
+          const hot = pickHottestRun(estimateRuns(b.runs));
           if (!hot) {
             await publishIsland(context, null, true);
             context.showToast("No in-progress runs on page");
@@ -834,4 +1006,12 @@ export default {
 };
 
 // Node smoke-test helpers (not used in iframe)
-export const __test = { islandToggleAction, parseActionsHtml, parseReleasesHtml };
+export const __test = {
+  estimateRunProgress,
+  estimateRuns,
+  islandToggleAction,
+  parseActionsHtml,
+  parseDurationSeconds,
+  parseReleasesHtml,
+  parseRunDurationHtml,
+};

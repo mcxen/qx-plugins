@@ -1,7 +1,7 @@
 {
   "id": "qxgh",
   "name": "QxGH",
-  "version": "1.3.3",
+  "version": "1.4.0",
   "description": "QxGH \u2014 watch GitHub Actions and Releases from public github.com pages (no REST API). Business-only workbench UI.",
   "author": "mcx",
   "icon": "",

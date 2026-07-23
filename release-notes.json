@@ -53,6 +53,14 @@
     ],
     "qxgh": [
       {
+        "version": "1.4.0",
+        "published_at": "2026-07-23",
+        "notes_localizations": {
+          "en": "Added history-based estimated workflow progress, live elapsed-time updates, and non-destructive refresh behavior.",
+          "zh-CN": "新增基于历史耗时的工作流预计进度、实时用时更新，并让刷新过程保留已有列表。"
+        }
+      },
+      {
         "version": "1.3.3",
         "published_at": "2026-07-23",
         "notes_localizations": {
