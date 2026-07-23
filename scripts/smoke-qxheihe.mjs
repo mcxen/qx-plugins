@@ -44,7 +44,7 @@ async function mockFetch(url, options = {}) {
         link: {
           ...posts.find((post) => post.linkid === id),
           text: JSON.stringify([
-            { type: "text", text: `<b>Full body ${id}</b>` },
+            { type: "text", text: `<p>Full body ${id}</p><p>Second paragraph ${id}</p>` },
             { type: "img", url: `https://images.example.test/detail-${id}.jpg` },
           ]),
         },
@@ -113,6 +113,7 @@ const context = {
   },
   getPreference(id) {
     if (id === "feedUrl") return legacyFeedUrl;
+    if (id === "detailImageLayout") return "horizontal";
     return id === "commentCookie" ? "session=smoke" : "";
   },
   openUrl(url) {
@@ -135,6 +136,7 @@ async function waitFor(predicate, label, timeoutMs = 15_000) {
 await waitFor(() => snapshot && !snapshot.loading && snapshot.items?.length, "feed");
 assert.ok(snapshot.items.length >= 5);
 assert.ok(snapshot.items.every((item) => item.id && item.detail));
+assert.ok(snapshot.items.every((item) => item.detail.imageLayout === "horizontal"));
 await waitFor(
   () => snapshot.items[0]?.detail?.sections?.some((section) => /评论区/.test(section.title || "")),
   "initial post detail and comments",
@@ -143,6 +145,7 @@ const selected = snapshot.items[0];
 handlers.onSelect(selected.id);
 const detailed = snapshot.items.find((item) => item.id === selected.id);
 assert.ok(detailed.detail.body || detailed.detail.images?.length);
+assert.match(detailed.detail.body, /Full body 1000\n\nSecond paragraph 1000/);
 assert.ok(detailed.detail.sections.some((section) => /commenter/.test(section.title || "")));
 assert.doesNotMatch(detailed.badge, /未读/);
 const cache = persisted.get("cache.community.v2");

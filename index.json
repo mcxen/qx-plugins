@@ -171,19 +171,27 @@
     {
       "id": "qxheihe",
       "name": "QxHeihe 小黑盒",
-      "version": "1.3.0",
+      "version": "1.4.0",
       "description": "浏览小黑盒社区推荐内容，在 Qx 内查看正文、多图、帖子信息与登录评论。",
       "download_url": "https://raw.githubusercontent.com/mcxen/qx-plugins/main/qxheihe.qx-plugin",
-      "size_bytes": 38319,
-      "checksum_sha256": "8723833766a2953349be5d980fe5cec30d1370450f6ac49fd101d061ec5d9834",
+      "size_bytes": 39588,
+      "checksum_sha256": "0f3dc1113f435d96fae8ba254bde68c159bc56697d22feaac43c4323ebb25de2",
       "required_permissions": [
         "http",
         "open-url"
       ],
       "updated_at": "2026-07-23",
       "author": "mcx",
-      "min_app_version": "0.6.16",
+      "min_app_version": "0.6.19",
       "releases": [
+        {
+          "version": "1.4.0",
+          "published_at": "2026-07-23",
+          "notes_localizations": {
+            "en": "Added configurable horizontal or grid multi-image details, host-native keyboard gallery navigation, and preserved article paragraphs.",
+            "zh-CN": "新增可配置的横向胶片或网格多图详情、宿主原生键盘大图切换，并修复正文段落合并问题。"
+          }
+        },
         {
           "version": "1.3.0",
           "published_at": "2026-07-23",

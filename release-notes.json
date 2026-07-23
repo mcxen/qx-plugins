@@ -63,6 +63,14 @@
     ],
     "qxheihe": [
       {
+        "version": "1.4.0",
+        "published_at": "2026-07-23",
+        "notes_localizations": {
+          "en": "Added configurable horizontal or grid multi-image details, host-native keyboard gallery navigation, and preserved article paragraphs.",
+          "zh-CN": "新增可配置的横向胶片或网格多图详情、宿主原生键盘大图切换，并修复正文段落合并问题。"
+        }
+      },
+      {
         "version": "1.3.0",
         "published_at": "2026-07-23",
         "notes_localizations": {

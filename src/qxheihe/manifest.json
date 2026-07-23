@@ -1,7 +1,7 @@
 {
   "id": "qxheihe",
   "name": "QxHeihe 小黑盒",
-  "version": "1.3.0",
+  "version": "1.4.0",
   "description": "浏览小黑盒社区推荐内容，在 Qx 内查看正文、多图、帖子信息与登录评论。",
   "author": "mcx",
   "icon": "icon.svg",
@@ -53,6 +53,18 @@
         { "label": "3 天", "value": "3" },
         { "label": "7 天", "value": "7" }
       ]
+    },
+    {
+      "id": "detailImageLayout",
+      "label": "详情多图布局",
+      "type": "select",
+      "required": false,
+      "default": "horizontal",
+      "description": "横向胶片可用左右键逐张浏览；响应式网格会同时展示更多图片。",
+      "options": [
+        { "label": "横向胶片", "value": "horizontal" },
+        { "label": "响应式网格", "value": "grid" }
+      ]
     }
   ],
   "storage": {
@@ -83,7 +95,7 @@
     "icon": "icon.svg",
     "keywords": ["小黑盒", "heybox", "社区", "帖子", "游戏"]
   },
-  "min_app_version": "0.6.16",
+  "min_app_version": "0.6.19",
   "platforms": ["macos", "windows"],
   "screenshots": []
 }

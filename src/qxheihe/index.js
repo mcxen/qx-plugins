@@ -12,6 +12,7 @@ const COMMENT_URL = "https://api.xiaoheihe.cn/bbs/web/link/comment/list";
 const LEGACY_CACHE_KEY = "qxheihe.feed.v1";
 const CACHE_KEY = "cache.community.v2";
 const DEFAULT_TTL_MS = 5 * 60 * 1000;
+const DETAIL_FORMAT_VERSION = 2;
 const SIGN_ALPHABET = "AB45STUVWZEFGJ6CH01D237IXYPQRKLMN89";
 
 function isChinese() {
@@ -30,6 +31,7 @@ function message(error) {
 function cleanText(value) {
   return String(value || "")
     .replace(/<br\s*\/?>/gi, "\n")
+    .replace(/<\/(?:p|div|section|article|h[1-6]|blockquote|li)>/gi, "\n\n")
     .replace(/<span[^>]*data-emoji=["']([^"']+)["'][^>]*><\/span>/gi, "[$1]")
     .replace(/<[^>]+>/g, "")
     .replace(/&nbsp;/g, " ")
@@ -475,6 +477,7 @@ function createPanel(container, context) {
     source: "",
     savedAt: 0,
     retentionDays: 7,
+    imageLayout: "horizontal",
     readAt: {},
     cachedAt: {},
     revision: 0,
@@ -589,6 +592,7 @@ function createPanel(container, context) {
           : undefined,
       body,
       images,
+      imageLayout: state.imageLayout,
       fields: [
         { label: copy("Author", "作者"), value: post.user?.username || "—" },
         { label: copy("Community", "社区"), value: topic },
@@ -723,7 +727,16 @@ function createPanel(container, context) {
   async function loadDetail(id) {
     const key = String(id || "");
     const previous = state.details.get(key);
-    if (!key || (previous && !previous.error && previous.commentsResolved) || state.detailLoading.has(key)) return;
+    if (
+      !key
+      || (
+        previous
+        && !previous.error
+        && previous.commentsResolved
+        && previous.detailFormatVersion === DETAIL_FORMAT_VERSION
+      )
+      || state.detailLoading.has(key)
+    ) return;
     const post = state.all.find((entry) => String(entry.linkid) === key);
     if (!post) return;
     const generation = state.generation;
@@ -769,6 +782,7 @@ function createPanel(container, context) {
       }
       state.details.set(key, {
         ...parsed,
+        detailFormatVersion: DETAIL_FORMAT_VERSION,
         topics: Array.isArray(result.topics) ? result.topics : post.topics,
         commentSections,
         commentsResolved: true,
@@ -780,7 +794,7 @@ function createPanel(container, context) {
       await persistCache();
     } catch (error) {
       if (!state.dead && generation === state.generation) {
-        state.details.set(key, { error: message(error) });
+        state.details.set(key, { ...(previous || {}), error: message(error) });
       }
     } finally {
       state.detailLoading.delete(key);
@@ -795,12 +809,18 @@ function createPanel(container, context) {
     const generation = ++state.generation;
     paint();
     try {
-      const configuredUrl = await preference(context, "feedUrl", DEFAULT_FEED_URL);
-      const ttlRaw = Number(await preference(context, "cacheTtlMinutes", "5"));
+      const [configuredUrl, ttlPreference, retentionPreference, imageLayoutPreference] = await Promise.all([
+        preference(context, "feedUrl", DEFAULT_FEED_URL),
+        preference(context, "cacheTtlMinutes", "5"),
+        preference(context, "retentionDays", "7"),
+        preference(context, "detailImageLayout", "horizontal"),
+      ]);
+      state.imageLayout = imageLayoutPreference === "grid" ? "grid" : "horizontal";
+      const ttlRaw = Number(ttlPreference);
       const ttlMs = Number.isFinite(ttlRaw) && ttlRaw > 0
         ? Math.min(60, ttlRaw) * 60 * 1000
         : DEFAULT_TTL_MS;
-      const retentionRaw = Number(await preference(context, "retentionDays", "7"));
+      const retentionRaw = Number(retentionPreference);
       state.retentionDays = retentionRaw === 3 ? 3 : 7;
       const cached = pruneCache(
         cacheModel(await cacheGet(context)) || cacheModel({}),
