@@ -503,6 +503,10 @@ function createPanel(context, container) {
     if (id === GENERAL_SETTINGS_ID) return null;
     return state.config.sources.find((source) => source.id === id) || state.config.sources[0];
   };
+  const sourceByExactId = (id) => {
+    if (!id || id === GENERAL_SETTINGS_ID) return null;
+    return state.config.sources.find((source) => source.id === id) || null;
+  };
 
   const persistImageCache = () => {
     state.cacheWriteQueue = state.cacheWriteQueue
@@ -711,40 +715,73 @@ function createPanel(context, container) {
           .join(" · ")
         : text("No parameters", "无参数");
 
-      // One visual row ≈ two sequential fields: Key then Value.
-      // Delete lives in Actions (Workbench form has no inline buttons).
       const parameterControls = params.flatMap((param, index) => {
         const n = index + 1;
-        const keyLabel = param.key
-          ? text(`#${n} Key`, `#${n} 参数名`)
-          : text(`#${n} Key (empty)`, `#${n} 参数名（空）`);
-        const valueLabel = param.key
-          ? text(`#${n} Value · ${param.key}`, `#${n} 值 · ${param.key}`)
-          : text(`#${n} Value`, `#${n} 值`);
+        const groupId = `parameter:${param.id}`;
+        const groupLabel = text(
+          `Parameter #${n}${param.key ? ` · ${param.key}` : ""}`,
+          `参数 #${n}${param.key ? ` · ${param.key}` : ""}`
+        );
+        const group = {
+          id: groupId,
+          label: groupLabel,
+          action: {
+            id: `delete-param:${param.id}`,
+            label: text("Delete parameter", "删除参数"),
+            tone: "danger"
+          }
+        };
         const valueControl = param.type === "select" && (param.options || []).length
           ? {
               id: `settings:param:${param.id}:value`,
-              label: valueLabel,
+              label: text("Value", "值"),
               value: param.value,
               type: "select",
-              options: param.options
+              options: param.options,
+              group: { id: groupId }
             }
           : {
               id: `settings:param:${param.id}:value`,
-              label: valueLabel,
+              label: text("Value", "值"),
               value: param.value,
               type: param.type === "number" ? "number" : "text",
-              placeholder: param.type === "number" ? "0" : text("value", "参数值")
+              placeholder: param.type === "number" ? "0" : text("value", "参数值"),
+              group: { id: groupId }
             };
         return [
           {
             id: `settings:param:${param.id}:key`,
-            label: keyLabel,
+            label: text("Key", "参数名"),
             value: param.key,
             type: "text",
-            placeholder: text("e.g. width", "例如 width")
+            placeholder: text("e.g. width", "例如 width"),
+            group
           },
-          valueControl
+          {
+            id: `settings:param:${param.id}:type`,
+            label: text("Type", "类型"),
+            value: param.type || "text",
+            type: "select",
+            options: [
+              { label: text("Text", "文本"), value: "text" },
+              { label: text("Number", "数字"), value: "number" },
+              { label: text("Select", "选项"), value: "select" }
+            ],
+            group: { id: groupId }
+          },
+          valueControl,
+          ...(param.type === "select" ? [{
+            id: `settings:param:${param.id}:options`,
+            label: text("Options", "选项列表"),
+            value: (param.options || [])
+              .map((option) => option.label === option.value
+                ? option.value
+                : `${option.label}=${option.value}`)
+              .join(", "),
+            type: "text",
+            placeholder: text("label=value, label=value", "名称=值, 名称=值"),
+            group: { id: groupId }
+          }] : [])
         ];
       });
 
@@ -769,8 +806,8 @@ function createPanel(context, container) {
           form: {
             title: text("API + Parameters", "API 与参数"),
             description: text(
-              "Each parameter is two fields: Key then Value. Use Actions → Add Parameter / Delete · name.",
-              "每个参数占两行：参数名 + 值。用右侧动作「添加参数 / 删除 · 名」管理行。"
+              "Each parameter has its own Key, Type, Value, options, and delete action. Changes save automatically.",
+              "每个参数独立管理参数名、类型、值、选项与删除操作，修改会自动保存。"
             ),
             controls: [
               {
@@ -815,19 +852,23 @@ function createPanel(context, container) {
                   placeholder: "data[0].urls.original"
                 }
               ] : []),
-              // Explicit heading row for the parameter list (label-only text control).
-              {
-                id: "settings:params:heading",
-                label: text(
-                  `Parameters (${params.length}) — Key + Value per row`,
-                  `参数列表（${params.length}）— 每行：参数名 + 值`
-                ),
-                value: params.length
-                  ? text("Scroll down to edit keys and values", "向下滚动编辑参数名与值")
-                  : text("No parameters yet — Add Parameter below", "暂无参数 — 点下方「添加参数」"),
-                type: "text"
-              },
               ...parameterControls
+            ],
+            actions: [
+              {
+                id: "add-param",
+                label: text("Add Parameter", "添加参数"),
+                primary: true
+              },
+              ...(hasDefaultParams ? [{
+                id: "fill-default-params",
+                label: text("Restore Default Parameters", "恢复默认参数")
+              }] : []),
+              {
+                id: "delete-source",
+                label: text("Delete API", "删除 API"),
+                tone: "danger"
+              }
             ]
           },
           fields: [
@@ -872,14 +913,6 @@ function createPanel(context, container) {
             id: "fill-default-params",
             label: text("Fill Default Parameters", "填充默认参数")
           }] : []),
-          ...params.map((param, index) => ({
-            id: `delete-param:${param.id}`,
-            label: text(
-              `Delete · #${index + 1} ${param.key || "param"}`,
-              `删除 · #${index + 1} ${param.key || "参数"}`
-            ),
-            tone: "danger"
-          })),
           {
             id: "delete-source",
             label: text("Delete API", "删除 API"),
@@ -1054,9 +1087,6 @@ function createPanel(context, container) {
       return;
     }
 
-    // Read-only helper field — ignore edits so it cannot trash the heading text.
-    if (controlId === "settings:params:heading") return;
-
     let needsHardPaint = false;
 
     if (controlId === "settings:source:name") {
@@ -1084,14 +1114,17 @@ function createPanel(context, container) {
       if (!param) return;
       if (property === "key") {
         // Do not trim trailing spaces while typing; only cap length.
+        const previousKey = param.key;
         param.key = String(value ?? "").slice(0, 120);
+        if (previousKey && previousKey !== param.key) {
+          for (const preset of source.presets || []) {
+            if (!Object.prototype.hasOwnProperty.call(preset.values, previousKey)) continue;
+            if (param.key) preset.values[param.key] = preset.values[previousKey];
+            delete preset.values[previousKey];
+          }
+        }
       } else if (property === "value") {
         param.value = String(value ?? "").slice(0, 2_000);
-        if (param.type !== "select" && param.value !== "" && Number.isFinite(Number(param.value))) {
-          param.type = "number";
-        } else if (param.type === "number" && param.value !== "" && !Number.isFinite(Number(param.value))) {
-          param.type = "text";
-        }
       } else if (property === "type") {
         param.type = value === "number" || value === "select" ? value : "text";
         if (param.type === "select") {
@@ -1166,6 +1199,16 @@ function createPanel(context, container) {
   };
 
   const deleteParameter = async (source, paramId) => {
+    const parameter = (source.params || []).find((param) => param.id === paramId);
+    if (!parameter) return;
+    const confirmation = await context.prompt(
+      text(
+        `Delete parameter “${parameter.key || "unnamed"}”? Press OK to confirm.`,
+        `删除参数“${parameter.key || "未命名"}”？点击确定即可确认。`
+      ),
+      "DELETE"
+    );
+    if (String(confirmation || "").trim().toUpperCase() !== "DELETE") return;
     source.params = (source.params || []).filter((param) => param.id !== paramId);
     for (const preset of source.presets || []) {
       for (const key of Object.keys(preset.values)) {
@@ -1175,6 +1218,7 @@ function createPanel(context, container) {
     invalidateSource(source);
     await persistConfig();
     paint();
+    context.showToast(text("Parameter deleted", "参数已删除"));
   };
 
   const savePreset = async (source) => {
@@ -1273,19 +1317,26 @@ function createPanel(context, container) {
   };
 
   const deleteSource = async (id) => {
-    const source = sourceById(id);
+    const source = sourceByExactId(id);
     if (!source) return;
     const confirmation = await context.prompt(
-      `${text("Type DELETE to remove", "输入 DELETE 以删除")} ${source.name}`,
-      ""
+      text(
+        `Delete API “${source.name}”? Press OK to confirm.`,
+        `删除 API“${source.name}”？点击确定即可确认。`
+      ),
+      "DELETE"
     );
-    if (confirmation !== "DELETE") return;
+    if (String(confirmation || "").trim().toUpperCase() !== "DELETE") return;
     state.config.sources = state.config.sources.filter((item) => item.id !== source.id);
     delete state.previews[source.id];
     delete state.downloads[source.id];
+    delete state.imageCache[source.id];
+    delete state.sourceErrors[source.id];
     ensureSelection();
     await writeConfig(context, state.config);
+    await writeImageCache(context, state.imageCache);
     paint();
+    context.showToast(text("API deleted", "API 已删除"));
   };
 
   const editDownloadDirectory = async () => {
@@ -1349,7 +1400,7 @@ function createPanel(context, container) {
     if (id === "reset-sources") return withBusy(text("Restoring defaults…", "正在恢复默认设置…"), restoreDefaults);
     if (id === "clear-image-cache") return withBusy(text("Clearing cache…", "正在清除缓存…"), clearImageCache);
 
-    const source = sourceById(targetId);
+    const source = sourceByExactId(targetId);
     if (!source) return;
     if (id === "add-param") {
       return withBusy(text("Adding parameter…", "正在添加参数…"), () => addParameter(source));

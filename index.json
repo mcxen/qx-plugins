@@ -8,7 +8,7 @@
       "description": "Search, inspect, upgrade and uninstall Homebrew formulae & casks (macOS). Uses Qx context.cli.",
       "download_url": "https://raw.githubusercontent.com/mcxen/qx-plugins/main/brew.qx-plugin",
       "size_bytes": 4095822,
-      "checksum_sha256": "3e3d2779d72cc4ffad276dac4f710ac4331a033321bc136c465402821742431b",
+      "checksum_sha256": "ffbb9adcd17d3bcd6611392ba865acb0eeb684a967c0cbe29504eaab2e3cd4f6",
       "required_permissions": [
         "cli",
         "notifications",
@@ -25,7 +25,7 @@
       "description": "View external monitor DDC/CI details and adjust brightness from Qx.",
       "download_url": "https://raw.githubusercontent.com/mcxen/qx-plugins/main/external-display-control.qx-plugin",
       "size_bytes": 21644,
-      "checksum_sha256": "d012cf1d906928560fbd45198b504da877789d1306f5b550e56c0167a784298e",
+      "checksum_sha256": "2cf5ebde2c3c7c337e5df64e000f54a7d43bb0dd15a9b0ca6c97ef26f278c368",
       "required_permissions": [
         "external-displays",
         "invoke:qx_external_displays_set_control",
@@ -43,12 +43,12 @@
       "description": "Reference plugin for declarative Workbench and the structured QxIsland session protocol, with persistent background timing and history.",
       "download_url": "https://raw.githubusercontent.com/mcxen/qx-plugins/main/pomodoro-island.qx-plugin",
       "size_bytes": 30186,
-      "checksum_sha256": "d0e1bc289f0bf9071fed690a58255bd77d7a86f9f4cc352cdf7a612ee49f036a",
+      "checksum_sha256": "cdbbd10141f801bf7d211c0dd4176f9e24c5c58b491a2c545af7e72d4a1742f0",
       "required_permissions": [
         "island",
         "notifications"
       ],
-      "updated_at": "2026-07-23",
+      "updated_at": "2026-07-20",
       "author": "mcx",
       "min_app_version": "0.5.43"
     },
@@ -59,7 +59,7 @@
       "description": "View calendar month-by-month",
       "download_url": "https://raw.githubusercontent.com/mcxen/qx-plugins/main/raycast-calendar.qx-plugin",
       "size_bytes": 3497140,
-      "checksum_sha256": "38576bbaa22e49f7a0411bed605932e9f5e0c12174a46dc8287a9c2deaebd277",
+      "checksum_sha256": "33c84791510c41abfbea8c0d77334bcccb97c22b71c7415d88811efc04f1e982",
       "required_permissions": [
         "http",
         "open-url",
@@ -76,7 +76,7 @@
       "description": "Browse Bing's daily images in a native Qx Gallery, then download or set them as wallpaper.",
       "download_url": "https://raw.githubusercontent.com/mcxen/qx-plugins/main/qx-bing-wallpaper.qx-plugin",
       "size_bytes": 11770261,
-      "checksum_sha256": "999d67d16a5cd0d40e5ba0a3d09e63c4c6762abb3821b3205f8026b8ade6779a",
+      "checksum_sha256": "d03fe718e4acb49de5dba7d0674b80b59681e8fe4bc025a754bcea5a23f1f037",
       "required_permissions": [
         "http",
         "open-url",
@@ -97,25 +97,25 @@
       "description": "QxGH — watch GitHub Actions and Releases from public github.com pages (no REST API). Business-only workbench UI.",
       "download_url": "https://raw.githubusercontent.com/mcxen/qx-plugins/main/qxgh.qx-plugin",
       "size_bytes": 32211,
-      "checksum_sha256": "8ce71018f666d93202b27410af7dff7052cc6104ababd5e55555c93d1132f700",
+      "checksum_sha256": "d43325688a8a55aff33a7fd47036ba7be9b1039413f586670292ea018a0a0608",
       "required_permissions": [
         "http",
         "open-url",
         "notifications",
         "island"
       ],
-      "updated_at": "2026-07-23",
+      "updated_at": "2026-07-20",
       "author": "mcx",
       "min_app_version": "0.5.38"
     },
     {
       "id": "qxpicture",
       "name": "Qxpicture",
-      "version": "0.2.0",
+      "version": "0.3.0",
       "description": "Browse random image APIs, save images, copy them, and set desktop wallpaper.",
       "download_url": "https://raw.githubusercontent.com/mcxen/qx-plugins/main/qxpicture.qx-plugin",
-      "size_bytes": 58706,
-      "checksum_sha256": "0f7910ba6c479c923ed8edcf5caf79c24df33662e86f9a8e919571aa24e385ed",
+      "size_bytes": 60779,
+      "checksum_sha256": "89bf0469972f8cd74038c664267b29341bcb7af9bf1f6bb02a3f131e533dd365",
       "required_permissions": [
         "storage",
         "http",
@@ -129,7 +129,7 @@
       ],
       "updated_at": "2026-07-23",
       "author": "Qx",
-      "min_app_version": "0.6.13"
+      "min_app_version": "0.6.14"
     },
     {
       "id": "sysinfo",
@@ -138,7 +138,7 @@
       "description": "Native Qx System Monitor for CPU, memory, battery health, storage, network, and processes on macOS and Windows.",
       "download_url": "https://raw.githubusercontent.com/mcxen/qx-plugins/main/sysinfo.qx-plugin",
       "size_bytes": 29552,
-      "checksum_sha256": "e5653593230b5931fb2e4dbb17930f9cc50127497b5a620590d24fc12ee82d1e",
+      "checksum_sha256": "a132d66a2c08e0ad4be1fbbac24732ee9b9e03f070ff72a8cf0223b7fee8144e",
       "required_permissions": [
         "system",
         "system-stats",
@@ -146,7 +146,7 @@
         "processes",
         "invoke:qx_system_information_kill_process"
       ],
-      "updated_at": "2026-07-23",
+      "updated_at": "2026-07-21",
       "author": "Qx",
       "min_app_version": "0.6.4"
     },
@@ -157,7 +157,7 @@
       "description": "Search Unsplash photos, download, and set desktop wallpaper. Ported for Qx (Access Key API; likes/OAuth not included).",
       "download_url": "https://raw.githubusercontent.com/mcxen/qx-plugins/main/unsplash.qx-plugin",
       "size_bytes": 6345046,
-      "checksum_sha256": "e6759e0f36bada1c5727ba5bea86b901a9385db76181152eb5593c80dd7e8102",
+      "checksum_sha256": "39d7fe76790ce7a846b2878abb602cfe09277f63e5dccd8df8a987a3717af516",
       "required_permissions": [
         "http",
         "open-url",
@@ -179,7 +179,7 @@
       "description": "Browse V2EX latest/hot topics with disk cache (stale-while-revalidate). Notifications & nodes need a token.",
       "download_url": "https://raw.githubusercontent.com/mcxen/qx-plugins/main/v2ex.qx-plugin",
       "size_bytes": 34246,
-      "checksum_sha256": "cb7b4234845a0cc1da1ba8dd62f2553bb4caa75dd9e3d015b4ffcbcdb68bd1e3",
+      "checksum_sha256": "657f55b06180e989ab8eed20b22083e1c8f67f6a3c881bf2d4417be5ea2d0b4e",
       "required_permissions": [
         "http",
         "open-url",
@@ -202,7 +202,7 @@
       "description": "Current conditions and multi-day forecast via Open-Meteo (or OpenWeatherMap). Cached for fast reopen.",
       "download_url": "https://raw.githubusercontent.com/mcxen/qx-plugins/main/weather.qx-plugin",
       "size_bytes": 23891,
-      "checksum_sha256": "a80613ab2a6c731e84aac5bef74b081f1b53d933bb9a6750a2d776ef0b469ef2",
+      "checksum_sha256": "a75d4903bc0c3b2ac199086feef73c37cb8b49dc887ef74d1690bf0a2ea2105b",
       "required_permissions": [
         "http",
         "open-url",

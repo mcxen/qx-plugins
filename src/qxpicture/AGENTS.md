@@ -18,6 +18,9 @@ Qx Workbench List/detail plugin for random image APIs.
    while item/detail `status` reports asynchronous refresh state.
 10. Use host-owned adaptive detail media and zoom; do not inject a plugin lightbox
     or host-selector CSS.
+11. API management uses Workbench form `actions`; each parameter uses a stable
+    control `group` with an inline delete action. Keep the Qx minimum version in
+    sync with that host protocol.
 
 ## Validation
 
