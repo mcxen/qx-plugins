@@ -144,6 +144,8 @@ assert.doesNotMatch(snapshot.items[1].images[0].url, /image\.coolapk\.com/);
 
 const selected = snapshot.items[0];
 handlers.onSelect(selected.id);
+assert.equal(snapshot.island?.activity, "spinner");
+assert.match(snapshot.island?.secondary || "", /加载原文/);
 await waitFor(
   () => snapshot.items.find((item) => item.id === selected.id)?.detail?.body?.includes("完整正文"),
   "full article",
@@ -161,6 +163,17 @@ assert.match(detailedWithImage.detail.images[0].url, /^data:image\/png;base64,/)
 assert.doesNotMatch(detailedWithImage.detail.images[0].url, /image\.coolapk\.com/);
 assert.ok(detailed.detail.sections.some((section) => /第一条回复/.test(section.body || "")));
 assert.doesNotMatch(detailed.badge, /未读/);
+
+handlers.onFilter("read-state", "read");
+assert.equal(snapshot.items.length, 1);
+handlers.onFilter("read-state", "unread");
+assert.equal(snapshot.items.length, 4);
+handlers.onFilter("read-state", "all");
+handlers.onAction("mark-visible-read");
+assert.ok(snapshot.items.every((item) => !/未读/.test(item.badge || "")));
+handlers.onAction("mark-visible-unread");
+assert.ok(snapshot.items.every((item) => /未读/.test(item.badge || "")));
+handlers.onAction(`read:${selected.id}`);
 
 handlers.onQuery("不存在的关键词");
 assert.equal(snapshot.items.length, 0);
@@ -187,6 +200,13 @@ handlers.onAction(`open:${selected.id}`, { id: selected.id });
 assert.match(openedUrl, /^https:\/\/www\.coolapk\.com\/feed\//);
 assert.ok(persisted.get("cache.community.v1").details[selected.id]);
 assert.ok(persisted.get("cache.community.v1").readAt[selected.id]);
+handlers.onAction("clear-read");
+assert.equal(snapshot.items.length, 5);
+await waitFor(
+  () => persisted.get("cache.community.v1").readAt[selected.id] == null,
+  "clear read posts",
+);
+assert.equal(persisted.get("cache.community.v1").readAt[selected.id], undefined);
 
 plugin.panel.destroy(container);
 
@@ -203,7 +223,7 @@ await waitFor(
   () => snapshot && !snapshot.loading && snapshot.items?.length && snapshot.error,
   "offline cache",
 );
-assert.equal(snapshot.items.length, 6);
+assert.equal(snapshot.items.length, 5);
 plugin.panel.destroy(offlineContainer);
 
 const expiredAt = Date.now() - 8 * 24 * 60 * 60 * 1000;
@@ -225,4 +245,4 @@ await waitFor(
 assert.equal(persisted.get("cache.community.v1").feeds.hot, undefined);
 plugin.panel.destroy(expiredContainer);
 
-console.log("QxCoolapk smoke ok: articleBodyMedia=true, dynamicCards=true, replies=true, offlineCache=true, retentionCleanup=true");
+console.log("QxCoolapk smoke ok: articleIsland=true, readFilters=true, cleanup=true, articleBodyMedia=true, dynamicCards=true, replies=true, offlineCache=true, retentionCleanup=true");

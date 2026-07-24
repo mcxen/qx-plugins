@@ -5,7 +5,7 @@
     "zh-CN": "QxCoolapk 酷安",
     "en": "QxCoolapk"
   },
-  "version": "1.1.1",
+  "version": "1.2.0",
   "description": "Browse Coolapk hot, news, and digital feeds and read complete posts, images, and replies in Qx.",
   "descriptions": {
     "zh-CN": "浏览酷安社区热门、快讯与数码内容，并在 Qx 内阅读完整正文、图片和回复。",
@@ -24,7 +24,8 @@
   ],
   "permissions": [
     "http",
-    "open-url"
+    "open-url",
+    "island"
   ],
   "preferences": [
     {
@@ -71,6 +72,41 @@
         { "label": "横向胶片", "value": "horizontal" },
         { "label": "响应式网格", "value": "grid" }
       ]
+    },
+    {
+      "id": "defaultReadFilter",
+      "label": "默认阅读筛选",
+      "type": "segmented",
+      "default": "all",
+      "description": "打开插件时默认展示全部、未读或已读内容。",
+      "options": [
+        { "label": "全部", "value": "all" },
+        { "label": "未读", "value": "unread" },
+        { "label": "已读", "value": "read" }
+      ]
+    },
+    {
+      "id": "cachePriority",
+      "label": "内存缓存优先级",
+      "type": "select",
+      "default": "read",
+      "description": "缓存达到上限时，优先保留哪类帖子。",
+      "options": [
+        { "label": "已读优先", "value": "read" },
+        { "label": "未读优先", "value": "unread" },
+        { "label": "按时间均衡", "value": "balanced" }
+      ]
+    },
+    {
+      "id": "hotCacheLimit",
+      "label": "内存帖子上限",
+      "type": "slider",
+      "default": 200,
+      "description": "限制插件会话和持久缓存保留的帖子数量。",
+      "min": 50,
+      "max": 500,
+      "step": 50,
+      "unit": " 条"
     }
   ],
   "storage": {

@@ -121,6 +121,14 @@
     ],
     "qxcoolapk": [
       {
+        "version": "1.2.0",
+        "published_at": "2026-07-24",
+        "notes_localizations": {
+          "en": "Adds original-article loading activity in the island, read/unread filters and bulk management, read cleanup, cache garbage cleanup, and configurable read-first memory retention.",
+          "zh-CN": "新增灵动岛原文加载动画、已读/未读筛选与批量管理、已读清理、缓存垃圾清理，以及可配置的已读优先内存保留策略。"
+        }
+      },
+      {
         "version": "1.1.1",
         "published_at": "2026-07-24",
         "notes_localizations": {

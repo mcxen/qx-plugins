@@ -143,19 +143,28 @@
     {
       "id": "qxcoolapk",
       "name": "QxCoolapk 酷安",
-      "version": "1.1.1",
+      "version": "1.2.0",
       "description": "Browse Coolapk hot, news, and digital feeds and read complete posts, images, and replies in Qx.",
       "download_url": "https://raw.githubusercontent.com/mcxen/qx-plugins/main/qxcoolapk.qx-plugin",
-      "size_bytes": 53177,
-      "checksum_sha256": "978789df7eaa9c9aa27717d7468a99c06ca0a860eadcb3d24e0a06d8d273ebc3",
+      "size_bytes": 57689,
+      "checksum_sha256": "992f9cfa4b225c4b8c2c83804da3531fd2ffb591511287b419903be2417122e5",
       "required_permissions": [
         "http",
-        "open-url"
+        "open-url",
+        "island"
       ],
       "updated_at": "2026-07-24",
       "author": "Qx",
       "min_app_version": "0.6.19",
       "releases": [
+        {
+          "version": "1.2.0",
+          "published_at": "2026-07-24",
+          "notes_localizations": {
+            "en": "Adds original-article loading activity in the island, read/unread filters and bulk management, read cleanup, cache garbage cleanup, and configurable read-first memory retention.",
+            "zh-CN": "新增灵动岛原文加载动画、已读/未读筛选与批量管理、已读清理、缓存垃圾清理，以及可配置的已读优先内存保留策略。"
+          }
+        },
         {
           "version": "1.1.1",
           "published_at": "2026-07-24",

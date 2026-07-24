@@ -512,6 +512,37 @@ function pruneCache(cache, retentionDays) {
   };
 }
 
+function compactCache(cache, priority, maxItems) {
+  const feedsById = new Map();
+  for (const entry of Object.values(cache.feeds || {})) {
+    for (const feed of entry.items || []) feedsById.set(feed.id, feed);
+  }
+  const ranked = [...feedsById.values()].sort((left, right) => {
+    const leftRead = Boolean(cache.readAt[left.id]);
+    const rightRead = Boolean(cache.readAt[right.id]);
+    if (leftRead !== rightRead && priority !== "balanced") {
+      const preferRead = priority === "read";
+      return leftRead === preferRead ? -1 : 1;
+    }
+    const leftAt = Number(cache.readAt[left.id] || cache.cachedAt[left.id] || left.dateline || 0);
+    const rightAt = Number(cache.readAt[right.id] || cache.cachedAt[right.id] || right.dateline || 0);
+    return rightAt - leftAt;
+  });
+  const keptIds = new Set(ranked.slice(0, maxItems).map((feed) => feed.id));
+  const feeds = Object.fromEntries(Object.entries(cache.feeds || {}).map(([mode, entry]) => [
+    mode,
+    { ...entry, items: (entry.items || []).filter((feed) => keptIds.has(feed.id)) },
+  ]).filter(([, entry]) => entry.items.length));
+  const keep = ([id]) => keptIds.has(String(id));
+  return {
+    ...cache,
+    feeds,
+    details: Object.fromEntries(Object.entries(cache.details || {}).filter(keep)),
+    readAt: Object.fromEntries(Object.entries(cache.readAt || {}).filter(keep)),
+    cachedAt: Object.fromEntries(Object.entries(cache.cachedAt || {}).filter(keep)),
+  };
+}
+
 async function readCache(context) {
   try {
     return normalizeCache(await context.storage.persist.get(CACHE_KEY));
@@ -540,6 +571,9 @@ function createPanel(container, context) {
     source: "",
     retentionDays: 7,
     imageLayout: "horizontal",
+    readFilter: "all",
+    cachePriority: "read",
+    hotCacheLimit: 200,
     detailLoading: new Set(),
     imageLoading: new Set(),
     imageReloadPending: new Set(),
@@ -562,8 +596,12 @@ function createPanel(container, context) {
 
   function visibleFeeds() {
     const needle = state.query.trim().toLocaleLowerCase();
-    if (!needle) return activeFeed().items;
-    return activeFeed().items.filter((feed) =>
+    return activeFeed().items.filter((feed) => {
+      const read = Boolean(state.cache.readAt[feed.id]);
+      if (state.readFilter === "read" && !read) return false;
+      if (state.readFilter === "unread" && read) return false;
+      if (!needle) return true;
+      return (
       [
         feedTitle(feed),
         cleanText(feed.message),
@@ -571,7 +609,8 @@ function createPanel(container, context) {
         feed.deviceTitle,
         feed.targetRow?.title,
       ].join(" ").toLocaleLowerCase().includes(needle)
-    );
+      );
+    });
   }
 
   function detailFor(feed) {
@@ -671,6 +710,16 @@ function createPanel(container, context) {
         label: copy(...definition.label),
         active: state.mode === id,
       })),
+      filters: [{
+        id: "read-state",
+        label: copy("Read state", "阅读状态"),
+        value: state.readFilter,
+        options: [
+          { label: copy("All", "全部"), value: "all" },
+          { label: copy("Unread", "未读"), value: "unread" },
+          { label: copy("Read", "已读"), value: "read" },
+        ],
+      }],
       loading: state.loading && activeFeed().items.length === 0,
       error: state.error,
       meta: state.source,
@@ -691,8 +740,21 @@ function createPanel(container, context) {
           label: state.loadingMore ? copy("Loading more…", "正在加载更多…") : copy("Load More", "加载更多"),
           disabled: state.loading || state.loadingMore,
         },
+        { id: "mark-visible-read", label: copy("Mark Visible Read", "当前结果标为已读") },
+        { id: "mark-visible-unread", label: copy("Mark Visible Unread", "当前结果标为未读") },
+        { id: "clear-read", label: copy("Clear Read Posts", "清理已读"), tone: "danger" },
+        { id: "clean-cache", label: copy("Clean Cache Garbage", "清理缓存垃圾") },
       ],
-      island: state.loading || state.loadingMore
+      island: selectedFeed() && isArticleFeed(selectedFeed())
+        && (state.detailLoading.has(selectedFeed().id) || state.imageLoading.has(selectedFeed().id))
+        ? {
+            primary: feedTitle(selectedFeed()),
+            secondary: state.detailLoading.has(selectedFeed().id)
+              ? copy("Loading original article", "正在加载原文")
+              : copy("Loading article images", "正在加载原文图片"),
+            activity: "spinner",
+          }
+        : state.loading || state.loadingMore
         ? {
             primary: "QxCoolapk",
             secondary: state.loadingMore ? copy("Loading more", "加载更多") : copy("Refreshing community", "刷新社区"),
@@ -716,6 +778,11 @@ function createPanel(container, context) {
           paint();
           void loadMode({ force: false });
         },
+        onFilter(id, value) {
+          if (id !== "read-state" || !["all", "unread", "read"].includes(value)) return;
+          state.readFilter = value;
+          paint();
+        },
         onSelect(id) {
           const key = String(id || "");
           state.selectedId = key;
@@ -730,6 +797,39 @@ function createPanel(container, context) {
         onAction(id, item) {
           if (id === "refresh") void loadMode({ force: true });
           else if (id === "load-more") void loadMore();
+          else if (id === "mark-visible-read") {
+            const now = Date.now();
+            for (const feed of visibleFeeds()) state.cache.readAt[feed.id] = now;
+            paint();
+            void persist();
+          } else if (id === "mark-visible-unread") {
+            for (const feed of visibleFeeds()) delete state.cache.readAt[feed.id];
+            paint();
+            void persist();
+          } else if (id === "clear-read") {
+            const readIds = new Set(Object.keys(state.cache.readAt));
+            for (const entry of Object.values(state.cache.feeds)) {
+              entry.items = (entry.items || []).filter((feed) => !readIds.has(feed.id));
+            }
+            for (const id of readIds) {
+              delete state.cache.details[id];
+              delete state.cache.readAt[id];
+              delete state.cache.cachedAt[id];
+            }
+            state.selectedId = null;
+            paint();
+            void persist();
+          } else if (id === "clean-cache") {
+            state.cache = compactCache(
+              pruneCache(state.cache, state.retentionDays),
+              state.cachePriority,
+              state.hotCacheLimit,
+            );
+            state.imagePreviews.clear();
+            state.imageFailures.clear();
+            paint();
+            void persist();
+          }
           else if (id.startsWith("open:")) {
             const key = id.slice("open:".length);
             const feed = activeFeed().items.find((entry) => entry.id === key)
@@ -751,7 +851,11 @@ function createPanel(container, context) {
   }
 
   async function persist() {
-    state.cache = pruneCache(state.cache, state.retentionDays);
+    state.cache = compactCache(
+      pruneCache(state.cache, state.retentionDays),
+      state.cachePriority,
+      state.hotCacheLimit,
+    );
     await writeCache(context, state.cache);
   }
 
@@ -954,15 +1058,27 @@ function createPanel(container, context) {
   }
 
   async function start() {
-    const [retention, imageLayout, defaultTab] = await Promise.all([
+    const [retention, imageLayout, defaultTab, readFilter, cachePriority, hotCacheLimit] = await Promise.all([
       preference(context, "retentionDays", "7"),
       preference(context, "detailImageLayout", "horizontal"),
       preference(context, "defaultTab", "hot"),
+      preference(context, "defaultReadFilter", "all"),
+      preference(context, "cachePriority", "read"),
+      preference(context, "hotCacheLimit", "200"),
     ]);
     state.retentionDays = Number(retention) === 3 ? 3 : 7;
     state.imageLayout = imageLayout === "grid" ? "grid" : "horizontal";
+    state.readFilter = ["all", "unread", "read"].includes(readFilter) ? readFilter : "all";
+    state.cachePriority = ["read", "unread", "balanced"].includes(cachePriority)
+      ? cachePriority
+      : "read";
+    state.hotCacheLimit = Math.max(50, Math.min(500, Number(hotCacheLimit) || 200));
     state.mode = MODES[defaultTab] ? defaultTab : "hot";
-    state.cache = pruneCache(await readCache(context), state.retentionDays);
+    state.cache = compactCache(
+      pruneCache(await readCache(context), state.retentionDays),
+      state.cachePriority,
+      state.hotCacheLimit,
+    );
     state.selectedId = activeFeed().items[0]?.id || null;
     if (activeFeed().items.length) {
       state.source = copy("Cached Coolapk feed", "酷安缓存");
