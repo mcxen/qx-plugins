@@ -1,5 +1,10 @@
 import assert from "node:assert/strict";
-import plugin, { buildRequestHeaders, cleanText, feedUrl } from "../src/qxcoolapk/index.js";
+import plugin, {
+  buildRequestHeaders,
+  cleanText,
+  feedUrl,
+  isArticleFeed,
+} from "../src/qxcoolapk/index.js";
 
 Object.defineProperty(globalThis, "navigator", {
   configurable: true,
@@ -21,6 +26,10 @@ const feeds = Array.from({ length: 6 }, (_, index) => ({
   picArr: [`http://image.coolapk.com/feed/${index + 1}.jpg`],
   userInfo: { uid: 100 + index, username: `作者-${index + 1}` },
   deviceTitle: "Qx Test Device",
+  feedType: index === 0 ? "feedArticle" : "feed",
+  feedTypeName: index === 0 ? "图文" : "动态",
+  is_html_article: index === 0 ? "1" : "0",
+  type: index === 0 ? "12" : "0",
 }));
 
 function response(data) {
@@ -111,6 +120,8 @@ async function waitFor(predicate, label, timeoutMs = 20_000) {
 
 assert.equal(cleanText("<p>A &amp; B</p><p>C</p>"), "A & B\n\nC");
 assert.equal(new URL(feedUrl("hot", 2)).searchParams.get("page"), "2");
+assert.equal(isArticleFeed(feeds[0]), true);
+assert.equal(isArticleFeed(feeds[1]), false);
 const headers = await buildRequestHeaders(1_784_804_927);
 assert.match(headers["X-App-Token"], /^v2/);
 
@@ -120,11 +131,12 @@ await waitFor(() => snapshot && !snapshot.loading && snapshot.items?.length, "fe
 assert.equal(snapshot.items.length, 5);
 assert.ok(snapshot.items.every((item) => item.id && item.detail));
 await waitFor(
-  () => snapshot.items.some((item) => item.image?.url?.startsWith("data:image/")),
-  "authenticated thumbnails",
+  () => snapshot.items.some((item) => item.images?.[0]?.url?.startsWith("data:image/")),
+  "authenticated dynamic cards",
 );
-assert.match(snapshot.items[0].image.url, /^data:image\/png;base64,/);
-assert.doesNotMatch(snapshot.items[0].image.url, /image\.coolapk\.com/);
+assert.equal(snapshot.items[0].images, undefined);
+assert.match(snapshot.items[1].images[0].url, /^data:image\/png;base64,/);
+assert.doesNotMatch(snapshot.items[1].images[0].url, /image\.coolapk\.com/);
 
 const selected = snapshot.items[0];
 handlers.onSelect(selected.id);
@@ -140,6 +152,7 @@ await waitFor(
 );
 const detailedWithImage = snapshot.items.find((item) => item.id === selected.id);
 assert.equal(detailedWithImage.detail.images.length, 1);
+assert.equal(detailedWithImage.detail.mediaPlacement, "after-body");
 assert.match(detailedWithImage.detail.images[0].url, /^data:image\/png;base64,/);
 assert.doesNotMatch(detailedWithImage.detail.images[0].url, /image\.coolapk\.com/);
 assert.ok(detailed.detail.sections.some((section) => /第一条回复/.test(section.body || "")));
@@ -208,4 +221,4 @@ await waitFor(
 assert.equal(persisted.get("cache.community.v1").feeds.hot, undefined);
 plugin.panel.destroy(expiredContainer);
 
-console.log("QxCoolapk smoke ok: fullArticle=true, images=true, replies=true, offlineCache=true, retentionCleanup=true");
+console.log("QxCoolapk smoke ok: articleBodyMedia=true, dynamicCards=true, replies=true, offlineCache=true, retentionCleanup=true");

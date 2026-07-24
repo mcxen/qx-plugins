@@ -9,7 +9,8 @@ content.
 - Local search across loaded posts
 - Complete post text loaded on selection
 - Authenticated image loading that avoids Coolapk CDN HTTP 567 responses
-- Background list thumbnails and bounded multi-image previews using the Qx host viewer
+- Article images placed with the reading body; dynamic-post images shown as compact list cards
+- Background card thumbnails and bounded multi-image previews using the Qx host viewer
 - First-page replies, read/unread state, and pagination
 - Cache-first startup, offline reading, and automatic 3/7-day cleanup
 - Open the original post on Coolapk

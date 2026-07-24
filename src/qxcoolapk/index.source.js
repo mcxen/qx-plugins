@@ -265,6 +265,13 @@ function feedImages(feed) {
   return imageUrls(feed?.picArr || feed?.pic || []);
 }
 
+export function isArticleFeed(feed) {
+  const feedType = String(feed?.feedType || feed?.feed_type || "").toLowerCase();
+  return feedType === "feedarticle"
+    || String(feed?.is_html_article ?? feed?.isHtmlArticle ?? "") === "1"
+    || String(feed?.type ?? "") === "12";
+}
+
 function responseContentType(response) {
   return String(
     response?.headers?.["content-type"]
@@ -569,6 +576,7 @@ function createPanel(container, context) {
 
   function detailFor(feed) {
     const cached = state.cache.details[feed.id];
+    const article = isArticleFeed(feed);
     const originals = imageUrls(cached?.images || feedImages(feed)).slice(0, 24);
     const images = originals.map((url) => {
       const preview = state.imagePreviews.get(`detail:${url}`)
@@ -604,6 +612,7 @@ function createPanel(container, context) {
       body: cached?.body || cleanText(feed.message),
       images,
       imageLayout: state.imageLayout,
+      mediaPlacement: article ? "after-body" : "header",
       fields: [
         { label: copy("Author", "作者"), value: authorName(feed) },
         { label: copy("Likes", "点赞"), value: Number(feed.likenum || 0) },
@@ -618,9 +627,13 @@ function createPanel(container, context) {
 
   function itemFor(feed) {
     const images = feedImages(feed);
-    const thumbnail = images[0]
-      ? state.imagePreviews.get(`thumbnail:${images[0]}`)
-      : "";
+    const article = isArticleFeed(feed);
+    const cardImages = article
+      ? []
+      : images.slice(0, 6).map((url) => {
+          const preview = state.imagePreviews.get(`thumbnail:${url}`);
+          return preview ? { url: preview, alt: feedTitle(feed), fit: "cover" } : null;
+        }).filter(Boolean);
     const read = Boolean(state.cache.readAt[feed.id]);
     return {
       id: feed.id,
@@ -629,7 +642,7 @@ function createPanel(container, context) {
       meta: `${authorName(feed)} · ${formatTime(feed.dateline)}`,
       badge: `${read ? "" : `${copy("Unread", "未读")} · `}${compactNumber(feed.likenum)} ♥ · ${compactNumber(feed.replynum)} ${copy("replies", "回复")}`,
       tone: read ? "neutral" : "accent",
-      image: thumbnail ? { url: thumbnail, alt: feedTitle(feed), fit: "cover" } : undefined,
+      images: cardImages.length ? cardImages : undefined,
       detail: detailFor(feed),
       actions: [
         { id: `open:${feed.id}`, label: copy("Open on Coolapk", "在酷安中打开"), primary: true },
@@ -776,17 +789,18 @@ function createPanel(container, context) {
 
   async function loadThumbnails(feeds) {
     let cursor = 0;
-    const rows = feeds.slice(0, 18);
+    const jobs = feeds
+      .slice(0, 18)
+      .filter((feed) => !isArticleFeed(feed))
+      .flatMap((feed) => feedImages(feed).slice(0, 6));
     const worker = async () => {
-      while (!state.dead && cursor < rows.length) {
-        const feed = rows[cursor++];
-        const url = feedImages(feed)[0];
-        if (!url) continue;
+      while (!state.dead && cursor < jobs.length) {
+        const url = jobs[cursor++];
         const preview = await proxyImage(url, "thumbnail");
         if (preview && !state.dead) paint();
       }
     };
-    await Promise.all(Array.from({ length: 3 }, worker));
+    await Promise.all(Array.from({ length: 4 }, worker));
   }
 
   async function loadDetailImages(id) {

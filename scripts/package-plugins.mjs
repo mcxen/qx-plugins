@@ -51,10 +51,15 @@ async function listPackageFiles(pluginDir, prefix = "") {
   return files;
 }
 
-async function packagePlugin(pluginDir, archivePath) {
+async function packagePlugin(pluginDir, archivePath, generatedFiles = {}) {
   const files = await listPackageFiles(pluginDir);
   if (files.length === 0) {
     throw new Error(`plugin directory has no files: ${pluginDir}`);
+  }
+  for (const generatedName of Object.keys(generatedFiles)) {
+    if (files.includes(generatedName)) {
+      throw new Error(`${generatedName} is generated during packaging and must not exist in ${pluginDir}`);
+    }
   }
   const fixedTime = new Date("2000-01-01T00:00:00Z");
   await Promise.all(files.map((file) => utimes(path.join(pluginDir, file), fixedTime, fixedTime)));
@@ -67,6 +72,13 @@ async function packagePlugin(pluginDir, archivePath) {
     zipfile.outputStream.pipe(output);
     for (const file of files) {
       zipfile.addFile(path.join(pluginDir, file), file, {
+        compress: false,
+        mtime: fixedTime,
+        mode: 0o100644,
+      });
+    }
+    for (const [file, content] of Object.entries(generatedFiles).sort(([a], [b]) => a.localeCompare(b))) {
+      zipfile.addBuffer(Buffer.from(content, "utf8"), file, {
         compress: false,
         mtime: fixedTime,
         mode: 0o100644,
@@ -103,11 +115,6 @@ async function main() {
     const id = manifest.id || path.basename(pluginDir);
     const archiveName = `${id}.qx-plugin`;
     const archivePath = path.join(repoRoot, archiveName);
-    await rm(archivePath, { force: true });
-    await packagePlugin(pluginDir, archivePath);
-
-    const checksum = await sha256(archivePath);
-    const size = (await stat(archivePath)).size;
     const previousEntry = previousById.get(id);
     const declaredReleases = releaseCatalog.plugins?.[id];
     if (!Array.isArray(declaredReleases)) {
@@ -133,6 +140,20 @@ async function main() {
           && !declaredReleases.some((declared) => declared.version === release.version),
       ),
     ].slice(0, 30);
+    const packagedReleaseHistory = {
+      schema_version: 1,
+      plugin_id: id,
+      current_version: manifest.version,
+      releases,
+    };
+
+    await rm(archivePath, { force: true });
+    await packagePlugin(pluginDir, archivePath, {
+      "releases.json": `${JSON.stringify(packagedReleaseHistory, null, 2)}\n`,
+    });
+
+    const checksum = await sha256(archivePath);
+    const size = (await stat(archivePath)).size;
     const updatedAt = previousEntry?.checksum_sha256 === checksum
       ? previousEntry.updated_at || today
       : today;

@@ -24,9 +24,11 @@ release-notes.json        # localized, newest-first App Store-style version hist
 
 Every published manifest version must have a matching entry in
 `release-notes.json`. Packaging fails when the current version has no release
-note, then emits the newest 30 entries as `index.json.plugins[].releases`.
-Historical entries are descriptive only; they do not claim that an old archive
-is still downloadable.
+note, then emits the newest 30 entries as both `index.json.plugins[].releases`
+and a generated `releases.json` inside that plugin archive. The root catalog
+remains the only source to maintain, while installed and offline packages keep
+a self-contained release history. Historical entries are descriptive only;
+they do not claim that an old archive is still downloadable.
 
 | Plugin | Kind | Notes |
 |--------|------|--------|
@@ -87,9 +89,9 @@ npm run package:plugins
 ```
 
 Rebuilds bundled plugin entries, scans `src/*/manifest.json`, builds deterministic
-`.qx-plugin` zips (fixed mtime), computes SHA-256, and rewrites `index.json`.
-Build-only `*.source.js` files remain in the repository and are not included in
-the published archives.
+`.qx-plugin` zips (fixed mtime), embeds generated `releases.json`, computes
+SHA-256, and rewrites `index.json`. Build-only `*.source.js` files remain in the
+repository and are not included in the published archives.
 
 ## Host foundations required by converted plugins
 

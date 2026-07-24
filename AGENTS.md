@@ -39,7 +39,7 @@ qx-plugins/
 │       ├── index.js          # ESM: export default { commands, panel? }
 │       ├── README.md         # human docs
 │       └── icon.*            # optional
-└── <plugin-id>.qx-plugin     # zip at repo root (generated)
+└── <plugin-id>.qx-plugin     # generated zip; includes generated releases.json
 ```
 
 ## Plugin development folder system
@@ -72,7 +72,10 @@ npm run package:plugins   # zips every src/* with manifest.json → *.qx-plugin 
 
 All distributable files under `src/<id>/` are packed (including **`AGENTS.md`**).
 Build-only `*.source.js` files are excluded; their generated `index.js` must be
-rebuilt by `npm run package:plugins`.
+rebuilt by `npm run package:plugins`. Root `release-notes.json` is the only
+release-history source; packaging injects the matching latest 30 entries as
+`releases.json` inside each archive. Do not hand-create that generated file in a
+plugin source directory.
 
 ### 4. Install locally (dev)
 

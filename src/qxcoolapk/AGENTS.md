@@ -15,17 +15,20 @@
 2. Keep stable Workbench item ids from the Coolapk feed `id`.
 3. Paint cached feeds before awaiting network refreshes.
 4. Load the complete article only after selection and update the same item id.
-5. Fetch Coolapk CDN images with the same anonymous authenticated headers as API
+5. Classify `feedArticle` / `is_html_article=1` / `type=12` as articles. Publish
+   their media with `detail.mediaPlacement="after-body"` and never as list cards.
+   Publish non-article feed media through `item.images` compact cards.
+6. Fetch Coolapk CDN images with the same anonymous authenticated headers as API
    requests. Never publish direct `image.coolapk.com` URLs to Workbench.
-6. Publish bounded session-only image previews through item images and
+7. Publish bounded session-only image previews through item images and
    `detail.images`; do not persist data URLs or draw a custom reader/lightbox.
-7. Generate a fresh anonymous `X-App-Token` for API and image requests. Do not persist tokens.
-8. Keep the Coolapk signature implementation dependency-free at runtime. The packaged
+8. Generate a fresh anonymous `X-App-Token` for API and image requests. Do not persist tokens.
+9. Keep the Coolapk signature implementation dependency-free at runtime. The packaged
    `index.js` includes the BSD-3-Clause-licensed `bcryptjs` implementation. Edit
    `index.source.js`; `npm run package:plugins` rebuilds the bundled entry.
-9. Keep rebuildable cache keys synchronized with `manifest.storage.cacheTargets`.
-10. Cache values use a top-level `savedAt` envelope for host retention cleanup.
-11. Do not add login, write, like, reply, or follow capabilities without a separate
+10. Keep rebuildable cache keys synchronized with `manifest.storage.cacheTargets`.
+11. Cache values use a top-level `savedAt` envelope for host retention cleanup.
+12. Do not add login, write, like, reply, or follow capabilities without a separate
     security and privacy review.
 
 ## Permissions

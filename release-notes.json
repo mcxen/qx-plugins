@@ -121,6 +121,14 @@
     ],
     "qxcoolapk": [
       {
+        "version": "1.1.0",
+        "published_at": "2026-07-24",
+        "notes_localizations": {
+          "en": "Distinguishes Coolapk articles from social posts: article images follow the reading body, while dynamic-post images appear as compact list cards.",
+          "zh-CN": "区分酷安图文与动态：文章图片跟随正文阅读，动态图片改为紧凑的信息流卡片。"
+        }
+      },
+      {
         "version": "1.0.1",
         "published_at": "2026-07-24",
         "notes_localizations": {
