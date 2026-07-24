@@ -44,7 +44,7 @@ async function listPackageFiles(pluginDir, prefix = "") {
     const relativePath = prefix ? path.posix.join(prefix, entry.name) : entry.name;
     if (entry.isDirectory()) {
       files.push(...await listPackageFiles(pluginDir, relativePath));
-    } else if (entry.isFile()) {
+    } else if (entry.isFile() && !entry.name.endsWith(".source.js")) {
       files.push(relativePath);
     }
   }

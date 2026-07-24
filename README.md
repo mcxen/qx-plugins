@@ -86,8 +86,10 @@ npm run convert:raycast -- /path/to/extensions/<name> \
 npm run package:plugins
 ```
 
-Scans `src/*/manifest.json`, builds deterministic `.qx-plugin` zips (fixed
-mtime), computes SHA-256, and rewrites `index.json`.
+Rebuilds bundled plugin entries, scans `src/*/manifest.json`, builds deterministic
+`.qx-plugin` zips (fixed mtime), computes SHA-256, and rewrites `index.json`.
+Build-only `*.source.js` files remain in the repository and are not included in
+the published archives.
 
 ## Host foundations required by converted plugins
 

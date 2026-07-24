@@ -70,7 +70,9 @@ mkdir -p src/my-plugin
 npm run package:plugins   # zips every src/* with manifest.json → *.qx-plugin + index.json
 ```
 
-All files under `src/<id>/` are packed (including **`AGENTS.md`**).
+All distributable files under `src/<id>/` are packed (including **`AGENTS.md`**).
+Build-only `*.source.js` files are excluded; their generated `index.js` must be
+rebuilt by `npm run package:plugins`.
 
 ### 4. Install locally (dev)
 

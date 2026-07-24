@@ -141,6 +141,32 @@
       ]
     },
     {
+      "id": "qxcoolapk",
+      "name": "QxCoolapk 酷安",
+      "version": "1.0.0",
+      "description": "Browse Coolapk hot, news, and digital feeds and read complete posts, images, and replies in Qx.",
+      "download_url": "https://raw.githubusercontent.com/mcxen/qx-plugins/main/qxcoolapk.qx-plugin",
+      "size_bytes": 46245,
+      "checksum_sha256": "220384483291da75a277aa09d9ee8367e78376564f5ef04e38debb8c5494d6ab",
+      "required_permissions": [
+        "http",
+        "open-url"
+      ],
+      "updated_at": "2026-07-24",
+      "author": "Qx",
+      "min_app_version": "0.6.19",
+      "releases": [
+        {
+          "version": "1.0.0",
+          "published_at": "2026-07-24",
+          "notes_localizations": {
+            "en": "Initial QxCoolapk release with hot/news/digital feeds, complete article reading, multi-image details, replies, read state, and offline cache.",
+            "zh-CN": "QxCoolapk 首发：支持热门、快讯与数码信息流，完整正文阅读、多图详情、回复、已读状态和离线缓存。"
+          }
+        }
+      ]
+    },
+    {
       "id": "qxgh",
       "name": "QxGH",
       "version": "1.4.0",

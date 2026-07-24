@@ -1,0 +1,106 @@
+{
+  "id": "qxcoolapk",
+  "name": "QxCoolapk 酷安",
+  "names": {
+    "zh-CN": "QxCoolapk 酷安",
+    "en": "QxCoolapk"
+  },
+  "version": "1.0.0",
+  "description": "Browse Coolapk hot, news, and digital feeds and read complete posts, images, and replies in Qx.",
+  "descriptions": {
+    "zh-CN": "浏览酷安社区热门、快讯与数码内容，并在 Qx 内阅读完整正文、图片和回复。",
+    "en": "Browse Coolapk community feeds and read complete posts, images, and replies in Qx."
+  },
+  "author": "Qx",
+  "icon": "icon.svg",
+  "keywords": [
+    "coolapk",
+    "酷安",
+    "社区",
+    "数码",
+    "手机",
+    "帖子",
+    "文章"
+  ],
+  "permissions": [
+    "http",
+    "open-url"
+  ],
+  "preferences": [
+    {
+      "id": "defaultTab",
+      "label": "默认内容",
+      "type": "select",
+      "required": false,
+      "default": "hot",
+      "description": "打开 QxCoolapk 时优先显示的内容。",
+      "options": [
+        { "label": "热门", "value": "hot" },
+        { "label": "快讯", "value": "news" },
+        { "label": "数码", "value": "digital" }
+      ]
+    },
+    {
+      "id": "cacheTtlMinutes",
+      "label": "列表缓存（分钟）",
+      "type": "string",
+      "required": false,
+      "default": "5",
+      "description": "缓存会立即显示；超过此时间后在后台刷新。"
+    },
+    {
+      "id": "retentionDays",
+      "label": "缓存自动清理",
+      "type": "select",
+      "required": false,
+      "default": "7",
+      "description": "帖子、正文与已读状态超过保留期后自动删除。",
+      "options": [
+        { "label": "3 天", "value": "3" },
+        { "label": "7 天", "value": "7" }
+      ]
+    },
+    {
+      "id": "detailImageLayout",
+      "label": "详情多图布局",
+      "type": "select",
+      "required": false,
+      "default": "horizontal",
+      "description": "横向胶片可逐张浏览；响应式网格会同时展示更多图片。",
+      "options": [
+        { "label": "横向胶片", "value": "horizontal" },
+        { "label": "响应式网格", "value": "grid" }
+      ]
+    }
+  ],
+  "storage": {
+    "cacheTargets": [
+      {
+        "id": "community",
+        "label": "QxCoolapk 社区缓存",
+        "description": "酷安帖子列表、完整正文、图片、回复和短期已读状态。",
+        "keys": [
+          "cache.community.v1"
+        ],
+        "retentionDays": 7
+      }
+    ]
+  },
+  "entry": "index.js",
+  "commands": [
+    {
+      "name": "open-qxcoolapk",
+      "title": "打开 QxCoolapk 酷安",
+      "description": "浏览酷安社区并阅读完整帖子",
+      "keywords": ["coolapk", "酷安", "社区", "数码", "帖子", "文章"]
+    }
+  ],
+  "panel": {
+    "title": "QxCoolapk 酷安",
+    "icon": "icon.svg",
+    "keywords": ["coolapk", "酷安", "社区", "数码", "帖子", "文章"]
+  },
+  "min_app_version": "0.6.19",
+  "platforms": ["macos", "windows"],
+  "screenshots": []
+}

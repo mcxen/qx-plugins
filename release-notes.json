@@ -119,6 +119,16 @@
         }
       }
     ],
+    "qxcoolapk": [
+      {
+        "version": "1.0.0",
+        "published_at": "2026-07-24",
+        "notes_localizations": {
+          "en": "Initial QxCoolapk release with hot/news/digital feeds, complete article reading, multi-image details, replies, read state, and offline cache.",
+          "zh-CN": "QxCoolapk 首发：支持热门、快讯与数码信息流，完整正文阅读、多图详情、回复、已读状态和离线缓存。"
+        }
+      }
+    ],
     "qxpicture": [
       {
         "version": "0.4.0",

@@ -6,12 +6,15 @@
   "scripts": {
     "convert:raycast": "node scripts/convert-raycast-extension.mjs",
     "convert:raycast-url": "node scripts/convert-raycast-url.mjs",
-    "package:plugins": "node scripts/package-plugins.mjs",
+    "build:qxcoolapk": "esbuild src/qxcoolapk/index.source.js --bundle --format=esm --platform=browser --target=es2022 --minify --legal-comments=inline --outfile=src/qxcoolapk/index.js",
+    "package:plugins": "npm run build:qxcoolapk && node scripts/package-plugins.mjs",
     "smoke:qxheihe": "node scripts/smoke-qxheihe.mjs",
+    "smoke:qxcoolapk": "node scripts/smoke-qxcoolapk.mjs",
     "smoke:qxgh": "node scripts/smoke-qxgh.mjs",
     "smoke:qxpicture": "node scripts/smoke-qxpicture.mjs"
   },
   "dependencies": {
+    "bcryptjs": "^3.0.2",
     "esbuild": "^0.25.5",
     "react": "^19.1.0",
     "react-dom": "^19.1.0",
