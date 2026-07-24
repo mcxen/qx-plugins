@@ -1,0 +1,146 @@
+{
+  "id": "qxweibo",
+  "name": "QxWeibo 微博",
+  "names": {
+    "zh-CN": "QxWeibo 微博",
+    "en": "QxWeibo"
+  },
+  "version": "1.0.0",
+  "description": "Read configured Weibo users, an aggregated following feed, comments, and proxied images in Qx.",
+  "descriptions": {
+    "zh-CN": "在 Qx 中阅读指定微博用户、聚合关注流、评论区和代理图片。",
+    "en": "Read configured Weibo users, an aggregated following feed, comments, and proxied images in Qx."
+  },
+  "author": "Qx",
+  "icon": "icon.svg",
+  "keywords": [
+    "weibo",
+    "微博",
+    "用户",
+    "关注",
+    "帖子",
+    "评论"
+  ],
+  "permissions": [
+    "http",
+    "open-url",
+    "island"
+  ],
+  "preferences": [
+    {
+      "id": "userId",
+      "label": "主用户 UID",
+      "type": "string",
+      "required": true,
+      "description": "微博个人主页中的数字 UID，用于“用户帖子”和自动读取关注列表。"
+    },
+    {
+      "id": "followedUserIds",
+      "label": "关注用户 UID",
+      "type": "textarea",
+      "required": false,
+      "rows": 5,
+      "placeholder": "1749127163\n2803301701",
+      "description": "可选，每行一个 UID。填写后直接聚合这些用户；留空则从主 UID 的公开关注列表中选取。"
+    },
+    {
+      "id": "visitorCookies",
+      "label": "游客 Cookie 池",
+      "type": "textarea",
+      "required": false,
+      "rows": 5,
+      "placeholder": "SUB=...; SUBP=...\nSUB=...; SUBP=...",
+      "description": "可选，每行一组完整 Cookie。插件会轮换使用；不足时仅在当前会话自动补充游客 Cookie，不写入内容缓存。"
+    },
+    {
+      "id": "visitorPoolSize",
+      "label": "游客 Cookie 数量",
+      "type": "select",
+      "default": "3",
+      "description": "当前会话维持的游客 Cookie 数量。",
+      "options": [
+        { "label": "2 个", "value": "2" },
+        { "label": "3 个", "value": "3" },
+        { "label": "4 个", "value": "4" }
+      ]
+    },
+    {
+      "id": "followingUserLimit",
+      "label": "关注流用户上限",
+      "type": "slider",
+      "default": 6,
+      "description": "留空关注 UID 时，最多聚合公开关注列表中的用户数量。",
+      "min": 3,
+      "max": 12,
+      "step": 1,
+      "unit": " 人"
+    },
+    {
+      "id": "requestDelayMs",
+      "label": "随机请求间隔",
+      "type": "string",
+      "default": "500-1200",
+      "description": "请求之间的随机等待范围（毫秒），例如 500-1200；降低并发并减少触发上游限制。"
+    },
+    {
+      "id": "cacheTtlMinutes",
+      "label": "列表缓存（分钟）",
+      "type": "string",
+      "default": "10",
+      "description": "先显示缓存；未过期时不重复拉取，过期后在后台刷新。"
+    },
+    {
+      "id": "retentionDays",
+      "label": "缓存自动清理",
+      "type": "select",
+      "default": "7",
+      "description": "帖子、评论与已读状态的保留时间。",
+      "options": [
+        { "label": "3 天", "value": "3" },
+        { "label": "7 天", "value": "7" },
+        { "label": "14 天", "value": "14" }
+      ]
+    },
+    {
+      "id": "detailImageLayout",
+      "label": "详情多图布局",
+      "type": "select",
+      "default": "horizontal",
+      "description": "横向胶片可逐张浏览；网格适合同时查看多张图片。",
+      "options": [
+        { "label": "横向胶片", "value": "horizontal" },
+        { "label": "响应式网格", "value": "grid" }
+      ]
+    }
+  ],
+  "storage": {
+    "cacheTargets": [
+      {
+        "id": "feed",
+        "label": "QxWeibo 内容缓存",
+        "description": "微博帖子、评论与短期已读状态；不包含游客 Cookie 和会话图片代理。",
+        "keys": [
+          "cache.weibo.v1"
+        ],
+        "retentionDays": 14
+      }
+    ]
+  },
+  "entry": "index.js",
+  "commands": [
+    {
+      "name": "open-qxweibo",
+      "title": "打开 QxWeibo 微博",
+      "description": "阅读微博用户帖子、关注流和评论",
+      "keywords": ["weibo", "微博", "用户", "关注", "帖子", "评论"]
+    }
+  ],
+  "panel": {
+    "title": "QxWeibo 微博",
+    "icon": "icon.svg",
+    "keywords": ["weibo", "微博", "用户", "关注", "帖子", "评论"]
+  },
+  "min_app_version": "0.6.25",
+  "platforms": ["macos", "windows"],
+  "screenshots": []
+}

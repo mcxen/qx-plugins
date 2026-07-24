@@ -177,6 +177,16 @@
         }
       }
     ],
+    "qxweibo": [
+      {
+        "version": "1.0.0",
+        "published_at": "2026-07-24",
+        "notes_localizations": {
+          "en": "Initial read-only Weibo release with configured-user posts, a bounded aggregated following feed, comments, rotating visitor cookies, randomized request pacing, SWR cache, and session-only image proxying.",
+          "zh-CN": "QxWeibo 首发：支持指定用户帖子、受控聚合关注流、评论区、游客 Cookie 轮换、随机请求间隔、缓存优先及仅会话保存的微博图片代理。"
+        }
+      }
+    ],
     "qxpicture": [
       {
         "version": "0.4.0",

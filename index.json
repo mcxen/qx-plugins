@@ -359,6 +359,33 @@
       ]
     },
     {
+      "id": "qxweibo",
+      "name": "QxWeibo 微博",
+      "version": "1.0.0",
+      "description": "Read configured Weibo users, an aggregated following feed, comments, and proxied images in Qx.",
+      "download_url": "https://raw.githubusercontent.com/mcxen/qx-plugins/main/qxweibo.qx-plugin",
+      "size_bytes": 45568,
+      "checksum_sha256": "1702296ec3dd34a90839e939ef60446006a1e49b7bc3d2a472a97a7c96585dd7",
+      "required_permissions": [
+        "http",
+        "open-url",
+        "island"
+      ],
+      "updated_at": "2026-07-24",
+      "author": "Qx",
+      "min_app_version": "0.6.25",
+      "releases": [
+        {
+          "version": "1.0.0",
+          "published_at": "2026-07-24",
+          "notes_localizations": {
+            "en": "Initial read-only Weibo release with configured-user posts, a bounded aggregated following feed, comments, rotating visitor cookies, randomized request pacing, SWR cache, and session-only image proxying.",
+            "zh-CN": "QxWeibo 首发：支持指定用户帖子、受控聚合关注流、评论区、游客 Cookie 轮换、随机请求间隔、缓存优先及仅会话保存的微博图片代理。"
+          }
+        }
+      ]
+    },
+    {
       "id": "sysinfo",
       "name": "Sysinfo",
       "version": "1.2.1",

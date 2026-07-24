@@ -10,6 +10,7 @@
     "package:plugins": "npm run build:qxcoolapk && node scripts/package-plugins.mjs",
     "smoke:qxheihe": "node scripts/smoke-qxheihe.mjs",
     "smoke:qxcoolapk": "node scripts/smoke-qxcoolapk.mjs",
+    "smoke:qxweibo": "node scripts/smoke-qxweibo.mjs",
     "smoke:qxgh": "node scripts/smoke-qxgh.mjs",
     "smoke:qxpicture": "node scripts/smoke-qxpicture.mjs"
   },
