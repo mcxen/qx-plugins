@@ -667,21 +667,22 @@ function createPanel(container, context) {
   function itemFor(feed) {
     const images = feedImages(feed);
     const article = isArticleFeed(feed);
-    const cardImages = article
-      ? []
-      : images.map((url) => {
-          const preview = state.imagePreviews.get(`thumbnail:${url}`);
-          return preview ? { url: preview, alt: feedTitle(feed), fit: "cover" } : null;
-        }).filter(Boolean);
+    const coverUrl = article ? "" : images[0];
+    const coverPreview = coverUrl
+      ? state.imagePreviews.get(`thumbnail:${coverUrl}`)
+      : "";
     const read = Boolean(state.cache.readAt[feed.id]);
+    const imageCount = images.length;
     return {
       id: feed.id,
       title: feedTitle(feed),
       subtitle: cleanText(feed.message) || `${authorName(feed)} · ${formatTime(feed.dateline)}`,
       meta: `${authorName(feed)} · ${formatTime(feed.dateline)}`,
-      badge: `${read ? "" : `${copy("Unread", "未读")} · `}${compactNumber(feed.likenum)} ♥ · ${compactNumber(feed.replynum)} ${copy("replies", "回复")}`,
+      badge: `${read ? "" : `${copy("Unread", "未读")} · `}${imageCount ? `${imageCount} ${copy("images", "图")} · ` : ""}${compactNumber(feed.likenum)} ♥ · ${compactNumber(feed.replynum)} ${copy("replies", "回复")}`,
       tone: read ? "neutral" : "accent",
-      images: cardImages.length ? cardImages : undefined,
+      image: coverPreview
+        ? { url: coverPreview, alt: feedTitle(feed), fit: "cover" }
+        : undefined,
       detail: detailFor(feed),
       actions: [
         { id: `open:${feed.id}`, label: copy("Open on Coolapk", "在酷安中打开"), primary: true },
@@ -745,13 +746,13 @@ function createPanel(container, context) {
         { id: "clear-read", label: copy("Clear Read Posts", "清理已读"), tone: "danger" },
         { id: "clean-cache", label: copy("Clean Cache Garbage", "清理缓存垃圾") },
       ],
-      island: selectedFeed() && isArticleFeed(selectedFeed())
+      island: selectedFeed()
         && (state.detailLoading.has(selectedFeed().id) || state.imageLoading.has(selectedFeed().id))
         ? {
             primary: feedTitle(selectedFeed()),
             secondary: state.detailLoading.has(selectedFeed().id)
-              ? copy("Loading original article", "正在加载原文")
-              : copy("Loading article images", "正在加载原文图片"),
+              ? copy("Loading original content", "正在加载原始正文")
+              : copy("Loading original images", "正在加载原始图片"),
             activity: "spinner",
           }
         : state.loading || state.loadingMore
@@ -894,9 +895,9 @@ function createPanel(container, context) {
   async function loadThumbnails(feeds) {
     let cursor = 0;
     const jobs = feeds
-      .slice(0, 18)
       .filter((feed) => !isArticleFeed(feed))
-      .flatMap((feed) => feedImages(feed));
+      .map((feed) => feedImages(feed)[0])
+      .filter(Boolean);
     const worker = async () => {
       while (!state.dead && cursor < jobs.length) {
         const url = jobs[cursor++];

@@ -121,6 +121,14 @@
     ],
     "qxcoolapk": [
       {
+        "version": "1.2.1",
+        "published_at": "2026-07-24",
+        "notes_localizations": {
+          "en": "Stabilizes the feed with one cover thumbnail per dynamic post, keeps every original image in the detail filmstrip with the API count, and shows original-content and original-image loading in the island.",
+          "zh-CN": "主列表改为每条动态只显示一张封面缩略图；详情胶片按酷安原始数量展示全部图片，并在灵动岛分别显示原始正文与原始图片加载状态。"
+        }
+      },
+      {
         "version": "1.2.0",
         "published_at": "2026-07-24",
         "notes_localizations": {

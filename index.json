@@ -143,11 +143,11 @@
     {
       "id": "qxcoolapk",
       "name": "QxCoolapk 酷安",
-      "version": "1.2.0",
+      "version": "1.2.1",
       "description": "Browse Coolapk hot, news, and digital feeds and read complete posts, images, and replies in Qx.",
       "download_url": "https://raw.githubusercontent.com/mcxen/qx-plugins/main/qxcoolapk.qx-plugin",
-      "size_bytes": 57689,
-      "checksum_sha256": "d12dd59d521f9426eaf4a5056d764de4653db5da99acc74c48c2328c07dec170",
+      "size_bytes": 58244,
+      "checksum_sha256": "9cdcefb89606c8cdee7763729598ef05027dad0ef0885e00473f4972e5d2e421",
       "required_permissions": [
         "http",
         "open-url",
@@ -157,6 +157,14 @@
       "author": "Qx",
       "min_app_version": "0.6.23",
       "releases": [
+        {
+          "version": "1.2.1",
+          "published_at": "2026-07-24",
+          "notes_localizations": {
+            "en": "Stabilizes the feed with one cover thumbnail per dynamic post, keeps every original image in the detail filmstrip with the API count, and shows original-content and original-image loading in the island.",
+            "zh-CN": "主列表改为每条动态只显示一张封面缩略图；详情胶片按酷安原始数量展示全部图片，并在灵动岛分别显示原始正文与原始图片加载状态。"
+          }
+        },
         {
           "version": "1.2.0",
           "published_at": "2026-07-24",

@@ -64,7 +64,9 @@ async function mockFetch(url, options = {}) {
       ...feeds.find((feed) => feed.id === id),
       message: `<h2>完整正文 ${id}</h2><p>第二段内容 &amp; 更多文字</p>`,
       readNum: 321,
-      picArr: [`http://image.coolapk.com/detail/${id}.jpg`],
+      picArr: id === feeds[0].id
+        ? [`http://image.coolapk.com/detail/${id}.jpg`]
+        : feeds.find((feed) => feed.id === id)?.picArr || [],
     });
   }
   if (String(url).includes("/feed/replyList")) {
@@ -134,18 +136,19 @@ await waitFor(() => snapshot && !snapshot.loading && snapshot.items?.length, "fe
 assert.equal(snapshot.items.length, 5);
 assert.ok(snapshot.items.every((item) => item.id && item.detail));
 await waitFor(
-  () => snapshot.items.some((item) => item.images?.[0]?.url?.startsWith("data:image/")),
-  "authenticated dynamic cards",
+  () => snapshot.items.some((item) => item.image?.url?.startsWith("data:image/")),
+  "authenticated dynamic covers",
 );
 assert.equal(snapshot.items[0].images, undefined);
-assert.equal(snapshot.items[1].images.length, 4);
-assert.match(snapshot.items[1].images[0].url, /^data:image\/png;base64,/);
-assert.doesNotMatch(snapshot.items[1].images[0].url, /image\.coolapk\.com/);
+assert.equal(snapshot.items[1].images, undefined);
+assert.match(snapshot.items[1].image.url, /^data:image\/png;base64,/);
+assert.doesNotMatch(snapshot.items[1].image.url, /image\.coolapk\.com/);
+assert.match(snapshot.items[1].badge, /4 图/);
 
 const selected = snapshot.items[0];
 handlers.onSelect(selected.id);
 assert.equal(snapshot.island?.activity, "spinner");
-assert.match(snapshot.island?.secondary || "", /加载原文/);
+assert.match(snapshot.island?.secondary || "", /加载原始正文/);
 await waitFor(
   () => snapshot.items.find((item) => item.id === selected.id)?.detail?.body?.includes("完整正文"),
   "full article",
@@ -175,6 +178,16 @@ handlers.onAction("mark-visible-unread");
 assert.ok(snapshot.items.every((item) => /未读/.test(item.badge || "")));
 handlers.onAction(`read:${selected.id}`);
 
+const dynamic = snapshot.items.find((item) => item.id === feeds[1].id);
+handlers.onSelect(dynamic.id);
+assert.match(snapshot.island?.secondary || "", /加载原始正文/);
+await waitFor(
+  () => snapshot.items.find((item) => item.id === dynamic.id)?.detail?.images?.length === 4,
+  "complete dynamic detail filmstrip",
+);
+assert.equal(snapshot.items.find((item) => item.id === dynamic.id).images, undefined);
+assert.equal(snapshot.items.find((item) => item.id === dynamic.id).detail.images.length, 4);
+
 handlers.onQuery("不存在的关键词");
 assert.equal(snapshot.items.length, 0);
 handlers.onQuery("");
@@ -201,7 +214,7 @@ assert.match(openedUrl, /^https:\/\/www\.coolapk\.com\/feed\//);
 assert.ok(persisted.get("cache.community.v1").details[selected.id]);
 assert.ok(persisted.get("cache.community.v1").readAt[selected.id]);
 handlers.onAction("clear-read");
-assert.equal(snapshot.items.length, 5);
+assert.equal(snapshot.items.length, 4);
 await waitFor(
   () => persisted.get("cache.community.v1").readAt[selected.id] == null,
   "clear read posts",
@@ -223,7 +236,7 @@ await waitFor(
   () => snapshot && !snapshot.loading && snapshot.items?.length && snapshot.error,
   "offline cache",
 );
-assert.equal(snapshot.items.length, 5);
+assert.equal(snapshot.items.length, 4);
 plugin.panel.destroy(offlineContainer);
 
 const expiredAt = Date.now() - 8 * 24 * 60 * 60 * 1000;
@@ -245,4 +258,4 @@ await waitFor(
 assert.equal(persisted.get("cache.community.v1").feeds.hot, undefined);
 plugin.panel.destroy(expiredContainer);
 
-console.log("QxCoolapk smoke ok: articleIsland=true, readFilters=true, cleanup=true, articleBodyMedia=true, dynamicCards=true, replies=true, offlineCache=true, retentionCleanup=true");
+console.log("QxCoolapk smoke ok: contentIsland=true, readFilters=true, cleanup=true, articleBodyMedia=true, singleListCovers=true, completeDetailFilmstrip=true, replies=true, offlineCache=true, retentionCleanup=true");
