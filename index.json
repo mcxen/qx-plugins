@@ -245,11 +245,11 @@
     {
       "id": "qxpicture",
       "name": "Qxpicture",
-      "version": "0.3.0",
+      "version": "0.4.0",
       "description": "Browse random image APIs, save images, copy them, and set desktop wallpaper.",
       "download_url": "https://raw.githubusercontent.com/mcxen/qx-plugins/main/qxpicture.qx-plugin",
-      "size_bytes": 60779,
-      "checksum_sha256": "afc42dca394ac956888c6579d15fa40d6130b976fabeb43ed728b36b5e46eaeb",
+      "size_bytes": 62789,
+      "checksum_sha256": "50a52984e20407d2b6fe5a4a04267e22d1995826f0f06711af0132b86200bffd",
       "required_permissions": [
         "storage",
         "http",
@@ -261,10 +261,18 @@
         "invoke:plugin_file_write_base64",
         "invoke:clipboard_write_image_file"
       ],
-      "updated_at": "2026-07-23",
+      "updated_at": "2026-07-24",
       "author": "Qx",
-      "min_app_version": "0.6.14",
+      "min_app_version": "0.6.22",
       "releases": [
+        {
+          "version": "0.4.0",
+          "published_at": "2026-07-24",
+          "notes_localizations": {
+            "en": "Rebuilt API creation as an inline validated Workbench draft with atomic persistence and reliable form focus.",
+            "zh-CN": "将 API 新增流程重构为 Workbench 内联校验草稿，原子持久化并修复表单焦点。"
+          }
+        },
         {
           "version": "0.3.0",
           "published_at": "2026-07-23",

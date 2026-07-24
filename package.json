@@ -1,14 +1,15 @@
 {
   "name": "qx-plugins",
   "private": true,
-  "version": "1.4.0",
+  "version": "1.4.1",
   "type": "module",
   "scripts": {
     "convert:raycast": "node scripts/convert-raycast-extension.mjs",
     "convert:raycast-url": "node scripts/convert-raycast-url.mjs",
     "package:plugins": "node scripts/package-plugins.mjs",
     "smoke:qxheihe": "node scripts/smoke-qxheihe.mjs",
-    "smoke:qxgh": "node scripts/smoke-qxgh.mjs"
+    "smoke:qxgh": "node scripts/smoke-qxgh.mjs",
+    "smoke:qxpicture": "node scripts/smoke-qxpicture.mjs"
   },
   "dependencies": {
     "esbuild": "^0.25.5",

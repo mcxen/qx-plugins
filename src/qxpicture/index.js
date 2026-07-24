@@ -6,6 +6,7 @@ const CONFIG_SCHEMA_VERSION = 2;
 /** Virtual plugin-files path (host maps to disk). Prefer real user paths for wallpaper. */
 const PLUGIN_FILES_CACHE = "/qx-plugin-files/qxpicture/images";
 const GENERAL_SETTINGS_ID = "__general__";
+const NEW_SOURCE_ID = "__new_source__";
 
 const MWM_TYPE_OPTIONS = [
   { label: "PC", value: "pc" },
@@ -484,6 +485,7 @@ function createPanel(context, container) {
     config: defaultConfig(),
     tab: "browse",
     selectedId: "picsum",
+    sourceDraft: null,
     previews: {},
     downloads: {},
     imageCache: {},
@@ -500,7 +502,7 @@ function createPanel(context, container) {
   };
 
   const sourceById = (id = state.selectedId) => {
-    if (id === GENERAL_SETTINGS_ID) return null;
+    if (id === GENERAL_SETTINGS_ID || id === NEW_SOURCE_ID) return null;
     return state.config.sources.find((source) => source.id === id) || state.config.sources[0];
   };
   const sourceByExactId = (id) => {
@@ -556,6 +558,9 @@ function createPanel(context, container) {
   };
 
   const ensureSelection = () => {
+    if (state.selectedId === NEW_SOURCE_ID && state.tab === "settings" && state.sourceDraft) {
+      return;
+    }
     if (state.selectedId === GENERAL_SETTINGS_ID) {
       if (state.tab === "settings") return;
       state.selectedId = state.config.sources[0]?.id || null;
@@ -705,7 +710,11 @@ function createPanel(context, container) {
       ]
     };
 
-    const sources = state.config.sources.map((source) => {
+    const editableSources = state.sourceDraft
+      ? [state.sourceDraft, ...state.config.sources]
+      : state.config.sources;
+    const sources = editableSources.map((source) => {
+      const isDraft = source.id === NEW_SOURCE_ID;
       const params = source.params || [];
       const request = buildRequest(source, false);
       const paramSummary = params.length
@@ -785,19 +794,25 @@ function createPanel(context, container) {
         ];
       });
 
-      const hasDefaultParams = DEFAULT_SOURCES.some(
+      const hasDefaultParams = !isDraft && DEFAULT_SOURCES.some(
         (item) => item.id === source.id && (item.params || []).length > 0
       );
 
       return {
         id: source.id,
-        title: source.name,
+        title: isDraft
+          ? (source.name || text("New API", "新 API"))
+          : source.name,
         subtitle: paramSummary === text("No parameters", "无参数")
           ? source.url
           : `${paramSummary}`,
-        badge: source.type === "json" ? "JSON" : text("Image", "图片"),
+        badge: isDraft
+          ? text("Draft", "草稿")
+          : source.type === "json" ? "JSON" : text("Image", "图片"),
         detail: {
-          title: source.name,
+          title: isDraft
+            ? text("Add image API", "添加图片 API")
+            : source.name,
           subtitle: source.url,
           body: text(
             "Edit Key / Value pairs below. Changes save immediately and are joined into the request on Refresh.",
@@ -806,8 +821,12 @@ function createPanel(context, container) {
           form: {
             title: text("API + Parameters", "API 与参数"),
             description: text(
-              "Each parameter has its own Key, Type, Value, options, and delete action. Changes save automatically.",
-              "每个参数独立管理参数名、类型、值、选项与删除操作，修改会自动保存。"
+              isDraft
+                ? "Complete the required fields, then save. Nothing is persisted until validation succeeds."
+                : "Each parameter has its own Key, Type, Value, options, and delete action. Changes save automatically.",
+              isDraft
+                ? "填写必填项后保存；校验成功前不会写入配置。"
+                : "每个参数独立管理参数名、类型、值、选项与删除操作，修改会自动保存。"
             ),
             controls: [
               {
@@ -852,9 +871,19 @@ function createPanel(context, container) {
                   placeholder: "data[0].urls.original"
                 }
               ] : []),
-              ...parameterControls
+              ...(!isDraft ? parameterControls : [])
             ],
-            actions: [
+            actions: isDraft ? [
+              {
+                id: "save-source-draft",
+                label: text("Save API", "保存 API"),
+                primary: true
+              },
+              {
+                id: "cancel-source-draft",
+                label: text("Cancel", "取消")
+              }
+            ] : [
               {
                 id: "add-param",
                 label: text("Add Parameter", "添加参数"),
@@ -903,7 +932,17 @@ function createPanel(context, container) {
             )
           }]
         },
-        actions: [
+        actions: isDraft ? [
+          {
+            id: "save-source-draft",
+            label: text("Save API", "保存 API"),
+            primary: true
+          },
+          {
+            id: "cancel-source-draft",
+            label: text("Cancel", "取消")
+          }
+        ] : [
           {
             id: "add-param",
             label: text("Add Parameter", "添加参数"),
@@ -950,7 +989,12 @@ function createPanel(context, container) {
       actions: browse ? [
         { id: "refresh", label: text("Refresh Current Image", "刷新当前图片"), primary: true, disabled: Boolean(state.busy) || !state.selectedId }
       ] : [
-        { id: "add-source", label: text("Add API", "添加 API"), primary: true },
+        {
+          id: "add-source",
+          label: text("Add API", "添加 API"),
+          primary: true,
+          disabled: Boolean(state.sourceDraft)
+        },
         { id: "download-directory", label: text("Choose Save Directory", "选择保存目录") },
         { id: "wallpaper-scope", label: text("Wallpaper Scope", "壁纸范围") },
         { id: "reset-sources", label: text("Restore Default APIs", "恢复默认 API") }
@@ -967,6 +1011,7 @@ function createPanel(context, container) {
       onTab(id) {
         state.tab = id === "settings" ? "settings" : "browse";
         state.error = null;
+        if (state.tab !== "settings") state.sourceDraft = null;
         if (state.tab === "settings" && !state.config.sources.some((s) => s.id === state.selectedId)) {
           state.selectedId = GENERAL_SETTINGS_ID;
         } else if (state.tab === "browse") {
@@ -1057,7 +1102,8 @@ function createPanel(context, container) {
       return;
     }
 
-    const source = sourceById(targetId);
+    const isDraft = targetId === NEW_SOURCE_ID;
+    const source = isDraft ? state.sourceDraft : sourceByExactId(targetId);
     if (!source) return;
 
     if (controlId === "browse:preset") {
@@ -1144,6 +1190,12 @@ function createPanel(context, container) {
         return;
       }
     } else {
+      return;
+    }
+
+    if (isDraft) {
+      if (needsHardPaint) paint();
+      else queueSoftPaint(180);
       return;
     }
 
@@ -1286,34 +1338,51 @@ function createPanel(context, container) {
     context.showToast(text("Image copied", "图片已复制"));
   };
 
-  const editSource = async (id, adding = false) => {
-    const existing = adding ? null : sourceById(id);
-    const name = await context.prompt(text("API name", "API 名称"), existing?.name || "");
-    if (name == null || !String(name).trim()) return;
-    const url = await context.prompt("URL", existing?.url || "https://");
-    if (url == null || !/^https?:\/\//i.test(String(url).trim())) {
+  const beginSourceDraft = () => {
+    state.tab = "settings";
+    state.sourceDraft = {
+      id: NEW_SOURCE_ID,
+      name: "",
+      url: "https://",
+      type: "direct",
+      params: [],
+      presets: []
+    };
+    state.selectedId = NEW_SOURCE_ID;
+    setError(null);
+    paint();
+  };
+
+  const cancelSourceDraft = () => {
+    state.sourceDraft = null;
+    state.selectedId = GENERAL_SETTINGS_ID;
+    setError(null);
+    paint();
+  };
+
+  const saveSourceDraft = async () => {
+    const draft = state.sourceDraft;
+    if (!draft) return;
+    const name = String(draft.name || "").trim();
+    const url = String(draft.url || "").trim();
+    if (!name) {
+      throw new Error(text("API name is required.", "API 名称不能为空。"));
+    }
+    if (!/^https?:\/\/[^\s]+$/i.test(url)) {
       throw new Error(text("Enter a valid HTTP or HTTPS URL.", "请输入有效的 HTTP 或 HTTPS 地址。"));
     }
-    const typeValue = await context.prompt(
-      text("Type: direct or json", "类型：direct 或 json"),
-      existing?.type || "direct"
-    );
-    if (typeValue == null) return;
-    const type = String(typeValue).trim().toLowerCase() === "json" ? "json" : "direct";
     const source = normalizeSource({
-      ...(existing || {}),
-      id: existing?.id || `custom-${Date.now()}`,
+      ...draft,
+      id: `custom-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
       name,
-      url,
-      type
+      url
     });
-    if (adding) state.config.sources.push(source);
-    else state.config.sources = state.config.sources.map((item) => item.id === source.id ? source : item);
-    delete state.previews[source.id];
-    delete state.downloads[source.id];
+    state.config.sources.push(source);
+    state.sourceDraft = null;
     state.selectedId = source.id;
-    await writeConfig(context, state.config);
+    await persistConfig();
     paint();
+    context.showToast(text("API added", "API 已添加"));
   };
 
   const deleteSource = async (id) => {
@@ -1393,7 +1462,17 @@ function createPanel(context, container) {
   };
 
   const runAction = async (id, targetId) => {
-    if (id === "add-source") return withBusy(text("Adding API…", "正在添加 API…"), () => editSource(null, true));
+    if (id === "add-source") {
+      beginSourceDraft();
+      return;
+    }
+    if (id === "cancel-source-draft") {
+      cancelSourceDraft();
+      return;
+    }
+    if (id === "save-source-draft") {
+      return withBusy(text("Saving API…", "正在保存 API…"), saveSourceDraft);
+    }
     if (id === "delete-source") return withBusy(text("Deleting API…", "正在删除 API…"), () => deleteSource(targetId));
     if (id === "download-directory") return withBusy(text("Updating save directory…", "正在更新保存目录…"), editDownloadDirectory);
     if (id === "wallpaper-scope") return withBusy(text("Updating wallpaper scope…", "正在更新壁纸范围…"), editWallpaperScope);

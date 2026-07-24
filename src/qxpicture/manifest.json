@@ -5,7 +5,7 @@
     "zh-CN": "Qxpicture 随机图片",
     "en": "Qxpicture"
   },
-  "version": "0.3.0",
+  "version": "0.4.0",
   "description": "Browse random image APIs, save images, copy them, and set desktop wallpaper.",
   "descriptions": {
     "zh-CN": "浏览随机图片 API，保存或复制图片，并设置桌面壁纸。",
@@ -58,5 +58,5 @@
     "title": "Qxpicture",
     "keywords": ["random image", "wallpaper", "api", "随机图片", "壁纸"]
   },
-  "min_app_version": "0.6.14"
+  "min_app_version": "0.6.22"
 }

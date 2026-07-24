@@ -121,6 +121,14 @@
     ],
     "qxpicture": [
       {
+        "version": "0.4.0",
+        "published_at": "2026-07-24",
+        "notes_localizations": {
+          "en": "Rebuilt API creation as an inline validated Workbench draft with atomic persistence and reliable form focus.",
+          "zh-CN": "将 API 新增流程重构为 Workbench 内联校验草稿，原子持久化并修复表单焦点。"
+        }
+      },
+      {
         "version": "0.3.0",
         "published_at": "2026-07-23",
         "notes_localizations": {
