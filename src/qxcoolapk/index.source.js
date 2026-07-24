@@ -348,6 +348,7 @@ async function decodeImage(blob) {
 async function safeImagePreview(bytes, type, purpose) {
   const direct = dataUrl(bytes, type);
   const isThumbnail = purpose === "thumbnail";
+  if (!isThumbnail && direct) return direct;
 
   let decoded;
   try {
@@ -355,11 +356,18 @@ async function safeImagePreview(bytes, type, purpose) {
     if (!decoded) return direct;
     const sourceWidth = Math.max(1, Number(decoded.width) || 1);
     const sourceHeight = Math.max(1, Number(decoded.height) || 1);
-    const maxDimension = isThumbnail ? 360 : 1_600;
-    if (!isThumbnail && Math.max(sourceWidth, sourceHeight) <= maxDimension && direct) {
-      return direct;
-    }
-    let scale = Math.min(1, maxDimension / Math.max(sourceWidth, sourceHeight));
+    const longScreenshot = sourceHeight / sourceWidth >= 3.2;
+    const maxDimension = isThumbnail ? 360 : 2_560;
+    const maxPixels = isThumbnail ? 360 * 360 : 8_000_000;
+    let scale = Math.min(
+      1,
+      longScreenshot && !isThumbnail
+        ? Math.min(1_440 / sourceWidth, Math.sqrt(maxPixels / (sourceWidth * sourceHeight)))
+        : Math.min(
+            maxDimension / Math.max(sourceWidth, sourceHeight),
+            Math.sqrt(maxPixels / (sourceWidth * sourceHeight)),
+          ),
+    );
     let quality = isThumbnail ? 0.72 : 0.84;
 
     for (let attempt = 0; attempt < 5; attempt += 1) {

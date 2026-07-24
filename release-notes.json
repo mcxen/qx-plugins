@@ -121,6 +121,14 @@
     ],
     "qxcoolapk": [
       {
+        "version": "1.2.2",
+        "published_at": "2026-07-24",
+        "notes_localizations": {
+          "en": "Improves full-image clarity by retaining safe original-resolution media and prepares oversized images with a higher-resolution, long-screenshot-aware fallback.",
+          "zh-CN": "提升大图清晰度：安全范围内保留原始分辨率，超大图片使用更高分辨率且识别超长截图的回退处理。"
+        }
+      },
+      {
         "version": "1.2.1",
         "published_at": "2026-07-24",
         "notes_localizations": {

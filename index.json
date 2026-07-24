@@ -143,11 +143,11 @@
     {
       "id": "qxcoolapk",
       "name": "QxCoolapk 酷安",
-      "version": "1.2.1",
+      "version": "1.2.2",
       "description": "Browse Coolapk hot, news, and digital feeds and read complete posts, images, and replies in Qx.",
       "download_url": "https://raw.githubusercontent.com/mcxen/qx-plugins/main/qxcoolapk.qx-plugin",
-      "size_bytes": 58244,
-      "checksum_sha256": "9cdcefb89606c8cdee7763729598ef05027dad0ef0885e00473f4972e5d2e421",
+      "size_bytes": 58741,
+      "checksum_sha256": "9a7180b1cd38e8ed3ac20b00be120c1abbee095773e99232a25ca3e02ca3ddc7",
       "required_permissions": [
         "http",
         "open-url",
@@ -157,6 +157,14 @@
       "author": "Qx",
       "min_app_version": "0.6.23",
       "releases": [
+        {
+          "version": "1.2.2",
+          "published_at": "2026-07-24",
+          "notes_localizations": {
+            "en": "Improves full-image clarity by retaining safe original-resolution media and prepares oversized images with a higher-resolution, long-screenshot-aware fallback.",
+            "zh-CN": "提升大图清晰度：安全范围内保留原始分辨率，超大图片使用更高分辨率且识别超长截图的回退处理。"
+          }
+        },
         {
           "version": "1.2.1",
           "published_at": "2026-07-24",
