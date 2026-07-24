@@ -147,7 +147,7 @@
       "description": "Browse Coolapk hot, news, and digital feeds and read complete posts, images, and replies in Qx.",
       "download_url": "https://raw.githubusercontent.com/mcxen/qx-plugins/main/qxcoolapk.qx-plugin",
       "size_bytes": 57689,
-      "checksum_sha256": "992f9cfa4b225c4b8c2c83804da3531fd2ffb591511287b419903be2417122e5",
+      "checksum_sha256": "d12dd59d521f9426eaf4a5056d764de4653db5da99acc74c48c2328c07dec170",
       "required_permissions": [
         "http",
         "open-url",
@@ -155,7 +155,7 @@
       ],
       "updated_at": "2026-07-24",
       "author": "Qx",
-      "min_app_version": "0.6.19",
+      "min_app_version": "0.6.23",
       "releases": [
         {
           "version": "1.2.0",

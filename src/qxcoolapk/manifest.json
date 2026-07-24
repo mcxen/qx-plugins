@@ -136,7 +136,7 @@
     "icon": "icon.svg",
     "keywords": ["coolapk", "酷安", "社区", "数码", "帖子", "文章"]
   },
-  "min_app_version": "0.6.19",
+  "min_app_version": "0.6.23",
   "platforms": ["macos", "windows"],
   "screenshots": []
 }
