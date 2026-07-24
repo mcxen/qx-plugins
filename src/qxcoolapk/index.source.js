@@ -265,11 +265,48 @@ function feedImages(feed) {
   return imageUrls(feed?.picArr || feed?.pic || []);
 }
 
+export function articleContentBlocks(feed) {
+  const raw = feed?.message_raw_output ?? feed?.messageRawOutput;
+  if (typeof raw !== "string" || !raw.trim()) return [];
+  let entries;
+  try {
+    entries = JSON.parse(raw);
+  } catch {
+    return [];
+  }
+  if (!Array.isArray(entries)) return [];
+  return entries.slice(0, 64).flatMap((entry) => {
+    if (!entry || typeof entry !== "object") return [];
+    if (entry.type === "text") {
+      const text = cleanText(String(entry.message || "").replace(/<!--\s*break\s*-->/gi, ""));
+      return text ? [{ type: "text", text }] : [];
+    }
+    if (entry.type === "image") {
+      const url = imageUrls([entry.url || entry.pic || entry.src])[0];
+      return url ? [{
+        type: "image",
+        url,
+        alt: cleanText(entry.description || entry.alt),
+      }] : [];
+    }
+    return [];
+  });
+}
+
 export function isArticleFeed(feed) {
   const feedType = String(feed?.feedType || feed?.feed_type || "").toLowerCase();
   return feedType === "feedarticle"
     || String(feed?.is_html_article ?? feed?.isHtmlArticle ?? "") === "1"
     || String(feed?.type ?? "") === "12";
+}
+
+export function canReuseCachedDetail(cached, feed) {
+  return Boolean(
+    cached
+    && !cached.error
+    && cached.complete
+    && (!isArticleFeed(feed) || Array.isArray(cached.content)),
+  );
 }
 
 function responseContentType(response) {
@@ -456,11 +493,47 @@ function normalizeFeedList(raw) {
   return [...byId.values()];
 }
 
-function replySections(raw) {
-  return normalizeFeedList(raw).slice(0, 12).map((reply, index) => ({
-    title: `${authorName(reply)} · #${index + 1} · ${formatTime(reply.dateline)}`,
-    body: cleanText(reply.message),
-  })).filter((section) => section.body);
+function replyItems(raw, parentFeed) {
+  const parentUid = String(parentFeed?.userInfo?.uid || parentFeed?.uid || "");
+  return normalizeFeedList(raw).slice(0, 100).map((reply, index) => {
+    const body = cleanText(reply.message);
+    const replyUid = String(reply?.userInfo?.uid || reply?.uid || "");
+    return {
+      id: String(reply.id || `reply-${index + 1}`),
+      floor: Number(reply.rnum || reply.floor || reply.replyFloor) || index + 1,
+      author: authorName(reply),
+      createdAt: formatTime(reply.dateline),
+      originalPoster: Boolean(parentUid && replyUid && parentUid === replyUid),
+      body,
+    };
+  }).filter((reply) => reply.body);
+}
+
+function cachedReplyItems(raw) {
+  return (Array.isArray(raw) ? raw : []).slice(0, 100).flatMap((reply, index) => {
+    if (!reply || typeof reply !== "object") return [];
+    if (reply.author && reply.body) {
+      return [{
+        id: String(reply.id || `reply-${index + 1}`),
+        floor: reply.floor || index + 1,
+        author: cleanText(reply.author),
+        createdAt: cleanText(reply.createdAt),
+        originalPoster: reply.originalPoster === true,
+        body: cleanText(reply.body),
+      }];
+    }
+    // Upgrade cached 1.3.x section rows without discarding offline replies.
+    const legacy = cleanText(reply.title).match(/^(.*?)\s*·\s*#(\d+)\s*·\s*(.*)$/);
+    const body = cleanText(reply.body);
+    return body ? [{
+      id: `legacy-reply-${index + 1}`,
+      floor: Number(legacy?.[2]) || index + 1,
+      author: cleanText(legacy?.[1]) || copy("Unknown author", "未知作者"),
+      createdAt: cleanText(legacy?.[3]),
+      originalPoster: false,
+      body,
+    }] : [];
+  });
 }
 
 async function preference(context, id, fallback = "") {
@@ -636,16 +709,41 @@ function createPanel(container, context) {
         zoomable: true,
       } : null;
     }).filter(Boolean);
-    const replies = Array.isArray(cached?.replies) ? cached.replies : [];
-    const sections = replies.length
-      ? [{
-          title: copy(`Replies (${replies.length} loaded)`, `回复（已加载 ${replies.length} 条）`),
-          body: copy("Showing the first page of replies.", "当前展示第一页回复。"),
-        }, ...replies]
-      : [];
+    const inlineSource = article && Array.isArray(cached?.content) ? cached.content : [];
+    const content = inlineSource.flatMap((block) => {
+      if (block?.type === "text") {
+        const text = cleanText(block.text);
+        return text ? [{ type: "text", text }] : [];
+      }
+      if (block?.type !== "image") return [];
+      const original = imageUrls([block.url])[0];
+      if (!original) return [];
+      const preview = state.imagePreviews.get(`detail:${original}`)
+        || state.imagePreviews.get(`thumbnail:${original}`);
+      return preview ? [{
+        type: "image",
+        image: {
+          url: preview,
+          alt: cleanText(block.alt) || feedTitle(feed),
+          fit: "contain",
+          aspectRatio: "auto",
+          zoomable: true,
+        },
+      }] : [];
+    });
+    const hasInlineContent = inlineSource.length > 0;
+    const replies = cachedReplyItems(cached?.replies);
+    const detailMeta = [
+      authorName(feed),
+      formatTime(feed.dateline),
+      `${compactNumber(feed.likenum)} ${copy("likes", "赞")}`,
+      `${compactNumber(feed.replynum)} ${copy("replies", "回复")}`,
+      `${compactNumber(cached?.readNum || feed.readNum || 0)} ${copy("views", "阅读")}`,
+      cleanText(feed.deviceTitle),
+    ].filter(Boolean);
     return {
       title: feedTitle(feed),
-      subtitle: `${authorName(feed)} · ${formatTime(feed.dateline)}`,
+      subtitle: detailMeta.join(" · "),
       status: state.detailLoading.has(feed.id) || state.imageLoading.has(feed.id)
         ? {
             state: "loading",
@@ -657,18 +755,15 @@ function createPanel(container, context) {
           ? { state: "error", error: cached.error }
           : undefined,
       body: cached?.body || cleanText(feed.message),
-      images,
+      content: hasInlineContent ? content : undefined,
+      images: hasInlineContent ? [] : images,
       imageLayout: state.imageLayout,
       mediaPlacement: article ? "after-body" : "header",
-      fields: [
-        { label: copy("Author", "作者"), value: authorName(feed) },
-        { label: copy("Likes", "点赞"), value: Number(feed.likenum || 0) },
-        { label: copy("Replies", "回复"), value: Number(feed.replynum || 0) },
-        { label: copy("Views", "阅读"), value: Number(cached?.readNum || feed.readNum || 0) },
-        { label: copy("Published", "发布时间"), value: formatTime(feed.dateline) },
-        { label: copy("Device", "设备"), value: cleanText(feed.deviceTitle) || "—" },
-      ],
-      sections,
+      replies: {
+        total: Number(feed.replynum) || replies.length,
+        items: replies,
+        emptyText: copy("No replies yet.", "暂无回复。"),
+      },
     };
   }
 
@@ -952,11 +1047,11 @@ function createPanel(container, context) {
     const key = String(id || "");
     if (!key || state.detailLoading.has(key)) return;
     const cached = state.cache.details[key];
-    if (cached && !cached.error && cached.complete) return;
     const feed = Object.values(state.cache.feeds)
       .flatMap((entry) => entry.items || [])
       .find((entry) => entry.id === key);
     if (!feed) return;
+    if (canReuseCachedDetail(cached, feed)) return;
     state.detailLoading.add(key);
     paint();
     try {
@@ -966,10 +1061,18 @@ function createPanel(container, context) {
       ]);
       if (state.dead) return;
       const detail = normalizeFeed(Array.isArray(detailRaw) ? detailRaw[0] : detailRaw) || feed;
+      const content = isArticleFeed(detail) ? articleContentBlocks(detail) : [];
+      const contentImages = content
+        .filter((block) => block.type === "image")
+        .map((block) => block.url);
       state.cache.details[key] = {
         body: cleanText(detail.message || feed.message),
-        images: feedImages(detail).length ? feedImages(detail) : feedImages(feed),
-        replies: replySections(repliesRaw),
+        content,
+        images: imageUrls([
+          ...contentImages,
+          ...(feedImages(detail).length ? feedImages(detail) : feedImages(feed)),
+        ]),
+        replies: replyItems(repliesRaw, detail),
         readNum: Number(detail.readNum || 0),
         complete: true,
         savedAt: Date.now(),

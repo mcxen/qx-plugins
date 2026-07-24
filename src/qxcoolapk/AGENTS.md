@@ -15,21 +15,28 @@
 2. Keep stable Workbench item ids from the Coolapk feed `id`.
 3. Paint cached feeds before awaiting network refreshes.
 4. Load the complete article only after selection and update the same item id.
-5. Classify `feedArticle` / `is_html_article=1` / `type=12` as articles. Publish
-   their media with `detail.mediaPlacement="after-body"` and never as list cards.
+5. Classify `feedArticle` / `is_html_article=1` / `type=12` as articles. Parse
+   `message_raw_output` into ordered `detail.content` text/image blocks so media
+   retains its source paragraph position; use `mediaPlacement="after-body"` only
+   as the fallback when ordered source blocks are unavailable. Never publish
+   article media as list cards.
    Publish every non-article feed image through scrollable `item.images` compact
    cards; do not impose a plugin-side image-count limit.
 6. Fetch Coolapk CDN images with the same anonymous authenticated headers as API
    requests. Never publish direct `image.coolapk.com` URLs to Workbench.
 7. Publish bounded session-only image previews through item images and
-   `detail.images`; do not persist data URLs or draw a custom reader/lightbox.
-8. Generate a fresh anonymous `X-App-Token` for API and image requests. Do not persist tokens.
-9. Keep the Coolapk signature implementation dependency-free at runtime. The packaged
+   `detail.images`; dynamic multi-image detail uses the host `horizontal`
+   filmstrip and host preview. Do not persist data URLs or draw a custom
+   reader/lightbox.
+8. Publish first-page replies through structured `detail.replies`, preserving
+   the upstream floor when present. Do not flatten replies into `sections`.
+9. Generate a fresh anonymous `X-App-Token` for API and image requests. Do not persist tokens.
+10. Keep the Coolapk signature implementation dependency-free at runtime. The packaged
    `index.js` includes the BSD-3-Clause-licensed `bcryptjs` implementation. Edit
    `index.source.js`; `npm run package:plugins` rebuilds the bundled entry.
-10. Keep rebuildable cache keys synchronized with `manifest.storage.cacheTargets`.
-11. Cache values use a top-level `savedAt` envelope for host retention cleanup.
-12. Do not add login, write, like, reply, or follow capabilities without a separate
+11. Keep rebuildable cache keys synchronized with `manifest.storage.cacheTargets`.
+12. Cache values use a top-level `savedAt` envelope for host retention cleanup.
+13. Do not add login, write, like, reply, or follow capabilities without a separate
     security and privacy review.
 
 ## Permissions

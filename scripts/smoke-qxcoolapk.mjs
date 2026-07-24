@@ -1,6 +1,8 @@
 import assert from "node:assert/strict";
 import plugin, {
+  articleContentBlocks,
   buildRequestHeaders,
+  canReuseCachedDetail,
   cleanText,
   feedUrl,
   isArticleFeed,
@@ -63,6 +65,13 @@ async function mockFetch(url, options = {}) {
     return response({
       ...feeds.find((feed) => feed.id === id),
       message: `<h2>完整正文 ${id}</h2><p>第二段内容 &amp; 更多文字</p>`,
+      message_raw_output: id === feeds[0].id
+        ? JSON.stringify([
+            { type: "text", message: `完整正文 ${id}<!--break--> 第一段` },
+            { type: "image", url: `http://image.coolapk.com/detail/${id}.jpg`, description: "原位图片" },
+            { type: "text", message: "第二段内容 &amp; 更多文字" },
+          ])
+        : "",
       readNum: 321,
       picArr: id === feeds[0].id
         ? [`http://image.coolapk.com/detail/${id}.jpg`]
@@ -72,9 +81,10 @@ async function mockFetch(url, options = {}) {
   if (String(url).includes("/feed/replyList")) {
     return response([{
       id: "reply-1",
+      rnum: 7,
       message: "<p>第一条回复</p>",
       dateline: 1_784_804_999,
-      userInfo: { username: "回复用户" },
+      userInfo: { uid: feeds[0].userInfo.uid, username: "回复用户" },
     }]);
   }
   const page = Number(new URL(url).searchParams.get("page") || 1);
@@ -127,6 +137,23 @@ assert.equal(cleanText("<p>A &amp; B</p><p>C</p>"), "A & B\n\nC");
 assert.equal(new URL(feedUrl("hot", 2)).searchParams.get("page"), "2");
 assert.equal(isArticleFeed(feeds[0]), true);
 assert.equal(isArticleFeed(feeds[1]), false);
+assert.equal(canReuseCachedDetail({ complete: true }, feeds[0]), false);
+assert.equal(canReuseCachedDetail({ complete: true, content: [] }, feeds[0]), true);
+assert.equal(canReuseCachedDetail({ complete: true }, feeds[1]), true);
+assert.deepEqual(
+  articleContentBlocks({
+    message_raw_output: JSON.stringify([
+      { type: "text", message: "第一段<!--break-->" },
+      { type: "image", url: "http://image.coolapk.com/inline.jpg", description: "原位图" },
+      { type: "text", message: "第二段" },
+    ]),
+  }),
+  [
+    { type: "text", text: "第一段" },
+    { type: "image", url: "https://image.coolapk.com/inline.jpg", alt: "原位图" },
+    { type: "text", text: "第二段" },
+  ],
+);
 const headers = await buildRequestHeaders(1_784_804_927);
 assert.match(headers["X-App-Token"], /^v2/);
 
@@ -156,15 +183,26 @@ await waitFor(
 const detailed = snapshot.items.find((item) => item.id === selected.id);
 assert.match(detailed.detail.body, /完整正文 9000\n\n第二段内容 & 更多文字/);
 await waitFor(
-  () => snapshot.items.find((item) => item.id === selected.id)?.detail?.images?.[0]?.url?.startsWith("data:image/"),
+  () => snapshot.items.find((item) => item.id === selected.id)?.detail?.content
+    ?.some((block) => block.type === "image" && block.image?.url?.startsWith("data:image/")),
   "authenticated article images",
 );
 const detailedWithImage = snapshot.items.find((item) => item.id === selected.id);
-assert.equal(detailedWithImage.detail.images.length, 1);
+assert.equal(detailedWithImage.detail.images.length, 0);
 assert.equal(detailedWithImage.detail.mediaPlacement, "after-body");
-assert.match(detailedWithImage.detail.images[0].url, /^data:image\/png;base64,/);
-assert.doesNotMatch(detailedWithImage.detail.images[0].url, /image\.coolapk\.com/);
-assert.ok(detailed.detail.sections.some((section) => /第一条回复/.test(section.body || "")));
+assert.equal(detailedWithImage.detail.fields, undefined);
+assert.match(detailedWithImage.detail.subtitle, /作者-1 · .* · 2 赞 · 2 回复 · 321 阅读 · Qx Test Device/);
+assert.deepEqual(
+  detailedWithImage.detail.content.map((block) => block.type),
+  ["text", "image", "text"],
+);
+assert.match(detailedWithImage.detail.content[1].image.url, /^data:image\/png;base64,/);
+assert.doesNotMatch(detailedWithImage.detail.content[1].image.url, /image\.coolapk\.com/);
+assert.equal(detailed.detail.sections, undefined);
+assert.equal(detailed.detail.replies.items[0].floor, 7);
+assert.equal(detailed.detail.replies.items[0].author, "回复用户");
+assert.equal(detailed.detail.replies.items[0].originalPoster, true);
+assert.match(detailed.detail.replies.items[0].body, /第一条回复/);
 assert.doesNotMatch(detailed.badge, /未读/);
 
 handlers.onFilter("read-state", "read");

@@ -121,6 +121,30 @@
     ],
     "qxcoolapk": [
       {
+        "version": "1.4.0",
+        "published_at": "2026-07-24",
+        "notes_localizations": {
+          "en": "Moves Coolapk replies to the host Workbench reply surface with stable #floor, author, time, and OP metadata while retaining the host-owned dynamic image filmstrip.",
+          "zh-CN": "酷安回复接入宿主 Workbench 通用回复区，统一显示 #楼号、作者、时间和楼主标记；动态多图继续使用宿主胶片与大图预览。"
+        }
+      },
+      {
+        "version": "1.3.1",
+        "published_at": "2026-07-24",
+        "notes_localizations": {
+          "en": "Compacts article metadata into the author and time line and removes the duplicated full-width property table below the body.",
+          "zh-CN": "将点赞、回复、阅读和设备压缩到作者与时间同一行，删除正文下方重复占位的属性大表格。"
+        }
+      },
+      {
+        "version": "1.3.0",
+        "published_at": "2026-07-24",
+        "notes_localizations": {
+          "en": "Restores long-form Coolapk articles from their ordered source blocks so each protected image appears at its original position between paragraphs.",
+          "zh-CN": "按酷安原始长文块恢复正文顺序，受保护图片会回到对应段落之间的原始位置，不再统一堆在文末。"
+        }
+      },
+      {
         "version": "1.2.2",
         "published_at": "2026-07-24",
         "notes_localizations": {
@@ -178,6 +202,22 @@
       }
     ],
     "qxweibo": [
+      {
+        "version": "1.1.0",
+        "published_at": "2026-07-24",
+        "notes_localizations": {
+          "en": "Moved Weibo comments into the shared Workbench reply surface with floor numbers, authors, timestamps, original-poster markers, and preserved reply relationships.",
+          "zh-CN": "微博评论接入 Workbench 通用底部回复区，统一显示楼号、作者、时间、楼主标记并保留回复关系。"
+        }
+      },
+      {
+        "version": "1.0.1",
+        "published_at": "2026-07-24",
+        "notes_localizations": {
+          "en": "Split maintainable source code into composition, Weibo workflow, and media proxy modules while retaining a self-contained runtime entry for Qx.",
+          "zh-CN": "将可维护源码拆分为入口组装、微博工作流与媒体代理模块，同时为 Qx 保留自包含的单文件运行入口。"
+        }
+      },
       {
         "version": "1.0.0",
         "published_at": "2026-07-24",

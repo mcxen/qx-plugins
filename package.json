@@ -1,16 +1,18 @@
 {
   "name": "qx-plugins",
   "private": true,
-  "version": "1.4.1",
+  "version": "1.4.2",
   "type": "module",
   "scripts": {
     "convert:raycast": "node scripts/convert-raycast-extension.mjs",
     "convert:raycast-url": "node scripts/convert-raycast-url.mjs",
     "build:qxcoolapk": "esbuild src/qxcoolapk/index.source.js --bundle --format=esm --platform=browser --target=es2022 --minify --legal-comments=inline --outfile=src/qxcoolapk/index.js",
-    "package:plugins": "npm run build:qxcoolapk && node scripts/package-plugins.mjs",
+    "build:qxweibo": "esbuild src/qxweibo/index.source.js --bundle --format=esm --platform=browser --target=es2022 --minify --legal-comments=inline --outfile=src/qxweibo/index.js",
+    "build:plugins": "npm run build:qxcoolapk && npm run build:qxweibo",
+    "package:plugins": "npm run build:plugins && node scripts/package-plugins.mjs",
     "smoke:qxheihe": "node scripts/smoke-qxheihe.mjs",
     "smoke:qxcoolapk": "node scripts/smoke-qxcoolapk.mjs",
-    "smoke:qxweibo": "node scripts/smoke-qxweibo.mjs",
+    "smoke:qxweibo": "npm run build:qxweibo && node scripts/smoke-qxweibo.mjs",
     "smoke:qxgh": "node scripts/smoke-qxgh.mjs",
     "smoke:qxpicture": "node scripts/smoke-qxpicture.mjs"
   },

@@ -73,8 +73,10 @@ async function mockFetch(url, options = {}) {
           id: "comment-1",
           text: "<b>第一条评论</b>",
           created_at: "Fri Jul 24 12:10:00 +0800 2026",
-          user: { id: 20001, screen_name: "评论用户" },
+          floor_number: 7,
+          user: users["10001"],
           like_counts: 3,
+          reply_text: "回复关系",
         }],
       },
     });
@@ -162,9 +164,15 @@ assert.equal(snapshot.items.length, 1);
 assert.equal(snapshot.items[0].id, "1000101");
 assert.ok(snapshot.items[0].detail);
 await waitFor(
-  () => snapshot.items[0].detail.sections?.some((section) => /评论用户/.test(section.title)),
+  () => snapshot.items[0].detail.replies?.items?.some((reply) => /第一条评论/.test(reply.body)),
   "comments",
 );
+assert.equal(snapshot.items[0].detail.sections, undefined);
+assert.equal(snapshot.items[0].detail.replies.total, 2);
+assert.equal(snapshot.items[0].detail.replies.items[0].floor, 7);
+assert.equal(snapshot.items[0].detail.replies.items[0].author, "主用户");
+assert.equal(snapshot.items[0].detail.replies.items[0].originalPoster, true);
+assert.match(snapshot.items[0].detail.replies.items[0].body, /回复：回复关系/);
 await waitFor(() => snapshot.items[0].detail.images?.length, "proxied image");
 assert.match(snapshot.items[0].detail.images[0].url, /^data:image\/png;base64,/);
 assert.equal(visitorRequests, 1);

@@ -9,6 +9,8 @@ content.
 - Local search across loaded posts
 - Complete post text loaded on selection
 - Authenticated image loading that avoids Coolapk CDN HTTP 567 responses
+- Ordered long-form article rendering that keeps images between their original paragraphs
+- Compact article metadata beside the author and published time
 - Article images placed with the reading body; all dynamic-post images shown in scrollable list cards
 - Background card thumbnails and bounded multi-image previews using the Qx host viewer
 - First-page replies, read/unread state, and pagination

@@ -36,7 +36,9 @@ qx-plugins/
 │   └── <plugin-id>/          # one folder per plugin
 │       ├── AGENTS.md         # REQUIRED for agents — architecture + edit checklist
 │       ├── manifest.json     # contract (id, permissions, commands, panel?)
-│       ├── index.js          # ESM: export default { commands, panel? }
+│       ├── index.js          # generated/self-contained runtime ESM
+│       ├── index.source.js   # optional multi-file composition root (build-only)
+│       ├── source/           # optional source modules; may ship for maintenance
 │       ├── README.md         # human docs
 │       └── icon.*            # optional
 └── <plugin-id>.qx-plugin     # generated zip; includes generated releases.json
@@ -51,6 +53,11 @@ mkdir -p src/my-plugin
 # copy AGENTS.md template from src/weather/AGENTS.md or pomodoro-island/AGENTS.md
 # write manifest.json + index.js + README.md
 ```
+
+Large plugins should use `index.source.js` + focused `source/*.js` modules and
+register an esbuild command in `build:plugins`. Qx reads only the manifest entry
+text and imports it through a Blob URL, so the generated `index.js` must be
+self-contained and must not retain relative ESM imports.
 
 ### 2. Contract (must stay true)
 
@@ -72,7 +79,9 @@ npm run package:plugins   # zips every src/* with manifest.json → *.qx-plugin 
 
 All distributable files under `src/<id>/` are packed (including **`AGENTS.md`**).
 Build-only `*.source.js` files are excluded; their generated `index.js` must be
-rebuilt by `npm run package:plugins`. Root `release-notes.json` is the only
+rebuilt by `npm run package:plugins`. Focused `source/*.js` modules may remain in
+the archive as readable maintenance sources, but the host does not import them
+directly. Root `release-notes.json` is the only
 release-history source; packaging injects the matching latest 30 entries as
 `releases.json` inside each archive. Do not hand-create that generated file in a
 plugin source directory.
