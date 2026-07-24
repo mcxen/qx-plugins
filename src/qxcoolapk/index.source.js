@@ -265,6 +265,121 @@ function feedImages(feed) {
   return imageUrls(feed?.picArr || feed?.pic || []);
 }
 
+function responseContentType(response) {
+  return String(
+    response?.headers?.["content-type"]
+      || response?.headers?.["Content-Type"]
+      || "",
+  ).split(";")[0].trim().toLowerCase();
+}
+
+function toBase64(bytes) {
+  let binary = "";
+  for (let offset = 0; offset < bytes.length; offset += 0x8000) {
+    binary += String.fromCharCode(...bytes.subarray(offset, offset + 0x8000));
+  }
+  return btoa(binary);
+}
+
+function dataUrl(bytes, type) {
+  const encoded = toBase64(bytes);
+  return encoded.length <= 1_900_000
+    ? `data:${type || "image/jpeg"};base64,${encoded}`
+    : "";
+}
+
+function canvasBlob(canvas, type, quality) {
+  if (typeof canvas.convertToBlob === "function") {
+    return canvas.convertToBlob({ type, quality });
+  }
+  return new Promise((resolve, reject) => {
+    canvas.toBlob(
+      (blob) => blob ? resolve(blob) : reject(new Error("Image conversion failed")),
+      type,
+      quality,
+    );
+  });
+}
+
+async function decodeImage(blob) {
+  if (typeof createImageBitmap === "function") {
+    const bitmap = await createImageBitmap(blob);
+    return {
+      source: bitmap,
+      width: bitmap.width,
+      height: bitmap.height,
+      close: () => bitmap.close?.(),
+    };
+  }
+  if (
+    typeof Image !== "function"
+    || typeof URL?.createObjectURL !== "function"
+  ) {
+    return null;
+  }
+  const objectUrl = URL.createObjectURL(blob);
+  try {
+    const image = new Image();
+    image.decoding = "async";
+    await new Promise((resolve, reject) => {
+      image.onload = resolve;
+      image.onerror = () => reject(new Error("Image decoding failed"));
+      image.src = objectUrl;
+    });
+    return {
+      source: image,
+      width: image.naturalWidth,
+      height: image.naturalHeight,
+      close: () => URL.revokeObjectURL(objectUrl),
+    };
+  } catch (error) {
+    URL.revokeObjectURL(objectUrl);
+    throw error;
+  }
+}
+
+async function safeImagePreview(bytes, type, purpose) {
+  const direct = dataUrl(bytes, type);
+  const isThumbnail = purpose === "thumbnail";
+
+  let decoded;
+  try {
+    decoded = await decodeImage(new Blob([bytes], { type }));
+    if (!decoded) return direct;
+    const sourceWidth = Math.max(1, Number(decoded.width) || 1);
+    const sourceHeight = Math.max(1, Number(decoded.height) || 1);
+    const maxDimension = isThumbnail ? 360 : 1_600;
+    if (!isThumbnail && Math.max(sourceWidth, sourceHeight) <= maxDimension && direct) {
+      return direct;
+    }
+    let scale = Math.min(1, maxDimension / Math.max(sourceWidth, sourceHeight));
+    let quality = isThumbnail ? 0.72 : 0.84;
+
+    for (let attempt = 0; attempt < 5; attempt += 1) {
+      const width = Math.max(1, Math.round(sourceWidth * scale));
+      const height = Math.max(1, Math.round(sourceHeight * scale));
+      const canvas = typeof OffscreenCanvas === "function"
+        ? new OffscreenCanvas(width, height)
+        : Object.assign(document.createElement("canvas"), { width, height });
+      const drawing = canvas.getContext("2d");
+      if (!drawing) throw new Error("Image canvas is unavailable");
+      drawing.fillStyle = "#ffffff";
+      drawing.fillRect(0, 0, width, height);
+      drawing.drawImage(decoded.source, 0, 0, width, height);
+      const output = await canvasBlob(canvas, "image/jpeg", quality);
+      const preview = dataUrl(new Uint8Array(await output.arrayBuffer()), "image/jpeg");
+      if (preview) return preview;
+      scale *= 0.72;
+      quality = Math.max(0.56, quality - 0.07);
+    }
+  } catch {
+    return direct;
+  } finally {
+    decoded?.close?.();
+  }
+  return direct;
+}
+
 function formatTime(timestamp) {
   const value = Number(timestamp);
   if (!Number.isFinite(value) || value <= 0) return copy("Unknown time", "时间未知");
@@ -419,6 +534,11 @@ function createPanel(container, context) {
     retentionDays: 7,
     imageLayout: "horizontal",
     detailLoading: new Set(),
+    imageLoading: new Set(),
+    imageReloadPending: new Set(),
+    imagePreviews: new Map(),
+    imageRequests: new Map(),
+    imageFailures: new Set(),
     requestSequence: 0,
     revision: 0,
     view: null,
@@ -449,13 +569,18 @@ function createPanel(container, context) {
 
   function detailFor(feed) {
     const cached = state.cache.details[feed.id];
-    const images = imageUrls(cached?.images || feedImages(feed)).slice(0, 24).map((url) => ({
-      url,
-      alt: feedTitle(feed),
-      fit: "cover",
-      aspectRatio: "auto",
-      zoomable: true,
-    }));
+    const originals = imageUrls(cached?.images || feedImages(feed)).slice(0, 24);
+    const images = originals.map((url) => {
+      const preview = state.imagePreviews.get(`detail:${url}`)
+        || state.imagePreviews.get(`thumbnail:${url}`);
+      return preview ? {
+        url: preview,
+        alt: feedTitle(feed),
+        fit: "cover",
+        aspectRatio: "auto",
+        zoomable: true,
+      } : null;
+    }).filter(Boolean);
     const replies = Array.isArray(cached?.replies) ? cached.replies : [];
     const sections = replies.length
       ? [{
@@ -466,8 +591,13 @@ function createPanel(container, context) {
     return {
       title: feedTitle(feed),
       subtitle: `${authorName(feed)} · ${formatTime(feed.dateline)}`,
-      status: state.detailLoading.has(feed.id)
-        ? { state: "loading", label: copy("Loading full article…", "正在加载完整正文…") }
+      status: state.detailLoading.has(feed.id) || state.imageLoading.has(feed.id)
+        ? {
+            state: "loading",
+            label: state.detailLoading.has(feed.id)
+              ? copy("Loading full article…", "正在加载完整正文…")
+              : copy("Loading protected images…", "正在加载受保护图片…"),
+          }
         : cached?.error
           ? { state: "error", error: cached.error }
           : undefined,
@@ -488,6 +618,9 @@ function createPanel(container, context) {
 
   function itemFor(feed) {
     const images = feedImages(feed);
+    const thumbnail = images[0]
+      ? state.imagePreviews.get(`thumbnail:${images[0]}`)
+      : "";
     const read = Boolean(state.cache.readAt[feed.id]);
     return {
       id: feed.id,
@@ -496,7 +629,7 @@ function createPanel(container, context) {
       meta: `${authorName(feed)} · ${formatTime(feed.dateline)}`,
       badge: `${read ? "" : `${copy("Unread", "未读")} · `}${compactNumber(feed.likenum)} ♥ · ${compactNumber(feed.replynum)} ${copy("replies", "回复")}`,
       tone: read ? "neutral" : "accent",
-      image: images[0] ? { url: images[0], alt: feedTitle(feed), fit: "cover" } : undefined,
+      image: thumbnail ? { url: thumbnail, alt: feedTitle(feed), fit: "cover" } : undefined,
       detail: detailFor(feed),
       actions: [
         { id: `open:${feed.id}`, label: copy("Open on Coolapk", "在酷安中打开"), primary: true },
@@ -579,6 +712,7 @@ function createPanel(container, context) {
           }
           paint();
           void loadDetail(key);
+          void loadDetailImages(key);
         },
         onAction(id, item) {
           if (id === "refresh") void loadMode({ force: true });
@@ -608,6 +742,85 @@ function createPanel(container, context) {
     await writeCache(context, state.cache);
   }
 
+  async function proxyImage(url, purpose) {
+    const key = `${purpose}:${url}`;
+    if (state.imagePreviews.has(key)) return state.imagePreviews.get(key);
+    if (state.imageFailures.has(key)) return "";
+    if (state.imageRequests.has(key)) return state.imageRequests.get(key);
+    const request = (async () => {
+      try {
+        const response = await context.http.fetch(url, {
+          method: "GET",
+          headers: await buildRequestHeaders(),
+          timeoutMs: 120_000,
+        });
+        if (!response?.ok) throw new Error(`HTTP ${response?.status || "error"}`);
+        const type = responseContentType(response);
+        if (!type.startsWith("image/")) throw new Error("Response is not an image");
+        const bytes = new Uint8Array(await response.arrayBuffer());
+        if (!bytes.length) throw new Error("Image response was empty");
+        const preview = await safeImagePreview(bytes, type, purpose);
+        if (!preview) throw new Error("Image is too large for a safe preview");
+        state.imagePreviews.set(key, preview);
+        return preview;
+      } catch {
+        state.imageFailures.add(key);
+        return "";
+      } finally {
+        state.imageRequests.delete(key);
+      }
+    })();
+    state.imageRequests.set(key, request);
+    return request;
+  }
+
+  async function loadThumbnails(feeds) {
+    let cursor = 0;
+    const rows = feeds.slice(0, 18);
+    const worker = async () => {
+      while (!state.dead && cursor < rows.length) {
+        const feed = rows[cursor++];
+        const url = feedImages(feed)[0];
+        if (!url) continue;
+        const preview = await proxyImage(url, "thumbnail");
+        if (preview && !state.dead) paint();
+      }
+    };
+    await Promise.all(Array.from({ length: 3 }, worker));
+  }
+
+  async function loadDetailImages(id) {
+    const key = String(id || "");
+    if (!key) return;
+    if (state.imageLoading.has(key)) {
+      state.imageReloadPending.add(key);
+      return;
+    }
+    const feed = Object.values(state.cache.feeds)
+      .flatMap((entry) => entry.items || [])
+      .find((entry) => entry.id === key);
+    if (!feed) return;
+    const originals = imageUrls(state.cache.details[key]?.images || feedImages(feed)).slice(0, 24);
+    if (!originals.length) return;
+    state.imageLoading.add(key);
+    paint();
+    let cursor = 0;
+    const worker = async () => {
+      while (!state.dead && cursor < originals.length) {
+        const url = originals[cursor++];
+        const preview = await proxyImage(url, "detail");
+        if (preview && !state.dead) paint();
+      }
+    };
+    try {
+      await Promise.all(Array.from({ length: 2 }, worker));
+    } finally {
+      state.imageLoading.delete(key);
+      paint();
+      if (state.imageReloadPending.delete(key)) void loadDetailImages(key);
+    }
+  }
+
   async function loadDetail(id) {
     const key = String(id || "");
     if (!key || state.detailLoading.has(key)) return;
@@ -635,6 +848,7 @@ function createPanel(container, context) {
         savedAt: Date.now(),
       };
       await persist();
+      void loadDetailImages(key);
     } catch (error) {
       if (!state.dead) {
         state.cache.details[key] = { ...(cached || {}), error: errorMessage(error) };
@@ -673,6 +887,7 @@ function createPanel(container, context) {
       state.source = copy("Live Coolapk community", "酷安社区实时数据");
       state.selectedId = items[0]?.id || null;
       await persist();
+      void loadThumbnails(items);
     } catch (error) {
       if (!state.dead && sequence === state.requestSequence) {
         state.error = errorMessage(error);
@@ -715,6 +930,7 @@ function createPanel(container, context) {
         `已加载 ${state.cache.feeds[mode].items.length} 个帖子`,
       );
       await persist();
+      void loadThumbnails(incoming);
     } catch (error) {
       if (!state.dead) state.error = errorMessage(error);
     } finally {
@@ -737,6 +953,7 @@ function createPanel(container, context) {
     if (activeFeed().items.length) {
       state.source = copy("Cached Coolapk feed", "酷安缓存");
       paint();
+      void loadThumbnails(activeFeed().items);
     }
     await writeCache(context, state.cache);
     void loadMode();

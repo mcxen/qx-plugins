@@ -27,9 +27,25 @@ function response(data) {
   return { ok: true, status: 200, json: async () => ({ data }) };
 }
 
+function imageResponse() {
+  const bytes = Uint8Array.from([
+    137, 80, 78, 71, 13, 10, 26, 10,
+    0, 0, 0, 13, 73, 72, 68, 82,
+    0, 0, 0, 1, 0, 0, 0, 1,
+    8, 2, 0, 0, 0, 144, 119, 83, 222,
+  ]);
+  return {
+    ok: true,
+    status: 200,
+    headers: { "content-type": "image/png" },
+    arrayBuffer: async () => bytes.buffer,
+  };
+}
+
 async function mockFetch(url, options = {}) {
   assert.match(String(options.headers?.["X-App-Token"] || ""), /^v2/);
   assert.equal(options.headers?.["X-App-Id"], "com.coolapk.market");
+  if (String(url).includes("image.coolapk.com")) return imageResponse();
   if (String(url).includes("/feed/detail")) {
     const id = new URL(url).searchParams.get("id");
     return response({
@@ -103,7 +119,12 @@ plugin.panel.render(container, context);
 await waitFor(() => snapshot && !snapshot.loading && snapshot.items?.length, "feed");
 assert.equal(snapshot.items.length, 5);
 assert.ok(snapshot.items.every((item) => item.id && item.detail));
-assert.match(snapshot.items[0].image.url, /^https:\/\//);
+await waitFor(
+  () => snapshot.items.some((item) => item.image?.url?.startsWith("data:image/")),
+  "authenticated thumbnails",
+);
+assert.match(snapshot.items[0].image.url, /^data:image\/png;base64,/);
+assert.doesNotMatch(snapshot.items[0].image.url, /image\.coolapk\.com/);
 
 const selected = snapshot.items[0];
 handlers.onSelect(selected.id);
@@ -113,7 +134,14 @@ await waitFor(
 );
 const detailed = snapshot.items.find((item) => item.id === selected.id);
 assert.match(detailed.detail.body, /完整正文 9000\n\n第二段内容 & 更多文字/);
-assert.ok(detailed.detail.images.length === 1);
+await waitFor(
+  () => snapshot.items.find((item) => item.id === selected.id)?.detail?.images?.[0]?.url?.startsWith("data:image/"),
+  "authenticated article images",
+);
+const detailedWithImage = snapshot.items.find((item) => item.id === selected.id);
+assert.equal(detailedWithImage.detail.images.length, 1);
+assert.match(detailedWithImage.detail.images[0].url, /^data:image\/png;base64,/);
+assert.doesNotMatch(detailedWithImage.detail.images[0].url, /image\.coolapk\.com/);
 assert.ok(detailed.detail.sections.some((section) => /第一条回复/.test(section.body || "")));
 assert.doesNotMatch(detailed.badge, /未读/);
 

@@ -143,11 +143,11 @@
     {
       "id": "qxcoolapk",
       "name": "QxCoolapk 酷安",
-      "version": "1.0.0",
+      "version": "1.0.1",
       "description": "Browse Coolapk hot, news, and digital feeds and read complete posts, images, and replies in Qx.",
       "download_url": "https://raw.githubusercontent.com/mcxen/qx-plugins/main/qxcoolapk.qx-plugin",
-      "size_bytes": 46245,
-      "checksum_sha256": "220384483291da75a277aa09d9ee8367e78376564f5ef04e38debb8c5494d6ab",
+      "size_bytes": 50686,
+      "checksum_sha256": "0b08d5853651e44493c8d37f68daa1ebecba2a2be9284e0e410fff55484c69ea",
       "required_permissions": [
         "http",
         "open-url"
@@ -156,6 +156,14 @@
       "author": "Qx",
       "min_app_version": "0.6.19",
       "releases": [
+        {
+          "version": "1.0.1",
+          "published_at": "2026-07-24",
+          "notes_localizations": {
+            "en": "Fixed Coolapk image HTTP 567 failures with authenticated media fetching, background thumbnails, and bounded large-image/GIF previews.",
+            "zh-CN": "修复酷安图片 HTTP 567：改用鉴权媒体请求，并新增后台缩略图及受控的大图/GIF 预览。"
+          }
+        },
         {
           "version": "1.0.0",
           "published_at": "2026-07-24",

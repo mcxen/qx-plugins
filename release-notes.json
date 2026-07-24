@@ -121,6 +121,14 @@
     ],
     "qxcoolapk": [
       {
+        "version": "1.0.1",
+        "published_at": "2026-07-24",
+        "notes_localizations": {
+          "en": "Fixed Coolapk image HTTP 567 failures with authenticated media fetching, background thumbnails, and bounded large-image/GIF previews.",
+          "zh-CN": "修复酷安图片 HTTP 567：改用鉴权媒体请求，并新增后台缩略图及受控的大图/GIF 预览。"
+        }
+      },
+      {
         "version": "1.0.0",
         "published_at": "2026-07-24",
         "notes_localizations": {
