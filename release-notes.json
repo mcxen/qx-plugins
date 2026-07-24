@@ -121,6 +121,14 @@
     ],
     "qxcoolapk": [
       {
+        "version": "1.1.1",
+        "published_at": "2026-07-24",
+        "notes_localizations": {
+          "en": "Dynamic-post cards now load every image returned by Coolapk instead of truncating the card gallery.",
+          "zh-CN": "动态卡片现在加载酷安返回的全部图片，不再截断卡片图集。"
+        }
+      },
+      {
         "version": "1.1.0",
         "published_at": "2026-07-24",
         "notes_localizations": {

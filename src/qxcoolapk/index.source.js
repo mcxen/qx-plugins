@@ -630,7 +630,7 @@ function createPanel(container, context) {
     const article = isArticleFeed(feed);
     const cardImages = article
       ? []
-      : images.slice(0, 6).map((url) => {
+      : images.map((url) => {
           const preview = state.imagePreviews.get(`thumbnail:${url}`);
           return preview ? { url: preview, alt: feedTitle(feed), fit: "cover" } : null;
         }).filter(Boolean);
@@ -792,7 +792,7 @@ function createPanel(container, context) {
     const jobs = feeds
       .slice(0, 18)
       .filter((feed) => !isArticleFeed(feed))
-      .flatMap((feed) => feedImages(feed).slice(0, 6));
+      .flatMap((feed) => feedImages(feed));
     const worker = async () => {
       while (!state.dead && cursor < jobs.length) {
         const url = jobs[cursor++];

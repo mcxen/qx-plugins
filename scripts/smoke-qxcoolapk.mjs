@@ -23,7 +23,10 @@ const feeds = Array.from({ length: 6 }, (_, index) => ({
   dateline: 1_784_804_927 + index,
   likenum: index + 2,
   replynum: 2,
-  picArr: [`http://image.coolapk.com/feed/${index + 1}.jpg`],
+  picArr: index === 1
+    ? Array.from({ length: 4 }, (_, imageIndex) =>
+        `http://image.coolapk.com/feed/${index + 1}-${imageIndex + 1}.jpg`)
+    : [`http://image.coolapk.com/feed/${index + 1}.jpg`],
   userInfo: { uid: 100 + index, username: `作者-${index + 1}` },
   deviceTitle: "Qx Test Device",
   feedType: index === 0 ? "feedArticle" : "feed",
@@ -135,6 +138,7 @@ await waitFor(
   "authenticated dynamic cards",
 );
 assert.equal(snapshot.items[0].images, undefined);
+assert.equal(snapshot.items[1].images.length, 4);
 assert.match(snapshot.items[1].images[0].url, /^data:image\/png;base64,/);
 assert.doesNotMatch(snapshot.items[1].images[0].url, /image\.coolapk\.com/);
 

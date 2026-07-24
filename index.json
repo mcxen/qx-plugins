@@ -143,11 +143,11 @@
     {
       "id": "qxcoolapk",
       "name": "QxCoolapk 酷安",
-      "version": "1.1.0",
+      "version": "1.1.1",
       "description": "Browse Coolapk hot, news, and digital feeds and read complete posts, images, and replies in Qx.",
       "download_url": "https://raw.githubusercontent.com/mcxen/qx-plugins/main/qxcoolapk.qx-plugin",
-      "size_bytes": 52793,
-      "checksum_sha256": "662798bd86e1a3c1d2edebafb06f262f45fce2f3380fe64b6dc36ac6cd5f9e70",
+      "size_bytes": 53177,
+      "checksum_sha256": "978789df7eaa9c9aa27717d7468a99c06ca0a860eadcb3d24e0a06d8d273ebc3",
       "required_permissions": [
         "http",
         "open-url"
@@ -156,6 +156,14 @@
       "author": "Qx",
       "min_app_version": "0.6.19",
       "releases": [
+        {
+          "version": "1.1.1",
+          "published_at": "2026-07-24",
+          "notes_localizations": {
+            "en": "Dynamic-post cards now load every image returned by Coolapk instead of truncating the card gallery.",
+            "zh-CN": "动态卡片现在加载酷安返回的全部图片，不再截断卡片图集。"
+          }
+        },
         {
           "version": "1.1.0",
           "published_at": "2026-07-24",

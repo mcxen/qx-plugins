@@ -17,7 +17,8 @@
 4. Load the complete article only after selection and update the same item id.
 5. Classify `feedArticle` / `is_html_article=1` / `type=12` as articles. Publish
    their media with `detail.mediaPlacement="after-body"` and never as list cards.
-   Publish non-article feed media through `item.images` compact cards.
+   Publish every non-article feed image through scrollable `item.images` compact
+   cards; do not impose a plugin-side image-count limit.
 6. Fetch Coolapk CDN images with the same anonymous authenticated headers as API
    requests. Never publish direct `image.coolapk.com` URLs to Workbench.
 7. Publish bounded session-only image previews through item images and
