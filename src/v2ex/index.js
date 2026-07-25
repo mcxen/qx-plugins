@@ -12,6 +12,21 @@ const CACHE_PREFIX = "v2ex.cache.";
 const DEFAULT_TTL_MS = 3 * 60 * 1000;
 const STALE_MS = 60 * 60 * 1000;
 
+var qxLocale = "en";
+var stopLocale = null;
+
+function setLocale(context) {
+  stopLocale?.();
+  qxLocale = context?.locale?.current || "en";
+  stopLocale = context?.locale?.onChange?.(({ current }) => {
+    qxLocale = current || "en";
+  }) || null;
+}
+
+function text(en, zh) {
+  return qxLocale === "zh-CN" ? zh : en;
+}
+
 function escapeHtml(value) {
   return String(value ?? "")
     .replaceAll("&", "&amp;")
@@ -31,16 +46,16 @@ function formatTime(ts) {
   const d = new Date(ts * 1000);
   const diff = Date.now() - d.getTime();
   const hours = Math.floor(diff / 3600000);
-  if (hours < 1) return "just now";
-  if (hours < 24) return `${hours}h ago`;
+  if (hours < 1) return text("just now", "刚刚");
+  if (hours < 24) return text(`${hours}h ago`, `${hours}小时前`);
   const days = Math.floor(hours / 24);
-  if (days < 30) return `${days}d ago`;
-  return d.toLocaleDateString();
+  if (days < 30) return text(`${days}d ago`, `${days}天前`);
+  return d.toLocaleDateString(qxLocale);
 }
 
 function formatDate(ts) {
   if (!ts) return "-";
-  return new Date(ts * 1000).toLocaleString(undefined, {
+  return new Date(ts * 1000).toLocaleString(qxLocale, {
     year: "numeric",
     month: "short",
     day: "numeric",
@@ -167,9 +182,9 @@ async function writeCache(context, key, data) {
 function ageLabel(savedAt) {
   if (!savedAt) return "";
   const sec = Math.max(0, Math.floor((Date.now() - savedAt) / 1000));
-  if (sec < 60) return `${sec}s ago`;
-  if (sec < 3600) return `${Math.floor(sec / 60)}m ago`;
-  return `${Math.floor(sec / 3600)}h ago`;
+  if (sec < 60) return text(`${sec}s ago`, `${sec}秒前`);
+  if (sec < 3600) return text(`${Math.floor(sec / 60)}m ago`, `${Math.floor(sec / 60)}分钟前`);
+  return text(`${Math.floor(sec / 3600)}h ago`, `${Math.floor(sec / 3600)}小时前`);
 }
 
 /** Host invoke first (shared disk cache), then public HTTP. */
@@ -246,6 +261,7 @@ async function loadWithCache(context, key, loader, { force = false, ttlMs = DEFA
 }
 
 function renderTopicsPanel(container, context, initialMode = "latest") {
+  setLocale(context);
   let topics = [];
   let filtered = [];
   let selected = 0;
@@ -267,31 +283,31 @@ function renderTopicsPanel(container, context, initialMode = "latest") {
   const search = document.createElement("input");
   search.type = "text";
   search.className = "v2ex-search";
-  search.placeholder = "Search loaded topics…";
+  search.placeholder = text("Search loaded topics…", "搜索已加载主题…");
   topbar.appendChild(search);
 
   const tabLatest = document.createElement("button");
   tabLatest.className = "v2ex-tab" + (mode === "latest" ? " active" : "");
-  tabLatest.textContent = "Latest";
+  tabLatest.textContent = text("Latest", "最新");
   tabLatest.onclick = () => void switchMode("latest");
   topbar.appendChild(tabLatest);
 
   const tabHot = document.createElement("button");
   tabHot.className = "v2ex-tab" + (mode === "hot" ? " active" : "");
-  tabHot.textContent = "Hot";
+  tabHot.textContent = text("Hot", "热门");
   tabHot.onclick = () => void switchMode("hot");
   topbar.appendChild(tabHot);
 
   const tabNodes = document.createElement("button");
   tabNodes.className = "v2ex-tab";
-  tabNodes.textContent = "Nodes";
+  tabNodes.textContent = text("Nodes", "节点");
   tabNodes.onclick = () => void switchMode("nodes");
   topbar.appendChild(tabNodes);
 
   const refreshBtn = document.createElement("button");
   refreshBtn.className = "v2ex-refresh";
-  refreshBtn.textContent = "Refresh";
-  refreshBtn.title = "Force refresh (bypass cache)";
+  refreshBtn.textContent = text("Refresh", "刷新");
+  refreshBtn.title = text("Force refresh (bypass cache)", "强制刷新（绕过缓存）");
   refreshBtn.onclick = () => void reload({ force: true });
   topbar.appendChild(refreshBtn);
 
@@ -299,7 +315,7 @@ function renderTopicsPanel(container, context, initialMode = "latest") {
 
   const status = document.createElement("div");
   status.className = "v2ex-status";
-  status.textContent = "Loading…";
+  status.textContent = text("Loading…", "加载中…");
   root.appendChild(status);
 
   const body = document.createElement("div");
@@ -327,7 +343,7 @@ function renderTopicsPanel(container, context, initialMode = "latest") {
       const nodes = await getNodes(context);
       currentNode = nodes[0] || "";
       if (!currentNode) {
-        setStatus("No nodes configured. Set preference «Nodes».", "error");
+        setStatus(text("No nodes configured. Set preference «Nodes».", "未配置节点，请在插件偏好设置中填写“节点”。"), "error");
         topics = [];
         applyFilter();
         return;
@@ -343,15 +359,15 @@ function renderTopicsPanel(container, context, initialMode = "latest") {
 
   async function reload({ force = false } = {}) {
     if (destroyed) return;
-    if (!force && topics.length === 0) setStatus("Loading…");
-    else if (force) setStatus("Refreshing…");
+    if (!force && topics.length === 0) setStatus(text("Loading…", "加载中…"));
+    else if (force) setStatus(text("Refreshing…", "刷新中…"));
 
     try {
       ttlMs = await getTtlMs(context);
       if (nodeView) {
         const token = await getToken(context);
         if (!token) {
-          setStatus("Nodes require an Access Token in plugin preferences.", "error");
+          setStatus(text("Nodes require an Access Token in plugin preferences.", "节点模式需要在插件偏好设置中填写访问令牌。"), "error");
           topics = [];
           applyFilter();
           return;
@@ -374,11 +390,11 @@ function renderTopicsPanel(container, context, initialMode = "latest") {
         applyFilter();
         setStatus(
           result.fromCache
-            ? `${filtered.length} in ${currentNode} · cached ${ageLabel(result.savedAt)}${result.refreshing ? " · updating…" : ""}`
-            : `${filtered.length} in ${currentNode}`,
+            ? `${filtered.length} ${text("in", "条，位于")} ${currentNode} · ${text("cached", "已缓存")} ${ageLabel(result.savedAt)}${result.refreshing ? ` · ${text("updating…", "更新中…")}` : ""}`
+            : `${filtered.length} ${text("in", "条，位于")} ${currentNode}`,
           result.fromCache && result.refreshing ? "stale" : "",
         );
-        if (result.error) setStatus(`${filtered.length} topics · offline cache`, "stale");
+        if (result.error) setStatus(`${filtered.length} ${text("topics · offline cache", "个主题 · 离线缓存")}`, "stale");
         return;
       }
 
@@ -392,12 +408,12 @@ function renderTopicsPanel(container, context, initialMode = "latest") {
       if (destroyed) return;
       topics = result.data;
       applyFilter();
-      const base = `${filtered.length} topics · ${mode}`;
+      const base = `${filtered.length} ${text("topics", "个主题")} · ${mode === "hot" ? text("hot", "热门") : text("latest", "最新")}`;
       if (result.error) {
-        setStatus(`${base} · offline cache (${ageLabel(result.savedAt)})`, "stale");
+        setStatus(`${base} · ${text("offline cache", "离线缓存")} (${ageLabel(result.savedAt)})`, "stale");
       } else if (result.fromCache) {
         setStatus(
-          `${base} · cached ${ageLabel(result.savedAt)}${result.refreshing ? " · updating…" : ""}`,
+          `${base} · ${text("cached", "已缓存")} ${ageLabel(result.savedAt)}${result.refreshing ? ` · ${text("updating…", "更新中…")}` : ""}`,
           result.refreshing ? "stale" : "",
         );
       } else {
@@ -405,7 +421,7 @@ function renderTopicsPanel(container, context, initialMode = "latest") {
       }
     } catch (err) {
       if (destroyed) return;
-      setStatus("Error: " + String(err), "error");
+      setStatus(`${text("Error: ", "错误：")}${String(err)}`, "error");
       if (topics.length === 0) {
         topics = [];
         applyFilter();
@@ -436,7 +452,7 @@ function renderTopicsPanel(container, context, initialMode = "latest") {
     if (filtered.length === 0) {
       const empty = document.createElement("div");
       empty.className = "v2ex-empty";
-      empty.textContent = query ? "No matching topics" : "No topics loaded";
+      empty.textContent = query ? text("No matching topics", "没有匹配的主题") : text("No topics loaded", "暂无主题");
       body.appendChild(empty);
       return;
     }
@@ -522,7 +538,7 @@ function renderTopicsPanel(container, context, initialMode = "latest") {
 
     const back = document.createElement("button");
     back.className = "v2ex-btn";
-    back.textContent = "← Back";
+    back.textContent = text("← Back", "← 返回");
     back.onclick = () => {
       viewing = null;
       replies = [];
@@ -541,20 +557,20 @@ function renderTopicsPanel(container, context, initialMode = "latest") {
       <span>${escapeHtml(topic.node || "")}</span>
       <span>${escapeHtml(topic.author || "")}</span>
       <span>${escapeHtml(formatTime(topic.last_modified || topic.created))}</span>
-      <span>${Number(topic.replies) || 0} replies</span>
+      <span>${Number(topic.replies) || 0} ${text("replies", "条回复")}</span>
     `;
     wrap.appendChild(meta);
 
     const content = document.createElement("div");
     content.className = "v2ex-detail-body";
-    content.innerHTML = topic.content || "<em>(no content)</em>";
+    content.innerHTML = topic.content || `<em>${text("(no content)", "（无内容）")}</em>`;
     wrap.appendChild(content);
 
     const actions = document.createElement("div");
     actions.className = "v2ex-detail-actions";
     const open = document.createElement("button");
     open.className = "v2ex-btn primary";
-    open.textContent = "Open in Browser";
+    open.textContent = text("Open in Browser", "在浏览器中打开");
     open.onclick = () => context.openUrl(topic.url);
     actions.appendChild(open);
     wrap.appendChild(actions);
@@ -564,7 +580,7 @@ function renderTopicsPanel(container, context, initialMode = "latest") {
       sec.className = "v2ex-section";
       const st = document.createElement("div");
       st.className = "v2ex-section-title";
-      st.textContent = `Replies (${replies.length})`;
+      st.textContent = `${text("Replies", "回复")} (${replies.length})`;
       sec.appendChild(st);
       replies.forEach((r) => {
         const row = document.createElement("div");
@@ -580,7 +596,7 @@ function renderTopicsPanel(container, context, initialMode = "latest") {
       const loading = document.createElement("div");
       loading.className = "v2ex-section-title";
       loading.style.marginTop = "16px";
-      loading.textContent = "Loading replies…";
+      loading.textContent = text("Loading replies…", "正在加载回复…");
       wrap.appendChild(loading);
     }
 
@@ -629,16 +645,17 @@ function renderTopicsPanel(container, context, initialMode = "latest") {
 }
 
 function renderNotificationsPanel(container, context) {
+  setLocale(context);
   container.innerHTML = STYLES + `<div class="v2ex-root"><div class="v2ex-body"></div></div>`;
   const body = container.querySelector(".v2ex-body");
 
   (async () => {
     const token = await getToken(context);
     if (!token) {
-      body.innerHTML = `<div class="v2ex-empty">No token configured.<br>Settings → Extensions → V2EX → Access Token<br><br><a href="https://v2ex.com/settings/tokens" style="color:var(--qx-accent)">Get Token →</a></div>`;
+      body.innerHTML = `<div class="v2ex-empty">${text("No token configured.", "未配置令牌。")}<br>${text("Settings → Extensions → V2EX → Access Token", "设置 → 扩展 → V2EX → 访问令牌")}<br><br><a href="https://v2ex.com/settings/tokens" style="color:var(--qx-accent)">${text("Get Token →", "获取令牌 →")}</a></div>`;
       return;
     }
-    body.innerHTML = `<div class="v2ex-empty">Loading notifications…</div>`;
+    body.innerHTML = `<div class="v2ex-empty">${text("Loading notifications…", "正在加载通知…")}</div>`;
     try {
       const result = await loadWithCache(
         context,
@@ -651,7 +668,7 @@ function renderNotificationsPanel(container, context) {
       );
       const notifications = result.data;
       if (!notifications.length) {
-        body.innerHTML = `<div class="v2ex-empty">No notifications.</div>`;
+        body.innerHTML = `<div class="v2ex-empty">${text("No notifications.", "暂无通知。")}</div>`;
         return;
       }
       body.innerHTML = "";
@@ -659,7 +676,7 @@ function renderNotificationsPanel(container, context) {
       section.className = "v2ex-section";
       const title = document.createElement("div");
       title.className = "v2ex-section-title";
-      title.textContent = `Notifications (${notifications.length})${result.fromCache ? " · cached" : ""}`;
+      title.textContent = `${text("Notifications", "通知")} (${notifications.length})${result.fromCache ? ` · ${text("cached", "已缓存")}` : ""}`;
       section.appendChild(title);
 
       notifications.forEach((n) => {
@@ -674,39 +691,40 @@ function renderNotificationsPanel(container, context) {
       });
       body.appendChild(section);
     } catch (err) {
-      body.innerHTML = `<div class="v2ex-error">Failed: ${escapeHtml(String(err))}</div>`;
+      body.innerHTML = `<div class="v2ex-error">${text("Failed: ", "失败：")}${escapeHtml(String(err))}</div>`;
     }
   })();
 }
 
 function renderTokenInfoPanel(container, context) {
+  setLocale(context);
   container.innerHTML = STYLES + `<div class="v2ex-root"><div class="v2ex-body"></div></div>`;
   const body = container.querySelector(".v2ex-body");
 
   (async () => {
     const token = await getToken(context);
     if (!token) {
-      body.innerHTML = `<div class="v2ex-empty">No token configured.<br>Settings → Extensions → V2EX</div>`;
+      body.innerHTML = `<div class="v2ex-empty">${text("No token configured.", "未配置令牌。")}<br>${text("Settings → Extensions → V2EX", "设置 → 扩展 → V2EX")}</div>`;
       return;
     }
-    body.innerHTML = `<div class="v2ex-empty">Checking token…</div>`;
+    body.innerHTML = `<div class="v2ex-empty">${text("Checking token…", "正在检查令牌…")}</div>`;
     try {
       const info = await context.invoke("v2ex_fetch_token_info", { token });
       body.innerHTML = "";
       const card = document.createElement("div");
       card.className = "v2ex-token-card";
       card.innerHTML = `
-        <div class="v2ex-token-row"><span class="v2ex-token-label">Status</span><span class="v2ex-token-badge">Valid</span></div>
-        <div class="v2ex-token-row"><span class="v2ex-token-label">Scope</span><span class="v2ex-token-value">${escapeHtml(info.scope || "-")}</span></div>
-        <div class="v2ex-token-row"><span class="v2ex-token-label">Total used</span><span class="v2ex-token-value">${info.total_used} times</span></div>
-        <div class="v2ex-token-row"><span class="v2ex-token-label">Last used</span><span class="v2ex-token-value">${formatDate(info.last_used)}</span></div>
-        <div class="v2ex-token-row"><span class="v2ex-token-label">Created</span><span class="v2ex-token-value">${formatDate(info.created)}</span></div>
-        <div class="v2ex-token-row"><span class="v2ex-token-label">Expires</span><span class="v2ex-token-value">${formatDate(info.created + info.expiration)}</span></div>
-        <div class="v2ex-token-row"><span class="v2ex-token-label">Good for</span><span class="v2ex-token-value">${info.good_for_days} days</span></div>
+        <div class="v2ex-token-row"><span class="v2ex-token-label">${text("Status", "状态")}</span><span class="v2ex-token-badge">${text("Valid", "有效")}</span></div>
+        <div class="v2ex-token-row"><span class="v2ex-token-label">${text("Scope", "权限范围")}</span><span class="v2ex-token-value">${escapeHtml(info.scope || "-")}</span></div>
+        <div class="v2ex-token-row"><span class="v2ex-token-label">${text("Total used", "使用次数")}</span><span class="v2ex-token-value">${info.total_used} ${text("times", "次")}</span></div>
+        <div class="v2ex-token-row"><span class="v2ex-token-label">${text("Last used", "上次使用")}</span><span class="v2ex-token-value">${formatDate(info.last_used)}</span></div>
+        <div class="v2ex-token-row"><span class="v2ex-token-label">${text("Created", "创建时间")}</span><span class="v2ex-token-value">${formatDate(info.created)}</span></div>
+        <div class="v2ex-token-row"><span class="v2ex-token-label">${text("Expires", "过期时间")}</span><span class="v2ex-token-value">${formatDate(info.created + info.expiration)}</span></div>
+        <div class="v2ex-token-row"><span class="v2ex-token-label">${text("Good for", "有效期")}</span><span class="v2ex-token-value">${info.good_for_days} ${text("days", "天")}</span></div>
       `;
       body.appendChild(card);
     } catch (err) {
-      body.innerHTML = `<div class="v2ex-error">Token check failed: ${escapeHtml(String(err))}</div>`;
+      body.innerHTML = `<div class="v2ex-error">${text("Token check failed: ", "令牌检查失败：")}${escapeHtml(String(err))}</div>`;
     }
   })();
 }
@@ -719,37 +737,42 @@ export default {
       name: "open-v2ex",
       title: "Open V2EX",
       async run(context) {
-        context.showToast("Open the V2EX panel from Extensions or search results");
+        setLocale(context);
+        context.showToast(text("Open the V2EX panel from Extensions or search results", "请从扩展或搜索结果打开 V2EX 面板"));
       },
     },
     {
       name: "view-hot",
       title: "V2EX Hot",
       async run(context) {
-        context.showToast("Open V2EX panel → Hot");
+        setLocale(context);
+        context.showToast(text("Open V2EX panel → Hot", "打开 V2EX 面板 → 热门"));
       },
     },
     {
       name: "view-latest",
       title: "V2EX Latest",
       async run(context) {
-        context.showToast("Open V2EX panel → Latest");
+        setLocale(context);
+        context.showToast(text("Open V2EX panel → Latest", "打开 V2EX 面板 → 最新"));
       },
     },
     {
       name: "view-notifications",
       title: "View Notifications",
       async run(context) {
+        setLocale(context);
         const token = await getToken(context);
         if (!token) {
-          context.showToast("No token — set Access Token in V2EX plugin preferences");
+          context.showToast(text("No token — set Access Token in V2EX plugin preferences", "未配置令牌，请在 V2EX 插件偏好设置中填写访问令牌"));
           return;
         }
         try {
           const rows = await context.invoke("v2ex_fetch_notifications", { token });
-          context.showToast(`${Array.isArray(rows) ? rows.length : 0} notification(s)`);
+          const count = Array.isArray(rows) ? rows.length : 0;
+          context.showToast(text(`${count} notification(s)`, `${count} 条通知`));
         } catch (err) {
-          context.showToast("Failed: " + String(err).slice(0, 100));
+          context.showToast(`${text("Failed: ", "失败：")}${String(err).slice(0, 100)}`);
         }
       },
     },
@@ -757,16 +780,17 @@ export default {
       name: "view-token",
       title: "View Token Info",
       async run(context) {
+        setLocale(context);
         const token = await getToken(context);
         if (!token) {
-          context.showToast("No token configured");
+          context.showToast(text("No token configured", "未配置令牌"));
           return;
         }
         try {
           const info = await context.invoke("v2ex_fetch_token_info", { token });
-          context.showToast(`Token valid · ${info.total_used} uses · ${info.scope}`);
+          context.showToast(text(`Token valid · ${info.total_used} uses · ${info.scope}`, `令牌有效 · ${info.total_used} 次使用 · ${info.scope}`));
         } catch (err) {
-          context.showToast("Failed: " + String(err).slice(0, 100));
+          context.showToast(`${text("Failed: ", "失败：")}${String(err).slice(0, 100)}`);
         }
       },
     },

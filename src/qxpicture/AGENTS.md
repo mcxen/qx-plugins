@@ -11,8 +11,9 @@ Qx Workbench List/detail plugin for random image APIs.
    (`~/Pictures/Qxpicture` on both platforms via `mediaScratchDirectory`).
 5. File and clipboard operations must keep their exact `invoke:` permissions.
 6. `panel.render` must return before network work completes.
-7. Image previews are restored from `qxpicture.image-cache.v1` on open;
-   network fetch only runs on explicit **Refresh**.
+7. Image previews are restored from `qxpicture.image-cache.v1` on open.
+   An empty cache triggers one bounded-concurrency batch warm-up; later network
+   fetches run only from explicit **Refresh** / **Refresh All** actions.
 8. Download directory defaults to `~/Downloads` and is editable under Settings → General.
 9. Keep `mountWorkbench()` controller updates revisioned. Preserve cached media
    while item/detail `status` reports asynchronous refresh state.
@@ -26,5 +27,6 @@ Qx Workbench List/detail plugin for random image APIs.
 
 - `node --check index.js`
 - Validate `manifest.json`
-- Test: open shows cache, Refresh fetches, click image lightbox, Save uses download dir,
-  Set Wallpaper writes local file then `setWallpaper`.
+- Test: an empty-cache open warms every API, cached reopen stays offline, Refresh
+  All tolerates per-source failures, Refresh fetches, click image lightbox, Save
+  uses download dir, Set Wallpaper writes local file then `setWallpaper`.

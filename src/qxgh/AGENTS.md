@@ -25,7 +25,9 @@ Do **not** call `api.github.com`. Data sources only:
 
 List items provide structured `detail` and `actions`; Workbench never accepts HTML.
 The hottest active run is projected through the Workbench `island` field so Qx
-chooses docked vs floating placement from user settings.
+chooses docked vs floating placement from user settings. It is also published to
+the OS-native `context.tray` submenu as non-clickable status rows (percentage /
+elapsed time) plus refresh actions; do not try to inject CSS into a system menu.
 The Workbench Actions list must expose a Show/Hide Island toggle. A user dismissal
 must call `context.island.dismiss()` and suppress automatic panel polling from
 recreating the session until the user explicitly shows it again.
@@ -42,7 +44,7 @@ src/qxgh/
 
 ## Permissions
 
-`http`, `open-url`, `notifications`, `island`
+`http`, `open-url`, `notifications`, `island`, `tray`
 
 ## Checklist
 

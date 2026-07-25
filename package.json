@@ -1,7 +1,7 @@
 {
   "name": "qx-plugins",
   "private": true,
-  "version": "1.4.2",
+  "version": "1.5.0",
   "type": "module",
   "scripts": {
     "convert:raycast": "node scripts/convert-raycast-extension.mjs",
@@ -10,11 +10,14 @@
     "build:qxweibo": "esbuild src/qxweibo/index.source.js --bundle --format=esm --platform=browser --target=es2022 --minify --legal-comments=inline --outfile=src/qxweibo/index.js",
     "build:plugins": "npm run build:qxcoolapk && npm run build:qxweibo",
     "package:plugins": "npm run build:plugins && node scripts/package-plugins.mjs",
+    "package:one": "node scripts/package-plugins.mjs",
     "smoke:qxheihe": "node scripts/smoke-qxheihe.mjs",
-    "smoke:qxcoolapk": "node scripts/smoke-qxcoolapk.mjs",
+    "smoke:qxcoolapk": "npm run build:qxcoolapk && node scripts/smoke-qxcoolapk.mjs",
     "smoke:qxweibo": "npm run build:qxweibo && node scripts/smoke-qxweibo.mjs",
     "smoke:qxgh": "node scripts/smoke-qxgh.mjs",
-    "smoke:qxpicture": "node scripts/smoke-qxpicture.mjs"
+    "smoke:qxpicture": "node scripts/smoke-qxpicture.mjs",
+    "smoke:bing-wallpaper": "node scripts/smoke-qx-bing-wallpaper.mjs",
+    "smoke:sysinfo": "node scripts/smoke-sysinfo.mjs"
   },
   "dependencies": {
     "bcryptjs": "^3.0.2",

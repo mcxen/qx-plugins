@@ -5,6 +5,7 @@ import {
   normalizePost,
   parseCookies,
   parseIds,
+  setLocale,
 } from "./source/weibo.js";
 
 const panels = new WeakMap();
@@ -15,6 +16,7 @@ const plugin = {
       name: "open-qxweibo",
       title: "打开 QxWeibo 微博",
       async run(context) {
+        setLocale(context);
         await context.showToast(copy(
           "Open QxWeibo from Extensions or search.",
           "请从扩展模块或搜索中打开 QxWeibo。",
@@ -35,5 +37,5 @@ const plugin = {
   },
 };
 
-export { cleanText, normalizePost, parseCookies, parseIds };
+export { cleanText, normalizePost, parseCookies, parseIds, setLocale };
 export default plugin;

@@ -7,6 +7,7 @@ const CONFIG_SCHEMA_VERSION = 2;
 const PLUGIN_FILES_CACHE = "/qx-plugin-files/qxpicture/images";
 const GENERAL_SETTINGS_ID = "__general__";
 const NEW_SOURCE_ID = "__new_source__";
+const REFRESH_ALL_CONCURRENCY = 3;
 
 const MWM_TYPE_OPTIONS = [
   { label: "PC", value: "pc" },
@@ -129,8 +130,15 @@ const DEFAULT_SOURCES = [
   }
 ];
 
+var qxLocale = "en";
+var stopLocale = null;
+function setLocale(context) {
+  stopLocale?.();
+  qxLocale = context?.locale?.current || "en";
+  stopLocale = context?.locale?.onChange?.(({ current }) => { qxLocale = current; }) || null;
+}
 function isZh() {
-  return /^(zh-CN|zh-Hans|zh-SG|zh-MY|zh$)/i.test(String(navigator.language || ""));
+  return qxLocale === "zh-CN";
 }
 
 function text(en, zh) {
@@ -481,6 +489,7 @@ async function writeImageCache(context, cache) {
 }
 
 function createPanel(context, container) {
+  setLocale(context);
   const state = {
     config: defaultConfig(),
     tab: "browse",
@@ -492,6 +501,7 @@ function createPanel(context, container) {
     loadingIds: new Set(),
     sourceErrors: {},
     busy: null,
+    batchProgress: null,
     error: null,
     dead: false,
     generation: 0,
@@ -987,7 +997,8 @@ function createPanel(context, container) {
       selectedId: state.selectedId,
       items: browse ? browseItems() : settingsItems(),
       actions: browse ? [
-        { id: "refresh", label: text("Refresh Current Image", "刷新当前图片"), primary: true, disabled: Boolean(state.busy) || !state.selectedId }
+        { id: "refresh", label: text("Refresh Current Image", "刷新当前图片"), primary: true, disabled: Boolean(state.busy) || !state.selectedId },
+        { id: "refresh-all", label: text("Refresh All API Images", "刷新全部 API 壁纸"), disabled: Boolean(state.busy) || !state.config.sources.length }
       ] : [
         {
           id: "add-source",
@@ -1000,7 +1011,15 @@ function createPanel(context, container) {
         { id: "reset-sources", label: text("Restore Default APIs", "恢复默认 API") }
       ],
       island: state.busy
-        ? { primary: "Qxpicture", secondary: state.busy, activity: "spinner", tone: "neutral" }
+        ? {
+            primary: "Qxpicture",
+            secondary: state.busy,
+            activity: "spinner",
+            progress: state.batchProgress?.total
+              ? Math.round((state.batchProgress.completed / state.batchProgress.total) * 100)
+              : undefined,
+            tone: "neutral"
+          }
         : null
     };
     if (state.view) {
@@ -1034,6 +1053,7 @@ function createPanel(context, container) {
   };
 
   const refreshSource = async (id, { cacheBust = true } = {}) => {
+    if (state.busy) return;
     const source = sourceById(id);
     if (!source || state.loadingIds.has(source.id)) return;
     const generation = state.generation;
@@ -1053,6 +1073,85 @@ function createPanel(context, container) {
     } finally {
       state.loadingIds.delete(source.id);
       paint();
+    }
+  };
+
+  const refreshAllSources = async ({ cacheBust = true, notify = true } = {}) => {
+    if (state.busy) return;
+    const sources = [...state.config.sources];
+    const total = sources.length;
+    if (!total) return;
+
+    const generation = state.generation;
+    const queue = [...sources];
+    const failures = [];
+    state.batchProgress = { completed: 0, total, failed: 0 };
+    state.busy = text(`Refreshing all images 0/${total}…`, `正在刷新全部壁纸 0/${total}…`);
+    setError(null);
+    paint();
+
+    const worker = async () => {
+      while (!state.dead && generation === state.generation) {
+        const source = queue.shift();
+        if (!source) return;
+        state.loadingIds.add(source.id);
+        delete state.sourceErrors[source.id];
+        paint();
+        try {
+          const download = await resolveDownload(context, source, { cacheBust });
+          if (state.dead || generation !== state.generation) return;
+          rememberDownload(source.id, download);
+        } catch (error) {
+          if (!state.dead && generation === state.generation) {
+            const message = String(error?.message || error);
+            failures.push({ id: source.id, message });
+            state.sourceErrors[source.id] = message;
+          }
+        } finally {
+          state.loadingIds.delete(source.id);
+          if (!state.dead && generation === state.generation) {
+            state.batchProgress.completed += 1;
+            state.batchProgress.failed = failures.length;
+            state.busy = text(
+              `Refreshing all images ${state.batchProgress.completed}/${total}…`,
+              `正在刷新全部壁纸 ${state.batchProgress.completed}/${total}…`
+            );
+            paint();
+          }
+        }
+      }
+    };
+
+    try {
+      await Promise.all(
+        Array.from(
+          { length: Math.min(REFRESH_ALL_CONCURRENCY, total) },
+          () => worker()
+        )
+      );
+      await state.cacheWriteQueue.catch(() => {});
+      if (state.dead || generation !== state.generation) return;
+      if (failures.length) {
+        setError(text(
+          `${total - failures.length}/${total} APIs refreshed; ${failures.length} failed.`,
+          `${total - failures.length}/${total} 个 API 刷新成功，${failures.length} 个失败。`
+        ));
+      } else {
+        setError(null);
+      }
+      if (notify) {
+        context.showToast(
+          failures.length
+            ? state.error
+            : text(`Refreshed ${total} API images`, `已刷新 ${total} 个 API 壁纸`)
+        );
+      }
+    } finally {
+      if (!state.dead && generation === state.generation) {
+        state.batchProgress = null;
+        state.busy = null;
+        paint();
+      }
     }
   };
 
@@ -1478,6 +1577,7 @@ function createPanel(context, container) {
     if (id === "wallpaper-scope") return withBusy(text("Updating wallpaper scope…", "正在更新壁纸范围…"), editWallpaperScope);
     if (id === "reset-sources") return withBusy(text("Restoring defaults…", "正在恢复默认设置…"), restoreDefaults);
     if (id === "clear-image-cache") return withBusy(text("Clearing cache…", "正在清除缓存…"), clearImageCache);
+    if (id === "refresh-all") return refreshAllSources({ cacheBust: true, notify: true });
 
     const source = sourceByExactId(targetId);
     if (!source) return;
@@ -1520,6 +1620,9 @@ function createPanel(context, container) {
       if (entry?.preview) state.previews[id] = entry.preview;
     }
     paint();
+    if (!Object.keys(state.imageCache).length && state.config.sources.length) {
+      await refreshAllSources({ cacheBust: true, notify: false });
+    }
   };
 
   return { state, paint, initialize };
@@ -1531,6 +1634,7 @@ export default {
       name: "open",
       title: "Open Qxpicture",
       async run(context) {
+        setLocale(context);
         context.showToast(text("Open Qxpicture from Extensions", "请从扩展中打开 Qxpicture"));
       }
     }
@@ -1538,6 +1642,7 @@ export default {
   panel: {
     title: "Qxpicture",
     render(container, context) {
+      setLocale(context);
       if (!context.ui?.mountWorkbench || !context.http?.fetch || !context.system?.setWallpaper) {
         container.textContent = text("Qx 0.6.13 or newer is required.", "需要 Qx 0.6.13 或更高版本。");
         return;

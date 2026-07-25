@@ -12,6 +12,17 @@ archive on `main`:
 https://raw.githubusercontent.com/mcxen/qx-plugins/main/<plugin-id>.qx-plugin
 ```
 
+## Support the plugin marketplace
+
+The catalog and its plugins are maintained in spare time. If they are useful,
+optional sponsorship helps keep hosting, testing, and ongoing maintenance
+available; all plugins remain usable without a contribution.
+
+- [爱发电](https://ifdian.net/a/mcxen)
+- [Ko-fi](https://ko-fi.com/mcxen)
+
+<p><img src="./assets/sponsor-wechat.png" alt="微信赞助二维码" width="360"></p>
+
 ## Repository layout
 
 ```text

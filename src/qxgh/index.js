@@ -8,6 +8,21 @@ const CACHE_KEY = "qxgh.html.bundle.v1";
 const DEFAULT_REPOS = "mcxen/qx\nmcxen/qx-plugins";
 const UA = "QxGH/1.2 (+https://github.com/mcxen/qx; public page reader)";
 
+var qxLocale = "en";
+var stopLocale = null;
+
+function setLocale(context) {
+  stopLocale?.();
+  qxLocale = context?.locale?.current || "en";
+  stopLocale = context?.locale?.onChange?.(({ current }) => {
+    qxLocale = current || "en";
+  }) || null;
+}
+
+function text(en, zh) {
+  return qxLocale === "zh-CN" ? zh : en;
+}
+
 // ── prefs / utils ──────────────────────────────────────────────────────────
 
 async function pref(context, id, fallback = "") {
@@ -39,10 +54,10 @@ function clampInt(raw, min, max, fallback) {
 function ageLabel(ts) {
   if (!ts) return "";
   const sec = Math.max(0, Math.floor((Date.now() - ts) / 1000));
-  if (sec < 60) return `${sec}s ago`;
-  if (sec < 3600) return `${Math.floor(sec / 60)}m ago`;
-  if (sec < 86400) return `${Math.floor(sec / 3600)}h ago`;
-  return `${Math.floor(sec / 86400)}d ago`;
+  if (sec < 60) return text(`${sec}s ago`, `${sec}秒前`);
+  if (sec < 3600) return text(`${Math.floor(sec / 60)}m ago`, `${Math.floor(sec / 60)}分钟前`);
+  if (sec < 86400) return text(`${Math.floor(sec / 3600)}h ago`, `${Math.floor(sec / 3600)}小时前`);
+  return text(`${Math.floor(sec / 86400)}d ago`, `${Math.floor(sec / 86400)}天前`);
 }
 
 function relativeTime(iso) {
@@ -75,9 +90,9 @@ function formatDurationSeconds(value) {
   const hours = Math.floor(total / 3600);
   const minutes = Math.floor((total % 3600) / 60);
   const seconds = total % 60;
-  if (hours) return `${hours}h ${minutes}m`;
-  if (minutes) return `${minutes}m ${seconds}s`;
-  return `${seconds}s`;
+  if (hours) return text(`${hours}h ${minutes}m`, `${hours}小时${minutes}分`);
+  if (minutes) return text(`${minutes}m ${seconds}s`, `${minutes}分${seconds}秒`);
+  return text(`${seconds}s`, `${seconds}秒`);
 }
 
 function median(values) {
@@ -532,12 +547,61 @@ function summaryLine(bundle) {
   const fails = runs.filter((r) => r.conclusion === "failure").length;
   const ok = runs.filter((r) => r.conclusion === "success").length;
   const parts = [];
-  if (active) parts.push(`${active} running`);
-  if (fails) parts.push(`${fails} failed`);
-  if (ok) parts.push(`${ok} ok`);
-  if (!parts.length) parts.push(`${runs.length} runs`);
-  parts.push("html");
+  if (active) parts.push(text(`${active} running`, `${active} 个运行中`));
+  if (fails) parts.push(text(`${fails} failed`, `${fails} 个失败`));
+  if (ok) parts.push(text(`${ok} ok`, `${ok} 个成功`));
+  if (!parts.length) parts.push(text(`${runs.length} runs`, `${runs.length} 次运行`));
+  parts.push("HTML");
   return parts.join(" · ");
+}
+
+/**
+ * Project the active deployment into a native tray submenu. This deliberately
+ * uses the host's `status` presentation instead of web styling: system menus
+ * own their typography and colors on both macOS and Windows.
+ */
+async function publishTray(context, bundle) {
+  if (!context?.tray?.setItems) return;
+  try {
+    if (!await prefBool(context, "trayWatch", true)) {
+      await context.tray.clear?.();
+      return;
+    }
+    const runs = estimateRuns(bundle?.runs || []);
+    const run = pickHottestRun(runs);
+    const group = run ? `QxGH · ${run.repo}` : `QxGH · ${text("Actions", "操作")}`;
+    const status = { group, presentation: "status" };
+    const items = run
+      ? [
+          {
+            id: "active-run",
+            title: `${run.displayTitle || run.name || text("Deployment", "部署")}`.slice(0, 64),
+            ...status,
+          },
+          {
+            id: "deployment-progress",
+            title: run.status === "queued"
+              ? text("Deployment queued · estimate starts when running", "部署已排队 · 开始运行后计算预计时间")
+              : `${text("Deployment", "部署")} ${run.progress?.percent ?? 0}% · ${formatDurationSeconds(run.progress?.elapsedSeconds)} / ~${formatDurationSeconds(run.progress?.totalSeconds)}`,
+            ...status,
+          },
+          {
+            id: "deployment-updated",
+            title: `${text("Updated", "更新于")} ${relativeTime(run.updatedAt) || text("just now", "刚刚")}`,
+            ...status,
+          },
+          { id: "refresh", title: text("Refresh deployments", "刷新部署"), group, command: "refresh-qxgh" },
+          { id: "summary", title: text("Show CI summary", "显示 CI 摘要"), group, command: "qxgh-status" },
+        ]
+      : [
+          { id: "idle", title: text("No active deployments", "没有进行中的部署"), ...status },
+          { id: "refresh", title: text("Refresh deployments", "刷新部署"), group, command: "refresh-qxgh" },
+          { id: "summary", title: text("Show CI summary", "显示 CI 摘要"), group, command: "qxgh-status" },
+        ];
+    await context.tray.setItems(items);
+  } catch {
+    // Tray is an optional projection. Network and Workbench state stay usable.
+  }
 }
 
 async function publishIsland(context, run, enabled) {
@@ -552,7 +616,7 @@ async function publishIsland(context, run, enabled) {
   }
   const payload = {
     primary: String(run.repo),
-    secondary: `${run.displayTitle || run.name} · ${run.progress?.estimated ? "estimated" : run.status}`,
+    secondary: `${run.displayTitle || run.name} · ${run.progress?.estimated ? text("estimated", "预计") : run.status}`,
     progress: run.progress?.percent,
     tone: "neutral",
     activity: "bounce",
@@ -572,10 +636,10 @@ function islandForRun(run, enabled) {
   if (!enabled || !run) return null;
   return {
     primary: String(run.repo),
-    secondary: `${run.displayTitle || run.name} · ${run.progress?.estimated ? "estimated" : run.status}`,
+    secondary: `${run.displayTitle || run.name} · ${run.progress?.estimated ? text("estimated", "预计") : run.status}`,
     progress: run.progress?.percent,
     tone: "neutral",
-    action: { label: "Refresh", command: "refresh-qxgh" },
+    action: { label: text("Refresh", "刷新"), command: "refresh-qxgh" },
   };
 }
 
@@ -583,7 +647,7 @@ function islandToggleAction(run, enabled) {
   const visible = Boolean(enabled && run);
   return {
     id: "toggle-island",
-    label: visible ? "Hide Active Run from Island" : "Show Active Run on Island",
+    label: visible ? text("Hide Active Run from Island", "从灵动岛隐藏当前运行") : text("Show Active Run on Island", "在灵动岛显示当前运行"),
   };
 }
 
@@ -608,7 +672,7 @@ function runTone(status, conclusion) {
 function runToItem(run) {
   const statusText = isActiveRun(run) ? run.status : run.conclusion || run.status || "";
   const estimate = run.progress?.estimated && run.status !== "queued"
-    ? `estimated ${run.progress.percent}% · ${formatDurationSeconds(run.progress.elapsedSeconds)} / ~${formatDurationSeconds(run.progress.totalSeconds)}`
+    ? `${text("estimated", "预计")} ${run.progress.percent}% · ${formatDurationSeconds(run.progress.elapsedSeconds)} / ~${formatDurationSeconds(run.progress.totalSeconds)}`
     : "";
   const sub = [
     run.repo,
@@ -632,29 +696,29 @@ function runToItem(run) {
     title: run.displayTitle,
     subtitle: `${run.repo} · ${run.name}`,
     fields: [
-      { label: "Status", value: run.status, tone: runTone(run.status, run.conclusion) },
-      { label: "Conclusion", value: run.conclusion || "—" },
-      { label: "Run", value: run.runNumber != null ? `#${run.runNumber}` : "—" },
+      { label: text("Status", "状态"), value: run.status, tone: runTone(run.status, run.conclusion) },
+      { label: text("Conclusion", "结论"), value: run.conclusion || "—" },
+      { label: text("Run", "运行"), value: run.runNumber != null ? `#${run.runNumber}` : "—" },
       {
-        label: isActiveRun(run) ? "Estimated progress" : "Duration",
+        label: isActiveRun(run) ? text("Estimated progress", "预计进度") : text("Duration", "耗时"),
         value: run.progress?.estimated
-          ? run.status === "queued"
-            ? "Queued · estimate starts when running"
+            ? run.status === "queued"
+            ? text("Queued · estimate starts when running", "已排队 · 开始运行后计算预计时间")
             : `${run.progress.percent}% · ${formatDurationSeconds(run.progress.elapsedSeconds)} elapsed / ~${formatDurationSeconds(run.progress.totalSeconds)} expected`
           : run.duration || "—",
         tone: isActiveRun(run) ? "accent" : "neutral",
       },
       ...(run.progress?.estimated ? [{
-        label: "Estimate basis",
+        label: text("Estimate basis", "估算依据"),
         value: run.progress.sampleCount
-          ? `${run.progress.sampleCount} recent ${run.progress.scope} run${run.progress.sampleCount === 1 ? "" : "s"}`
-          : "Conservative 10-minute fallback",
+          ? `${run.progress.sampleCount} ${text("recent", "最近")} ${run.progress.scope} ${text("run", "次运行")}${run.progress.sampleCount === 1 ? "" : text("s", "")}`
+          : text("Conservative 10-minute fallback", "保守估算：10 分钟兜底"),
       }] : []),
-      { label: "Updated", value: run.updatedAt || "—" },
-      { label: "Source", value: "public HTML page" },
+      { label: text("Updated", "更新时间"), value: run.updatedAt || "—" },
+      { label: text("Source", "来源"), value: text("public HTML page", "公开 HTML 页面") },
     ],
   };
-  item.actions = [{ id: "open-item", label: "Open Run", primary: true, kbd: "Enter" }];
+  item.actions = [{ id: "open-item", label: text("Open Run", "打开运行"), primary: true, kbd: "Enter" }];
   return item;
 }
 
@@ -675,13 +739,13 @@ function releaseToItem(rel) {
     title: rel.name || rel.tag,
     subtitle: `${rel.repo} · ${rel.tag}`,
     fields: [
-      { label: "Latest", value: rel.latest ? "yes" : "no", tone: rel.latest ? "success" : "neutral" },
-      { label: "Prerelease", value: rel.prerelease ? "yes" : "no" },
-      { label: "Published", value: rel.publishedAt || "—" },
-      { label: "Source", value: "public HTML page" },
+      { label: text("Latest", "最新"), value: rel.latest ? text("yes", "是") : text("no", "否"), tone: rel.latest ? "success" : "neutral" },
+      { label: text("Prerelease", "预发布"), value: rel.prerelease ? text("yes", "是") : text("no", "否") },
+      { label: text("Published", "发布时间"), value: rel.publishedAt || "—" },
+      { label: text("Source", "来源"), value: text("public HTML page", "公开 HTML 页面") },
     ],
   };
-  item.actions = [{ id: "open-item", label: "Open Release", primary: true, kbd: "Enter" }];
+  item.actions = [{ id: "open-item", label: text("Open Release", "打开发布"), primary: true, kbd: "Enter" }];
   return item;
 }
 
@@ -694,6 +758,7 @@ function filterByQuery(items, query) {
 // ── Panel ──────────────────────────────────────────────────────────────────
 
 function renderPanel(container, context) {
+  setLocale(context);
   let destroyed = false;
   let tab = "actions";
   let query = "";
@@ -729,9 +794,9 @@ function renderPanel(container, context) {
       selectedItem = items[0];
     }
 
-    let meta = loading && !bundle ? "Loading pages…" : summaryLine({ ...(bundle || {}), runs });
-    if (loading && bundle) meta += " · refreshing";
-    if (bundle?.fromCache) meta += ` · cached ${ageLabel(bundle.savedAt)}`;
+    let meta = loading && !bundle ? text("Loading pages…", "正在加载页面…") : summaryLine({ ...(bundle || {}), runs });
+    if (loading && bundle) meta += ` · ${text("refreshing", "刷新中")}`;
+    if (bundle?.fromCache) meta += ` · ${text("cached", "已缓存")} ${ageLabel(bundle.savedAt)}`;
 
     context.ui.mountWorkbench(
       {
@@ -740,22 +805,22 @@ function renderPanel(container, context) {
         loading: loading && !bundle,
         error: bundle?.error || null,
         query,
-        queryPlaceholder: "Filter…",
+        queryPlaceholder: text("Filter…", "筛选…"),
         tabs: [
-          { id: "actions", label: `Actions (${runs.length})`, active: tab === "actions" },
-          { id: "releases", label: `Releases (${releases.length})`, active: tab === "releases" },
-          { id: "both", label: "Both", active: tab === "both" },
+          { id: "actions", label: `${text("Actions", "操作")} (${runs.length})`, active: tab === "actions" },
+          { id: "releases", label: `${text("Releases", "发布")} (${releases.length})`, active: tab === "releases" },
+          { id: "both", label: text("Both", "全部"), active: tab === "both" },
         ],
         actions: [
-          { id: "refresh", label: loading ? "Refreshing…" : "Refresh", primary: !selectedItem, disabled: loading },
-          { id: "open-web", label: "Open Repository Page" },
+          { id: "refresh", label: loading ? text("Refreshing…", "刷新中…") : text("Refresh", "刷新"), primary: !selectedItem, disabled: loading },
+          { id: "open-web", label: text("Open Repository Page", "打开仓库页面") },
           islandToggleAction(hottestRun, islandEnabled),
         ],
         items,
         selectedId,
         detail: selectedItem?.detail,
         island: islandForRun(hottestRun, islandEnabled),
-        emptyText: loading ? "Loading GitHub pages…" : "No items — check repos in preferences",
+        emptyText: loading ? text("Loading GitHub pages…", "正在加载 GitHub 页面…") : text("No items — check repos in preferences", "没有项目，请检查偏好设置中的仓库"),
       },
       {
         onTab: (id) => {
@@ -788,7 +853,7 @@ function renderPanel(container, context) {
           if (id === "open-item") {
             const url = actionItem?.raw?.htmlUrl;
             if (url && context.openUrl) void context.openUrl(url);
-            else context.showToast("Select an item first");
+            else context.showToast(text("Select an item first", "请先选择一个项目"));
             return;
           }
           if (id === "toggle-island") {
@@ -800,9 +865,9 @@ function renderPanel(container, context) {
             void (async () => {
               await publishIsland(context, hot, nextIslandEnabled);
               if (!nextIslandEnabled) {
-                context.showToast("QxGH removed from Island");
+                context.showToast(text("QxGH removed from Island", "QxGH 已从灵动岛移除"));
               } else {
-                context.showToast(hot ? `Watching ${hot.repo}` : "No in-progress runs");
+                context.showToast(hot ? `${text("Watching", "正在关注")} ${hot.repo}` : text("No in-progress runs", "没有进行中的运行"));
               }
             })();
           }
@@ -851,6 +916,7 @@ function renderPanel(container, context) {
         selectedItem = all.find((x) => x.id === selectedId) || null;
         if (!selectedItem) selectedId = null;
       }
+      await publishTray(context, bundle);
       paint();
     } catch (err) {
       if (destroyed || sequence !== loadSequence) return;
@@ -879,7 +945,10 @@ function renderPanel(container, context) {
   })();
 
   progressTimer = context.setInterval(() => {
-    if (!destroyed && pickHottestRun(bundle?.runs || [])) paint();
+    if (!destroyed && pickHottestRun(bundle?.runs || [])) {
+      void publishTray(context, bundle);
+      paint();
+    }
   }, 5_000);
 
   void reload({ force: false });
@@ -915,13 +984,15 @@ export default {
       name: "open-qxgh",
       title: "QxGH",
       async run(context) {
-        context.showToast("Open QxGH from Extensions, or search “QxGH”");
+        setLocale(context);
+        context.showToast(text("Open QxGH from Extensions, or search “QxGH”", "请从扩展打开 QxGH，或搜索“QxGH”"));
       },
     },
     {
       name: "refresh-qxgh",
       title: "Refresh QxGH",
       async run(context) {
+        setLocale(context);
         try {
           const b = await loadBundle(context, { force: true });
           context.showToast(summaryLine(b).slice(0, 120));
@@ -930,6 +1001,7 @@ export default {
             pickHottestRun(estimateRuns(b.runs)),
             await prefBool(context, "islandWatch", true),
           );
+          await publishTray(context, b);
         } catch (err) {
           context.showToast(String(err).slice(0, 120));
         }
@@ -939,9 +1011,11 @@ export default {
       name: "qxgh-status",
       title: "QxGH CI Summary",
       async run(context) {
+        setLocale(context);
         try {
           const b = await loadBundle(context, { force: false });
           const hot = pickHottestRun(estimateRuns(b.runs));
+          await publishTray(context, b);
           let msg = summaryLine(b);
           if (hot) msg = `${hot.repo}: ${hot.displayTitle || hot.name} · ${msg}`;
           context.showToast(msg.slice(0, 140));
@@ -954,16 +1028,17 @@ export default {
       name: "qxgh-watch-island",
       title: "QxGH Watch on Island",
       async run(context) {
+        setLocale(context);
         try {
           const b = await loadBundle(context, { force: true });
           const hot = pickHottestRun(estimateRuns(b.runs));
           if (!hot) {
             await publishIsland(context, null, true);
-            context.showToast("No in-progress runs on page");
+            context.showToast(text("No in-progress runs on page", "页面上没有进行中的运行"));
             return;
           }
           await publishIsland(context, hot, true);
-          context.showToast(`Watching ${hot.repo} · ${hot.displayTitle || hot.name}`.slice(0, 120));
+          context.showToast(`${text("Watching", "正在关注")} ${hot.repo} · ${hot.displayTitle || hot.name}`.slice(0, 120));
         } catch (err) {
           context.showToast(String(err).slice(0, 120));
         }
@@ -983,7 +1058,7 @@ export default {
       }
       if (!context.ui?.mountWorkbench) {
         container.innerHTML =
-          "<p style='padding:16px;font:13px system-ui'>Needs host workbench (context.ui). Update Qx.</p>";
+          `<p style='padding:16px;font:13px system-ui'>${text("Needs host workbench (context.ui). Update Qx.", "需要主机 Workbench（context.ui），请更新 Qx。")}</p>`;
         destroyPanel = () => {
           container.innerHTML = "";
         };
@@ -1014,4 +1089,5 @@ export const __test = {
   parseDurationSeconds,
   parseReleasesHtml,
   parseRunDurationHtml,
+  publishTray,
 };

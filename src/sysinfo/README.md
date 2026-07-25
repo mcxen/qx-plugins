@@ -29,10 +29,11 @@ Surfaces:
 - Processes: sortable process list with an explicit, confirmed terminate action.
 - System Settings: semantic destinations through `context.system.openSettings`.
 
-The selected live hardware category (CPU, Memory, Power, or Network) and the
-Processes view refresh every five seconds. Background refresh keeps the current
-rows usable. CPU and Memory share one in-flight stats sample during the initial
-hardware-list load.
+CPU, Memory, Power, and Network refresh together every five seconds for as long
+as the Hardware view is open, regardless of which category is selected.
+Processes refreshes on the same cadence while that view is open. Background
+refresh keeps the current rows usable, and CPU plus Memory share one in-flight
+stats sample so their values come from the same refresh cycle.
 Static system specifications and storage capacity are cached per panel runtime
 and only rescanned when the user explicitly chooses Refresh.
 

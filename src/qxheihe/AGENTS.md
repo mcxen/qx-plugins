@@ -24,6 +24,8 @@
 8. Keep rebuildable keys synchronized with `manifest.storage.cacheTargets`.
 9. Cache values use a top-level `savedAt` envelope for host retention cleanup.
 10. Reading a post writes `readAt` once; reopening it must not indefinitely extend retention.
+11. Keep read state in `item.tone` only. Badges contain content metrics, never redundant
+    `Read` / `Unread` text.
 
 ## Permissions
 

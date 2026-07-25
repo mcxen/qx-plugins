@@ -8,6 +8,21 @@ const CACHE_KEY = "weather.bundle.v1";
 const DEFAULT_TTL_MS = 30 * 60 * 1000;
 const STALE_MS = 12 * 60 * 60 * 1000;
 
+var qxLocale = "en";
+var stopLocale = null;
+
+function setLocale(context) {
+  stopLocale?.();
+  qxLocale = context?.locale?.current || "en";
+  stopLocale = context?.locale?.onChange?.(({ current }) => {
+    qxLocale = current || "en";
+  }) || null;
+}
+
+function text(en, zh) {
+  return qxLocale === "zh-CN" ? zh : en;
+}
+
 const STYLES = `
 <style>
   .wx-root { display:flex; flex-direction:column; height:100%; font:13px -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif; color:var(--qx-text-primary,#e8e8e8); margin:0; }
@@ -83,7 +98,20 @@ function mapOwm(id) {
 }
 
 function conditionLabel(code) {
-  return String(code || "cloudy").replace(/-/g, " ");
+  const key = String(code || "cloudy");
+  const labels = {
+    clear: ["clear", "晴朗"],
+    "clear-night": ["clear night", "晴朗夜间"],
+    "partly-cloudy": ["partly cloudy", "局部多云"],
+    "partly-cloudy-night": ["partly cloudy night", "夜间局部多云"],
+    cloudy: ["cloudy", "多云"],
+    fog: ["fog", "雾"],
+    rain: ["rain", "雨"],
+    snow: ["snow", "雪"],
+    thunderstorm: ["thunderstorm", "雷暴"],
+  };
+  const [en, zh] = labels[key] || [key.replace(/-/g, " "), key.replace(/-/g, " ")];
+  return text(en, zh);
 }
 
 function conditionEmoji(code) {
@@ -102,7 +130,7 @@ function conditionEmoji(code) {
 function dayLabel(isoDate) {
   try {
     const d = new Date(`${isoDate}T12:00:00`);
-    return d.toLocaleDateString(undefined, { weekday: "short" });
+    return d.toLocaleDateString(qxLocale, { weekday: "short" });
   } catch {
     return isoDate?.slice(5) || "";
   }
@@ -111,9 +139,9 @@ function dayLabel(isoDate) {
 function ageLabel(ts) {
   if (!ts) return "";
   const sec = Math.max(0, Math.floor((Date.now() - ts) / 1000));
-  if (sec < 60) return `${sec}s ago`;
-  if (sec < 3600) return `${Math.floor(sec / 60)}m ago`;
-  return `${Math.floor(sec / 3600)}h ago`;
+  if (sec < 60) return text(`${sec}s ago`, `${sec}秒前`);
+  if (sec < 3600) return text(`${Math.floor(sec / 60)}m ago`, `${Math.floor(sec / 60)}分钟前`);
+  return text(`${Math.floor(sec / 3600)}h ago`, `${Math.floor(sec / 3600)}小时前`);
 }
 
 async function pref(context, id, fallback = "") {
@@ -160,7 +188,7 @@ async function geocode(context, query) {
     `https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(q)}&count=1&language=en&format=json`,
   );
   const hit = data?.results?.[0];
-  if (!hit) throw new Error(`Location not found: ${q}`);
+  if (!hit) throw new Error(text(`Location not found: ${q}`, `找不到位置：${q}`));
   return {
     name: hit.name,
     latitude: hit.latitude,
@@ -174,7 +202,7 @@ async function autoLocate(context) {
     const loc = await context.invoke("detect_location");
     if (loc?.latitude != null) {
       return {
-        name: loc.city || "Current location",
+        name: loc.city || text("Current location", "当前位置"),
         latitude: loc.latitude,
         longitude: loc.longitude,
         country: loc.country || "",
@@ -188,7 +216,7 @@ async function autoLocate(context) {
     const data = await httpJson(context, "https://ipapi.co/json/");
     if (data?.latitude != null) {
       return {
-        name: data.city || data.region || "Near you",
+        name: data.city || data.region || text("Near you", "附近"),
         latitude: data.latitude,
         longitude: data.longitude,
         country: data.country_name || data.country || "",
@@ -197,7 +225,7 @@ async function autoLocate(context) {
   } catch {
     /* ignore */
   }
-  throw new Error("Could not detect location. Set a city in plugin preferences.");
+  throw new Error(text("Could not detect location. Set a city in plugin preferences.", "无法检测位置，请在插件偏好设置中填写城市。"));
 }
 
 async function fetchOpenMeteo(context, location) {
@@ -247,7 +275,7 @@ async function fetchOwm(context, location, apiKey) {
     windSpeed: data.current.wind_speed,
   };
   const forecast = (data.daily || []).slice(1, 7).map((d) => ({
-    label: new Date(d.dt * 1000).toLocaleDateString(undefined, { weekday: "short" }),
+    label: new Date(d.dt * 1000).toLocaleDateString(qxLocale, { weekday: "short" }),
     tempMin: d.temp.min,
     tempMax: d.temp.max,
     conditionCode: mapOwm(d.weather?.[0]?.id ?? 800),
@@ -406,7 +434,7 @@ async function loadBundle(context, { force = false } = {}) {
         error: errors[0],
       };
     }
-    throw new Error(errors[0] || "Weather fetch failed");
+    throw new Error(errors[0] || text("Weather fetch failed", "天气获取失败"));
   }
 
   await storageSet(context, CACHE_KEY, { items, units, savedAt: Date.now() });
@@ -441,8 +469,8 @@ function renderCard(weather, units) {
       <div class="wx-temp">${toUnit(cur.temperature, units)}${u}</div>
       <div class="wx-cond">${escapeHtml(conditionLabel(cur.conditionCode))}</div>
       <div class="wx-meta">
-        <span>H ${toUnit(cur.tempMax, units)}${u}</span>
-        <span>L ${toUnit(cur.tempMin, units)}${u}</span>
+        <span>${text("H", "最高")} ${toUnit(cur.tempMax, units)}${u}</span>
+        <span>${text("L", "最低")} ${toUnit(cur.tempMin, units)}${u}</span>
         <span>💧 ${cur.humidity ?? "—"}%</span>
         <span>🌬 ${Math.round(cur.windSpeed ?? 0)} m/s</span>
       </div>
@@ -452,17 +480,18 @@ function renderCard(weather, units) {
 }
 
 function renderPanel(container, context) {
+  setLocale(context);
   let destroyed = false;
   container.innerHTML = STYLES + `<div class="wx-root"></div>`;
   const root = container.querySelector(".wx-root");
 
   root.innerHTML = `
     <div class="wx-bar">
-      <div class="wx-title">Weather</div>
-      <button class="wx-btn" type="button" data-act="refresh">Refresh</button>
+      <div class="wx-title">${text("Weather", "天气")}</div>
+      <button class="wx-btn" type="button" data-act="refresh">${text("Refresh", "刷新")}</button>
     </div>
-    <div class="wx-status">Loading…</div>
-    <div class="wx-body"><div class="wx-empty">Loading weather…</div></div>
+    <div class="wx-status">${text("Loading…", "加载中…")}</div>
+    <div class="wx-body"><div class="wx-empty">${text("Loading weather…", "正在加载天气…")}</div></div>
   `;
 
   const statusEl = root.querySelector(".wx-status");
@@ -477,25 +506,25 @@ function renderPanel(container, context) {
   async function reload({ force = false } = {}) {
     if (destroyed) return;
     refreshBtn.disabled = true;
-    if (force) setStatus("Refreshing…");
+    if (force) setStatus(text("Refreshing…", "刷新中…"));
     try {
       const result = await loadBundle(context, { force });
       if (destroyed) return;
       const { items, units } = result;
       bodyEl.innerHTML = `<div class="wx-grid">${items.map((w) => renderCard(w, units)).join("")}</div>`;
-      let msg = `${items.length} location${items.length === 1 ? "" : "s"}`;
+      let msg = text(`${items.length} location${items.length === 1 ? "" : "s"}`, `${items.length} 个位置`);
       if (result.fromCache) {
-        msg += ` · cached ${ageLabel(result.savedAt)}`;
-        if (result.refreshing) msg += " · updating…";
+        msg += ` · ${text("cached", "已缓存")} ${ageLabel(result.savedAt)}`;
+        if (result.refreshing) msg += ` · ${text("updating…", "更新中…")}`;
         setStatus(msg, result.refreshing ? "stale" : "");
       } else if (result.error) {
-        setStatus(`${msg} · partial: ${result.error}`, "err");
+        setStatus(`${msg} · ${text("partial: ", "部分失败：")}${result.error}`, "err");
       } else {
         setStatus(msg);
       }
     } catch (err) {
       if (destroyed) return;
-      bodyEl.innerHTML = `<div class="wx-empty">${escapeHtml(String(err))}<br><br>Set cities in Settings → Extensions → Weather.</div>`;
+      bodyEl.innerHTML = `<div class="wx-empty">${escapeHtml(String(err))}<br><br>${text("Set cities in Settings → Extensions → Weather.", "请在设置 → 扩展 → Weather 中填写城市。")}</div>`;
       setStatus(String(err), "err");
     } finally {
       refreshBtn.disabled = false;
@@ -518,13 +547,15 @@ export default {
       name: "open-weather",
       title: "Weather",
       async run(context) {
-        context.showToast("Open the Weather panel from Extensions");
+        setLocale(context);
+        context.showToast(text("Open the Weather panel from Extensions", "请从扩展打开天气面板"));
       },
     },
     {
       name: "refresh-weather",
       title: "Refresh Weather",
       async run(context) {
+        setLocale(context);
         try {
           const result = await loadBundle(context, { force: true });
           const first = result.items[0];
@@ -534,7 +565,7 @@ export default {
               `${first.location.name}: ${toUnit(first.current.temperature, result.units)}${u}`,
             );
           } else {
-            context.showToast("Weather refreshed");
+            context.showToast(text("Weather refreshed", "天气已刷新"));
           }
         } catch (err) {
           context.showToast(String(err).slice(0, 120));

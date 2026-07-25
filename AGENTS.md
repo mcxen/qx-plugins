@@ -75,6 +75,7 @@ self-contained and must not retain relative ESM imports.
 
 ```bash
 npm run package:plugins   # zips every src/* with manifest.json → *.qx-plugin + index.json
+npm run package:one -- --only=sysinfo  # package only named plugins; preserve other index entries
 ```
 
 All distributable files under `src/<id>/` are packed (including **`AGENTS.md`**).

@@ -1,4 +1,4 @@
-import { responseContentType, safeImagePreview } from "./media.js";
+import { bytesToBase64, responseContentType, safeImagePreview } from "./media.js";
 
 const CACHE_KEY = "cache.weibo.v1";
 const API_BASE = "https://m.weibo.cn";
@@ -6,9 +6,15 @@ const VISITOR_URL = "https://visitor.passport.weibo.cn/visitor/genvisitor2";
 const USER_AGENT = "Mozilla/5.0 (iPhone; CPU iPhone OS 16_0 like Mac OS X) AppleWebKit/605.1.15";
 const DAY_MS = 24 * 60 * 60 * 1000;
 
+let qxLocale = "en";
+let stopLocale = null;
+function setLocale(context) {
+  stopLocale?.();
+  qxLocale = context?.locale?.current || "en";
+  stopLocale = context?.locale?.onChange?.(({ current }) => { qxLocale = current; }) || null;
+}
 function isChinese() {
-  return (globalThis.navigator?.languages || [globalThis.navigator?.language || ""])
-    .some((locale) => /^zh(?:-|$)/i.test(String(locale)));
+  return qxLocale === "zh-CN";
 }
 
 function copy(en, zh) {
@@ -287,6 +293,7 @@ async function preference(context, id, fallback = "") {
 }
 
 function createPanel(container, context) {
+  setLocale(context);
   const state = {
     cache: emptyCache(),
     mode: "user",
@@ -370,11 +377,12 @@ function createPanel(container, context) {
 
   function detailFor(post) {
     const detail = state.cache.details[post.id];
-    const images = post.pics.map((url) => {
+    const images = post.pics.map((url, index) => {
       const preview = state.imagePreviews.get(`detail:${url}`)
         || state.imagePreviews.get(`thumbnail:${url}`);
       return preview ? {
         url: preview,
+        downloadId: `post:${post.id}:${index}`,
         alt: postTitle(post),
         fit: "contain",
         aspectRatio: "auto",
@@ -417,7 +425,7 @@ function createPanel(container, context) {
       title: postTitle(post),
       subtitle: post.text,
       meta: `${post.user?.screenName || copy("Unknown author", "未知作者")} · ${formatDate(post.createdAt)}`,
-      badge: `${read ? "" : `${copy("Unread", "未读")} · `}${post.pics.length ? `${post.pics.length} ${copy("images", "图")} · ` : ""}${formatCount(post.commentsCount)} ${copy("comments", "评论")}`,
+      badge: `${post.pics.length ? `${post.pics.length} ${copy("images", "图")} · ` : ""}${formatCount(post.commentsCount)} ${copy("comments", "评论")}`,
       tone: read ? "neutral" : "accent",
       image: preview ? { url: preview, alt: postTitle(post), fit: "cover" } : undefined,
       detail: detailFor(post),
@@ -509,6 +517,9 @@ function createPanel(container, context) {
         paint();
         loadDetail(postId);
         loadPostImages(postId);
+      },
+      onDownload(id) {
+        void downloadOriginalImage(id);
       },
       onAction(id, item) {
         if (id === "refresh") {
@@ -727,6 +738,43 @@ function createPanel(container, context) {
     }
   }
 
+  async function downloadOriginalImage(downloadId) {
+    const match = String(downloadId || "").match(/^post:(.+):(\d+)$/);
+    const post = match ? allPosts().find((entry) => entry.id === match[1]) : null;
+    const index = match ? Number(match[2]) : -1;
+    const url = post?.pics[index];
+    if (!post || !url || !Number.isInteger(index)) {
+      await context.showToast(copy("Original image is unavailable.", "原图暂不可用。"));
+      return;
+    }
+    try {
+      await ensureCookiePool();
+      const response = await imageSchedule(() => context.http.fetch(url, {
+        method: "GET",
+        headers: {
+          "User-Agent": USER_AGENT,
+          Referer: "https://weibo.com/",
+          Cookie: nextCookie(),
+          Accept: "image/avif,image/webp,image/apng,image/*,*/*;q=0.8",
+        },
+        timeoutMs: 120_000,
+      }));
+      if (!response?.ok) throw new Error(`Weibo image HTTP ${response?.status || "error"}`);
+      const mimeType = responseContentType(response) || "image/jpeg";
+      const bytes = new Uint8Array(await response.arrayBuffer());
+      if (!bytes.length) throw new Error("Image response was empty");
+      const extension = mimeType.split("/")[1]?.replace(/[^a-z0-9]/gi, "") || "jpg";
+      await context.system.saveDownload({
+        filename: `weibo-${post.id}-${index + 1}.${extension}`,
+        mimeType,
+        dataBase64: bytesToBase64(bytes),
+      });
+      await context.showToast(copy("Original image saved to Downloads.", "原图已保存到下载目录。"));
+    } catch (error) {
+      await context.showToast(errorMessage(error));
+    }
+  }
+
   async function loadDetail(postId) {
     const id = String(postId || "");
     const post = allPosts().find((entry) => entry.id === id);
@@ -887,4 +935,4 @@ function createPanel(container, context) {
   };
 }
 
-export { cleanText, copy, createPanel, normalizePost, parseCookies, parseIds };
+export { cleanText, copy, createPanel, normalizePost, parseCookies, parseIds, setLocale };

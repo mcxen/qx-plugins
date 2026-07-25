@@ -115,6 +115,7 @@ const controller = {
 };
 
 const context = {
+  locale: { current: "zh-CN", preference: "zh-CN", onChange: () => () => {} },
   http: { fetch: mockFetch },
   storage: {
     persist: {
@@ -162,6 +163,8 @@ plugin.panel.render(container, context);
 await waitFor(() => snapshot && !snapshot.loading && snapshot.items?.length, "user feed");
 assert.equal(snapshot.items.length, 1);
 assert.equal(snapshot.items[0].id, "1000101");
+assert.equal(snapshot.items[0].tone, "accent");
+assert.doesNotMatch(snapshot.items[0].badge, /已读|未读|\b(?:Read|Unread)\b/i);
 assert.ok(snapshot.items[0].detail);
 await waitFor(
   () => snapshot.items[0].detail.replies?.items?.some((reply) => /第一条评论/.test(reply.body)),
@@ -185,6 +188,7 @@ assert.deepEqual(new Set(snapshot.items.map((item) => item.id)), new Set(["10002
 
 const selected = snapshot.items[0];
 handlers.onSelect(selected.id);
+assert.equal(snapshot.items.find((item) => item.id === selected.id).tone, "neutral");
 assert.ok(persisted.get("cache.weibo.v1").readAt[selected.id]);
 handlers.onAction(`open:${selected.id}`, selected);
 assert.equal(openedUrl, `https://m.weibo.cn/detail/${selected.id}`);

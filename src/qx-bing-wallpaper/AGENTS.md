@@ -5,8 +5,8 @@ Native Qx business plugin. Do not run it through the Raycast converter.
 ## Surfaces
 
 - `open-gallery`: panel entry
-- `set-random-wallpaper`: daily background command
-- `set-latest-wallpaper`: daily background command
+- `set-random-wallpaper` / `set-latest-wallpaper`: manual no-view commands
+- `daily-wallpaper`: the single daily background command; reads `dailyWallpaperMode`
 - Workbench Gallery: images, selection, structured details, item/panel Actions
 - Host-owned adaptive image detail + zoom Dialog; no iframe CSS/lightbox workaround
 - Persisted Bing archive cache
@@ -21,6 +21,9 @@ Native Qx business plugin. Do not run it through the Raycast converter.
 6. Do not add Raycast metadata, imports, shims, or converted bundles.
 7. Keep `mountWorkbench()` controller updates revisioned; item/detail loading uses
    structured `status` and retains the current image.
+8. Never catch and swallow command failures. The host background ledger must receive rejection
+   so it cannot display a false success.
+9. Persist a last-applied record only after both file write and host wallpaper application succeed.
 
 ## Permissions
 
@@ -36,4 +39,5 @@ Native Qx business plugin. Do not run it through the Raycast converter.
 - Bump `manifest.version` for behavior changes.
 - Keep `min_app_version` aligned with the Workbench Gallery host version.
 - Run `npm run package:plugins`.
+- Run `npm run smoke:bing-wallpaper`.
 - Install `qx-bing-wallpaper.qx-plugin` locally and verify Gallery selection plus every Action.

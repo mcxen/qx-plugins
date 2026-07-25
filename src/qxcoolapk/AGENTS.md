@@ -38,11 +38,14 @@
 12. Cache values use a top-level `savedAt` envelope for host retention cleanup.
 13. Do not add login, write, like, reply, or follow capabilities without a separate
     security and privacy review.
+14. Keep read state in `item.tone`; badges contain image/like/reply metrics without
+    redundant `Read` / `Unread` text.
 
 ## Permissions
 
 - `http`: Coolapk feed, full article, first-page reply, and protected image requests.
 - `open-url`: open the selected post on Coolapk.
+- `system`: save authenticated original image bytes to the user's Downloads directory.
 
 ## Edit checklist
 

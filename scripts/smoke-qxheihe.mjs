@@ -97,6 +97,7 @@ const controller = {
 };
 
 const context = {
+  locale: { current: "zh-CN", preference: "zh-CN", onChange: () => () => {} },
   http: { fetch: mockFetch },
   storage: {
     persist: {
@@ -142,12 +143,17 @@ await waitFor(
   "initial post detail and comments",
 );
 const selected = snapshot.items[0];
+assert.equal(selected.tone, "accent");
+assert.doesNotMatch(selected.badge, /已读|未读|\b(?:Read|Unread)\b/i);
 handlers.onSelect(selected.id);
 const detailed = snapshot.items.find((item) => item.id === selected.id);
 assert.ok(detailed.detail.body || detailed.detail.images?.length);
 assert.match(detailed.detail.body, /Full body 1000\n\nSecond paragraph 1000/);
+assert.equal(detailed.detail.fields, undefined);
+assert.match(detailed.detail.subtitle, /author-1.*Games.*赞.*评论/);
 assert.ok(detailed.detail.sections.some((section) => /commenter/.test(section.title || "")));
-assert.doesNotMatch(detailed.badge, /未读/);
+assert.equal(detailed.tone, "neutral");
+assert.doesNotMatch(detailed.badge, /已读|未读|\b(?:Read|Unread)\b/i);
 const cache = persisted.get("cache.community.v2");
 assert.ok(cache.posts.length >= 5);
 assert.ok(cache.readAt[selected.id]);

@@ -1,7 +1,7 @@
 {
   "id": "qxgh",
   "name": "QxGH",
-  "version": "1.4.0",
+  "version": "1.5.0",
   "description": "QxGH \u2014 watch GitHub Actions and Releases from public github.com pages (no REST API). Business-only workbench UI.",
   "author": "mcx",
   "icon": "",
@@ -22,7 +22,8 @@
     "http",
     "open-url",
     "notifications",
-    "island"
+    "island",
+    "tray"
   ],
   "preferences": [
     {
@@ -58,6 +59,14 @@
       "required": false,
       "default": true,
       "description": "Show external QxIsland when a watched repo has a running/queued workflow."
+    },
+    {
+      "id": "trayWatch",
+      "label": "Show active deployment in tray",
+      "type": "boolean",
+      "required": false,
+      "default": true,
+      "description": "Add an OS-native QxGH tray submenu with deployment percentage, elapsed time, and refresh actions."
     }
   ],
   "entry": "index.js",

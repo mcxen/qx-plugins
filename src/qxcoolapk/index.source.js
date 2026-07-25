@@ -15,9 +15,15 @@ const MODES = {
   digital: { label: ["Digital", "数码"], path: "/v6/page/dataList", board: "/page?url=V10_DIGITAL_HOME" },
 };
 
+let qxLocale = "en";
+let stopLocale = null;
+function setLocale(context) {
+  stopLocale?.();
+  qxLocale = context?.locale?.current || "en";
+  stopLocale = context?.locale?.onChange?.(({ current }) => { qxLocale = current; }) || null;
+}
 function isChinese() {
-  return (navigator.languages || [navigator.language || ""])
-    .some((locale) => /^zh(?:-|$)/i.test(String(locale)));
+  return qxLocale === "zh-CN";
 }
 
 function copy(en, zh) {
@@ -641,6 +647,7 @@ async function writeCache(context, cache) {
 }
 
 function createPanel(container, context) {
+  setLocale(context);
   const state = {
     cache: emptyCache(),
     mode: "hot",
@@ -697,12 +704,13 @@ function createPanel(container, context) {
   function detailFor(feed) {
     const cached = state.cache.details[feed.id];
     const article = isArticleFeed(feed);
-    const originals = imageUrls(cached?.images || feedImages(feed)).slice(0, 24);
-    const images = originals.map((url) => {
+    const originals = imageUrls(cached?.images || feedImages(feed));
+    const images = originals.map((url, index) => {
       const preview = state.imagePreviews.get(`detail:${url}`)
         || state.imagePreviews.get(`thumbnail:${url}`);
       return preview ? {
         url: preview,
+        downloadId: `image:${feed.id}:${index}`,
         alt: feedTitle(feed),
         fit: "cover",
         aspectRatio: "auto",
@@ -710,7 +718,7 @@ function createPanel(container, context) {
       } : null;
     }).filter(Boolean);
     const inlineSource = article && Array.isArray(cached?.content) ? cached.content : [];
-    const content = inlineSource.flatMap((block) => {
+    const content = inlineSource.flatMap((block, index) => {
       if (block?.type === "text") {
         const text = cleanText(block.text);
         return text ? [{ type: "text", text }] : [];
@@ -724,6 +732,7 @@ function createPanel(container, context) {
         type: "image",
         image: {
           url: preview,
+          downloadId: `content:${feed.id}:${index}`,
           alt: cleanText(block.alt) || feedTitle(feed),
           fit: "contain",
           aspectRatio: "auto",
@@ -781,7 +790,7 @@ function createPanel(container, context) {
       title: feedTitle(feed),
       subtitle: cleanText(feed.message) || `${authorName(feed)} · ${formatTime(feed.dateline)}`,
       meta: `${authorName(feed)} · ${formatTime(feed.dateline)}`,
-      badge: `${read ? "" : `${copy("Unread", "未读")} · `}${imageCount ? `${imageCount} ${copy("images", "图")} · ` : ""}${compactNumber(feed.likenum)} ♥ · ${compactNumber(feed.replynum)} ${copy("replies", "回复")}`,
+      badge: `${imageCount ? `${imageCount} ${copy("images", "图")} · ` : ""}${compactNumber(feed.likenum)} ♥ · ${compactNumber(feed.replynum)} ${copy("replies", "回复")}`,
       tone: read ? "neutral" : "accent",
       image: coverPreview
         ? { url: coverPreview, alt: feedTitle(feed), fit: "cover" }
@@ -897,6 +906,9 @@ function createPanel(container, context) {
           paint();
           void loadDetail(key);
           void loadDetailImages(key);
+        },
+        onDownload(id) {
+          void downloadOriginalImage(id);
         },
         onAction(id, item) {
           if (id === "refresh") void loadMode({ force: true });
@@ -1022,7 +1034,7 @@ function createPanel(container, context) {
       .flatMap((entry) => entry.items || [])
       .find((entry) => entry.id === key);
     if (!feed) return;
-    const originals = imageUrls(state.cache.details[key]?.images || feedImages(feed)).slice(0, 24);
+    const originals = imageUrls(state.cache.details[key]?.images || feedImages(feed));
     if (!originals.length) return;
     state.imageLoading.add(key);
     paint();
@@ -1040,6 +1052,45 @@ function createPanel(container, context) {
       state.imageLoading.delete(key);
       paint();
       if (state.imageReloadPending.delete(key)) void loadDetailImages(key);
+    }
+  }
+
+  async function downloadOriginalImage(downloadId) {
+    const match = String(downloadId || "").match(/^(image|content):(.+):(\d+)$/);
+    const kind = match?.[1];
+    const key = match?.[2] || "";
+    const index = match ? Number(match[3]) : -1;
+    const feed = Object.values(state.cache.feeds)
+      .flatMap((entry) => entry.items || [])
+      .find((entry) => entry.id === key);
+    const cached = feed ? state.cache.details[key] : null;
+    const contentUrl = kind === "content" ? cached?.content?.[index]?.url : "";
+    const imageUrl = kind === "image"
+      ? imageUrls(cached?.images || (feed ? feedImages(feed) : []))[index]
+      : contentUrl;
+    if (!feed || !imageUrl || !Number.isInteger(index)) {
+      await context.showToast(copy("Original image is unavailable.", "原图暂不可用。"));
+      return;
+    }
+    try {
+      const response = await context.http.fetch(imageUrl, {
+        method: "GET",
+        headers: await buildRequestHeaders(),
+        timeoutMs: 120_000,
+      });
+      if (!response?.ok) throw new Error(`Coolapk image HTTP ${response?.status || "error"}`);
+      const mimeType = responseContentType(response) || "image/jpeg";
+      const bytes = new Uint8Array(await response.arrayBuffer());
+      if (!bytes.length) throw new Error("Image response was empty");
+      const extension = mimeType.split("/")[1]?.replace(/[^a-z0-9]/gi, "") || "jpg";
+      await context.system.saveDownload({
+        filename: `coolapk-${feed.id}-${index + 1}.${extension}`,
+        mimeType,
+        dataBase64: toBase64(bytes),
+      });
+      await context.showToast(copy("Original image saved to Downloads.", "原图已保存到下载目录。"));
+    } catch (error) {
+      await context.showToast(errorMessage(error));
     }
   }
 
@@ -1221,6 +1272,7 @@ const plugin = {
     name: "open-qxcoolapk",
     title: "打开 QxCoolapk 酷安",
     async run(context) {
+      setLocale(context);
       await context.showToast(copy(
         "Open QxCoolapk from Extensions or search.",
         "请从扩展模块或搜索中打开 QxCoolapk。",
@@ -1230,6 +1282,7 @@ const plugin = {
   panel: {
     title: "QxCoolapk 酷安",
     render(container, context) {
+      setLocale(context);
       activePanels.get(container)?.destroy();
       activePanels.set(container, createPanel(container, context));
     },

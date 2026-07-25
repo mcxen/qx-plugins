@@ -2,8 +2,15 @@
 
 const CACHE_KEY = "unsplash.gallery.v1";
 
+let qxLocale = "en";
+let stopLocale = null;
+function setLocale(context) {
+  stopLocale?.();
+  qxLocale = context?.locale?.current || "en";
+  stopLocale = context?.locale?.onChange?.(({ current }) => { qxLocale = current; }) || null;
+}
 function zh() {
-  return /^(zh-CN|zh-Hans|zh-SG|zh-MY|zh$)/i.test(String(navigator.language || ""));
+  return qxLocale === "zh-CN";
 }
 
 function text(en, cn) {
@@ -138,6 +145,7 @@ async function setWallpaper(context, photo) {
 }
 
 function createPanel(context) {
+  setLocale(context);
   const state = {
     query: "nature",
     page: 1,
@@ -349,6 +357,7 @@ export default {
       name: "open-search",
       title: "Unsplash: Search Photos",
       async run(context) {
+        setLocale(context);
         context.showToast(text("Open Unsplash from Extensions", "请从扩展中打开 Unsplash"));
       },
     },
@@ -357,6 +366,7 @@ export default {
       title: "Unsplash: Set Random Wallpaper",
       mode: "no-view",
       async run(context) {
+        setLocale(context);
         try {
           const photo = await randomPhoto(context);
           await setWallpaper(context, photo);
@@ -370,6 +380,7 @@ export default {
   panel: {
     title: "Unsplash",
     render(container, context) {
+      setLocale(context);
       if (!context.ui?.mountWorkbench || !context.http?.fetch) {
         container.textContent = text("Qx 0.5.39 or newer is required.", "需要 Qx 0.5.39 或更高版本。");
         return;

@@ -9,6 +9,21 @@ const STATE_KEY = "pomodoro.state.v2";
 const HISTORY_KEY = "pomodoro.history.v1";
 const MAX_HISTORY = 120;
 
+var qxLocale = "en";
+var stopLocale = null;
+
+function setLocale(context) {
+  stopLocale?.();
+  qxLocale = context?.locale?.current || "en";
+  stopLocale = context?.locale?.onChange?.(({ current }) => {
+    qxLocale = current || "en";
+  }) || null;
+}
+
+function text(en, zh) {
+  return qxLocale === "zh-CN" ? zh : en;
+}
+
 let runtimeTimerId = null;
 let runtimeContext = null;
 let runtimeState = null;
@@ -69,14 +84,14 @@ function formatRemaining(ms) {
 function formatDate(ts) {
   if (!ts) return "—";
   try {
-    return new Date(ts).toLocaleString();
+    return new Date(ts).toLocaleString(qxLocale);
   } catch {
     return String(ts);
   }
 }
 
 function kindLabel(kind) {
-  return kind === "break" ? "Short break" : "Focus session";
+  return kind === "break" ? text("Short break", "短休息") : text("Focus session", "专注");
 }
 
 function nextKind(kind) {
@@ -88,14 +103,14 @@ function startCommand(kind) {
 }
 
 function startLabel(kind) {
-  return kind === "break" ? "Start Short Break" : "Start Focus";
+  return kind === "break" ? text("Start Short Break", "开始短休息") : text("Start Focus", "开始专注");
 }
 
 function phaseLabel(phase) {
-  if (phase === "running") return "In progress";
-  if (phase === "paused") return "Paused";
-  if (phase === "complete") return "Complete";
-  return "Ready";
+  if (phase === "running") return text("In progress", "进行中");
+  if (phase === "paused") return text("Paused", "已暂停");
+  if (phase === "complete") return text("Complete", "已完成");
+  return text("Ready", "准备就绪");
 }
 
 function progressFor(state) {
@@ -150,12 +165,12 @@ function islandModel(state) {
   if (state.phase === "complete") {
     const recommendedKind = nextKind(state.kind);
     return {
-      primary: `${kindLabel(state.kind)} complete`,
-      secondary: recommendedKind === "break" ? "Take a short break" : "Ready to focus again",
+      primary: `${kindLabel(state.kind)} ${text("complete", "已完成")}`,
+      secondary: recommendedKind === "break" ? text("Take a short break", "休息一下") : text("Ready to focus again", "准备再次专注"),
       progress: 100,
       tone: "success",
       action: {
-        label: recommendedKind === "break" ? "Start break" : "Start focus",
+        label: recommendedKind === "break" ? text("Start break", "开始休息") : text("Start focus", "开始专注"),
         command: startCommand(recommendedKind),
         icon: "play",
       },
@@ -181,7 +196,7 @@ function islandModel(state) {
         },
     tone: state.phase === "paused" ? "warning" : "neutral",
     action: {
-      label: state.phase === "paused" ? "Resume" : "Pause",
+      label: state.phase === "paused" ? text("Resume", "继续") : text("Pause", "暂停"),
       command: "toggle-pomodoro",
       icon: state.phase === "paused" ? "play" : "pause",
     },
@@ -223,8 +238,8 @@ async function complete(context, state) {
     await publishIsland(context, completeState);
     try {
       await context.notification.show({
-        title: `${kindLabel(latest.kind)} complete`,
-        body: latest.kind === "break" ? "Time to focus again." : "Take a short break.",
+        title: `${kindLabel(latest.kind)} ${text("complete", "已完成")}`,
+        body: latest.kind === "break" ? text("Time to focus again.", "该再次专注了。") : text("Take a short break.", "休息一下。"),
       });
     } catch {
       /* notifications are best effort */
@@ -253,6 +268,7 @@ function armRuntimeTicker(context, state) {
  * an expired persisted deadline after panel close, app wake or runtime reload.
  */
 async function reconcileBackgroundTimer(context) {
+  setLocale(context);
   runtimeContext = context;
   const state = await readState(context);
   runtimeState = state;
@@ -270,6 +286,7 @@ async function reconcileBackgroundTimer(context) {
 }
 
 async function start(context, kind) {
+  setLocale(context);
   runtimeContext = context;
   const previous = await readState(context);
   if (previous.phase === "running" || previous.phase === "paused") {
@@ -295,6 +312,7 @@ async function start(context, kind) {
 }
 
 async function toggle(context) {
+  setLocale(context);
   runtimeContext = context;
   const state = await readState(context);
   if (state.phase === "idle" || state.phase === "complete") {
@@ -322,6 +340,7 @@ async function toggle(context) {
 }
 
 async function stop(context) {
+  setLocale(context);
   runtimeContext = context;
   const state = await readState(context);
   clearRuntimeTicker(context);
@@ -353,16 +372,16 @@ function historyItem(entry) {
       title: kindLabel(entry.kind),
       subtitle: formatDate(entry.startedAt),
       fields: [
-        { label: "Outcome", value: entry.outcome || "—", tone: completed ? "success" : "warning" },
-        { label: "Started", value: formatDate(entry.startedAt) },
-        { label: "Ended", value: formatDate(entry.endedAt) },
-        { label: "Planned", value: formatRemaining(entry.durationMs || 0) },
-        { label: "Elapsed", value: formatRemaining(entry.elapsedMs || 0) },
+        { label: text("Outcome", "结果"), value: entry.outcome || "—", tone: completed ? "success" : "warning" },
+        { label: text("Started", "开始时间"), value: formatDate(entry.startedAt) },
+        { label: text("Ended", "结束时间"), value: formatDate(entry.endedAt) },
+        { label: text("Planned", "计划时长"), value: formatRemaining(entry.durationMs || 0) },
+        { label: text("Elapsed", "已用时长"), value: formatRemaining(entry.elapsedMs || 0) },
       ],
     },
     actions: [{
       id: `again:${entry.kind}`,
-      label: entry.kind === "break" ? "Start another break" : "Start another focus",
+      label: entry.kind === "break" ? text("Start another break", "再次开始休息") : text("Start another focus", "再次开始专注"),
       command: entry.kind === "break" ? "start-short-break" : "start-focus",
       primary: true,
     }],
@@ -395,27 +414,27 @@ function activeItem(state, historyCount) {
 function currentDetail(state, historyCount) {
   const remaining = currentRemaining(state);
   const body = state.phase === "running"
-    ? "Focus is running. You can pause or stop it from Actions, the bottom bar, or the QxIsland."
+    ? text("Focus is running. You can pause or stop it from Actions, the bottom bar, or the QxIsland.", "专注正在进行中。你可以从操作区、底栏或 QxIsland 暂停或停止。")
     : state.phase === "paused"
-      ? "The timer is paused. Resume it from Actions or the QxIsland when you are ready."
+      ? text("The timer is paused. Resume it from Actions or the QxIsland when you are ready.", "计时器已暂停，准备好后可从操作区或 QxIsland 继续。")
       : state.phase === "complete"
-        ? "This session is complete. Start another focus round or take a short break."
-        : "Start a focus round from Actions to begin timing.";
+        ? text("This session is complete. Start another focus round or take a short break.", "本次已完成。可以再次专注或短暂休息。")
+        : text("Start a focus round from Actions to begin timing.", "从操作区开始一轮专注以启动计时。");
   return {
     title: kindLabel(state.kind),
     subtitle: `${formatRemaining(remaining)} · ${phaseLabel(state.phase)}`,
     body,
     fields: [
-      { label: "State", value: phaseLabel(state.phase), tone: state.phase === "complete" ? "success" : state.phase === "paused" ? "warning" : "accent" },
-      { label: "Remaining", value: formatRemaining(remaining) },
-      { label: "Progress", value: `${Math.round(progressFor(state))}%` },
-      { label: "History", value: historyCount },
-      { label: "Started", value: formatDate(state.startedAt) },
+      { label: text("State", "状态"), value: phaseLabel(state.phase), tone: state.phase === "complete" ? "success" : state.phase === "paused" ? "warning" : "accent" },
+      { label: text("Remaining", "剩余"), value: formatRemaining(remaining) },
+      { label: text("Progress", "进度"), value: `${Math.round(progressFor(state))}%` },
+      { label: text("History", "历史"), value: historyCount },
+      { label: text("Started", "开始时间"), value: formatDate(state.startedAt) },
       {
         label: "Island",
         value: state.phase === "idle" || state.islandVisible === false
-          ? "Hidden from Actions"
-          : "Docked / floating by Qx settings",
+          ? text("Hidden from Actions", "已从操作区隐藏")
+          : text("Docked / floating by Qx settings", "由 Qx 设置控制停靠/浮动"),
       },
     ],
   };
@@ -427,12 +446,12 @@ function panelActions(state, hasHistory) {
     actions = [
         {
           id: "toggle",
-          label: state.phase === "paused" ? "Resume" : "Pause",
+          label: state.phase === "paused" ? text("Resume", "继续") : text("Pause", "暂停"),
           command: "toggle-pomodoro",
           primary: true,
           kbd: "Enter",
         },
-        { id: "stop", label: "Stop", command: "stop-pomodoro", tone: "danger" },
+        { id: "stop", label: text("Stop", "停止"), command: "stop-pomodoro", tone: "danger" },
       ];
   } else if (state.phase === "complete") {
     const recommendedKind = nextKind(state.kind);
@@ -446,29 +465,30 @@ function panelActions(state, hasHistory) {
       },
       {
         id: `again:${state.kind}`,
-        label: state.kind === "break" ? "Repeat Short Break" : "Repeat Focus",
+        label: state.kind === "break" ? text("Repeat Short Break", "重复短休息") : text("Repeat Focus", "重复专注"),
         command: startCommand(state.kind),
       },
     ];
   } else {
     actions = [
-        { id: "focus", label: "Start Focus", command: "start-focus", primary: true, kbd: "Enter" },
-        { id: "break", label: "Start Short Break", command: "start-short-break" },
+        { id: "focus", label: text("Start Focus", "开始专注"), command: "start-focus", primary: true, kbd: "Enter" },
+        { id: "break", label: text("Start Short Break", "开始短休息"), command: "start-short-break" },
       ];
   }
   if (state.phase !== "idle") {
     actions.push({
       id: "toggle-island",
       label: state.islandVisible === false
-        ? "Show Timer on Island"
-        : "Hide Timer from Island",
+        ? text("Show Timer on Island", "在灵动岛显示计时器")
+        : text("Hide Timer from Island", "从灵动岛隐藏计时器"),
     });
   }
-  if (hasHistory) actions.push({ id: "clear-history", label: "Clear History", tone: "danger" });
+  if (hasHistory) actions.push({ id: "clear-history", label: text("Clear History", "清除历史"), tone: "danger" });
   return actions;
 }
 
 function renderPanel(container, context) {
+  setLocale(context);
   let destroyed = false;
   let state = defaultState();
   let history = [];
@@ -496,13 +516,13 @@ function renderPanel(container, context) {
     if (selectedId && !items.some((item) => item.id === selectedId)) selectedId = null;
     context.ui.mountWorkbench({
       title: "Pomodoro",
-      meta: `${phaseLabel(state.phase)} · ${history.length} sessions`,
+      meta: `${phaseLabel(state.phase)} · ${history.length} ${text("sessions", "个会话")}`,
       query,
-      queryPlaceholder: "Filter history…",
+      queryPlaceholder: text("Filter history…", "筛选历史…"),
       tabs: [
-        { id: "all", label: `All (${history.length})`, active: tab === "all" },
-        { id: "focus", label: "Focus", active: tab === "focus" },
-        { id: "break", label: "Breaks", active: tab === "break" },
+        { id: "all", label: `${text("All", "全部")} (${history.length})`, active: tab === "all" },
+        { id: "focus", label: text("Focus", "专注"), active: tab === "focus" },
+        { id: "break", label: text("Breaks", "休息"), active: tab === "break" },
       ],
       items,
       selectedId,
@@ -510,7 +530,7 @@ function renderPanel(container, context) {
       actions: panelActions(state, history.length > 0),
       island: islandModel(state),
       backgroundPoll: { command: "pomodoro-heartbeat" },
-      emptyText: "No sessions yet — start a focus round from Actions",
+      emptyText: text("No sessions yet — start a focus round from Actions", "还没有会话，请从操作区开始一轮专注"),
     }, {
       onTab: (id) => {
         tab = id || "all";
@@ -533,8 +553,8 @@ function renderPanel(container, context) {
           });
           await publishIsland(context, state);
           context.showToast(state.islandVisible === false
-            ? "Pomodoro hidden from Island"
-            : "Pomodoro shown on Island");
+            ? text("Pomodoro hidden from Island", "番茄钟已从灵动岛隐藏")
+            : text("Pomodoro shown on Island", "番茄钟已显示在灵动岛"));
           paint();
           return;
         }
@@ -542,7 +562,7 @@ function renderPanel(container, context) {
           await context.storage.persist.set(HISTORY_KEY, []);
           history = [];
           selectedId = null;
-          context.showToast("Pomodoro history cleared");
+          context.showToast(text("Pomodoro history cleared", "番茄钟历史已清除"));
           paint();
         }
       },

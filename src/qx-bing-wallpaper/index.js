@@ -4,11 +4,19 @@
  */
 
 const CACHE_KEY = "bing-wallpapers.v1";
+const LAST_APPLIED_KEY = "bing-wallpaper.last-applied.v1";
 const CACHE_TTL_MS = 3 * 60 * 60 * 1000;
 const WALLPAPER_DIR = "/qx-plugin-files/qx-bing-wallpaper/wallpapers";
 
+let qxLocale = "en";
+let stopLocale = null;
+function setLocale(context) {
+  stopLocale?.();
+  qxLocale = context?.locale?.current || "en";
+  stopLocale = context?.locale?.onChange?.(({ current }) => { qxLocale = current; }) || null;
+}
 function zh() {
-  return /^(zh-CN|zh-Hans|zh-SG|zh-MY|zh$)/i.test(String(navigator.language || ""));
+  return qxLocale === "zh-CN";
 }
 
 function text(en, cn) {
@@ -136,6 +144,7 @@ async function saveWallpaper(context, image) {
 }
 
 function createPanelState(context) {
+  setLocale(context);
   const state = {
     images: [],
     selectedId: null,
@@ -314,15 +323,25 @@ function createPanelState(context) {
   return { state, paint, load };
 }
 
-async function backgroundWallpaper(context, random) {
+async function backgroundWallpaper(context, random, notify = true) {
   const bundle = await loadWallpapers(context, true);
   const images = bundle.images || [];
   const image = random ? images[Math.floor(Math.random() * images.length)] : images[0];
   if (!image) throw new Error(text("No Bing wallpaper found", "没有找到 Bing 壁纸"));
-  await applyWallpaper(context, image);
-  context.showToast(random
-    ? text("Random Bing wallpaper set", "已设置随机 Bing 壁纸")
-    : text("Latest Bing wallpaper set", "已设置最新 Bing 壁纸"));
+  const path = await applyWallpaper(context, image);
+  await context.storage.persist.set(LAST_APPLIED_KEY, {
+    appliedAt: Date.now(),
+    imageId: imageId(image),
+    startdate: image.startdate || null,
+    mode: random ? "random" : "latest",
+    path,
+  });
+  if (notify) {
+    context.showToast(random
+      ? text("Random Bing wallpaper set", "已设置随机 Bing 壁纸")
+      : text("Latest Bing wallpaper set", "已设置最新 Bing 壁纸"));
+  }
+  return { image, path };
 }
 
 export default {
@@ -331,6 +350,7 @@ export default {
       name: "open-gallery",
       title: "Qx Bing Wallpaper",
       async run(context) {
+        setLocale(context);
         context.showToast(text("Open Qx Bing Wallpaper from Extensions", "请从扩展中打开 Qx Bing Wallpaper"));
       },
     },
@@ -339,8 +359,8 @@ export default {
       title: "Set Random Bing Wallpaper",
       mode: "no-view",
       async run(context) {
-        try { await backgroundWallpaper(context, true); }
-        catch (error) { context.showToast(String(error?.message || error)); }
+        setLocale(context);
+        await backgroundWallpaper(context, true);
       },
     },
     {
@@ -348,8 +368,18 @@ export default {
       title: "Set Latest Bing Wallpaper",
       mode: "no-view",
       async run(context) {
-        try { await backgroundWallpaper(context, false); }
-        catch (error) { context.showToast(String(error?.message || error)); }
+        setLocale(context);
+        await backgroundWallpaper(context, false);
+      },
+    },
+    {
+      name: "daily-wallpaper",
+      title: "Daily Bing Wallpaper",
+      mode: "no-view",
+      async run(context, options = {}) {
+        setLocale(context);
+        const mode = String(await preference(context, "dailyWallpaperMode", "latest"));
+        await backgroundWallpaper(context, mode === "random", options.launchType !== "background");
       },
     },
   ],
@@ -357,6 +387,7 @@ export default {
   panel: {
     title: "Qx Bing Wallpaper",
     render(container, context) {
+      setLocale(context);
       if (!context.ui?.mountWorkbench) {
         container.textContent = text("Qx 0.5.39 or newer is required.", "需要 Qx 0.5.39 或更高版本。");
         return;

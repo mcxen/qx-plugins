@@ -22,8 +22,9 @@
 - System identity/specification and storage capacity are cached per panel runtime;
   live polling must not rescan them. CPU/memory load, power, network counters,
   and processes refresh in the background without replacing content with loading UI.
-- In Hardware, only the selected live category polls after the initial snapshot;
-  CPU and Memory share an in-flight stats request when both initial rows render.
+- While Hardware is open, CPU, Memory, Power, and Network refresh together every
+  five seconds regardless of selection; CPU and Memory share the same in-flight
+  stats request so one refresh cycle stays internally consistent.
 - CPU specifications include the model plus optional physical/logical,
   performance/efficiency core counts, maximum frequency, cache line size, and
   native L1/L2/L3 cache records. They come from the cached system snapshot,

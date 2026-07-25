@@ -1,5 +1,20 @@
 const M1DDC_URL = "https://github.com/waydabber/m1ddc";
 
+var qxLocale = "en";
+var stopLocale = null;
+
+function setLocale(context) {
+  stopLocale?.();
+  qxLocale = context?.locale?.current || "en";
+  stopLocale = context?.locale?.onChange?.(({ current }) => {
+    qxLocale = current || "en";
+  }) || null;
+}
+
+function text(en, zh) {
+  return qxLocale === "zh-CN" ? zh : en;
+}
+
 function escapeHtml(value) {
   return String(value ?? "")
     .replaceAll("&", "&amp;")
@@ -163,7 +178,7 @@ function renderControl(parent, state, display, key, label, iconName, refresh) {
 
   const applyValue = async (next) => {
     const valueToSet = clampPercent(next);
-    state.status.textContent = `Setting ${label.toLowerCase()}...`;
+    state.status.textContent = text(`Setting ${label.toLowerCase()}...`, `正在设置${label}…`);
     state.loading = true;
     state.refreshButton.classList.add("is-loading");
     try {
@@ -172,7 +187,7 @@ function renderControl(parent, state, display, key, label, iconName, refresh) {
         control: key,
         value: valueToSet,
       });
-      state.status.textContent = `${label} set to ${valueToSet}%`;
+      state.status.textContent = text(`${label} set to ${valueToSet}%`, `${label}已设置为 ${valueToSet}%`);
       await refresh();
     } catch (error) {
       state.status.innerHTML = `<span class="display-error">${escapeHtml(String(error))}</span>`;
@@ -238,7 +253,7 @@ function stat(label, value, iconName) {
   return `
     <div class="display-stat">
       <div class="display-stat-label">${icon(iconName)}${escapeHtml(label)}</div>
-      <div class="display-stat-value">${value === null ? "N/A" : `${escapeHtml(value)}%`}</div>
+      <div class="display-stat-value">${value === null ? text("N/A", "不可用") : `${escapeHtml(value)}%`}</div>
     </div>
   `;
 }
@@ -256,24 +271,24 @@ function renderDisplay(body, state, display, refresh) {
         <div class="display-card-icon">${icon("monitor")}</div>
         <div>
           <div class="display-name">${escapeHtml(display.name)}</div>
-          <div class="display-meta">DDC display ${escapeHtml(display.id)} · ${escapeHtml(state.driver?.label || "driver")}</div>
+          <div class="display-meta">${text("DDC display", "DDC 显示器")} ${escapeHtml(display.id)} · ${escapeHtml(state.driver?.label || text("driver", "驱动"))}</div>
         </div>
       </div>
     </div>
     <div class="display-grid">
-      ${stat("Brightness", brightness, "sun")}
-      ${stat("Contrast", contrast, "contrast")}
-      ${stat("Volume", volume, "volume2")}
+      ${stat(text("Brightness", "亮度"), brightness, "sun")}
+      ${stat(text("Contrast", "对比度"), contrast, "contrast")}
+      ${stat(text("Volume", "音量"), volume, "volume2")}
     </div>
   `;
 
-  renderControl(card, state, display, "brightness", "Brightness", "sun", refresh);
-  renderControl(card, state, display, "contrast", "Contrast", "contrast", refresh);
-  renderControl(card, state, display, "volume", "Volume", "volume2", refresh);
+  renderControl(card, state, display, "brightness", text("Brightness", "亮度"), "sun", refresh);
+  renderControl(card, state, display, "contrast", text("Contrast", "对比度"), "contrast", refresh);
+  renderControl(card, state, display, "volume", text("Volume", "音量"), "volume2", refresh);
 
   const raw = document.createElement("pre");
   raw.className = "display-raw";
-  raw.textContent = display.raw || "No raw display details returned by the DDC driver.";
+  raw.textContent = display.raw || text("No raw display details returned by the DDC driver.", "DDC 驱动未返回原始显示器详情。");
   card.appendChild(raw);
   body.appendChild(card);
 }
@@ -281,9 +296,9 @@ function renderDisplay(body, state, display, refresh) {
 function renderEmpty(body, state, message) {
   body.innerHTML = `
     <div class="display-empty">
-      <div class="display-empty-title">${icon("activity")}External display DDC/CI is not ready</div>
+    <div class="display-empty-title">${icon("activity")}${text("External display DDC/CI is not ready", "外接显示器 DDC/CI 尚未就绪")}</div>
       <div>${escapeHtml(message)}</div>
-      <div style="margin-top:10px;">Install a compatible open-source CLI and make sure the display, cable, hub, and monitor settings support DDC/CI.</div>
+      <div style="margin-top:10px;">${text("Install a compatible open-source CLI and make sure the display, cable, hub, and monitor settings support DDC/CI.", "请安装兼容的开源命令行工具，并确认显示器、线缆、扩展坞和显示器设置支持 DDC/CI。")}</div>
       <div class="display-install-actions"></div>
     </div>
   `;
@@ -293,12 +308,12 @@ function renderEmpty(body, state, message) {
     state.loading = true;
     buttonElement.disabled = true;
     buttonElement.classList.add("is-loading");
-    state.status.textContent = `Installing ${driver} with Homebrew...`;
+    state.status.textContent = text(`Installing ${driver} with Homebrew...`, `正在通过 Homebrew 安装 ${driver}…`);
     try {
       await invoke(state.context, "qx_external_displays_install_driver", {
         req: { driver },
       });
-      state.status.textContent = `${driver} installed. Detecting displays...`;
+      state.status.textContent = text(`${driver} installed. Detecting displays...`, `${driver} 已安装，正在检测显示器…`);
       state.loading = false;
       await state.refresh();
     } catch (error) {
@@ -309,21 +324,22 @@ function renderEmpty(body, state, message) {
       buttonElement.classList.remove("is-loading");
     }
   };
-  const m1 = button("Install m1ddc", "github", "primary");
-  const ddcctl = button("Install ddcctl", "externalLink");
+  const m1 = button(text("Install m1ddc", "安装 m1ddc"), "github", "primary");
+  const ddcctl = button(text("Install ddcctl", "安装 ddcctl"), "externalLink");
   m1.onclick = () => installDriver("m1ddc", m1);
   ddcctl.onclick = () => installDriver("ddcctl", ddcctl);
   actions.append(m1, ddcctl);
 }
 
 function renderPanel(container, context) {
+  setLocale(context);
   const state = { context, driver: null, status: null, refreshButton: null, loading: false, refresh: null };
   container.innerHTML = STYLES + `
     <div class="display-root">
       <div class="display-topbar">
-        <div class="display-brand">${icon("monitor")}<span>External Displays</span></div>
-        <div class="display-status">Loading...</div>
-        <button class="display-button" data-action="refresh">${icon("refreshCw")}<span>Refresh</span></button>
+        <div class="display-brand">${icon("monitor")}<span>${text("External Displays", "外接显示器")}</span></div>
+        <div class="display-status">${text("Loading...", "加载中…")}</div>
+        <button class="display-button" data-action="refresh">${icon("refreshCw")}<span>${text("Refresh", "刷新")}</span></button>
         <button class="display-button" data-action="help">${icon("github")}<span>GitHub</span></button>
       </div>
       <div class="display-body"></div>
@@ -341,23 +357,23 @@ function renderPanel(container, context) {
     state.refreshButton.disabled = true;
     state.refreshButton.classList.add("is-loading");
     body.innerHTML = "";
-    state.status.textContent = "Detecting DDC driver...";
+    state.status.textContent = text("Detecting DDC driver...", "正在检测 DDC 驱动…");
     try {
       state.driver = await invoke(context, "qx_external_displays_driver");
       if (!state.driver) {
-        state.status.textContent = "No DDC CLI found";
-        renderEmpty(body, state, "Qx looks for m1ddc first, then ddcctl, in Homebrew and system binary paths.");
+        state.status.textContent = text("No DDC CLI found", "未找到 DDC 命令行工具");
+        renderEmpty(body, state, text("Qx looks for m1ddc first, then ddcctl, in Homebrew and system binary paths.", "Qx 会先在 Homebrew 和系统路径中查找 m1ddc，再查找 ddcctl。"));
         return;
       }
       state.status.textContent = `Using ${state.driver.label} at ${state.driver.path}`;
       const displays = await invoke(context, "qx_external_displays_list");
       body.innerHTML = "";
       if (!Array.isArray(displays) || displays.length === 0) {
-        renderEmpty(body, state, `${state.driver.label} is installed, but no controllable external display was reported.`);
+        renderEmpty(body, state, text(`${state.driver.label} is installed, but no controllable external display was reported.`, `${state.driver.label} 已安装，但没有检测到可控制的外接显示器。`));
         return;
       }
       displays.forEach((display) => renderDisplay(body, state, display, refresh));
-      state.status.textContent = `${displays.length} controllable display(s) · ${state.driver.label}`;
+      state.status.textContent = text(`${displays.length} controllable display(s) · ${state.driver.label}`, `${displays.length} 台可控制显示器 · ${state.driver.label}`);
     } catch (error) {
       state.status.innerHTML = `<span class="display-error">${escapeHtml(String(error))}</span>`;
       renderEmpty(body, state, String(error));
@@ -380,8 +396,9 @@ export default {
       name: "open-displays",
       title: "External Display Control",
       async run(context) {
+        setLocale(context);
         const driver = await invoke(context, "qx_external_displays_driver");
-        context.showToast(driver ? `External Display Control uses ${driver.label}` : "Install m1ddc or ddcctl first.");
+        context.showToast(driver ? text(`External Display Control uses ${driver.label}`, `外接显示器控制正在使用 ${driver.label}`) : text("Install m1ddc or ddcctl first.", "请先安装 m1ddc 或 ddcctl。"));
       },
     },
     {

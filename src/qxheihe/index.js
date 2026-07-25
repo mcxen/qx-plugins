@@ -15,9 +15,15 @@ const DEFAULT_TTL_MS = 5 * 60 * 1000;
 const DETAIL_FORMAT_VERSION = 2;
 const SIGN_ALPHABET = "AB45STUVWZEFGJ6CH01D237IXYPQRKLMN89";
 
+let qxLocale = "en";
+let stopLocale = null;
+function setLocale(context) {
+  stopLocale?.();
+  qxLocale = context?.locale?.current || "en";
+  stopLocale = context?.locale?.onChange?.(({ current }) => { qxLocale = current; }) || null;
+}
 function isChinese() {
-  return (navigator.languages || [navigator.language || ""])
-    .some((locale) => /^zh(?:-|$)/i.test(String(locale)));
+  return qxLocale === "zh-CN";
 }
 
 function copy(en, zh) {
@@ -464,6 +470,7 @@ function feedUrlAtOffset(base, offset, {
 }
 
 function createPanel(container, context) {
+  setLocale(context);
   const state = {
     all: [],
     visible: [],
@@ -582,9 +589,16 @@ function createPanel(container, context) {
         body: cached.commentNotice,
       });
     }
+    const detailMeta = [
+      post.user?.username || copy("Unknown author", "未知作者"),
+      topic,
+      formatTime(post.create_at),
+      `${compactNumber(post.link_award_num || post.up)} ${copy("likes", "赞")}`,
+      `${compactNumber(post.comment_num)} ${copy("comments", "评论")}`,
+    ].filter(Boolean);
     return {
       title: postTitle(post),
-      subtitle: `${post.user?.username || copy("Unknown author", "未知作者")} · ${topic} · ${formatTime(post.create_at)}`,
+      subtitle: detailMeta.join(" · "),
       status: state.detailLoading.has(id)
         ? { state: "loading", label: copy("Loading post and comments…", "正在加载正文与评论…") }
         : cached?.error
@@ -593,13 +607,6 @@ function createPanel(container, context) {
       body,
       images,
       imageLayout: state.imageLayout,
-      fields: [
-        { label: copy("Author", "作者"), value: post.user?.username || "—" },
-        { label: copy("Community", "社区"), value: topic },
-        { label: copy("Likes", "点赞"), value: Number(post.link_award_num || post.up || 0) },
-        { label: copy("Comments", "评论"), value: Number(post.comment_num || 0) },
-        { label: copy("Published", "发布时间"), value: formatTime(post.create_at) },
-      ],
       sections,
     };
   }
@@ -613,7 +620,7 @@ function createPanel(container, context) {
       title: postTitle(post),
       subtitle: cleanText(post.description) || `${post.user?.username || "—"} · ${topic}`,
       meta: `${post.user?.username || "—"} · ${formatTime(post.create_at)}`,
-      badge: `${isRead ? "" : `${copy("Unread", "未读")} · `}${compactNumber(post.link_award_num || post.up)} ♥ · ${compactNumber(post.comment_num)} ${copy("comments", "评论")}`,
+      badge: `${compactNumber(post.link_award_num || post.up)} ♥ · ${compactNumber(post.comment_num)} ${copy("comments", "评论")}`,
       tone: isRead ? "neutral" : "accent",
       image: images[0] ? {
         url: images[0],
@@ -925,6 +932,7 @@ const plugin = {
     name: "open-qxheihe",
     title: "打开 QxHeihe 小黑盒",
     async run(context) {
+      setLocale(context);
       await context.showToast(copy(
         "Open QxHeihe from Extensions or search.",
         "请从扩展模块或搜索中打开 QxHeihe。"
@@ -934,6 +942,7 @@ const plugin = {
   panel: {
     title: "QxHeihe 小黑盒",
     render(container, context) {
+      setLocale(context);
       activePanels.get(container)?.destroy();
       activePanels.set(container, createPanel(container, context));
     },

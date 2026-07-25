@@ -1,7 +1,14 @@
 /** Qx Brew — native Workbench list/detail plugin. */
 
+let qxLocale = "en";
+let stopLocale = null;
+function setLocale(context) {
+  stopLocale?.();
+  qxLocale = context?.locale?.current || "en";
+  stopLocale = context?.locale?.onChange?.(({ current }) => { qxLocale = current; }) || null;
+}
 function zh() {
-  return /^(zh-CN|zh-Hans|zh-SG|zh-MY|zh$)/i.test(String(navigator.language || ""));
+  return qxLocale === "zh-CN";
 }
 
 function text(en, cn) {
@@ -141,6 +148,7 @@ async function searchBrew(context, query) {
 }
 
 function createPanel(context) {
+  setLocale(context);
   const state = {
     tab: "installed",
     query: "",
@@ -353,6 +361,7 @@ export default {
       name: "open-brew",
       title: "Brew",
       async run(context) {
+        setLocale(context);
         context.showToast(text("Open Brew from Extensions", "请从扩展中打开 Brew"));
       },
     },
@@ -360,6 +369,7 @@ export default {
       name: "brew-outdated",
       title: "Brew: Outdated",
       async run(context) {
+        setLocale(context);
         try {
           const items = await loadOutdated(context);
           context.showToast(items.length
@@ -374,6 +384,7 @@ export default {
       name: "brew-upgrade-all",
       title: "Brew: Upgrade All Outdated",
       async run(context) {
+        setLocale(context);
         const answer = await context.prompt(text(
           "Upgrade all outdated packages? Type YES to continue.",
           "更新全部可更新软件包？输入 YES 继续。",

@@ -1,7 +1,7 @@
 {
   "id": "sysinfo",
   "name": "Sysinfo",
-  "version": "1.2.1",
+  "version": "1.2.2",
   "description": "Native Qx System Monitor for CPU, memory, battery health, storage, network, and processes on macOS and Windows.",
   "author": "Qx",
   "icon": "icon.svg",

@@ -102,6 +102,7 @@ const controller = {
 };
 
 const context = {
+  locale: { current: "zh-CN", preference: "zh-CN", onChange: () => () => {} },
   http: { fetch: mockFetch },
   storage: {
     persist: {
@@ -203,7 +204,8 @@ assert.equal(detailed.detail.replies.items[0].floor, 7);
 assert.equal(detailed.detail.replies.items[0].author, "回复用户");
 assert.equal(detailed.detail.replies.items[0].originalPoster, true);
 assert.match(detailed.detail.replies.items[0].body, /第一条回复/);
-assert.doesNotMatch(detailed.badge, /未读/);
+assert.equal(detailed.tone, "neutral");
+assert.doesNotMatch(detailed.badge, /已读|未读|\b(?:Read|Unread)\b/i);
 
 handlers.onFilter("read-state", "read");
 assert.equal(snapshot.items.length, 1);
@@ -211,9 +213,11 @@ handlers.onFilter("read-state", "unread");
 assert.equal(snapshot.items.length, 4);
 handlers.onFilter("read-state", "all");
 handlers.onAction("mark-visible-read");
-assert.ok(snapshot.items.every((item) => !/未读/.test(item.badge || "")));
+assert.ok(snapshot.items.every((item) => item.tone === "neutral"));
+assert.ok(snapshot.items.every((item) => !/已读|未读|\b(?:Read|Unread)\b/i.test(item.badge || "")));
 handlers.onAction("mark-visible-unread");
-assert.ok(snapshot.items.every((item) => /未读/.test(item.badge || "")));
+assert.ok(snapshot.items.every((item) => item.tone === "accent"));
+assert.ok(snapshot.items.every((item) => !/已读|未读|\b(?:Read|Unread)\b/i.test(item.badge || "")));
 handlers.onAction(`read:${selected.id}`);
 
 const dynamic = snapshot.items.find((item) => item.id === feeds[1].id);

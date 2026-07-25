@@ -31,6 +31,8 @@
 13. Edit `index.source.js` and `source/*.js`; `index.js` is the bundled runtime entry.
     Qx currently loads one entry source through a Blob URL, so packaged runtime code must not
     depend on unresolved relative imports.
+14. Keep read state in `item.tone`; badges contain image/comment metrics without
+    redundant `Read` / `Unread` text.
 
 ## Source layout
 
@@ -50,6 +52,7 @@ The mobile endpoint mapping and response normalization are adapted from
 
 - `http`: visitor passport, feeds, public following list, comments and image proxy.
 - `open-url`: open the selected post on Weibo.
+- `system`: save authenticated original image bytes to the user's Downloads directory.
 - `island`: show feed/detail/image loading activity through Workbench.
 
 ## Edit checklist

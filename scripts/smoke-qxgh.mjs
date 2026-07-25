@@ -71,6 +71,7 @@ const releasesHtml = `
 let snapshot = null;
 let handlers = null;
 let openedUrl = "";
+let trayItems = [];
 const panelContext = {
   http: {
     fetch: async (url) => ({
@@ -105,6 +106,10 @@ const panelContext = {
     openedUrl = url;
   },
   showToast() {},
+  tray: {
+    async setItems(items) { trayItems = items; },
+    async clear() { trayItems = []; },
+  },
   island: { dismiss: async () => {} },
 };
 const panelContainer = { innerHTML: "" };
@@ -116,6 +121,8 @@ while (!snapshot?.items?.length || snapshot.meta?.includes("Loading")) {
 }
 assert.ok(snapshot.items[0].progress >= 39 && snapshot.items[0].progress <= 42);
 assert.match(snapshot.items[0].detail.fields[4].value, /2 recent workflow runs/);
+assert.ok(trayItems.some((item) => item.id === "deployment-progress" && /Deployment \d+%/.test(item.title)));
+assert.ok(trayItems.some((item) => item.id === "deployment-progress" && item.presentation === "status"));
 handlers.onAction("open-item", snapshot.items[1]);
 assert.match(openedUrl, /actions\/runs\/102$/);
 handlers.onAction("refresh", snapshot.items[0]);

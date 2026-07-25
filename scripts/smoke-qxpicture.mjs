@@ -18,13 +18,25 @@ const waitForAsyncHandlers = async () => {
   await new Promise((resolve) => setTimeout(resolve, 0));
 };
 
-function createHarness(seed = new Map()) {
+const waitFor = async (predicate, message) => {
+  for (let attempt = 0; attempt < 200; attempt += 1) {
+    if (predicate()) return;
+    await new Promise((resolve) => setTimeout(resolve, 0));
+  }
+  throw new Error(message);
+};
+
+function createHarness(seed = new Map(), { failPattern = null } = {}) {
   let snapshot = null;
   let handlers = null;
   let promptCalls = 0;
+  let activeFetches = 0;
+  let maxActiveFetches = 0;
+  const httpCalls = [];
   const toasts = [];
   const storage = seed;
   const context = {
+    locale: { current: "en", preference: "en", onChange: () => () => {} },
     ui: {
       mountWorkbench(nextSnapshot, nextHandlers) {
         snapshot = nextSnapshot;
@@ -47,8 +59,37 @@ function createHarness(seed = new Map()) {
       },
     },
     http: {
-      async fetch() {
-        throw new Error("network is not used by the API configuration smoke test");
+      async fetch(url) {
+        const requestUrl = String(url);
+        httpCalls.push(requestUrl);
+        activeFetches += 1;
+        maxActiveFetches = Math.max(maxActiveFetches, activeFetches);
+        await new Promise((resolve) => setTimeout(resolve, 0));
+        activeFetches -= 1;
+        if (failPattern && requestUrl.includes(failPattern)) {
+          throw new Error(`mock failure for ${failPattern}`);
+        }
+        if (requestUrl.includes("api.lolicon.app")) {
+          return {
+            ok: true,
+            status: 200,
+            url: requestUrl,
+            headers: { "content-type": "application/json" },
+            async json() {
+              return { data: [{ urls: { original: "https://images.test/lolicon.jpg" } }] };
+            },
+          };
+        }
+        const bytes = Uint8Array.from([0xff, 0xd8, 0xff, 0xd9]);
+        return {
+          ok: true,
+          status: 200,
+          url: requestUrl,
+          headers: { "content-type": "image/jpeg" },
+          async arrayBuffer() {
+            return bytes.buffer;
+          },
+        };
       },
     },
     system: {
@@ -82,11 +123,55 @@ function createHarness(seed = new Map()) {
     get promptCalls() {
       return promptCalls;
     },
+    get httpCalls() {
+      return httpCalls;
+    },
+    get maxActiveFetches() {
+      return maxActiveFetches;
+    },
   };
 }
 
 const harness = createHarness();
+await waitFor(
+  () => Object.keys(harness.container.__qxpicture.state.imageCache).length === 12
+    && harness.container.__qxpicture.state.busy == null,
+  "empty-cache first open did not warm every configured API",
+);
+assert.equal(harness.httpCalls.length, 13, "12 sources include one JSON lookup plus image fetch");
+assert.ok(harness.maxActiveFetches <= 3, "batch refresh must keep bounded concurrency");
+assert.equal(
+  harness.snapshot.actions.some((action) => action.id === "refresh-all"),
+  true,
+  "browse actions expose Refresh All",
+);
+
+const cachedOpen = createHarness(harness.storage);
 await waitForAsyncHandlers();
+assert.equal(cachedOpen.httpCalls.length, 0, "cached reopen must not fetch automatically");
+cachedOpen.handlers.onAction("refresh-all", null);
+await waitFor(
+  () => cachedOpen.httpCalls.length === 13
+    && cachedOpen.container.__qxpicture.state.busy == null,
+  "Refresh All action did not update every API",
+);
+assert.ok(
+  cachedOpen.httpCalls.some((url) => url.includes("_qx=")),
+  "manual Refresh All must bypass upstream caches",
+);
+
+const partialFailure = createHarness(new Map(), { failPattern: "api.paugram.com" });
+await waitFor(
+  () => partialFailure.container.__qxpicture.state.busy == null
+    && Object.keys(partialFailure.container.__qxpicture.state.sourceErrors).length === 1,
+  "batch refresh did not retain a per-source failure",
+);
+assert.equal(
+  Object.keys(partialFailure.container.__qxpicture.state.imageCache).length,
+  11,
+  "one failed API must not abort successful batch entries",
+);
+
 harness.handlers.onTab("settings");
 harness.handlers.onAction("add-source", null);
 await waitForAsyncHandlers();
@@ -141,4 +226,4 @@ assert.equal(
 assert.ok(reloaded.container.__qxpicture.state.sourceDraft, "invalid draft remains editable");
 assert.match(reloaded.container.__qxpicture.state.error || "", /valid HTTP or HTTPS URL/i);
 
-process.stdout.write("Qxpicture API draft smoke test passed\n");
+process.stdout.write("Qxpicture cache warm-up, Refresh All, and API draft smoke tests passed\n");

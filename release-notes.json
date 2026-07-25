@@ -43,6 +43,14 @@
     ],
     "qx-bing-wallpaper": [
       {
+        "version": "2.2.0",
+        "published_at": "2026-07-25",
+        "notes_localizations": {
+          "en": "Fixed daily wallpaper recovery after sleep or restart, replaced competing schedules with one configurable daily job, and report real failures instead of false success.",
+          "zh-CN": "修复休眠或重启后的每日壁纸补执行，合并为一个可配置的每日任务，并让真实失败不再显示为成功。"
+        }
+      },
+      {
         "version": "2.1.0",
         "published_at": "2026-07-23",
         "notes_localizations": {
@@ -52,6 +60,14 @@
       }
     ],
     "qxgh": [
+      {
+        "version": "1.5.0",
+        "published_at": "2026-07-25",
+        "notes_localizations": {
+          "en": "Added a native tray deployment submenu with estimated progress, elapsed/expected time, refresh, and CI summary actions.",
+          "zh-CN": "新增原生托盘部署子菜单：显示预计进度、已用/预计时间，并提供刷新和 CI 摘要操作。"
+        }
+      },
       {
         "version": "1.4.0",
         "published_at": "2026-07-23",
@@ -70,6 +86,22 @@
       }
     ],
     "qxheihe": [
+      {
+        "version": "1.4.2",
+        "published_at": "2026-07-25",
+        "notes_localizations": {
+          "en": "Moved author, community, publication time, like, and comment metadata into the Workbench detail header.",
+          "zh-CN": "将作者、社区、发布时间、点赞和评论信息移动到 Workbench 详情作者信息行，移除正文下方重复属性表。"
+        }
+      },
+      {
+        "version": "1.4.1",
+        "published_at": "2026-07-25",
+        "notes_localizations": {
+          "en": "Simplified list badges by expressing read state through accent and neutral colors without redundant Read or Unread text.",
+          "zh-CN": "精简列表标记：已读状态仅通过蓝色与灰色区分，不再重复显示“已读/未读”文字。"
+        }
+      },
       {
         "version": "1.4.0",
         "published_at": "2026-07-23",
@@ -120,6 +152,14 @@
       }
     ],
     "qxcoolapk": [
+      {
+        "version": "1.4.1",
+        "published_at": "2026-07-25",
+        "notes_localizations": {
+          "en": "Simplified post badges by keeping read state color-only while retaining image, like, and reply metrics.",
+          "zh-CN": "精简帖子标记：已读状态仅保留蓝色与灰色区分，继续显示图片、点赞和回复数据。"
+        }
+      },
       {
         "version": "1.4.0",
         "published_at": "2026-07-24",
@@ -203,6 +243,14 @@
     ],
     "qxweibo": [
       {
+        "version": "1.1.1",
+        "published_at": "2026-07-25",
+        "notes_localizations": {
+          "en": "Simplified post badges by keeping read state color-only while retaining image and comment metrics.",
+          "zh-CN": "精简微博标记：已读状态仅保留蓝色与灰色区分，继续显示图片和评论数据。"
+        }
+      },
+      {
         "version": "1.1.0",
         "published_at": "2026-07-24",
         "notes_localizations": {
@@ -229,6 +277,14 @@
     ],
     "qxpicture": [
       {
+        "version": "0.5.0",
+        "published_at": "2026-07-25",
+        "notes_localizations": {
+          "en": "Added a Refresh All API Images action and a bounded first-open cache warm-up when no image previews are stored.",
+          "zh-CN": "新增“刷新全部 API 壁纸”操作，并在没有图片缓存的首次打开时以受控并发批量预热。"
+        }
+      },
+      {
         "version": "0.4.0",
         "published_at": "2026-07-24",
         "notes_localizations": {
@@ -246,6 +302,14 @@
       }
     ],
     "sysinfo": [
+      {
+        "version": "1.2.2",
+        "published_at": "2026-07-25",
+        "notes_localizations": {
+          "en": "Kept CPU, memory, power, and network rows refreshing together while the Hardware view is open.",
+          "zh-CN": "进入硬件视图后，CPU、内存、电源与网络数据保持同一轮持续刷新。"
+        }
+      },
       {
         "version": "1.2.1",
         "published_at": "2026-07-23",

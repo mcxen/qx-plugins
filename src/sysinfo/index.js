@@ -1,5 +1,12 @@
+let qxLocale = "en";
+let stopLocale = null;
+function setLocale(context) {
+  stopLocale?.();
+  qxLocale = context?.locale?.current || "en";
+  stopLocale = context?.locale?.onChange?.(({ current }) => { qxLocale = current; }) || null;
+}
 function zh() {
-  return /^(zh-CN|zh-Hans|zh-SG|zh-MY|zh$)/i.test(String(navigator.language || ""));
+  return qxLocale === "zh-CN";
 }
 
 function text(en, cn) {
@@ -104,6 +111,7 @@ const HARDWARE_IDS = ["system", "cpu", "memory", "power", "storage", "network"];
 const LIVE_HARDWARE_IDS = new Set(["cpu", "memory", "power", "network"]);
 
 function createPanel(context) {
+  setLocale(context);
   const state = {
     view: "hardware",
     query: "",
@@ -227,9 +235,6 @@ function createPanel(context) {
       onSelect(id) {
         state.selectedId = id;
         paint();
-        if (state.view === "hardware" && LIVE_HARDWARE_IDS.has(id)) {
-          void reload({ background: true, selectedOnly: true });
-        }
       },
       onAction(id) {
         if (id === "refresh") {
@@ -510,22 +515,25 @@ function createPanel(context) {
     return items.filter(Boolean);
   };
 
-  const reload = async ({ background = false, forceStatic = false, selectedOnly = false } = {}) => {
+  const loadLiveHardwareItems = async () => {
+    const items = await Promise.all(
+      [...LIVE_HARDWARE_IDS].map((id) => loadHardwareItem(id, false)),
+    );
+    return items.filter(Boolean);
+  };
+
+  const reload = async ({ background = false, forceStatic = false, liveOnly = false } = {}) => {
     const generation = ++state.generation;
     if (!background) state.loading = true;
     state.error = null;
     if (!background) paint();
     try {
-      const selectedItem = selectedOnly
-        ? await loadHardwareItem(state.selectedId, false)
-        : null;
-      const items = selectedOnly ? null : await loadItems({ forceStatic });
+      const liveItems = liveOnly ? await loadLiveHardwareItems() : null;
+      const items = liveOnly ? null : await loadItems({ forceStatic });
       if (state.dead || generation !== state.generation) return;
-      if (selectedOnly) {
-        if (selectedItem) {
-          state.items = state.items.map((item) =>
-            item.id === selectedItem.id ? selectedItem : item);
-        }
+      if (liveOnly) {
+        const liveById = new Map(liveItems.map((item) => [item.id, item]));
+        state.items = state.items.map((item) => liveById.get(item.id) || item);
         return;
       }
       const previousSelection = state.selectedId;
@@ -564,9 +572,7 @@ function createPanel(context) {
   context.setInterval(() => {
     if (state.dead || state.loading) return;
     if (state.view === "processes") void reload({ background: true });
-    else if (LIVE_HARDWARE_IDS.has(state.selectedId)) {
-      void reload({ background: true, selectedOnly: true });
-    }
+    else void reload({ background: true, liveOnly: true });
   }, 5_000);
 
   return {
@@ -585,6 +591,7 @@ export default {
       name: "open-sysinfo",
       title: "Sysinfo",
       async run(context) {
+        setLocale(context);
         context.showToast(text("Open Sysinfo from Extensions", "请从扩展中打开 Sysinfo"));
       },
     },
@@ -592,6 +599,7 @@ export default {
   panel: {
     title: "Sysinfo",
     async render(container, context) {
+      setLocale(context);
       const panel = createPanel(context);
       container.__qxSysinfo = panel;
       panel.paint();

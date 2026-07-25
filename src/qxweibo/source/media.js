@@ -3,7 +3,7 @@ export function responseContentType(response) {
     .split(";")[0].trim().toLowerCase();
 }
 
-function bytesToBase64(bytes) {
+export function bytesToBase64(bytes) {
   let output = "";
   for (let offset = 0; offset < bytes.length; offset += 32_768) {
     output += String.fromCharCode(...bytes.subarray(offset, offset + 32_768));

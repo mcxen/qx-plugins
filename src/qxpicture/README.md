@@ -9,7 +9,9 @@ Qx Workbench plugin for browsing random image APIs.
   edit select options, restore defaults, or delete with confirmation.
 - Edit each API's parameter schema in Settings and save reusable parameter presets.
 - Generate encoded query strings or POST JSON bodies from the same stored schema.
-- Refresh the selected source.
+- Refresh the selected source or refresh every configured API with one Action.
+- On first open, automatically fetch every configured API once when no image
+  cache exists; subsequent opens remain cache-first.
 - Keep cached images visible while each async refresh reports item-level status.
 - Use the host-owned adaptive detail image and zoom dialog.
 - Save or copy the current image.

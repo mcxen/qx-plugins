@@ -39,6 +39,15 @@ When an active run is using QxIsland, open the QxGH Actions menu and choose
 and keeps it hidden across panel polling/refreshes for the current panel session.
 Use **Show Active Run on Island** to restore it.
 
+## Tray deployment status
+
+Enable **Show active deployment in tray** in the QxGH extension preferences.
+After QxGH refreshes, opening the Qx system tray menu shows a native **QxGH ·
+repository** submenu. It includes the estimated deployment percentage and
+elapsed/expected duration, plus **Refresh deployments** and **Show CI summary**.
+Status rows are intentionally non-clickable so macOS and Windows retain their
+own accessibility, contrast, and menu styling.
+
 ## Permissions
 
-`http` · `open-url` · `notifications` · `island`
+`http` · `open-url` · `notifications` · `island` · `tray`

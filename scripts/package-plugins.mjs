@@ -15,6 +15,13 @@ const repoRoot = path.resolve(scriptDir, "..");
 const sourceRoot = path.join(repoRoot, "src");
 const rawBase = process.env.QX_PLUGIN_RAW_BASE || "https://raw.githubusercontent.com/mcxen/qx-plugins/main";
 const today = new Date().toISOString().slice(0, 10);
+const onlyArg = process.argv.find((arg) => arg.startsWith("--only="));
+const requestedIds = new Set(
+  (onlyArg?.slice("--only=".length) || "")
+    .split(",")
+    .map((id) => id.trim())
+    .filter(Boolean),
+);
 
 async function readJson(filePath, fallback = null) {
   try {
@@ -105,7 +112,7 @@ async function main() {
     { schema_version: 1, plugins: {} },
   );
   const previousById = new Map((previous.plugins || []).map((entry) => [entry.id, entry]));
-  const plugins = [];
+  const plugins = requestedIds.size > 0 ? [...(previous.plugins || [])] : [];
   const packaged = [];
 
   for (const pluginDir of await pluginDirs()) {
@@ -113,6 +120,7 @@ async function main() {
     if (!existsSync(manifestPath)) continue;
     const manifest = await readJson(manifestPath);
     const id = manifest.id || path.basename(pluginDir);
+    if (requestedIds.size > 0 && !requestedIds.has(id)) continue;
     const archiveName = `${id}.qx-plugin`;
     const archivePath = path.join(repoRoot, archiveName);
     const previousEntry = previousById.get(id);
@@ -158,7 +166,7 @@ async function main() {
       ? previousEntry.updated_at || today
       : today;
 
-    plugins.push({
+    const nextEntry = {
       id,
       name: manifest.name || id,
       version: manifest.version || "1.0.0",
@@ -171,10 +179,20 @@ async function main() {
       author: manifest.author || "",
       min_app_version: manifest.min_app_version || manifest.minAppVersion || previousEntry?.min_app_version || "0.4.28",
       releases,
-    });
+    };
+    const previousIndex = plugins.findIndex((entry) => entry.id === id);
+    if (previousIndex >= 0) plugins[previousIndex] = nextEntry;
+    else plugins.push(nextEntry);
     packaged.push({ id, archive: archiveName, size_bytes: size, checksum_sha256: checksum });
   }
 
+  if (requestedIds.size > 0) {
+    const packagedIds = new Set(packaged.map((entry) => entry.id));
+    const missing = [...requestedIds].filter((id) => !packagedIds.has(id));
+    if (missing.length > 0) {
+      throw new Error(`unknown plugin id(s): ${missing.join(", ")}`);
+    }
+  }
   plugins.sort((a, b) => a.name.localeCompare(b.name));
   await writeFile(
     path.join(repoRoot, "index.json"),

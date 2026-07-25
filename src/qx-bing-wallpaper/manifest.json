@@ -1,7 +1,7 @@
 {
   "id": "qx-bing-wallpaper",
   "name": "Qx Bing Wallpaper",
-  "version": "2.1.0",
+  "version": "2.2.0",
   "description": "Browse Bing's daily images in a native Qx Gallery, then download or set them as wallpaper.",
   "author": "Qx",
   "icon": "extension-icon.png",
@@ -41,6 +41,18 @@
       "required": false,
       "default": "~/Downloads",
       "description": "Folder used by the Download action."
+    },
+    {
+      "id": "dailyWallpaperMode",
+      "label": "Daily Wallpaper",
+      "type": "select",
+      "required": false,
+      "default": "latest",
+      "description": "Choose whether the daily background task uses the latest or a random Bing image.",
+      "options": [
+        { "label": "Latest Image", "value": "latest" },
+        { "label": "Random Recent Image", "value": "random" }
+      ]
     }
   ],
   "entry": "index.js",
@@ -56,18 +68,25 @@
     {
       "name": "set-random-wallpaper",
       "title": "Set Random Bing Wallpaper",
-      "description": "Set a random recent Bing wallpaper once per day.",
+      "description": "Set a random recent Bing wallpaper now.",
       "icon": "random-wallpaper-icon.png",
       "keywords": ["random", "bing", "wallpaper"],
-      "mode": "no-view",
-      "interval": "1d"
+      "mode": "no-view"
     },
     {
       "name": "set-latest-wallpaper",
       "title": "Set Latest Bing Wallpaper",
-      "description": "Set the latest Bing wallpaper once per day.",
+      "description": "Set the latest Bing wallpaper now.",
       "icon": "auto-switch-wallpaper-icon.png",
       "keywords": ["latest", "bing", "wallpaper"],
+      "mode": "no-view"
+    },
+    {
+      "name": "daily-wallpaper",
+      "title": "Daily Bing Wallpaper",
+      "description": "Apply the configured Bing wallpaper once per day.",
+      "icon": "auto-switch-wallpaper-icon.png",
+      "keywords": ["daily", "automatic", "bing", "wallpaper"],
       "mode": "no-view",
       "interval": "1d"
     }
