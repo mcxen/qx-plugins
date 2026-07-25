@@ -1,8 +1,8 @@
 {
   "id": "qx-bing-wallpaper",
   "name": "Qx Bing Wallpaper",
-  "version": "2.2.0",
-  "description": "Browse Bing's daily images in a native Qx Gallery, then download or set them as wallpaper.",
+  "version": "2.2.1",
+  "description": "Browse Bing's daily images in a native Qx thumbnail list, then download or set them as wallpaper.",
   "author": "Qx",
   "icon": "extension-icon.png",
   "screenshots": [
@@ -60,7 +60,7 @@
     {
       "name": "open-gallery",
       "title": "Qx Bing Wallpaper",
-      "description": "Browse Bing daily wallpapers in the Qx Gallery.",
+      "description": "Browse Bing daily wallpapers in a Qx Workbench list with thumbnails.",
       "icon": "bing-wallpaper-icon.png",
       "keywords": ["bing", "wallpaper", "gallery", "必应", "壁纸", "图库"],
       "mode": "view"

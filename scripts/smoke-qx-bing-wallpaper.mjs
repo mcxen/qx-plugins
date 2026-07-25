@@ -36,11 +36,13 @@ function createContext({ mode = "latest", failArchive = false } = {}) {
   const wallpaperPaths = [];
   const invokes = [];
   const toasts = [];
+  const workbenchSnapshots = [];
   return {
     persisted,
     wallpaperPaths,
     invokes,
     toasts,
+    workbenchSnapshots,
     context: {
       locale: { current: "en", onChange: () => () => {} },
       getPreference: async (id) => (id === "dailyWallpaperMode" ? mode : null),
@@ -76,10 +78,40 @@ function createContext({ mode = "latest", failArchive = false } = {}) {
           invokes.push({ command, args });
         },
       },
+      ui: {
+        mountWorkbench: (snapshot) => {
+          workbenchSnapshots.push(snapshot);
+          return {
+            update(nextSnapshot) {
+              workbenchSnapshots.push(nextSnapshot);
+            },
+          };
+        },
+      },
       showToast: (message) => toasts.push(String(message)),
     },
   };
 }
+
+const panelRun = createContext();
+const panelContainer = { textContent: "", innerHTML: "" };
+plugin.panel.render(panelContainer, panelRun.context);
+await new Promise((resolve) => setImmediate(resolve));
+await new Promise((resolve) => setImmediate(resolve));
+const panelSnapshot = panelRun.workbenchSnapshots.at(-1);
+assert.equal(panelSnapshot.layout.kind, "list", "wallpapers must use the Workbench List layout");
+assert.ok(panelSnapshot.items.length > 0, "wallpaper list must publish fetched items");
+assert.match(
+  panelSnapshot.items[0].image.url,
+  /_640x360\.jpg$/,
+  "Workbench List items must publish thumbnail images",
+);
+assert.match(
+  panelSnapshot.items[0].detail.image.url,
+  /_UHD\.jpg$/,
+  "Workbench detail must retain the full-resolution image",
+);
+plugin.panel.destroy(panelContainer);
 
 const daily = plugin.commands.find((command) => command.name === "daily-wallpaper");
 assert.ok(daily, "daily command missing");

@@ -43,6 +43,14 @@
     ],
     "qx-bing-wallpaper": [
       {
+        "version": "2.2.1",
+        "published_at": "2026-07-25",
+        "notes_localizations": {
+          "en": "Changed wallpaper browsing to a Workbench thumbnail list so the left column stays readable when the full-size detail is open.",
+          "zh-CN": "将壁纸浏览改为 Workbench 缩略图列表，打开大图详情时左侧列表不再挤压堆叠。"
+        }
+      },
+      {
         "version": "2.2.0",
         "published_at": "2026-07-25",
         "notes_localizations": {

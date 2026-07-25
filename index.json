@@ -112,11 +112,11 @@
     {
       "id": "qx-bing-wallpaper",
       "name": "Qx Bing Wallpaper",
-      "version": "2.2.0",
-      "description": "Browse Bing's daily images in a native Qx Gallery, then download or set them as wallpaper.",
+      "version": "2.2.1",
+      "description": "Browse Bing's daily images in a native Qx thumbnail list, then download or set them as wallpaper.",
       "download_url": "https://raw.githubusercontent.com/mcxen/qx-plugins/main/qx-bing-wallpaper.qx-plugin",
-      "size_bytes": 11773411,
-      "checksum_sha256": "1a02b1eb2de6ce1ed79ab69d2c37fe6a70cb9d0a63baf0e45e43e04717d86ed3",
+      "size_bytes": 11773804,
+      "checksum_sha256": "8a1005d9f40a9676365416f318c0baa5cd0df4734caabfedf31b37d703377404",
       "required_permissions": [
         "http",
         "open-url",
@@ -130,6 +130,14 @@
       "author": "Qx",
       "min_app_version": "0.6.13",
       "releases": [
+        {
+          "version": "2.2.1",
+          "published_at": "2026-07-25",
+          "notes_localizations": {
+            "en": "Changed wallpaper browsing to a Workbench thumbnail list so the left column stays readable when the full-size detail is open.",
+            "zh-CN": "将壁纸浏览改为 Workbench 缩略图列表，打开大图详情时左侧列表不再挤压堆叠。"
+          }
+        },
         {
           "version": "2.2.0",
           "published_at": "2026-07-25",

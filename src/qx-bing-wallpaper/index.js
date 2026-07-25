@@ -176,7 +176,7 @@ function createPanelState(context) {
       title: "Qx Bing Wallpaper",
       query: state.query,
       queryPlaceholder: text("Search wallpapers…", "搜索壁纸…"),
-      layout: { kind: "gallery", columns: 4, aspectRatio: "landscape" },
+      layout: { kind: "list" },
       loading: state.loading,
       error: state.error,
       meta: state.stale

@@ -5,11 +5,11 @@ Raycast converter or compatibility runtime.
 
 ## Features
 
-- Host-rendered Workbench Gallery with search and keyboard selection
+- Host-rendered Workbench List with thumbnails, search, and keyboard selection
 - Adaptive full-resolution detail media with host-owned zoom preview
-- Per-image async feedback without clearing the Gallery
+- Per-image async feedback without clearing the List
 - Item Actions: set wallpaper, download, copy image link, open Bing source
-- Panel Actions: set a random wallpaper and refresh the Gallery
+- Panel Actions: set a random wallpaper and refresh the List
 - Three-hour persisted cache with stale fallback
 - One daily background task, configurable to use the latest or a random recent image
 - Durable last-applied record; download or wallpaper failures remain visible as failed background runs

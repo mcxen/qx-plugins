@@ -7,7 +7,7 @@ Native Qx business plugin. Do not run it through the Raycast converter.
 - `open-gallery`: panel entry
 - `set-random-wallpaper` / `set-latest-wallpaper`: manual no-view commands
 - `daily-wallpaper`: the single daily background command; reads `dailyWallpaperMode`
-- Workbench Gallery: images, selection, structured details, item/panel Actions
+- Workbench List: thumbnail images, selection, structured details, item/panel Actions
 - Host-owned adaptive image detail + zoom Dialog; no iframe CSS/lightbox workaround
 - Persisted Bing archive cache
 
@@ -37,7 +37,7 @@ Native Qx business plugin. Do not run it through the Raycast converter.
 ## Edit checklist
 
 - Bump `manifest.version` for behavior changes.
-- Keep `min_app_version` aligned with the Workbench Gallery host version.
+- Keep `min_app_version` aligned with the Workbench List thumbnail host version.
 - Run `npm run package:plugins`.
 - Run `npm run smoke:bing-wallpaper`.
-- Install `qx-bing-wallpaper.qx-plugin` locally and verify Gallery selection plus every Action.
+- Install `qx-bing-wallpaper.qx-plugin` locally and verify List thumbnail selection plus every Action.
