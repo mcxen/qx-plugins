@@ -495,11 +495,11 @@
     {
       "id": "sysinfo",
       "name": "Sysinfo",
-      "version": "1.3.0",
-      "description": "Native Qx System Monitor for CPU, memory, battery health, storage, network, and processes on macOS and Windows.",
+      "version": "1.4.0",
+      "description": "Native Qx System Monitor for CPU, memory, power, storage, displays, network, and processes on macOS and Windows.",
       "download_url": "https://raw.githubusercontent.com/mcxen/qx-plugins/main/sysinfo.qx-plugin",
-      "size_bytes": 31872,
-      "checksum_sha256": "9db7ae69f8dfbe6ae2fad0b75faf8a7a15ff6418902e5b1e9b1ca14c54a0fab3",
+      "size_bytes": 40877,
+      "checksum_sha256": "4505a35b5d86a32cf43ff6e4213b88aa36d65d856a3dd4b7eebca5653fdb64e1",
       "required_permissions": [
         "system",
         "system-stats",
@@ -509,8 +509,24 @@
       ],
       "updated_at": "2026-07-26",
       "author": "Qx",
-      "min_app_version": "0.6.34",
+      "min_app_version": "0.6.38",
       "releases": [
+        {
+          "version": "1.4.0",
+          "published_at": "2026-07-26",
+          "notes_localizations": {
+            "en": "Added a localized display inventory with resolution, refresh rate, scaling, rotation, connection technology and available EDID identifiers, plus recognizable hardware category icons.",
+            "zh-CN": "新增汉化显示器清单，展示分辨率、刷新率、缩放、旋转、连接协议及可用的 EDID 标识，并为硬件分类补充易识别图标。"
+          }
+        },
+        {
+          "version": "1.3.1",
+          "published_at": "2026-07-26",
+          "notes_localizations": {
+            "en": "Prevented overlapping monitor refreshes and adopted Qx's direct Win32 system and battery sampling path.",
+            "zh-CN": "避免系统监视刷新重叠，并接入 Qx 的原生 Win32 系统与电池采样路径。"
+          }
+        },
         {
           "version": "1.3.0",
           "published_at": "2026-07-26",

@@ -31,6 +31,10 @@ Surfaces:
   remaining time, cycle count, condition, maximum capacity, temperature and
   available capacity metrics.
 - Storage: system-volume usage.
+- Displays: name, resolution, refresh rate, scale, rotation, built-in/primary
+  state, and available connection technology / EDID identifiers. Windows uses
+  the host DisplayConfig adapter for HDMI, DisplayPort, eDP, Miracast and
+  virtual/indirect paths; unavailable macOS connector metadata renders as `—`.
 - Network: active IPv4 interfaces and byte counters.
 - Processes: sortable process list with an explicit, confirmed terminate action.
 - System Settings: semantic destinations through `context.system.openSettings`.
@@ -40,8 +44,16 @@ as the Hardware view is open, regardless of which category is selected.
 Processes refreshes on the same cadence while that view is open. Background
 refresh keeps the current rows usable, and CPU plus Memory share one in-flight
 stats sample so their values come from the same refresh cycle.
-Static system specifications and storage capacity are cached per panel runtime
-and only rescanned when the user explicitly chooses Refresh.
+The entire refresh cycle is single-flight: timer ticks are skipped while a
+sample is active, while a tab change or manual refresh is queued once. This
+prevents slow native providers from accumulating overlapping requests.
+Static system specifications, storage capacity, and display inventory are cached
+per panel runtime and only rescanned when the user explicitly chooses Refresh.
+
+Storage capacity is available now. Per-device SMART health and temperature need
+separate native NVMe/ATA IOCTL (Windows) and IOKit (macOS) adapters. USB bridge
+hardware and Apple/third-party drivers may not expose those sensors, so future
+fields remain optional and must never be synthesized from volume utilization.
 
 Kernel family and release follow neofetch's lightweight approach: the host reads
 the equivalent of `uname -srm` once as part of that static snapshot. Linux OS
@@ -51,6 +63,10 @@ its Darwin kernel identity.
 Battery fields are optional by contract: Windows hardware and firmware expose
 different subsets than macOS. Missing metrics render as `—`; a desktop without a
 battery renders a deliberate No Battery state instead of failing the panel.
+On Qx 0.6.36 and newer, Windows system, storage, network, process, and power
+reads use direct Win32 APIs. The polling path does not start PowerShell or WMI
+providers; extended battery-health fields remain optional when the native
+system status API does not expose them.
 
 Permissions:
 

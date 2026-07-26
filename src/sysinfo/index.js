@@ -107,7 +107,7 @@ function powerState(power) {
 }
 
 const VIEW_IDS = ["hardware", "processes"];
-const HARDWARE_IDS = ["system", "cpu", "memory", "power", "storage", "network"];
+const HARDWARE_IDS = ["system", "cpu", "memory", "power", "storage", "displays", "network"];
 const LIVE_HARDWARE_IDS = new Set(["cpu", "memory", "power", "network"]);
 
 function createPanel(context) {
@@ -126,7 +126,11 @@ function createPanel(context) {
   let systemSnapshotRequest = null;
   let storageCache = null;
   let storageRequest = null;
+  let displaysCache = null;
+  let displaysRequest = null;
   let statsRequest = null;
+  let reloadRequest = null;
+  let queuedReload = null;
 
   const systemSnapshot = async (force = false) => {
     if (!force && systemSnapshotCache) return systemSnapshotCache;
@@ -154,6 +158,19 @@ function createPanel(context) {
       return storageCache;
     } finally {
       if (storageRequest === request) storageRequest = null;
+    }
+  };
+
+  const displaysSnapshot = async (force = false) => {
+    if (!force && displaysCache) return displaysCache;
+    if (!force && displaysRequest) return displaysRequest;
+    const request = context.system.displays();
+    displaysRequest = request;
+    try {
+      displaysCache = await request;
+      return displaysCache;
+    } finally {
+      if (displaysRequest === request) displaysRequest = null;
     }
   };
 
@@ -185,6 +202,7 @@ function createPanel(context) {
   const settingsSection = () => {
     if (state.view === "processes") return "apps";
     if (state.selectedId === "storage") return "storage";
+    if (state.selectedId === "displays") return "display";
     if (state.selectedId === "network") return "network";
     if (state.selectedId === "power") return "power";
     return "about";
@@ -197,7 +215,7 @@ function createPanel(context) {
       state.selectedId = items[0].id;
     }
     context.ui.mountWorkbench({
-      title: "Sysinfo",
+      title: text("Sysinfo", "系统信息"),
       layout: { kind: "list" },
       query: state.query,
       queryPlaceholder: state.view === "processes"
@@ -258,11 +276,14 @@ function createPanel(context) {
       id: "system",
       title: text("System", "系统"),
       subtitle: info.hostname || info.os || info.macOS || environment.platform,
-      icon: "◉",
+      icon: "🖥️",
       badge: environment.arch,
       detail: {
         title: info.hostname,
-        subtitle: info.os || info.macOS,
+        subtitle: text(
+          "Computer identity, operating system, architecture, and kernel",
+          "计算机身份、操作系统、架构与内核信息",
+        ),
         fields: [
           { label: text("Platform", "平台"), value: info.platform || environment.platform },
           { label: text("Architecture", "架构"), value: info.architecture || environment.arch },
@@ -287,12 +308,16 @@ function createPanel(context) {
       id: "cpu",
       title: "CPU",
       subtitle: info.chip || "—",
-      icon: "C",
+      icon: "⚙️",
       badge: percent(used),
       progress: used,
       tone: used >= 85 ? "danger" : used >= 65 ? "warning" : "accent",
       detail: {
         title: text("Processor", "处理器"),
+        subtitle: text(
+          "Processor model, topology, frequency, cache, and current load",
+          "处理器型号、核心拓扑、频率、缓存与当前负载",
+        ),
         fields: [
           { label: text("Used", "已用"), value: percent(used) },
           { label: text("Free", "空闲"), value: percent(Math.max(0, 100 - used)) },
@@ -317,12 +342,16 @@ function createPanel(context) {
       id: "memory",
       title: text("Memory", "内存"),
       subtitle: `${usedGb.toFixed(2)} / ${totalGb.toFixed(2)} GB`,
-      icon: "M",
+      icon: "🧩",
       badge: percent(used),
       progress: used,
       tone: used >= 90 ? "danger" : used >= 75 ? "warning" : "success",
       detail: {
         title: text("Memory", "内存"),
+        subtitle: text(
+          "Physical memory capacity and current utilization",
+          "物理内存容量与当前使用情况",
+        ),
         fields: [
           { label: text("Used", "已用"), value: `${usedGb.toFixed(2)} GB` },
           { label: text("Free", "可用"), value: `${Math.max(0, totalGb - usedGb).toFixed(2)} GB` },
@@ -341,7 +370,7 @@ function createPanel(context) {
         id: "power",
         title: text("Power", "电源"),
         subtitle: power.summary || text("This device reports no battery", "该设备未报告电池"),
-        icon: "P",
+        icon: "🔌",
         badge: power.source || "—",
         detail: {
           title: text("Power", "电源"),
@@ -359,7 +388,7 @@ function createPanel(context) {
       id: "power",
       title: text("Power", "电源"),
       subtitle: `${powerState(power)} · ${power.source}`,
-      icon: "P",
+      icon: "🔋",
       badge: `${Math.round(level)}%`,
       progress: level,
       tone: power.isCharging || power.fullyCharged
@@ -371,7 +400,10 @@ function createPanel(context) {
             : "accent",
       detail: {
         title: text("Battery & Power", "电池与电源"),
-        subtitle: power.summary,
+        subtitle: text(
+          "Battery state, charging source, capacity, health, and temperature",
+          "电池状态、充电来源、容量、健康度与温度",
+        ),
         sections: [
           {
             title: text("Charge", "电量"),
@@ -417,18 +449,89 @@ function createPanel(context) {
       id: "storage",
       title: text("Storage", "存储"),
       subtitle: storage.summary,
-      icon: "D",
+      icon: "💾",
       badge: storage.percentUsed,
       progress,
       tone: progress >= 90 ? "danger" : progress >= 75 ? "warning" : "accent",
       detail: {
         title: text("System Storage", "系统存储"),
+        subtitle: text(
+          "System volume capacity. SMART health and device temperature appear only when the hardware exposes them.",
+          "系统卷容量；SMART 健康度与设备温度仅在硬件开放数据时显示。",
+        ),
         fields: [
           { label: text("Used", "已用"), value: storage.used },
           { label: text("Free", "可用"), value: storage.free },
           { label: text("Total", "总计"), value: storage.total },
           { label: text("Utilization", "使用率"), value: storage.percentUsed },
         ],
+      },
+    }];
+  };
+
+  const displayItems = async (force = false) => {
+    const displays = await displaysSnapshot(force);
+    const list = Array.isArray(displays) ? displays : [];
+    const sections = list.map((display, index) => ({
+      title: display.name || text(`Display ${index + 1}`, `显示器 ${index + 1}`),
+      fields: [
+        {
+          label: text("Resolution", "分辨率"),
+          value: `${number(display.width)} × ${number(display.height)}`,
+        },
+        {
+          label: text("Refresh rate", "刷新率"),
+          value: number(display.refreshRateHz) > 0
+            ? `${number(display.refreshRateHz).toFixed(2)} Hz`
+            : "—",
+        },
+        {
+          label: text("Scale factor", "缩放比例"),
+          value: number(display.scaleFactor) > 0
+            ? `${number(display.scaleFactor).toFixed(2)}×`
+            : "—",
+        },
+        {
+          label: text("Rotation", "旋转"),
+          value: display.rotationDegrees == null
+            ? "—"
+            : `${number(display.rotationDegrees).toFixed(0)}°`,
+        },
+        { label: text("Connection", "连接协议"), value: optional(display.connection) },
+        { label: text("Built-in", "内置显示器"), value: yesNo(display.isBuiltin) },
+        { label: text("Primary", "主显示器"), value: yesNo(display.isPrimary) },
+        {
+          label: text("EDID manufacturer", "EDID 厂商码"),
+          value: display.edidManufacturerId == null
+            ? "—"
+            : `0x${number(display.edidManufacturerId).toString(16).toUpperCase().padStart(4, "0")}`,
+        },
+        {
+          label: text("EDID product", "EDID 产品码"),
+          value: display.edidProductCode == null
+            ? "—"
+            : `0x${number(display.edidProductCode).toString(16).toUpperCase().padStart(4, "0")}`,
+        },
+      ],
+    }));
+    const primary = list.find((display) => display.isPrimary) || list[0];
+    return [{
+      id: "displays",
+      title: text("Displays", "显示器"),
+      subtitle: list.length
+        ? text(`${list.length} connected displays`, `已连接 ${list.length} 台显示器`)
+        : text("No display information", "未读取到显示器信息"),
+      icon: "🖥️",
+      badge: primary
+        ? `${number(primary.width)} × ${number(primary.height)}`
+        : "—",
+      detail: {
+        title: text("Displays", "显示器"),
+        subtitle: text(
+          "Resolution, refresh rate, scaling, rotation, and available connection protocol / EDID identifiers",
+          "分辨率、刷新率、缩放、旋转，以及系统可提供的连接协议与 EDID 标识",
+        ),
+        sections,
       },
     }];
   };
@@ -457,10 +560,14 @@ function createPanel(context) {
       subtitle: devices.length
         ? text(`${devices.length} active interfaces`, `${devices.length} 个活动接口`)
         : text("No active IPv4 interface", "没有活动的 IPv4 接口"),
-      icon: "N",
+      icon: "🌐",
       badge: `↓ ${bytes(counters.totalBytesIn)} · ↑ ${bytes(counters.totalBytesOut)}`,
       detail: {
         title: text("Network", "网络"),
+        subtitle: text(
+          "Active IPv4 interfaces and cumulative traffic counters",
+          "活动 IPv4 网络接口与累计流量计数",
+        ),
         fields: [
           { label: text("Received", "已接收"), value: bytes(counters.totalBytesIn) },
           { label: text("Sent", "已发送"), value: bytes(counters.totalBytesOut) },
@@ -478,7 +585,7 @@ function createPanel(context) {
         id: `process-${process.pid}`,
         title: process.name,
         subtitle: `PID ${process.pid}`,
-        icon: "●",
+        icon: "⚙️",
         badge: `${percent(process.cpu)} CPU · ${percent(process.mem)} MEM`,
         tone: process.cpu >= 80 ? "danger" : process.cpu >= 40 ? "warning" : "neutral",
         detail: {
@@ -503,6 +610,7 @@ function createPanel(context) {
     if (id === "memory") return (await memoryItems())[0];
     if (id === "power") return (await powerItems())[0];
     if (id === "storage") return (await storageItems(forceStatic))[0];
+    if (id === "displays") return (await displayItems(forceStatic))[0];
     if (id === "network") return (await networkItems())[0];
     return null;
   };
@@ -522,7 +630,7 @@ function createPanel(context) {
     return items.filter(Boolean);
   };
 
-  const reload = async ({ background = false, forceStatic = false, liveOnly = false } = {}) => {
+  const performReload = async ({ background = false, forceStatic = false, liveOnly = false } = {}) => {
     const generation = ++state.generation;
     if (!background) state.loading = true;
     state.error = null;
@@ -549,6 +657,29 @@ function createPanel(context) {
       state.loading = false;
       paint();
     }
+  };
+
+  const reload = (options = {}) => {
+    if (reloadRequest) {
+      // Timer ticks are disposable. User navigation/refresh is retained and
+      // runs once after the active sample so different views cannot overlap.
+      if (!options.background) {
+        state.generation += 1;
+        queuedReload = options;
+      }
+      return reloadRequest;
+    }
+    const request = performReload(options);
+    reloadRequest = request;
+    void request.finally(() => {
+      if (reloadRequest === request) reloadRequest = null;
+      if (!state.dead && queuedReload) {
+        const next = queuedReload;
+        queuedReload = null;
+        void reload(next);
+      }
+    });
+    return request;
   };
 
   const killSelected = async () => {
@@ -581,6 +712,7 @@ function createPanel(context) {
     destroy() {
       state.dead = true;
       state.generation += 1;
+      queuedReload = null;
     },
   };
 }

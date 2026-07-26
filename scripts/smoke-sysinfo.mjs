@@ -1,18 +1,20 @@
 import assert from "node:assert/strict";
-import { pathToFileURL } from "node:url";
 
-const moduleUrl = pathToFileURL(new URL("../src/sysinfo/index.js", import.meta.url).pathname);
+const moduleUrl = new URL("../src/sysinfo/index.js", import.meta.url);
 moduleUrl.searchParams.set("smoke", String(Date.now()));
 const plugin = (await import(moduleUrl.href)).default;
 
 let intervalCallback = null;
 let handlers = null;
 let latestView = null;
+let blockPower = false;
+let releasePower = null;
 const calls = {
   stats: 0,
   power: 0,
   network: 0,
   counters: 0,
+  displays: 0,
   processes: 0,
 };
 
@@ -43,6 +45,9 @@ const context = {
     },
     power: async () => {
       calls.power += 1;
+      if (blockPower) {
+        await new Promise((resolve) => { releasePower = resolve; });
+      }
       return {
         batteryPresent: true,
         batteryLevel: 80,
@@ -59,6 +64,23 @@ const context = {
       total: "100 GB",
       percentUsed: "50%",
     }),
+    displays: async () => {
+      calls.displays += 1;
+      return [{
+        id: 1,
+        name: "Smoke Display",
+        width: 2560,
+        height: 1440,
+        refreshRateHz: 144,
+        scaleFactor: 1.25,
+        rotationDegrees: 0,
+        connection: "DisplayPort",
+        edidManufacturerId: 0x1234,
+        edidProductCode: 0x5678,
+        isPrimary: true,
+        isBuiltin: false,
+      }];
+    },
     network: async () => {
       calls.network += 1;
       return { devices: [{ name: "Ethernet", ip: "192.0.2.1" }] };
@@ -92,17 +114,25 @@ const context = {
 const container = {};
 await plugin.panel.render(container, context);
 
-for (let attempt = 0; attempt < 20 && latestView?.items?.length !== 6; attempt += 1) {
+for (let attempt = 0; attempt < 20 && latestView?.items?.length !== 7; attempt += 1) {
   await new Promise((resolve) => setTimeout(resolve, 0));
 }
 
-assert.equal(latestView.items.length, 6, "initial Hardware snapshot should render all rows");
+assert.equal(latestView.items.length, 7, "initial Hardware snapshot should render all rows");
 assert.equal(calls.stats, 1, "CPU and Memory should share the initial stats request");
 assert.equal(calls.power, 1);
 assert.equal(calls.network, 1);
+assert.equal(calls.displays, 1, "display inventory should load once with the static snapshot");
+const displayItem = latestView.items.find((item) => item.id === "displays");
+assert.equal(displayItem?.icon, "🖥️");
+assert.equal(displayItem?.detail?.sections?.[0]?.fields?.find(
+  (field) => field.label === "Connection",
+)?.value, "DisplayPort");
 assert.ok(intervalCallback, "Hardware refresh interval should be registered");
 
 handlers.onSelect("system");
+blockPower = true;
+intervalCallback();
 intervalCallback();
 for (let attempt = 0; attempt < 20 && calls.power < 2; attempt += 1) {
   await new Promise((resolve) => setTimeout(resolve, 0));
@@ -110,8 +140,15 @@ for (let attempt = 0; attempt < 20 && calls.power < 2; attempt += 1) {
 
 assert.equal(calls.stats, 2, "one live cycle should still share CPU/Memory stats");
 assert.equal(calls.power, 2, "Power refreshes even when System is selected");
+assert.equal(calls.network, 2, "overlapping timer ticks should share one refresh cycle");
+releasePower();
+blockPower = false;
+for (let attempt = 0; attempt < 20 && latestView.loading; attempt += 1) {
+  await new Promise((resolve) => setTimeout(resolve, 0));
+}
 assert.equal(calls.network, 2, "Network refreshes even when System is selected");
 assert.equal(calls.counters, 2, "Network counters refresh in the same cycle");
+assert.equal(calls.displays, 1, "static display inventory should not refresh on live timer ticks");
 assert.equal(latestView.selectedId, "system", "background refresh preserves selection");
 
 await plugin.panel.destroy(container);

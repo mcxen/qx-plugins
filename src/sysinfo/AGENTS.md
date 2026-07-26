@@ -4,7 +4,7 @@
 
 - One `open-sysinfo` launcher command.
 - One host-rendered Workbench panel. The Hardware view uses the left List for
-  System, CPU, Memory, Power, Storage, and Network categories; Processes remains
+  System, CPU, Memory, Power, Storage, Displays, and Network categories; Processes remains
   a separate top-level view because its rows are processes, not hardware types.
 - No custom iframe HTML/CSS, island, background timer, or direct native command.
 
@@ -22,7 +22,10 @@
 - `panel.render` must paint immediately, then load asynchronously.
 - Live tabs refresh no faster than every five seconds and retain usable content
   while the next sample loads.
-- System identity/specification and storage capacity are cached per panel runtime;
+- Refresh is single-flight across timer ticks, tab changes, and manual actions.
+  Disposable background ticks are skipped while a sample is active; user-driven
+  navigation/refresh is queued once and runs after the active sample.
+- System identity/specification, storage capacity, and display inventory are cached per panel runtime;
   live polling must not rescan them. CPU/memory load, power, network counters,
   and processes refresh in the background without replacing content with loading UI.
 - While Hardware is open, CPU, Memory, Power, and Network refresh together every
@@ -36,6 +39,11 @@
 - Kernel identity follows neofetch's cached `uname -srm` model: keep kernel
   family and release separate in the host contract and render the combined
   value without polling it.
+- Display inventory depends only on `context.system.displays()`. The host owns
+  xcap/DisplayConfig/CoreGraphics details and returns optional connection/EDID
+  fields; the plugin renders missing protocol data as `—`.
+- Storage SMART health and temperature are optional future host fields. Never
+  infer health from free capacity or label an unavailable sensor as healthy.
 - Process termination always requires a typed `YES` confirmation.
 - Keep both `platforms` entries; unsupported fields degrade to `—`, not a
   platform-specific fork.
@@ -59,5 +67,7 @@
 ## Do not
 
 - Spawn PowerShell, Bash, `system_profiler`, or `taskkill` from the plugin.
+- Reintroduce Windows WMI/PowerShell polling in the plugin or host hot path;
+  Qx 0.6.36+ supplies the native Win32 implementation behind `context.system.*`.
 - Render a second list/detail shell in iframe HTML.
 - Poll at sub-second intervals from `panel.render`.
