@@ -498,8 +498,8 @@
       "version": "1.4.0",
       "description": "Native Qx System Monitor for CPU, memory, power, storage, displays, network, and processes on macOS and Windows.",
       "download_url": "https://raw.githubusercontent.com/mcxen/qx-plugins/main/sysinfo.qx-plugin",
-      "size_bytes": 40877,
-      "checksum_sha256": "4505a35b5d86a32cf43ff6e4213b88aa36d65d856a3dd4b7eebca5653fdb64e1",
+      "size_bytes": 40148,
+      "checksum_sha256": "55138f8d614732ad9ef0e71215111c8a2d9108aff086669f48c04d6959478202",
       "required_permissions": [
         "system",
         "system-stats",
