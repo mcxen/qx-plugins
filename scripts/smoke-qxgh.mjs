@@ -72,19 +72,30 @@ let snapshot = null;
 let handlers = null;
 let openedUrl = "";
 let trayItems = [];
+let releaseRunDetails = null;
+const runDetailsGate = new Promise((resolve) => {
+  releaseRunDetails = resolve;
+});
+let runDetailRequests = 0;
 const panelContext = {
   http: {
-    fetch: async (url) => ({
-      ok: true,
-      status: 200,
-      text: async () => {
-        if (String(url).endsWith("/actions")) return actionsHtml;
-        if (String(url).endsWith("/releases")) return releasesHtml;
-        if (String(url).includes("/runs/102")) return `<span>Total duration</span><b>4m 0s</b>${" ".repeat(250)}`;
-        if (String(url).includes("/runs/101")) return `<span>Total duration</span><b>6m 0s</b>${" ".repeat(250)}`;
-        return `<span>Total duration</span><b>1m 0s</b>${" ".repeat(250)}`;
-      },
-    }),
+    fetch: async (url) => {
+      if (String(url).includes("/runs/")) {
+        runDetailRequests += 1;
+        await runDetailsGate;
+      }
+      return {
+        ok: true,
+        status: 200,
+        text: async () => {
+          if (String(url).endsWith("/actions")) return actionsHtml;
+          if (String(url).endsWith("/releases")) return releasesHtml;
+          if (String(url).includes("/runs/102")) return `<span>Total duration</span><b>4m 0s</b>${" ".repeat(250)}`;
+          if (String(url).includes("/runs/101")) return `<span>Total duration</span><b>6m 0s</b>${" ".repeat(250)}`;
+          return `<span>Total duration</span><b>1m 0s</b>${" ".repeat(250)}`;
+        },
+      };
+    },
   },
   storage: { persist: { get: async () => null, set: async () => {} } },
   ui: {
@@ -117,6 +128,12 @@ await plugin.panel.render(panelContainer, panelContext);
 const started = Date.now();
 while (!snapshot?.items?.length || snapshot.meta?.includes("Loading")) {
   if (Date.now() - started > 5_000) throw new Error("Timed out loading QxGH panel smoke");
+  await new Promise((resolve) => setTimeout(resolve, 10));
+}
+assert.equal(snapshot.loading, false, "slow run-detail hydration must not block the first list");
+assert.ok(runDetailRequests > 0, "duration hydration should continue in the background");
+releaseRunDetails();
+for (let attempt = 0; attempt < 100 && !(snapshot.items[0]?.progress >= 39); attempt += 1) {
   await new Promise((resolve) => setTimeout(resolve, 10));
 }
 assert.ok(snapshot.items[0].progress >= 39 && snapshot.items[0].progress <= 42);

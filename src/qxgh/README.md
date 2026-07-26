@@ -5,6 +5,11 @@ Watch **GitHub Actions** and **Releases** for public repos you pin in preference
 **Module mode: business-only** — declarative `context.ui` Workbench with structured list/detail/actions.
 **Data: public HTML only** — `github.com/.../actions` and `.../releases` (no REST API).
 
+Repository Actions and Releases index pages are fetched concurrently. The first
+usable list renders as soon as those index pages arrive; historical run
+durations are enriched in the background so a slow system proxy cannot hold the
+whole panel on its loading skeleton.
+
 ## Running progress
 
 GitHub's public Actions list does not expose a real percentage. QxGH labels its

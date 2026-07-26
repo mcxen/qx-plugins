@@ -311,16 +311,7 @@ function parseRunDurationHtml(html) {
 }
 
 async function hydrateRunDurations(context, runs, previousRuns = []) {
-  const previous = new Map(
-    previousRuns
-      .filter((run) => run?.id && run.duration)
-      .map((run) => [String(run.id), run.duration]),
-  );
-  for (const run of runs) {
-    if (!run.duration && previous.has(String(run.id))) {
-      run.duration = previous.get(String(run.id));
-    }
-  }
+  reuseRunDurations(runs, previousRuns);
   const candidates = runs
     .filter((run) =>
       !isActiveRun(run)
@@ -337,6 +328,20 @@ async function hydrateRunDurations(context, runs, previousRuns = []) {
       // A missing duration sample must not fail the Actions list.
     }
   }));
+  return runs;
+}
+
+function reuseRunDurations(runs, previousRuns = []) {
+  const previous = new Map(
+    previousRuns
+      .filter((run) => run?.id && run.duration)
+      .map((run) => [String(run.id), run.duration]),
+  );
+  for (const run of runs) {
+    if (!run.duration && previous.has(String(run.id))) {
+      run.duration = previous.get(String(run.id));
+    }
+  }
   return runs;
 }
 
@@ -423,32 +428,41 @@ function isActiveRun(run) {
 async function fetchRepoBundle(context, full, previousRuns = []) {
   const actionsUrl = `https://github.com/${full}/actions`;
   const releasesUrl = `https://github.com/${full}/releases`;
-  const errors = [];
-  let runs = [];
-  let releases = [];
+  const [actionsResult, releasesResult] = await Promise.all([
+    fetchPage(context, actionsUrl)
+      .then((html) => {
+        const runs = reuseRunDurations(
+          parseActionsHtml(html, full),
+          previousRuns.filter((run) => run.repo === full),
+        );
+        return {
+          runs,
+          error: runs.length ? null : `${full} actions: no runs parsed (page layout?)`,
+        };
+      })
+      .catch((error) => ({
+        runs: [],
+        error: `${full} actions: ${error.message || error}`,
+      })),
+    fetchPage(context, releasesUrl)
+      .then((html) => {
+        const releases = parseReleasesHtml(html, full);
+        return {
+          releases,
+          error: releases.length ? null : `${full} releases: no tags parsed`,
+        };
+      })
+      .catch((error) => ({
+        releases: [],
+        error: `${full} releases: ${error.message || error}`,
+      })),
+  ]);
 
-  try {
-    const html = await fetchPage(context, actionsUrl);
-    runs = parseActionsHtml(html, full);
-    if (!runs.length) errors.push(`${full} actions: no runs parsed (page layout?)`);
-    else await hydrateRunDurations(
-      context,
-      runs,
-      previousRuns.filter((run) => run.repo === full),
-    );
-  } catch (e) {
-    errors.push(`${full} actions: ${e.message || e}`);
-  }
-
-  try {
-    const html = await fetchPage(context, releasesUrl);
-    releases = parseReleasesHtml(html, full);
-    if (!releases.length) errors.push(`${full} releases: no tags parsed`);
-  } catch (e) {
-    errors.push(`${full} releases: ${e.message || e}`);
-  }
-
-  return { runs, releases, errors };
+  return {
+    runs: actionsResult.runs,
+    releases: releasesResult.releases,
+    errors: [actionsResult.error, releasesResult.error].filter(Boolean),
+  };
 }
 
 async function fetchAll(context, { repos, previousRuns = [] }) {
@@ -459,8 +473,10 @@ async function fetchAll(context, { repos, previousRuns = [] }) {
   const releases = [];
   const errors = [];
 
-  for (const full of repos) {
-    const part = await fetchRepoBundle(context, full, previousRuns);
+  const repoBundles = await Promise.all(
+    repos.map((full) => fetchRepoBundle(context, full, previousRuns)),
+  );
+  for (const part of repoBundles) {
     runs.push(...part.runs);
     releases.push(...part.releases);
     errors.push(...part.errors);
@@ -918,6 +934,27 @@ function renderPanel(container, context) {
       }
       await publishTray(context, bundle);
       paint();
+      const hydrationBundle = bundle;
+      void (async () => {
+        await hydrateRunDurations(context, hydrationBundle.runs || []);
+        if (destroyed || sequence !== loadSequence || bundle !== hydrationBundle) return;
+        try {
+          if (context.storage?.persist?.set) {
+            await context.storage.persist.set(CACHE_KEY, {
+              repos: hydrationBundle.repos,
+              runs: hydrationBundle.runs,
+              releases: hydrationBundle.releases,
+              savedAt: hydrationBundle.savedAt,
+              error: hydrationBundle.error,
+              mode: "html",
+            });
+          }
+        } catch {
+          /* optional */
+        }
+        await publishTray(context, hydrationBundle);
+        paint();
+      })();
     } catch (err) {
       if (destroyed || sequence !== loadSequence) return;
       bundle = bundle

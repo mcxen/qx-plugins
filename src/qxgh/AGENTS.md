@@ -31,6 +31,9 @@ elapsed time) plus refresh actions; do not try to inject CSS into a system menu.
 The Workbench Actions list must expose a Show/Hide Island toggle. A user dismissal
 must call `context.island.dismiss()` and suppress automatic panel polling from
 recreating the session until the user explicitly shows it again.
+Actions and Releases index pages for every configured repository must load in
+parallel. Run-detail duration hydration is secondary enrichment: never keep the
+first usable Workbench list in a loading state while those detail pages resolve.
 
 ## Layout
 

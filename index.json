@@ -267,11 +267,11 @@
     {
       "id": "qxgh",
       "name": "QxGH",
-      "version": "1.5.0",
+      "version": "1.5.1",
       "description": "QxGH — watch GitHub Actions and Releases from public github.com pages (no REST API). Business-only workbench UI.",
       "download_url": "https://raw.githubusercontent.com/mcxen/qx-plugins/main/qxgh.qx-plugin",
-      "size_bytes": 45709,
-      "checksum_sha256": "015e8306d6da35316b1114dd582e42b8fe2a85b0676b81f4311d225b722a19be",
+      "size_bytes": 49193,
+      "checksum_sha256": "14b48403b3f0c38564f67d795d4bee424c9f0335130b997c22f0f0cf47f7c6c3",
       "required_permissions": [
         "http",
         "open-url",
@@ -279,10 +279,18 @@
         "island",
         "tray"
       ],
-      "updated_at": "2026-07-25",
+      "updated_at": "2026-07-26",
       "author": "mcx",
       "min_app_version": "0.5.38",
       "releases": [
+        {
+          "version": "1.5.1",
+          "published_at": "2026-07-26",
+          "notes_localizations": {
+            "en": "Fixed long cold loads behind a system proxy by fetching repository indexes concurrently and moving run-duration enrichment behind the first usable list.",
+            "zh-CN": "修复系统代理下冷启动长时间卡在加载状态：仓库索引改为并发请求，运行耗时在首批可用列表之后后台补齐。"
+          }
+        },
         {
           "version": "1.5.0",
           "published_at": "2026-07-25",
