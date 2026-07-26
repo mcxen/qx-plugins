@@ -13,6 +13,9 @@
 - Keep `manifest.panel` and `export default.panel` together.
 - Depend only on typed `context.system.*` ports. Platform differences belong in
   Qx Rust adapters, never in this plugin.
+- `manifest.homeWidgets` only associates supported semantic system sources with
+  this panel. Home chrome, sampling, layout, focus, and resize behavior remain
+  host-owned; never add widget DOM or CSS to the plugin.
 - Battery presence, external power, charging, and fully charged are independent
   states. Never infer one from another. Optional health/capacity metrics render
   as `—` on hardware that does not expose them.

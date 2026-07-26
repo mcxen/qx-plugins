@@ -8,6 +8,12 @@ and Windows, without carrying over Raycast components or runtime shims.
 The plugin uses only stable `context.system.*` ports. PowerShell, Win32, IOKit,
 `ioreg`, and other platform details stay inside Qx host adapters.
 
+Its manifest also associates the CPU, memory, power, and network semantic data
+sources with the Sysinfo panel through `homeWidgets`. Qx renders those cards on
+the empty Launcher itself, shares the existing non-blocking system sampler, and
+opens Sysinfo when a card is activated. The plugin does not inject Home DOM,
+CSS, polling, or layout dimensions.
+
 The Hardware view uses the left Workbench list to choose a hardware category;
 the center detail pane shows that category. Processes stays as a separate view
 because each process must remain an individually selectable and actionable row.
