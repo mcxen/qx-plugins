@@ -270,8 +270,8 @@
       "version": "1.5.1",
       "description": "QxGH — watch GitHub Actions and Releases from public github.com pages (no REST API). Business-only workbench UI.",
       "download_url": "https://raw.githubusercontent.com/mcxen/qx-plugins/main/qxgh.qx-plugin",
-      "size_bytes": 49193,
-      "checksum_sha256": "14b48403b3f0c38564f67d795d4bee424c9f0335130b997c22f0f0cf47f7c6c3",
+      "size_bytes": 47919,
+      "checksum_sha256": "37602ffbac23e986a2e0d7c7399e138476d9e08204412f8f9e4e9e311db45920",
       "required_permissions": [
         "http",
         "open-url",
