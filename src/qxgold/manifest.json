@@ -1,0 +1,79 @@
+{
+  "id": "qxgold",
+  "name": "QX Gold 金价追踪",
+  "names": {
+    "zh-CN": "QX Gold 金价追踪",
+    "en": "QX Gold Gold Price Tracker"
+  },
+  "version": "1.1.0",
+  "description": "追踪京东金融积存金实时价格与历史曲线。",
+  "descriptions": {
+    "zh-CN": "追踪京东金融积存金实时价格与历史曲线。",
+    "en": "Track live JD accumulated-gold prices and a cached history chart."
+  },
+  "author": "Qx",
+  "keywords": ["黄金", "金价", "gold", "京东", "投资"],
+  "permissions": ["http", "island"],
+  "preferences": [
+    {
+      "id": "showInIsland",
+      "label": "显示在灵动岛 / Show in Island",
+      "type": "select",
+      "default": "on",
+      "description": "开启后在 Qx 灵动岛显示当前金价；关闭后不占用灵动岛信息位。 / Show the current price in Qx Island; when off, do not reserve an Island slot.",
+      "options": [
+        { "label": "开启 / On", "value": "on" },
+        { "label": "关闭 / Off", "value": "off" }
+      ]
+    },
+    {
+      "id": "refreshIntervalSeconds",
+      "label": "刷新间隔（秒）",
+      "type": "select",
+      "default": "60",
+      "options": [
+        { "label": "30 秒", "value": "30" },
+        { "label": "60 秒", "value": "60" },
+        { "label": "5 分钟", "value": "300" }
+      ]
+    },
+    {
+      "id": "historyDays",
+      "label": "历史曲线保留",
+      "type": "select",
+      "default": "7",
+      "options": [
+        { "label": "1 天", "value": "1" },
+        { "label": "7 天", "value": "7" },
+        { "label": "30 天", "value": "30" }
+      ]
+    }
+  ],
+  "storage": {
+    "cacheTargets": [
+      {
+        "id": "gold-history",
+        "label": "QX Gold 金价历史",
+        "description": "京东金融积存金价格快照与历史曲线。",
+        "keys": ["qxgold.history.v1"],
+        "retentionDays": 30
+      }
+    ]
+  },
+  "entry": "index.js",
+  "commands": [
+    {
+      "name": "open-qxgold",
+      "title": "打开 QX Gold 金价追踪",
+      "description": "查看京东金融积存金实时价格和走势",
+      "keywords": ["黄金", "金价", "gold"]
+    }
+  ],
+  "panel": {
+    "title": "QX Gold 金价追踪",
+    "keywords": ["黄金", "金价", "gold", "京东"]
+  },
+  "min_app_version": "0.6.19",
+  "platforms": ["macos", "windows"],
+  "screenshots": []
+}

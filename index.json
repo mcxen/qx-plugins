@@ -7,14 +7,14 @@
       "version": "1.1.0",
       "description": "Search, inspect, upgrade and uninstall Homebrew formulae & casks (macOS). Uses Qx context.cli.",
       "download_url": "https://raw.githubusercontent.com/mcxen/qx-plugins/main/brew.qx-plugin",
-      "size_bytes": 4096633,
-      "checksum_sha256": "c1c1d19773253e62a5f4cdb8d5cd2651e0323b4cd41247523bfaa62c40404214",
+      "size_bytes": 4095822,
+      "checksum_sha256": "3e3d2779d72cc4ffad276dac4f710ac4331a033321bc136c465402821742431b",
       "required_permissions": [
         "cli",
         "notifications",
         "open-url"
       ],
-      "updated_at": "2026-07-25",
+      "updated_at": "2026-07-23",
       "author": "qx (ported from Raycast brew by nhojb et al.)",
       "min_app_version": "0.5.39",
       "releases": [
@@ -34,15 +34,15 @@
       "version": "1.0.1",
       "description": "View external monitor DDC/CI details and adjust brightness from Qx.",
       "download_url": "https://raw.githubusercontent.com/mcxen/qx-plugins/main/external-display-control.qx-plugin",
-      "size_bytes": 23645,
-      "checksum_sha256": "125064ed8f9ef248fe1e7308d855cc8202eafc04fbf482c1e2223c4e28304320",
+      "size_bytes": 21644,
+      "checksum_sha256": "d012cf1d906928560fbd45198b504da877789d1306f5b550e56c0167a784298e",
       "required_permissions": [
         "external-displays",
         "invoke:qx_external_displays_set_control",
         "open-url",
         "invoke:qx_external_displays_install_driver"
       ],
-      "updated_at": "2026-07-25",
+      "updated_at": "2026-07-23",
       "author": "mcx",
       "min_app_version": "0.4.61",
       "releases": [
@@ -62,13 +62,13 @@
       "version": "1.6.1",
       "description": "Reference plugin for declarative Workbench and the structured QxIsland session protocol, with persistent background timing and history.",
       "download_url": "https://raw.githubusercontent.com/mcxen/qx-plugins/main/pomodoro-island.qx-plugin",
-      "size_bytes": 32652,
-      "checksum_sha256": "427053f373f7e05f279c0133d9ed9bf790eec7b0908ed506ac4f139e70346e2d",
+      "size_bytes": 30186,
+      "checksum_sha256": "d0e1bc289f0bf9071fed690a58255bd77d7a86f9f4cc352cdf7a612ee49f036a",
       "required_permissions": [
         "island",
         "notifications"
       ],
-      "updated_at": "2026-07-25",
+      "updated_at": "2026-07-23",
       "author": "mcx",
       "min_app_version": "0.5.43",
       "releases": [
@@ -88,14 +88,14 @@
       "version": "1.2.0",
       "description": "View calendar month-by-month",
       "download_url": "https://raw.githubusercontent.com/mcxen/qx-plugins/main/raycast-calendar.qx-plugin",
-      "size_bytes": 3497611,
-      "checksum_sha256": "ec4c10ed50e3cf973de2da7354a887551cf15577b9d223cff95cfa4aefe08721",
+      "size_bytes": 3497140,
+      "checksum_sha256": "38576bbaa22e49f7a0411bed605932e9f5e0c12174a46dc8287a9c2deaebd277",
       "required_permissions": [
         "http",
         "open-url",
         "clipboard"
       ],
-      "updated_at": "2026-07-24",
+      "updated_at": "2026-07-23",
       "author": "fuksman",
       "min_app_version": "0.4.28",
       "releases": [
@@ -112,11 +112,11 @@
     {
       "id": "qx-bing-wallpaper",
       "name": "Qx Bing Wallpaper",
-      "version": "2.2.1",
-      "description": "Browse Bing's daily images in a native Qx thumbnail list, then download or set them as wallpaper.",
+      "version": "2.1.0",
+      "description": "Browse Bing's daily images in a native Qx Gallery, then download or set them as wallpaper.",
       "download_url": "https://raw.githubusercontent.com/mcxen/qx-plugins/main/qx-bing-wallpaper.qx-plugin",
-      "size_bytes": 11773804,
-      "checksum_sha256": "8a1005d9f40a9676365416f318c0baa5cd0df4734caabfedf31b37d703377404",
+      "size_bytes": 11770261,
+      "checksum_sha256": "999d67d16a5cd0d40e5ba0a3d09e63c4c6762abb3821b3205f8026b8ade6779a",
       "required_permissions": [
         "http",
         "open-url",
@@ -126,26 +126,10 @@
         "invoke:plugin_file_write_base64",
         "invoke:plugin_file_ensure_dir"
       ],
-      "updated_at": "2026-07-25",
+      "updated_at": "2026-07-23",
       "author": "Qx",
       "min_app_version": "0.6.13",
       "releases": [
-        {
-          "version": "2.2.1",
-          "published_at": "2026-07-25",
-          "notes_localizations": {
-            "en": "Changed wallpaper browsing to a Workbench thumbnail list so the left column stays readable when the full-size detail is open.",
-            "zh-CN": "将壁纸浏览改为 Workbench 缩略图列表，打开大图详情时左侧列表不再挤压堆叠。"
-          }
-        },
-        {
-          "version": "2.2.0",
-          "published_at": "2026-07-25",
-          "notes_localizations": {
-            "en": "Fixed daily wallpaper recovery after sleep or restart, replaced competing schedules with one configurable daily job, and report real failures instead of false success.",
-            "zh-CN": "修复休眠或重启后的每日壁纸补执行，合并为一个可配置的每日任务，并让真实失败不再显示为成功。"
-          }
-        },
         {
           "version": "2.1.0",
           "published_at": "2026-07-23",
@@ -157,109 +141,35 @@
       ]
     },
     {
-      "id": "qxcoolapk",
-      "name": "QxCoolapk 酷安",
-      "version": "1.4.1",
-      "description": "Browse Coolapk hot, news, and digital feeds and read complete posts, images, and replies in Qx.",
-      "download_url": "https://raw.githubusercontent.com/mcxen/qx-plugins/main/qxcoolapk.qx-plugin",
-      "size_bytes": 63893,
-      "checksum_sha256": "6217fdb0ea84463d5b61fe30bda0e906a244d7395db0dd868902fdcd66e9b7d9",
+      "id": "qxgold",
+      "name": "QX Gold 金价追踪",
+      "version": "1.1.0",
+      "description": "追踪京东金融积存金实时价格与历史曲线。",
+      "download_url": "https://raw.githubusercontent.com/mcxen/qx-plugins/main/qxgold.qx-plugin",
+      "size_bytes": 13849,
+      "checksum_sha256": "e772495edcf7cf39abce981b6bd2b4de50f8c4fa9c09bd110cbea6c06a442984",
       "required_permissions": [
         "http",
-        "open-url",
-        "system",
         "island"
       ],
-      "updated_at": "2026-07-25",
+      "updated_at": "2026-07-28",
       "author": "Qx",
-      "min_app_version": "0.6.26",
+      "min_app_version": "0.6.19",
       "releases": [
         {
-          "version": "1.4.1",
-          "published_at": "2026-07-25",
-          "notes_localizations": {
-            "en": "Simplified post badges by keeping read state color-only while retaining image, like, and reply metrics.",
-            "zh-CN": "精简帖子标记：已读状态仅保留蓝色与灰色区分，继续显示图片、点赞和回复数据。"
-          }
-        },
-        {
-          "version": "1.4.0",
-          "published_at": "2026-07-24",
-          "notes_localizations": {
-            "en": "Moves Coolapk replies to the host Workbench reply surface with stable #floor, author, time, and OP metadata while retaining the host-owned dynamic image filmstrip.",
-            "zh-CN": "酷安回复接入宿主 Workbench 通用回复区，统一显示 #楼号、作者、时间和楼主标记；动态多图继续使用宿主胶片与大图预览。"
-          }
-        },
-        {
-          "version": "1.3.1",
-          "published_at": "2026-07-24",
-          "notes_localizations": {
-            "en": "Compacts article metadata into the author and time line and removes the duplicated full-width property table below the body.",
-            "zh-CN": "将点赞、回复、阅读和设备压缩到作者与时间同一行，删除正文下方重复占位的属性大表格。"
-          }
-        },
-        {
-          "version": "1.3.0",
-          "published_at": "2026-07-24",
-          "notes_localizations": {
-            "en": "Restores long-form Coolapk articles from their ordered source blocks so each protected image appears at its original position between paragraphs.",
-            "zh-CN": "按酷安原始长文块恢复正文顺序，受保护图片会回到对应段落之间的原始位置，不再统一堆在文末。"
-          }
-        },
-        {
-          "version": "1.2.2",
-          "published_at": "2026-07-24",
-          "notes_localizations": {
-            "en": "Improves full-image clarity by retaining safe original-resolution media and prepares oversized images with a higher-resolution, long-screenshot-aware fallback.",
-            "zh-CN": "提升大图清晰度：安全范围内保留原始分辨率，超大图片使用更高分辨率且识别超长截图的回退处理。"
-          }
-        },
-        {
-          "version": "1.2.1",
-          "published_at": "2026-07-24",
-          "notes_localizations": {
-            "en": "Stabilizes the feed with one cover thumbnail per dynamic post, keeps every original image in the detail filmstrip with the API count, and shows original-content and original-image loading in the island.",
-            "zh-CN": "主列表改为每条动态只显示一张封面缩略图；详情胶片按酷安原始数量展示全部图片，并在灵动岛分别显示原始正文与原始图片加载状态。"
-          }
-        },
-        {
-          "version": "1.2.0",
-          "published_at": "2026-07-24",
-          "notes_localizations": {
-            "en": "Adds original-article loading activity in the island, read/unread filters and bulk management, read cleanup, cache garbage cleanup, and configurable read-first memory retention.",
-            "zh-CN": "新增灵动岛原文加载动画、已读/未读筛选与批量管理、已读清理、缓存垃圾清理，以及可配置的已读优先内存保留策略。"
-          }
-        },
-        {
-          "version": "1.1.1",
-          "published_at": "2026-07-24",
-          "notes_localizations": {
-            "en": "Dynamic-post cards now load every image returned by Coolapk instead of truncating the card gallery.",
-            "zh-CN": "动态卡片现在加载酷安返回的全部图片，不再截断卡片图集。"
-          }
-        },
-        {
           "version": "1.1.0",
-          "published_at": "2026-07-24",
+          "published_at": "2026-07-28",
           "notes_localizations": {
-            "en": "Distinguishes Coolapk articles from social posts: article images follow the reading body, while dynamic-post images appear as compact list cards.",
-            "zh-CN": "区分酷安图文与动态：文章图片跟随正文阅读，动态图片改为紧凑的信息流卡片。"
-          }
-        },
-        {
-          "version": "1.0.1",
-          "published_at": "2026-07-24",
-          "notes_localizations": {
-            "en": "Fixed Coolapk image HTTP 567 failures with authenticated media fetching, background thumbnails, and bounded large-image/GIF previews.",
-            "zh-CN": "修复酷安图片 HTTP 567：改用鉴权媒体请求，并新增后台缩略图及受控的大图/GIF 预览。"
+            "en": "Added an opt-in Qx Island price display with localized settings and slot release when disabled.",
+            "zh-CN": "新增可选的 Qx 灵动岛金价显示、双语设置，并在关闭时释放灵动岛信息位。"
           }
         },
         {
           "version": "1.0.0",
-          "published_at": "2026-07-24",
+          "published_at": "2026-07-28",
           "notes_localizations": {
-            "en": "Initial QxCoolapk release with hot/news/digital feeds, complete article reading, multi-image details, replies, read state, and offline cache.",
-            "zh-CN": "QxCoolapk 首发：支持热门、快讯与数码信息流，完整正文阅读、多图详情、回复、已读状态和离线缓存。"
+            "en": "Initial QX Gold release with live JD accumulated-gold pricing, cached samples, and a Workbench line chart.",
+            "zh-CN": "首个 QX Gold 版本：接入京东积存金实时价格、历史采样缓存与 Workbench 金价曲线。"
           }
         }
       ]
@@ -267,30 +177,21 @@
     {
       "id": "qxgh",
       "name": "QxGH",
-      "version": "1.5.0",
+      "version": "1.4.0",
       "description": "QxGH — watch GitHub Actions and Releases from public github.com pages (no REST API). Business-only workbench UI.",
       "download_url": "https://raw.githubusercontent.com/mcxen/qx-plugins/main/qxgh.qx-plugin",
-      "size_bytes": 45709,
-      "checksum_sha256": "015e8306d6da35316b1114dd582e42b8fe2a85b0676b81f4311d225b722a19be",
+      "size_bytes": 38883,
+      "checksum_sha256": "3eb881273cda125c972e22355f5714e004fd05f4de36fc3510b0a2b878b3a658",
       "required_permissions": [
         "http",
         "open-url",
         "notifications",
-        "island",
-        "tray"
+        "island"
       ],
-      "updated_at": "2026-07-25",
+      "updated_at": "2026-07-23",
       "author": "mcx",
       "min_app_version": "0.5.38",
       "releases": [
-        {
-          "version": "1.5.0",
-          "published_at": "2026-07-25",
-          "notes_localizations": {
-            "en": "Added a native tray deployment submenu with estimated progress, elapsed/expected time, refresh, and CI summary actions.",
-            "zh-CN": "新增原生托盘部署子菜单：显示预计进度、已用/预计时间，并提供刷新和 CI 摘要操作。"
-          }
-        },
         {
           "version": "1.4.0",
           "published_at": "2026-07-23",
@@ -312,35 +213,19 @@
     {
       "id": "qxheihe",
       "name": "QxHeihe 小黑盒",
-      "version": "1.4.2",
+      "version": "1.4.0",
       "description": "浏览小黑盒社区推荐内容，在 Qx 内查看正文、多图、帖子信息与登录评论。",
       "download_url": "https://raw.githubusercontent.com/mcxen/qx-plugins/main/qxheihe.qx-plugin",
-      "size_bytes": 42845,
-      "checksum_sha256": "b1e625cc4843e0b1d5730c4495b6ab67865c0e472ef6f126ad661662a0fa8f72",
+      "size_bytes": 39588,
+      "checksum_sha256": "0f3dc1113f435d96fae8ba254bde68c159bc56697d22feaac43c4323ebb25de2",
       "required_permissions": [
         "http",
         "open-url"
       ],
-      "updated_at": "2026-07-25",
+      "updated_at": "2026-07-23",
       "author": "mcx",
       "min_app_version": "0.6.19",
       "releases": [
-        {
-          "version": "1.4.2",
-          "published_at": "2026-07-25",
-          "notes_localizations": {
-            "en": "Moved author, community, publication time, like, and comment metadata into the Workbench detail header.",
-            "zh-CN": "将作者、社区、发布时间、点赞和评论信息移动到 Workbench 详情作者信息行，移除正文下方重复属性表。"
-          }
-        },
-        {
-          "version": "1.4.1",
-          "published_at": "2026-07-25",
-          "notes_localizations": {
-            "en": "Simplified list badges by expressing read state through accent and neutral colors without redundant Read or Unread text.",
-            "zh-CN": "精简列表标记：已读状态仅通过蓝色与灰色区分，不再重复显示“已读/未读”文字。"
-          }
-        },
         {
           "version": "1.4.0",
           "published_at": "2026-07-23",
@@ -394,11 +279,11 @@
     {
       "id": "qxpicture",
       "name": "Qxpicture",
-      "version": "0.5.0",
+      "version": "0.4.0",
       "description": "Browse random image APIs, save images, copy them, and set desktop wallpaper.",
       "download_url": "https://raw.githubusercontent.com/mcxen/qx-plugins/main/qxpicture.qx-plugin",
-      "size_bytes": 68160,
-      "checksum_sha256": "de1b8d92db525374d958f2e2830818c9b1f16b63751407eccf3d56bd04c90a1f",
+      "size_bytes": 62789,
+      "checksum_sha256": "50a52984e20407d2b6fe5a4a04267e22d1995826f0f06711af0132b86200bffd",
       "required_permissions": [
         "storage",
         "http",
@@ -410,18 +295,10 @@
         "invoke:plugin_file_write_base64",
         "invoke:clipboard_write_image_file"
       ],
-      "updated_at": "2026-07-25",
+      "updated_at": "2026-07-24",
       "author": "Qx",
       "min_app_version": "0.6.22",
       "releases": [
-        {
-          "version": "0.5.0",
-          "published_at": "2026-07-25",
-          "notes_localizations": {
-            "en": "Added a Refresh All API Images action and a bounded first-open cache warm-up when no image previews are stored.",
-            "zh-CN": "新增“刷新全部 API 壁纸”操作，并在没有图片缓存的首次打开时以受控并发批量预热。"
-          }
-        },
         {
           "version": "0.4.0",
           "published_at": "2026-07-24",
@@ -441,65 +318,13 @@
       ]
     },
     {
-      "id": "qxweibo",
-      "name": "QxWeibo 微博",
-      "version": "1.1.1",
-      "description": "Read configured Weibo users, an aggregated following feed, comments, and proxied images in Qx.",
-      "download_url": "https://raw.githubusercontent.com/mcxen/qx-plugins/main/qxweibo.qx-plugin",
-      "size_bytes": 72906,
-      "checksum_sha256": "b0ea5461be4a22d796f78b3f60383688c7e18035ef8b77a861b76e6d1f3881ec",
-      "required_permissions": [
-        "http",
-        "open-url",
-        "system",
-        "island"
-      ],
-      "updated_at": "2026-07-25",
-      "author": "Qx",
-      "min_app_version": "0.6.26",
-      "releases": [
-        {
-          "version": "1.1.1",
-          "published_at": "2026-07-25",
-          "notes_localizations": {
-            "en": "Simplified post badges by keeping read state color-only while retaining image and comment metrics.",
-            "zh-CN": "精简微博标记：已读状态仅保留蓝色与灰色区分，继续显示图片和评论数据。"
-          }
-        },
-        {
-          "version": "1.1.0",
-          "published_at": "2026-07-24",
-          "notes_localizations": {
-            "en": "Moved Weibo comments into the shared Workbench reply surface with floor numbers, authors, timestamps, original-poster markers, and preserved reply relationships.",
-            "zh-CN": "微博评论接入 Workbench 通用底部回复区，统一显示楼号、作者、时间、楼主标记并保留回复关系。"
-          }
-        },
-        {
-          "version": "1.0.1",
-          "published_at": "2026-07-24",
-          "notes_localizations": {
-            "en": "Split maintainable source code into composition, Weibo workflow, and media proxy modules while retaining a self-contained runtime entry for Qx.",
-            "zh-CN": "将可维护源码拆分为入口组装、微博工作流与媒体代理模块，同时为 Qx 保留自包含的单文件运行入口。"
-          }
-        },
-        {
-          "version": "1.0.0",
-          "published_at": "2026-07-24",
-          "notes_localizations": {
-            "en": "Initial read-only Weibo release with configured-user posts, a bounded aggregated following feed, comments, rotating visitor cookies, randomized request pacing, SWR cache, and session-only image proxying.",
-            "zh-CN": "QxWeibo 首发：支持指定用户帖子、受控聚合关注流、评论区、游客 Cookie 轮换、随机请求间隔、缓存优先及仅会话保存的微博图片代理。"
-          }
-        }
-      ]
-    },
-    {
       "id": "sysinfo",
       "name": "Sysinfo",
-      "version": "1.2.2",
+      "version": "1.2.1",
       "description": "Native Qx System Monitor for CPU, memory, battery health, storage, network, and processes on macOS and Windows.",
       "download_url": "https://raw.githubusercontent.com/mcxen/qx-plugins/main/sysinfo.qx-plugin",
-      "size_bytes": 30775,
-      "checksum_sha256": "de21cdd94268311b704a96bc2c9b14e9cabdb4972c9ddb5a26aef30d4ee36c74",
+      "size_bytes": 29552,
+      "checksum_sha256": "e5653593230b5931fb2e4dbb17930f9cc50127497b5a620590d24fc12ee82d1e",
       "required_permissions": [
         "system",
         "system-stats",
@@ -507,18 +332,10 @@
         "processes",
         "invoke:qx_system_information_kill_process"
       ],
-      "updated_at": "2026-07-25",
+      "updated_at": "2026-07-23",
       "author": "Qx",
       "min_app_version": "0.6.4",
       "releases": [
-        {
-          "version": "1.2.2",
-          "published_at": "2026-07-25",
-          "notes_localizations": {
-            "en": "Kept CPU, memory, power, and network rows refreshing together while the Hardware view is open.",
-            "zh-CN": "进入硬件视图后，CPU、内存、电源与网络数据保持同一轮持续刷新。"
-          }
-        },
         {
           "version": "1.2.1",
           "published_at": "2026-07-23",
@@ -535,8 +352,8 @@
       "version": "1.2.0",
       "description": "Search Unsplash photos, download, and set desktop wallpaper. Ported for Qx (Access Key API; likes/OAuth not included).",
       "download_url": "https://raw.githubusercontent.com/mcxen/qx-plugins/main/unsplash.qx-plugin",
-      "size_bytes": 6345882,
-      "checksum_sha256": "ced388649b2906418dae661bb836e29bfa9fa53ad16916bc86fdd677a4f8017f",
+      "size_bytes": 6345046,
+      "checksum_sha256": "e6759e0f36bada1c5727ba5bea86b901a9385db76181152eb5593c80dd7e8102",
       "required_permissions": [
         "http",
         "open-url",
@@ -547,7 +364,7 @@
         "invoke:plugin_file_ensure_dir",
         "invoke:plugin_file_exists"
       ],
-      "updated_at": "2026-07-25",
+      "updated_at": "2026-07-23",
       "author": "qx (ported from Raycast unsplash)",
       "min_app_version": "0.6.13",
       "releases": [
@@ -567,8 +384,8 @@
       "version": "2.1.0",
       "description": "Browse V2EX latest/hot topics with disk cache (stale-while-revalidate). Notifications & nodes need a token.",
       "download_url": "https://raw.githubusercontent.com/mcxen/qx-plugins/main/v2ex.qx-plugin",
-      "size_bytes": 37435,
-      "checksum_sha256": "8b82c859ad10e19cfd163932959ef52a81fe7fb68174e8108e7570de53895324",
+      "size_bytes": 34246,
+      "checksum_sha256": "cb7b4234845a0cc1da1ba8dd62f2553bb4caa75dd9e3d015b4ffcbcdb68bd1e3",
       "required_permissions": [
         "http",
         "open-url",
@@ -580,7 +397,7 @@
         "invoke:v2ex_fetch_token_info",
         "invoke:v2ex_fetch_notifications"
       ],
-      "updated_at": "2026-07-25",
+      "updated_at": "2026-07-23",
       "author": "mcx",
       "min_app_version": "0.5.18",
       "releases": [
@@ -600,8 +417,8 @@
       "version": "1.0.0",
       "description": "Current conditions and multi-day forecast via Open-Meteo (or OpenWeatherMap). Cached for fast reopen.",
       "download_url": "https://raw.githubusercontent.com/mcxen/qx-plugins/main/weather.qx-plugin",
-      "size_bytes": 25981,
-      "checksum_sha256": "e3db9d560868107bdbdf662c8056f83e72387079c41e5f34174b5cee83201c3b",
+      "size_bytes": 23891,
+      "checksum_sha256": "a80613ab2a6c731e84aac5bef74b081f1b53d933bb9a6750a2d776ef0b469ef2",
       "required_permissions": [
         "http",
         "open-url",
@@ -612,7 +429,7 @@
         "invoke:get_cached_weather_for_location",
         "invoke:detect_location"
       ],
-      "updated_at": "2026-07-25",
+      "updated_at": "2026-07-23",
       "author": "mcx",
       "min_app_version": "0.5.18",
       "releases": [
