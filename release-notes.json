@@ -101,6 +101,24 @@
         }
       }
     ],
+    "qxgold": [
+      {
+        "version": "1.1.0",
+        "published_at": "2026-07-28",
+        "notes_localizations": {
+          "en": "Added an opt-in Qx Island price display with localized settings and slot release when disabled.",
+          "zh-CN": "新增可选的 Qx 灵动岛金价显示、双语设置，并在关闭时释放灵动岛信息位。"
+        }
+      },
+      {
+        "version": "1.0.0",
+        "published_at": "2026-07-28",
+        "notes_localizations": {
+          "en": "Initial QX Gold release with live JD accumulated-gold pricing, cached samples, and a Workbench line chart.",
+          "zh-CN": "首个 QX Gold 版本：接入京东积存金实时价格、历史采样缓存与 Workbench 金价曲线。"
+        }
+      }
+    ],
     "qxheihe": [
       {
         "version": "1.4.2",
