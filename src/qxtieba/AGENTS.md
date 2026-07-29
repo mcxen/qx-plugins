@@ -33,6 +33,7 @@
 ## Edit checklist
 
 - [ ] Bump the plugin version and add `release-notes.json` history.
+- [ ] Run `npm run build:qxtieba`; the installed `index.js` must be a self-contained bundle with no relative imports.
 - [ ] Run `npm run smoke:qxtieba`.
 - [ ] Run `npm run package:one -- --only=qxtieba`.
 - [ ] Reinstall the archive into `~/.qx/plugins/qxtieba`.

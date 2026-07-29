@@ -121,6 +121,14 @@
     ],
     "qxtieba": [
       {
+        "version": "1.1.2",
+        "published_at": "2026-07-29",
+        "notes_localizations": {
+          "en": "Bundled the Protobuf transport into the self-contained plugin entry so Qx's Blob runtime can register the panel without unresolved relative imports.",
+          "zh-CN": "将 Protobuf 传输模块打包进自包含插件入口，修复 Qx Blob 运行时因无法解析相对导入而提示 Plugin not registered。"
+        }
+      },
+      {
         "version": "1.1.1",
         "published_at": "2026-07-29",
         "notes_localizations": {

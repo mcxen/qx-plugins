@@ -7,7 +7,7 @@ import {
   parseFeedHtml,
   parseThreadHtml,
   pruneCache,
-} from "../src/qxtieba/index.js";
+} from "../src/qxtieba/index.source.js";
 import { multipartBody, parseThreadResponse } from "../src/qxtieba/tieba-protobuf.js";
 
 function concat(...parts) {

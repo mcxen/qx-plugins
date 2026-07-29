@@ -525,11 +525,11 @@
     {
       "id": "qxtieba",
       "name": "QxTieba 贴吧",
-      "version": "1.1.1",
+      "version": "1.1.2",
       "description": "聚合浏览多个百度贴吧的公开帖子流，在 Qx 内阅读正文与楼层评论。",
       "download_url": "https://raw.githubusercontent.com/mcxen/qx-plugins/main/qxtieba.qx-plugin",
-      "size_bytes": 50971,
-      "checksum_sha256": "2bc4162a0c78e559d8c502e8e05ac89c962c2650b2cbf4d74e35aa2671803fb8",
+      "size_bytes": 43220,
+      "checksum_sha256": "37aeda0a98044ccaf32b8e084ec0681cc39e49fdd0f49b01adada1adb162aeaf",
       "required_permissions": [
         "http",
         "open-url"
@@ -538,6 +538,14 @@
       "author": "Qx",
       "min_app_version": "0.6.46",
       "releases": [
+        {
+          "version": "1.1.2",
+          "published_at": "2026-07-29",
+          "notes_localizations": {
+            "en": "Bundled the Protobuf transport into the self-contained plugin entry so Qx's Blob runtime can register the panel without unresolved relative imports.",
+            "zh-CN": "将 Protobuf 传输模块打包进自包含插件入口，修复 Qx Blob 运行时因无法解析相对导入而提示 Plugin not registered。"
+          }
+        },
         {
           "version": "1.1.1",
           "published_at": "2026-07-29",
