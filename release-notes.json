@@ -121,6 +121,14 @@
     ],
     "qxtieba": [
       {
+        "version": "1.1.1",
+        "published_at": "2026-07-29",
+        "notes_localizations": {
+          "en": "Fixed HTTP 403 thread failures by matching astron-tieba-mcp 0.1.7's anonymous app-compatible Protobuf detail protocol, including first-page floors and nested comments.",
+          "zh-CN": "按照 astron-tieba-mcp 0.1.7 的游客态 app-compatible Protobuf 详情协议修复帖子 HTTP 403，并读取首屏楼层与楼中楼评论。"
+        }
+      },
+      {
         "version": "1.1.0",
         "published_at": "2026-07-29",
         "notes_localizations": {

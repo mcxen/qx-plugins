@@ -6,6 +6,8 @@
  * replaces usable local content.
  */
 
+import { fetchTiebaThreadDetail } from "./tieba-protobuf.js";
+
 const BASE_URL = "https://tieba.baidu.com";
 const CACHE_KEY = "cache.community.v1";
 const DEFAULT_FORUMS = ["图拉丁", "笔记本"];
@@ -300,19 +302,11 @@ async function fetchText(context, url, referer = BASE_URL) {
 }
 
 async function fetchFeed(context, forumName, page) {
-  let firstError = null;
-  for (const desktop of [false, true]) {
-    try {
-      const url = buildFeedUrl(forumName, page, desktop);
-      const html = await fetchText(context, url, BASE_URL);
-      const result = parseFeedHtml(html, forumName, page);
-      if (result.items.length) return result;
-      throw new Error(copy("Tieba returned no readable posts", "贴吧未返回可读取的帖子"));
-    } catch (error) {
-      firstError ||= error;
-    }
-  }
-  throw firstError || new Error(copy("Tieba feed is unavailable", "贴吧 Feed 不可用"));
+  const url = buildFeedUrl(forumName, page, false);
+  const html = await fetchText(context, url, BASE_URL);
+  const result = parseFeedHtml(html, forumName, page);
+  if (result.items.length) return result;
+  throw new Error(copy("Tieba returned no readable posts", "贴吧未返回可读取的帖子"));
 }
 
 function interleavePosts(groups) {
@@ -358,9 +352,7 @@ async function fetchForumSelection(context, forumNames, selection, page) {
 }
 
 async function fetchDetail(context, post) {
-  const url = `${threadUrl(post.id)}?pn=1&see_lz=0&ie=utf-8`;
-  const html = await fetchText(context, url, buildFeedUrl(post.forumName, 1));
-  const detail = parseThreadHtml(html, post);
+  const detail = await fetchTiebaThreadDetail(context, post);
   if (!detail.body && !detail.replies.length) {
     throw new Error(copy("Tieba returned no readable thread content", "贴吧未返回可读取的帖子内容"));
   }

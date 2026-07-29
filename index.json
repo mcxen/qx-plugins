@@ -525,19 +525,27 @@
     {
       "id": "qxtieba",
       "name": "QxTieba 贴吧",
-      "version": "1.1.0",
+      "version": "1.1.1",
       "description": "聚合浏览多个百度贴吧的公开帖子流，在 Qx 内阅读正文与楼层评论。",
       "download_url": "https://raw.githubusercontent.com/mcxen/qx-plugins/main/qxtieba.qx-plugin",
-      "size_bytes": 40314,
-      "checksum_sha256": "7e95e805141f97b2d52bfb18196bea91482166ef061b0615ef5c34540346332c",
+      "size_bytes": 50971,
+      "checksum_sha256": "2bc4162a0c78e559d8c502e8e05ac89c962c2650b2cbf4d74e35aa2671803fb8",
       "required_permissions": [
         "http",
         "open-url"
       ],
       "updated_at": "2026-07-29",
       "author": "Qx",
-      "min_app_version": "0.6.19",
+      "min_app_version": "0.6.46",
       "releases": [
+        {
+          "version": "1.1.1",
+          "published_at": "2026-07-29",
+          "notes_localizations": {
+            "en": "Fixed HTTP 403 thread failures by matching astron-tieba-mcp 0.1.7's anonymous app-compatible Protobuf detail protocol, including first-page floors and nested comments.",
+            "zh-CN": "按照 astron-tieba-mcp 0.1.7 的游客态 app-compatible Protobuf 详情协议修复帖子 HTTP 403，并读取首屏楼层与楼中楼评论。"
+          }
+        },
         {
           "version": "1.1.0",
           "published_at": "2026-07-29",

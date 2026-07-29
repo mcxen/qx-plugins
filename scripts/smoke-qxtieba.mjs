@@ -8,6 +8,35 @@ import {
   parseThreadHtml,
   pruneCache,
 } from "../src/qxtieba/index.js";
+import { multipartBody, parseThreadResponse } from "../src/qxtieba/tieba-protobuf.js";
+
+function concat(...parts) {
+  return Buffer.concat(parts.map((part) => Buffer.from(part)));
+}
+
+function varint(value) {
+  let current = BigInt(value);
+  const bytes = [];
+  while (current > 0x7fn) {
+    bytes.push(Number(current & 0x7fn) | 0x80);
+    current >>= 7n;
+  }
+  bytes.push(Number(current));
+  return Buffer.from(bytes);
+}
+
+function fieldVarint(field, value) {
+  return concat(varint((field << 3) | 0), varint(value));
+}
+
+function fieldBytes(field, value) {
+  const bytes = Buffer.from(value);
+  return concat(varint((field << 3) | 2), varint(bytes.length), bytes);
+}
+
+function fieldText(field, value) {
+  return fieldBytes(field, Buffer.from(value, "utf8"));
+}
 
 assert.equal(normalizeForumName(" Python吧 "), "Python");
 assert.equal(normalizeForumName("原神吧吧"), "原神吧");
@@ -72,6 +101,63 @@ assert.equal(detail.replies[0].floor, 2);
 assert.equal(detail.replies[0].body, "有帮助的回复\n\n♥ 3");
 assert.equal(detail.replies[1].originalPoster, true);
 
+const owner = concat(fieldVarint(2, 99), fieldText(4, "楼主"));
+const visitor = concat(fieldVarint(2, 100), fieldText(4, "吧友"));
+const mainContent = concat(fieldText(2, "Protobuf 主楼"), fieldText(25, "https://imgsrc.baidu.com/main.jpg"));
+const replyContent = fieldText(2, "Protobuf 楼层");
+const nestedContent = fieldText(2, "楼中楼评论");
+const nestedComment = concat(
+  fieldVarint(1, 3001),
+  fieldBytes(2, nestedContent),
+  fieldVarint(3, 1_700_000_200),
+  fieldVarint(4, 99),
+  fieldBytes(7, owner),
+);
+const nestedWrapper = fieldBytes(2, nestedComment);
+const mainPost = concat(
+  fieldVarint(1, 1001),
+  fieldVarint(3, 1),
+  fieldVarint(4, 1_700_000_000),
+  fieldBytes(5, mainContent),
+  fieldVarint(19, 99),
+  fieldBytes(23, owner),
+);
+const replyPost = concat(
+  fieldVarint(1, 1002),
+  fieldVarint(3, 2),
+  fieldVarint(4, 1_700_000_100),
+  fieldBytes(5, replyContent),
+  fieldBytes(15, nestedWrapper),
+  fieldVarint(19, 100),
+  fieldBytes(23, visitor),
+);
+const thread = concat(
+  fieldVarint(1, 123456789),
+  fieldText(3, "Protobuf 帖子"),
+  fieldVarint(4, 2),
+  fieldBytes(18, owner),
+  fieldVarint(45, 1_700_000_000),
+  fieldVarint(56, 99),
+);
+const page = fieldVarint(6, 1);
+const responseData = concat(
+  fieldBytes(3, page),
+  fieldBytes(6, mainPost),
+  fieldBytes(6, replyPost),
+  fieldBytes(8, thread),
+  fieldBytes(13, owner),
+  fieldBytes(13, visitor),
+);
+const protoDetail = parseThreadResponse(fieldBytes(2, responseData), { id: "123456789" });
+assert.equal(protoDetail.title, "Protobuf 帖子");
+assert.equal(protoDetail.body, "Protobuf 主楼");
+assert.deepEqual(protoDetail.images, ["https://imgsrc.baidu.com/main.jpg"]);
+assert.equal(protoDetail.replies.length, 1);
+assert.equal(protoDetail.replies[0].author, "吧友");
+assert.match(protoDetail.replies[0].body, /↳ 楼主：楼中楼评论/);
+assert.equal(protoDetail.hasMore, true);
+assert.match(Buffer.from(multipartBody(Buffer.from([0, 128, 255]))).toString("latin1"), /name="data"/);
+
 const now = Date.now();
 const pruned = pruneCache({
   forumName: "Python",
@@ -86,4 +172,4 @@ const pruned = pruneCache({
 assert.deepEqual(pruned.posts.map((post) => post.id), ["new"]);
 assert.deepEqual(Object.keys(pruned.details), ["new"]);
 
-console.log(`QxTieba smoke ok: feed=${feed.items.length}, replies=${detail.replies.length}, images=${detail.images.length}`);
+console.log(`QxTieba smoke ok: feed=${feed.items.length}, htmlReplies=${detail.replies.length}, protobufReplies=${protoDetail.replies.length}`);
