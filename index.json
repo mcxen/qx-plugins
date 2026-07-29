@@ -354,19 +354,27 @@
     {
       "id": "qxheihe",
       "name": "QxHeihe 小黑盒",
-      "version": "1.4.2",
+      "version": "1.4.3",
       "description": "浏览小黑盒社区推荐内容，在 Qx 内查看正文、多图、帖子信息与登录评论。",
       "download_url": "https://raw.githubusercontent.com/mcxen/qx-plugins/main/qxheihe.qx-plugin",
-      "size_bytes": 42845,
-      "checksum_sha256": "b1e625cc4843e0b1d5730c4495b6ab67865c0e472ef6f126ad661662a0fa8f72",
+      "size_bytes": 44678,
+      "checksum_sha256": "7d66a8e7cea94091524775ff26b6d6004ae4d75fdbfb2df36b54399f4bcb0122",
       "required_permissions": [
         "http",
         "open-url"
       ],
-      "updated_at": "2026-07-25",
+      "updated_at": "2026-07-29",
       "author": "mcx",
       "min_app_version": "0.6.19",
       "releases": [
+        {
+          "version": "1.4.3",
+          "published_at": "2026-07-29",
+          "notes_localizations": {
+            "en": "Switched comment loading to the signed public comment tree endpoint, enabling anonymous first-page comments with nested replies.",
+            "zh-CN": "切换到带签名的公开评论树接口，支持匿名读取首屏评论及楼中楼回复。"
+          }
+        },
         {
           "version": "1.4.2",
           "published_at": "2026-07-25",

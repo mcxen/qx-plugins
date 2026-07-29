@@ -9,6 +9,7 @@
 const DEFAULT_FEED_URL = "https://api.xiaoheihe.cn/bbs/app/feeds?app=heybox&os_type=web&x_app=heybox_website&x_client_type=web&x_os_type=Mac&x_client_version=&client_type=web&web_version=3.0&version=999.0.4&pull=0&offset=0&dw=604";
 const DETAIL_URL = "https://api.xiaoheihe.cn/bbs/web/link/detail";
 const COMMENT_URL = "https://api.xiaoheihe.cn/bbs/web/link/comment/list";
+const COMMENT_TREE_URL = "https://api.xiaoheihe.cn/bbs/app/link/tree";
 const LEGACY_CACHE_KEY = "qxheihe.feed.v1";
 const CACHE_KEY = "cache.community.v2";
 const DEFAULT_TTL_MS = 5 * 60 * 1000;
@@ -333,7 +334,10 @@ function commentRows(result) {
     result?.rows,
     result?.data,
   ];
-  return candidates.find(Array.isArray) || [];
+  const direct = candidates.find(Array.isArray);
+  if (direct) return direct;
+  return (Array.isArray(result?.comments) ? result.comments : [])
+    .flatMap((floor) => Array.isArray(floor?.comment) ? floor.comment : []);
 }
 
 function commentAuthor(comment) {
@@ -465,6 +469,32 @@ function feedUrlAtOffset(base, offset, {
   url.searchParams.set("version", "999.0.4");
   url.searchParams.set("_time", String(timestamp));
   url.searchParams.set("nonce", nonce);
+  url.searchParams.set("hkey", heiheHkey(url.pathname, timestamp, nonce));
+  return url.toString();
+}
+
+function commentTreeUrl(linkId, {
+  timestamp = Math.floor(Date.now() / 1000),
+  nonce = randomNonce(),
+} = {}) {
+  const url = new URL(COMMENT_TREE_URL);
+  url.searchParams.set("app", "heybox");
+  url.searchParams.set("os_type", "web");
+  url.searchParams.set("x_app", "heybox_website");
+  url.searchParams.set("x_client_type", "web");
+  url.searchParams.set("x_os_type", "Mac");
+  url.searchParams.set("x_client_version", "");
+  url.searchParams.set("client_type", "web");
+  url.searchParams.set("web_version", "3.0");
+  url.searchParams.set("version", "999.0.4");
+  url.searchParams.set("_time", String(timestamp));
+  url.searchParams.set("nonce", nonce);
+  url.searchParams.set("link_id", String(linkId));
+  url.searchParams.set("is_first", "1");
+  url.searchParams.set("page", "1");
+  url.searchParams.set("index", "1");
+  url.searchParams.set("limit", "20");
+  url.searchParams.set("owner_only", "0");
   url.searchParams.set("hkey", heiheHkey(url.pathname, timestamp, nonce));
   return url.toString();
 }
@@ -759,25 +789,36 @@ function createPanel(container, context) {
         `${DETAIL_URL}?link_id=${encodeURIComponent(key)}`,
         { Referer: postUrl(post) },
       );
-      const commentRequest = cookie
-        ? fetchJson(
+      const commentHeaders = { Referer: postUrl(post) };
+      if (cookie) commentHeaders.Cookie = cookie;
+      const commentRequest = fetchJson(
+        context,
+        commentTreeUrl(key),
+        commentHeaders,
+      ).then((result) => {
+        if (!Array.isArray(result?.comments)) throw new Error("Comment tree response was not a comment payload");
+        return { result };
+      }).catch(async (treeError) => {
+        // The older web endpoint is retained for logged-in installations or
+        // servers that temporarily do not expose the public comment tree.
+        try {
+          const result = await fetchJson(
             context,
             `${COMMENT_URL}?link_id=${encodeURIComponent(key)}&offset=0&limit=20`,
-            { Cookie: cookie, Referer: postUrl(post) },
-          ).then((result) => ({ result })).catch((error) => ({ error }))
-        : Promise.resolve({ skipped: true });
+            commentHeaders,
+          );
+          return { result };
+        } catch {
+          return { error: treeError };
+        }
+      });
       const [result, commentOutcome] = await Promise.all([detailRequest, commentRequest]);
       if (state.dead || generation !== state.generation) return;
       const link = { ...post, ...(result.link || {}) };
       const parsed = parseDetailContent(link);
       const commentSections = commentOutcome.result ? parseComments(commentOutcome.result) : [];
       let commentNotice = "";
-      if (commentOutcome.skipped) {
-        commentNotice = copy(
-          "Xiaoheihe requires login for comments. Add your Xiaoheihe Cookie in plugin preferences, or open the post in Xiaoheihe.",
-          "小黑盒评论接口要求登录。可在插件设置中填写小黑盒 Cookie，或前往小黑盒查看评论。",
-        );
-      } else if (commentOutcome.error) {
+      if (commentOutcome.error) {
         commentNotice = copy(
           `Comments unavailable: ${message(commentOutcome.error)}`,
           `评论暂不可用：${message(commentOutcome.error)}`,

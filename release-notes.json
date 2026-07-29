@@ -121,6 +121,14 @@
     ],
     "qxheihe": [
       {
+        "version": "1.4.3",
+        "published_at": "2026-07-29",
+        "notes_localizations": {
+          "en": "Switched comment loading to the signed public comment tree endpoint, enabling anonymous first-page comments with nested replies.",
+          "zh-CN": "切换到带签名的公开评论树接口，支持匿名读取首屏评论及楼中楼回复。"
+        }
+      },
+      {
         "version": "1.4.2",
         "published_at": "2026-07-25",
         "notes_localizations": {
