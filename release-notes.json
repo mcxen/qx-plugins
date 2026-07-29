@@ -121,6 +121,14 @@
     ],
     "qxheihe": [
       {
+        "version": "1.4.4",
+        "published_at": "2026-07-29",
+        "notes_localizations": {
+          "en": "Handled upstream CAPTCHA/risk-control responses explicitly, preserving cached comments and providing a localized verification prompt without repeated retries.",
+          "zh-CN": "明确处理上游 CAPTCHA/风控响应，保留缓存评论并显示双语验证提示，避免重复重试。"
+        }
+      },
+      {
         "version": "1.4.3",
         "published_at": "2026-07-29",
         "notes_localizations": {

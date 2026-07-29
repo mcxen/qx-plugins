@@ -819,10 +819,17 @@ function createPanel(container, context) {
       const commentSections = commentOutcome.result ? parseComments(commentOutcome.result) : [];
       let commentNotice = "";
       if (commentOutcome.error) {
-        commentNotice = copy(
-          `Comments unavailable: ${message(commentOutcome.error)}`,
-          `评论暂不可用：${message(commentOutcome.error)}`,
-        );
+        const errorText = message(commentOutcome.error);
+        const needsVerification = /captcha|show_captcha|验证|风控/i.test(errorText);
+        commentNotice = needsVerification
+          ? copy(
+              "Xiaoheihe asked for verification. Open the post in Xiaoheihe, complete the check, then refresh. Cached comments remain available.",
+              "小黑盒要求完成验证。请在小黑盒中打开帖子完成验证后再刷新；已有缓存评论仍会保留。",
+            )
+          : copy(
+              `Comments unavailable: ${errorText}`,
+              `评论暂不可用：${errorText}`,
+            );
       } else if (!commentSections.length) {
         commentNotice = Number(link.comment_num || post.comment_num || 0) > 0
           ? copy("No readable comments were returned. The login may have expired.", "未返回可读取的评论，登录信息可能已失效。")

@@ -354,11 +354,11 @@
     {
       "id": "qxheihe",
       "name": "QxHeihe 小黑盒",
-      "version": "1.4.3",
+      "version": "1.4.4",
       "description": "浏览小黑盒社区推荐内容，在 Qx 内查看正文、多图、帖子信息与登录评论。",
       "download_url": "https://raw.githubusercontent.com/mcxen/qx-plugins/main/qxheihe.qx-plugin",
-      "size_bytes": 44678,
-      "checksum_sha256": "7d66a8e7cea94091524775ff26b6d6004ae4d75fdbfb2df36b54399f4bcb0122",
+      "size_bytes": 45564,
+      "checksum_sha256": "746e26241434c4caaa9168e447cf93b3641ab4aacf7fe9a5af27d5c6f1b2abf1",
       "required_permissions": [
         "http",
         "open-url"
@@ -367,6 +367,14 @@
       "author": "mcx",
       "min_app_version": "0.6.19",
       "releases": [
+        {
+          "version": "1.4.4",
+          "published_at": "2026-07-29",
+          "notes_localizations": {
+            "en": "Handled upstream CAPTCHA/risk-control responses explicitly, preserving cached comments and providing a localized verification prompt without repeated retries.",
+            "zh-CN": "明确处理上游 CAPTCHA/风控响应，保留缓存评论并显示双语验证提示，避免重复重试。"
+          }
+        },
         {
           "version": "1.4.3",
           "published_at": "2026-07-29",
