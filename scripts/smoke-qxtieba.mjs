@@ -1,4 +1,5 @@
 import assert from "node:assert/strict";
+import { gzipSync } from "node:zlib";
 import {
   buildFeedUrl,
   normalizeForumName,
@@ -8,7 +9,7 @@ import {
   parseThreadHtml,
   pruneCache,
 } from "../src/qxtieba/index.source.js";
-import { multipartBody, parseThreadResponse } from "../src/qxtieba/tieba-protobuf.js";
+import { decodeThreadResponse, multipartBody, parseThreadResponse } from "../src/qxtieba/tieba-protobuf.js";
 
 function concat(...parts) {
   return Buffer.concat(parts.map((part) => Buffer.from(part)));
@@ -156,6 +157,26 @@ assert.equal(protoDetail.replies.length, 1);
 assert.equal(protoDetail.replies[0].author, "吧友");
 assert.match(protoDetail.replies[0].body, /↳ 楼主：楼中楼评论/);
 assert.equal(protoDetail.hasMore, true);
+const compressedResponse = {
+  headers: { "content-encoding": "gzip", "content-type": "application/octet-stream" },
+  async arrayBuffer() {
+    return gzipSync(fieldBytes(2, responseData));
+  },
+};
+const compressedDetail = await decodeThreadResponse(compressedResponse, { id: "123456789" });
+assert.equal(compressedDetail.title, "Protobuf 帖子");
+const transparentlyDecodedDetail = await decodeThreadResponse({
+  headers: { "content-encoding": "gzip", "content-type": "application/octet-stream" },
+  async arrayBuffer() { return fieldBytes(2, responseData); },
+}, { id: "123456789" });
+assert.equal(transparentlyDecodedDetail.title, "Protobuf 帖子");
+await assert.rejects(
+  decodeThreadResponse({
+    headers: { "content-type": "text/html" },
+    async arrayBuffer() { return Buffer.from("<html>verify</html>"); },
+  }),
+  /HTML verification page/,
+);
 assert.match(Buffer.from(multipartBody(Buffer.from([0, 128, 255]))).toString("latin1"), /name="data"/);
 
 const now = Date.now();

@@ -525,11 +525,11 @@
     {
       "id": "qxtieba",
       "name": "QxTieba 贴吧",
-      "version": "1.1.2",
+      "version": "1.1.3",
       "description": "聚合浏览多个百度贴吧的公开帖子流，在 Qx 内阅读正文与楼层评论。",
       "download_url": "https://raw.githubusercontent.com/mcxen/qx-plugins/main/qxtieba.qx-plugin",
-      "size_bytes": 43220,
-      "checksum_sha256": "37aeda0a98044ccaf32b8e084ec0681cc39e49fdd0f49b01adada1adb162aeaf",
+      "size_bytes": 47209,
+      "checksum_sha256": "1fba4ec20ca46a0a43eb193523185a6cfa15d727dcfa85c98999964b4cb78f61",
       "required_permissions": [
         "http",
         "open-url"
@@ -538,6 +538,14 @@
       "author": "Qx",
       "min_app_version": "0.6.46",
       "releases": [
+        {
+          "version": "1.1.3",
+          "published_at": "2026-07-29",
+          "notes_localizations": {
+            "en": "Fixed compressed Tieba Protobuf responses being misread as unsupported wire types, switched detail requests to HTTPS with identity encoding, and added clear verification/JSON diagnostics.",
+            "zh-CN": "修复贴吧压缩 Protobuf 被误判为不支持的 wire type；详情请求改用 HTTPS 与 identity 编码，并补充验证页和 JSON 响应的准确诊断。"
+          }
+        },
         {
           "version": "1.1.2",
           "published_at": "2026-07-29",

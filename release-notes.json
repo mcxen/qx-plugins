@@ -121,6 +121,14 @@
     ],
     "qxtieba": [
       {
+        "version": "1.1.3",
+        "published_at": "2026-07-29",
+        "notes_localizations": {
+          "en": "Fixed compressed Tieba Protobuf responses being misread as unsupported wire types, switched detail requests to HTTPS with identity encoding, and added clear verification/JSON diagnostics.",
+          "zh-CN": "修复贴吧压缩 Protobuf 被误判为不支持的 wire type；详情请求改用 HTTPS 与 identity 编码，并补充验证页和 JSON 响应的准确诊断。"
+        }
+      },
+      {
         "version": "1.1.2",
         "published_at": "2026-07-29",
         "notes_localizations": {

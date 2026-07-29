@@ -1,6 +1,6 @@
 const APP_BASE_HOST = "tiebac.baidu.com";
 const APP_VERSION = "12.64.1.1";
-const THREAD_DETAIL_URL = `http://${APP_BASE_HOST}/c/f/pb/page?cmd=302001`;
+const THREAD_DETAIL_URL = `https://${APP_BASE_HOST}/c/f/pb/page?cmd=302001`;
 const MULTIPART_BOUNDARY = "-*_r1999";
 const decoder = new TextDecoder("utf-8");
 const encoder = new TextEncoder();
@@ -282,6 +282,61 @@ function parseThreadResponse(input, fallbackPost = {}) {
   };
 }
 
+function responseHeader(response, name) {
+  const target = String(name || "").toLowerCase();
+  const headers = response?.headers;
+  if (!headers) return "";
+  if (typeof headers.get === "function") return String(headers.get(name) || "");
+  const entry = Object.entries(headers).find(([key]) => key.toLowerCase() === target);
+  return String(entry?.[1] || "");
+}
+
+async function gunzip(bytes) {
+  if (typeof DecompressionStream !== "function") {
+    throw new Error("Tieba returned compressed Protobuf that this WebView cannot decompress");
+  }
+  const stream = new Blob([bytes]).stream().pipeThrough(new DecompressionStream("gzip"));
+  return new Uint8Array(await new Response(stream).arrayBuffer());
+}
+
+function responsePreview(bytes) {
+  return decoder.decode(bytes.subarray(0, 240)).replace(/[\r\n\t]+/g, " ").trim();
+}
+
+async function decodeThreadResponse(response, fallbackPost = {}) {
+  let bytes = new Uint8Array(await response.arrayBuffer());
+  if (bytes[0] === 0x1f && bytes[1] === 0x8b) {
+    bytes = await gunzip(bytes);
+  }
+  if (!bytes.length) throw new Error("Tieba API returned an empty response");
+
+  const preview = responsePreview(bytes);
+  const first = preview.charAt(0);
+  const contentType = responseHeader(response, "content-type").toLowerCase();
+  if (first === "<" || contentType.includes("text/html")) {
+    throw new Error("Tieba returned an HTML verification page instead of thread data");
+  }
+  if (first === "{" || first === "[" || contentType.includes("application/json")) {
+    let detail = preview;
+    try {
+      const payload = JSON.parse(decoder.decode(bytes));
+      detail = String(payload?.error_msg || payload?.error || payload?.message || preview);
+    } catch {
+      // Keep the bounded response preview when the JSON body is malformed.
+    }
+    throw new Error(`Tieba returned JSON instead of thread data: ${detail}`);
+  }
+
+  try {
+    return parseThreadResponse(bytes, fallbackPost);
+  } catch (error) {
+    const signature = [...bytes.subarray(0, 8)]
+      .map((value) => value.toString(16).padStart(2, "0"))
+      .join(" ");
+    throw new Error(`Tieba Protobuf decode failed (${signature}): ${error?.message || error}`);
+  }
+}
+
 async function fetchTiebaThreadDetail(context, post, page = 1) {
   const request = multipartBody(buildThreadRequest(post.id, page, 20));
   const response = await context.http.fetch(THREAD_DETAIL_URL, {
@@ -290,7 +345,7 @@ async function fetchTiebaThreadDetail(context, post, page = 1) {
     headers: {
       "User-Agent": `aiotieba/${APP_VERSION}`,
       "x_bd_data_type": "protobuf",
-      "Accept-Encoding": "gzip",
+      "Accept-Encoding": "identity",
       Connection: "keep-alive",
       Host: APP_BASE_HOST,
       "Content-Type": `multipart/form-data; boundary=${MULTIPART_BOUNDARY}`,
@@ -298,11 +353,12 @@ async function fetchTiebaThreadDetail(context, post, page = 1) {
     bodyBase64: bytesToBase64(request),
   });
   if (!response?.ok) throw new Error(`Tieba API HTTP ${response?.status || "error"}`);
-  return parseThreadResponse(new Uint8Array(await response.arrayBuffer()), post);
+  return decodeThreadResponse(response, post);
 }
 
 export {
   buildThreadRequest,
+  decodeThreadResponse,
   fetchTiebaThreadDetail,
   multipartBody,
   parseThreadResponse,
