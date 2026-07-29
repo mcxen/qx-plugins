@@ -16,8 +16,9 @@
 3. Paint cache before awaiting a network refresh.
 4. Full post detail loads only after selection and updates the same item id.
 5. Publish structured `detail.images`; do not draw a custom image viewer.
-6. Public detail must not depend on comment login. Comments may use the optional
-   plain-text preference `commentCookie`; never persist it inside community cache.
+6. Public detail must not depend on comment login. Always attempt the first
+   anonymous comment page; the optional plain-text preference `commentCookie`
+   may enhance the request. Never persist it inside community cache.
 7. Sign every feed request immediately before dispatch. A configured legacy URL
    may provide business parameters, but its `hkey`, `_time`, and `nonce` must
    always be discarded and regenerated for refresh and pagination.

@@ -162,8 +162,8 @@
       "version": "1.1.0",
       "description": "追踪京东金融积存金实时价格与历史曲线。",
       "download_url": "https://raw.githubusercontent.com/mcxen/qx-plugins/main/qxgold.qx-plugin",
-      "size_bytes": 13849,
-      "checksum_sha256": "e772495edcf7cf39abce981b6bd2b4de50f8c4fa9c09bd110cbea6c06a442984",
+      "size_bytes": 12538,
+      "checksum_sha256": "18d58e47bac660d688e3c1c1bd366e0209e295e52a28d6fd6a0b4cb4506eea17",
       "required_permissions": [
         "http",
         "island"
@@ -301,11 +301,11 @@
     {
       "id": "qxgh",
       "name": "QxGH",
-      "version": "1.5.1",
+      "version": "1.5.0",
       "description": "QxGH — watch GitHub Actions and Releases from public github.com pages (no REST API). Business-only workbench UI.",
       "download_url": "https://raw.githubusercontent.com/mcxen/qx-plugins/main/qxgh.qx-plugin",
-      "size_bytes": 47919,
-      "checksum_sha256": "37602ffbac23e986a2e0d7c7399e138476d9e08204412f8f9e4e9e311db45920",
+      "size_bytes": 45709,
+      "checksum_sha256": "015e8306d6da35316b1114dd582e42b8fe2a85b0676b81f4311d225b722a19be",
       "required_permissions": [
         "http",
         "open-url",
@@ -313,18 +313,10 @@
         "island",
         "tray"
       ],
-      "updated_at": "2026-07-26",
+      "updated_at": "2026-07-25",
       "author": "mcx",
       "min_app_version": "0.5.38",
       "releases": [
-        {
-          "version": "1.5.1",
-          "published_at": "2026-07-26",
-          "notes_localizations": {
-            "en": "Fixed long cold loads behind a system proxy by fetching repository indexes concurrently and moving run-duration enrichment behind the first usable list.",
-            "zh-CN": "修复系统代理下冷启动长时间卡在加载状态：仓库索引改为并发请求，运行耗时在首批可用列表之后后台补齐。"
-          }
-        },
         {
           "version": "1.5.0",
           "published_at": "2026-07-25",
@@ -354,51 +346,19 @@
     {
       "id": "qxheihe",
       "name": "QxHeihe 小黑盒",
-      "version": "1.4.6",
+      "version": "1.4.2",
       "description": "浏览小黑盒社区推荐内容，在 Qx 内查看正文、多图、帖子信息与登录评论。",
       "download_url": "https://raw.githubusercontent.com/mcxen/qx-plugins/main/qxheihe.qx-plugin",
-      "size_bytes": 47052,
-      "checksum_sha256": "27d0d75db0b1e9027ef7b9e7808efe7c39e777dff9fbee0060c889a8fd9bdaf1",
+      "size_bytes": 42845,
+      "checksum_sha256": "b1e625cc4843e0b1d5730c4495b6ab67865c0e472ef6f126ad661662a0fa8f72",
       "required_permissions": [
         "http",
         "open-url"
       ],
-      "updated_at": "2026-07-29",
+      "updated_at": "2026-07-25",
       "author": "mcx",
       "min_app_version": "0.6.19",
       "releases": [
-        {
-          "version": "1.4.6",
-          "published_at": "2026-07-29",
-          "notes_localizations": {
-            "en": "Aligned anonymous comment-tree requests with the browser post origin and web Referer instead of API share redirects.",
-            "zh-CN": "将匿名评论树请求改为使用浏览器帖子 Origin 和网页 Referer，避免复用 API 分享跳转地址。"
-          }
-        },
-        {
-          "version": "1.4.5",
-          "published_at": "2026-07-29",
-          "notes_localizations": {
-            "en": "Invalidated older detail caches after the anonymous comment-tree transport change so installed updates retry comments instead of reusing a resolved empty result.",
-            "zh-CN": "匿名评论树传输变更后升级详情缓存版本，确保安装更新会重新拉取评论，而不是继续复用已解析但为空的旧结果。"
-          }
-        },
-        {
-          "version": "1.4.4",
-          "published_at": "2026-07-29",
-          "notes_localizations": {
-            "en": "Handled upstream CAPTCHA/risk-control responses explicitly, preserving cached comments and providing a localized verification prompt without repeated retries.",
-            "zh-CN": "明确处理上游 CAPTCHA/风控响应，保留缓存评论并显示双语验证提示，避免重复重试。"
-          }
-        },
-        {
-          "version": "1.4.3",
-          "published_at": "2026-07-29",
-          "notes_localizations": {
-            "en": "Switched comment loading to the signed public comment tree endpoint, enabling anonymous first-page comments with nested replies.",
-            "zh-CN": "切换到带签名的公开评论树接口，支持匿名读取首屏评论及楼中楼回复。"
-          }
-        },
         {
           "version": "1.4.2",
           "published_at": "2026-07-25",
@@ -569,11 +529,11 @@
     {
       "id": "sysinfo",
       "name": "Sysinfo",
-      "version": "1.4.0",
-      "description": "Native Qx System Monitor for CPU, memory, power, storage, displays, network, and processes on macOS and Windows.",
+      "version": "1.3.0",
+      "description": "Native Qx System Monitor for CPU, memory, battery health, storage, network, and processes on macOS and Windows.",
       "download_url": "https://raw.githubusercontent.com/mcxen/qx-plugins/main/sysinfo.qx-plugin",
-      "size_bytes": 40148,
-      "checksum_sha256": "55138f8d614732ad9ef0e71215111c8a2d9108aff086669f48c04d6959478202",
+      "size_bytes": 31872,
+      "checksum_sha256": "9db7ae69f8dfbe6ae2fad0b75faf8a7a15ff6418902e5b1e9b1ca14c54a0fab3",
       "required_permissions": [
         "system",
         "system-stats",
@@ -583,24 +543,8 @@
       ],
       "updated_at": "2026-07-26",
       "author": "Qx",
-      "min_app_version": "0.6.38",
+      "min_app_version": "0.6.34",
       "releases": [
-        {
-          "version": "1.4.0",
-          "published_at": "2026-07-26",
-          "notes_localizations": {
-            "en": "Added a localized display inventory with resolution, refresh rate, scaling, rotation, connection technology and available EDID identifiers, plus recognizable hardware category icons.",
-            "zh-CN": "新增汉化显示器清单，展示分辨率、刷新率、缩放、旋转、连接协议及可用的 EDID 标识，并为硬件分类补充易识别图标。"
-          }
-        },
-        {
-          "version": "1.3.1",
-          "published_at": "2026-07-26",
-          "notes_localizations": {
-            "en": "Prevented overlapping monitor refreshes and adopted Qx's direct Win32 system and battery sampling path.",
-            "zh-CN": "避免系统监视刷新重叠，并接入 Qx 的原生 Win32 系统与电池采样路径。"
-          }
-        },
         {
           "version": "1.3.0",
           "published_at": "2026-07-26",
