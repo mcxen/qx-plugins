@@ -14,14 +14,16 @@
 1. `manifest.panel` and `export default.panel` must remain paired.
 2. Parse `forumName` as a comma/newline-separated list, normalize each entry by
    trimming a trailing `吧`, and preserve single-forum preferences.
-3. Use stable thread ids from `/p/<tid>` or Tieba `data-field`; never list indexes.
-4. Paint cached content before awaiting a network refresh.
-5. Thread pages provide the first page of public floors as Workbench `detail.replies`.
-6. Keep the main-post body separate from replies and mark matching authors as OP.
-7. Publish structured `detail.images`; do not draw a custom image viewer.
-8. Keep cache keys synchronized with `manifest.storage.cacheTargets`.
-9. Cache values use a top-level `savedAt` envelope for host retention cleanup.
-10. Anonymous endpoints may be rate-limited or risk-controlled; preserve cache and expose retry/open actions.
+3. Keep a Mixed tab plus one native tab per configured forum. Mixed loading is
+   partial-failure tolerant and interleaves forums instead of concatenating them.
+4. Use stable thread ids from `/p/<tid>` or Tieba `data-field`; never list indexes.
+5. Paint cached content before awaiting a network refresh.
+6. Thread pages provide the first page of public floors as Workbench `detail.replies`.
+7. Keep the main-post body separate from replies and mark matching authors as OP.
+8. Publish structured `detail.images`; do not draw a custom image viewer.
+9. Keep cache keys synchronized with `manifest.storage.cacheTargets`.
+10. Cache values use a top-level `savedAt` envelope for host retention cleanup.
+11. Anonymous endpoints may be rate-limited or risk-controlled; preserve cache and expose retry/open actions.
 
 ## Permissions
 

@@ -354,11 +354,11 @@
     {
       "id": "qxheihe",
       "name": "QxHeihe 小黑盒",
-      "version": "1.4.6",
-      "description": "浏览小黑盒社区推荐内容，在 Qx 内查看正文、多图、帖子信息与登录评论。",
+      "version": "1.4.7",
+      "description": "浏览小黑盒社区推荐内容，在 Qx 内查看正文、多图、帖子信息与匿名优先评论。",
       "download_url": "https://raw.githubusercontent.com/mcxen/qx-plugins/main/qxheihe.qx-plugin",
-      "size_bytes": 44506,
-      "checksum_sha256": "e3e557f66e2567bd7a1b9aff6e31891f0d6219c23a76b9f400ecd32b6ca20688",
+      "size_bytes": 47659,
+      "checksum_sha256": "1c94605a9b04f511408b09fd7cd4d1dcc5d668320a45246bd2ee9044411b6e6c",
       "required_permissions": [
         "http",
         "open-url"
@@ -367,6 +367,14 @@
       "author": "mcx",
       "min_app_version": "0.6.19",
       "releases": [
+        {
+          "version": "1.4.7",
+          "published_at": "2026-07-29",
+          "notes_localizations": {
+            "en": "Restored the signed anonymous comment-tree transport and repackaged the marketplace archive without replacing the existing 1.4.6 artifact in place.",
+            "zh-CN": "恢复带签名的匿名评论树传输，并以新版本重新打包市场归档，避免原地替换已有 1.4.6 安装包。"
+          }
+        },
         {
           "version": "1.4.6",
           "published_at": "2026-07-29",
@@ -517,11 +525,11 @@
     {
       "id": "qxtieba",
       "name": "QxTieba 贴吧",
-      "version": "1.0.1",
-      "description": "浏览指定百度贴吧的公开帖子流，在 Qx 内阅读正文与楼层评论。",
+      "version": "1.1.0",
+      "description": "聚合浏览多个百度贴吧的公开帖子流，在 Qx 内阅读正文与楼层评论。",
       "download_url": "https://raw.githubusercontent.com/mcxen/qx-plugins/main/qxtieba.qx-plugin",
-      "size_bytes": 37440,
-      "checksum_sha256": "18359e89f98b7407acf833559542f53d47256e97af8313a2f44bf4455b21abae",
+      "size_bytes": 40314,
+      "checksum_sha256": "7e95e805141f97b2d52bfb18196bea91482166ef061b0615ef5c34540346332c",
       "required_permissions": [
         "http",
         "open-url"
@@ -530,6 +538,14 @@
       "author": "Qx",
       "min_app_version": "0.6.19",
       "releases": [
+        {
+          "version": "1.1.0",
+          "published_at": "2026-07-29",
+          "notes_localizations": {
+            "en": "Added a mixed multi-forum feed that loads configured forums concurrently, interleaves posts, and remains usable when one forum fails.",
+            "zh-CN": "新增多贴吧混合 Feed：并发加载配置贴吧、交错合并帖子，并在单个贴吧失败时继续展示其他贴吧。"
+          }
+        },
         {
           "version": "1.0.1",
           "published_at": "2026-07-29",

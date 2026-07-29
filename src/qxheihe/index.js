@@ -9,10 +9,13 @@
 const DEFAULT_FEED_URL = "https://api.xiaoheihe.cn/bbs/app/feeds?app=heybox&os_type=web&x_app=heybox_website&x_client_type=web&x_os_type=Mac&x_client_version=&client_type=web&web_version=3.0&version=999.0.4&pull=0&offset=0&dw=604";
 const DETAIL_URL = "https://api.xiaoheihe.cn/bbs/web/link/detail";
 const COMMENT_URL = "https://api.xiaoheihe.cn/bbs/web/link/comment/list";
+const COMMENT_TREE_URL = "https://api.xiaoheihe.cn/bbs/app/link/tree";
 const LEGACY_CACHE_KEY = "qxheihe.feed.v1";
 const CACHE_KEY = "cache.community.v2";
 const DEFAULT_TTL_MS = 5 * 60 * 1000;
-const DETAIL_FORMAT_VERSION = 2;
+// Bump when the comment transport or normalized detail payload changes so an
+// older cached "commentsResolved" result cannot suppress the new tree fetch.
+const DETAIL_FORMAT_VERSION = 3;
 const SIGN_ALPHABET = "AB45STUVWZEFGJ6CH01D237IXYPQRKLMN89";
 
 let qxLocale = "en";
@@ -326,6 +329,10 @@ function commentText(comment) {
 }
 
 function commentRows(result) {
+  const tree = Array.isArray(result?.comments) ? result.comments : [];
+  if (tree.some((floor) => Array.isArray(floor?.comment))) {
+    return tree.flatMap((floor) => Array.isArray(floor?.comment) ? floor.comment : []);
+  }
   const candidates = [
     result?.comments,
     result?.comment_list,
@@ -333,7 +340,9 @@ function commentRows(result) {
     result?.rows,
     result?.data,
   ];
-  return candidates.find(Array.isArray) || [];
+  const direct = candidates.find(Array.isArray);
+  if (direct) return direct;
+  return [];
 }
 
 function commentAuthor(comment) {
@@ -465,6 +474,32 @@ function feedUrlAtOffset(base, offset, {
   url.searchParams.set("version", "999.0.4");
   url.searchParams.set("_time", String(timestamp));
   url.searchParams.set("nonce", nonce);
+  url.searchParams.set("hkey", heiheHkey(url.pathname, timestamp, nonce));
+  return url.toString();
+}
+
+function commentTreeUrl(linkId, {
+  timestamp = Math.floor(Date.now() / 1000),
+  nonce = randomNonce(),
+} = {}) {
+  const url = new URL(COMMENT_TREE_URL);
+  url.searchParams.set("app", "heybox");
+  url.searchParams.set("os_type", "web");
+  url.searchParams.set("x_app", "heybox_website");
+  url.searchParams.set("x_client_type", "web");
+  url.searchParams.set("x_os_type", "Mac");
+  url.searchParams.set("x_client_version", "");
+  url.searchParams.set("client_type", "web");
+  url.searchParams.set("web_version", "3.0");
+  url.searchParams.set("version", "999.0.4");
+  url.searchParams.set("_time", String(timestamp));
+  url.searchParams.set("nonce", nonce);
+  url.searchParams.set("link_id", String(linkId));
+  url.searchParams.set("is_first", "1");
+  url.searchParams.set("page", "1");
+  url.searchParams.set("index", "1");
+  url.searchParams.set("limit", "20");
+  url.searchParams.set("owner_only", "0");
   url.searchParams.set("hkey", heiheHkey(url.pathname, timestamp, nonce));
   return url.toString();
 }
@@ -760,15 +795,33 @@ function createPanel(container, context) {
         { Referer: postUrl(post) },
       );
       const commentHeaders = { Referer: postUrl(post) };
-      // The public endpoint also serves anonymous requests. A Cookie is an
-      // optional enhancement for accounts/instances that require it, not a
-      // prerequisite for attempting to load the first page.
+      // Feed share_url values can point at the API v3 redirect. The browser
+      // comment request originates from the public web post, so keep this
+      // request's origin aligned with that page instead of the API redirect.
+      commentHeaders.Referer = `https://www.xiaoheihe.cn/app/bbs/link/${encodeURIComponent(key)}`;
+      commentHeaders.Origin = "https://www.xiaoheihe.cn";
       if (cookie) commentHeaders.Cookie = cookie;
       const commentRequest = fetchJson(
         context,
-        `${COMMENT_URL}?link_id=${encodeURIComponent(key)}&offset=0&limit=20`,
+        commentTreeUrl(key),
         commentHeaders,
-      ).then((result) => ({ result })).catch((error) => ({ error }));
+      ).then((result) => {
+        if (!Array.isArray(result?.comments)) throw new Error("Comment tree response was not a comment payload");
+        return { result };
+      }).catch(async (treeError) => {
+        // The older web endpoint is retained for logged-in installations or
+        // servers that temporarily do not expose the public comment tree.
+        try {
+          const result = await fetchJson(
+            context,
+            `${COMMENT_URL}?link_id=${encodeURIComponent(key)}&offset=0&limit=20`,
+            commentHeaders,
+          );
+          return { result };
+        } catch {
+          return { error: treeError };
+        }
+      });
       const [result, commentOutcome] = await Promise.all([detailRequest, commentRequest]);
       if (state.dead || generation !== state.generation) return;
       const link = { ...post, ...(result.link || {}) };
@@ -776,10 +829,17 @@ function createPanel(container, context) {
       const commentSections = commentOutcome.result ? parseComments(commentOutcome.result) : [];
       let commentNotice = "";
       if (commentOutcome.error) {
-        commentNotice = copy(
-          `Comments unavailable: ${message(commentOutcome.error)}`,
-          `评论暂不可用：${message(commentOutcome.error)}`,
-        );
+        const errorText = message(commentOutcome.error);
+        const needsVerification = /captcha|show_captcha|验证|风控/i.test(errorText);
+        commentNotice = needsVerification
+          ? copy(
+              "Xiaoheihe asked for verification. Open the post in Xiaoheihe, complete the check, then refresh. Cached comments remain available.",
+              "小黑盒要求完成验证。请在小黑盒中打开帖子完成验证后再刷新；已有缓存评论仍会保留。",
+            )
+          : copy(
+              `Comments unavailable: ${errorText}`,
+              `评论暂不可用：${errorText}`,
+            );
       } else if (!commentSections.length) {
         commentNotice = Number(link.comment_num || post.comment_num || 0) > 0
           ? copy("No readable comments were returned. The login may have expired.", "未返回可读取的评论，登录信息可能已失效。")

@@ -121,6 +121,14 @@
     ],
     "qxtieba": [
       {
+        "version": "1.1.0",
+        "published_at": "2026-07-29",
+        "notes_localizations": {
+          "en": "Added a mixed multi-forum feed that loads configured forums concurrently, interleaves posts, and remains usable when one forum fails.",
+          "zh-CN": "新增多贴吧混合 Feed：并发加载配置贴吧、交错合并帖子，并在单个贴吧失败时继续展示其他贴吧。"
+        }
+      },
+      {
         "version": "1.0.1",
         "published_at": "2026-07-29",
         "notes_localizations": {
@@ -138,6 +146,14 @@
       }
     ],
     "qxheihe": [
+      {
+        "version": "1.4.7",
+        "published_at": "2026-07-29",
+        "notes_localizations": {
+          "en": "Restored the signed anonymous comment-tree transport and repackaged the marketplace archive without replacing the existing 1.4.6 artifact in place.",
+          "zh-CN": "恢复带签名的匿名评论树传输，并以新版本重新打包市场归档，避免原地替换已有 1.4.6 安装包。"
+        }
+      },
       {
         "version": "1.4.6",
         "published_at": "2026-07-29",

@@ -3,6 +3,7 @@ import {
   buildFeedUrl,
   normalizeForumName,
   parseForumNames,
+  interleavePosts,
   parseFeedHtml,
   parseThreadHtml,
   pruneCache,
@@ -12,6 +13,13 @@ assert.equal(normalizeForumName(" Python吧 "), "Python");
 assert.equal(normalizeForumName("原神吧吧"), "原神吧");
 assert.deepEqual(parseForumNames("图拉丁吧, 笔记本吧\n图拉丁吧"), ["图拉丁", "笔记本"]);
 assert.deepEqual(parseForumNames(""), ["图拉丁", "笔记本"]);
+assert.deepEqual(
+  interleavePosts([
+    [{ id: "a1" }, { id: "a2" }],
+    [{ id: "b1" }, { id: "a2" }, { id: "b2" }],
+  ]).map((post) => post.id),
+  ["a1", "b1", "a2", "b2"],
+);
 assert.equal(buildFeedUrl("Python吧", 2), "https://tieba.baidu.com/mo/q/forum?kw=Python&page=2");
 assert.equal(buildFeedUrl("Python", 2, true), "https://tieba.baidu.com/f?kw=Python&ie=utf-8&pn=50");
 

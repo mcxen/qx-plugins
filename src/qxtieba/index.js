@@ -11,6 +11,7 @@ const CACHE_KEY = "cache.community.v1";
 const DEFAULT_FORUMS = ["图拉丁", "笔记本"];
 const DEFAULT_FORUM = DEFAULT_FORUMS[0];
 const DEFAULT_FORUM_PREFERENCE = "图拉丁吧, 笔记本吧";
+const MIXED_FORUM = "__mixed__";
 const DEFAULT_TTL_MS = 5 * 60 * 1000;
 const DETAIL_TTL_MS = 10 * 60 * 1000;
 const WEB_USER_AGENT = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36 QxTieba/1.0";
@@ -314,6 +315,48 @@ async function fetchFeed(context, forumName, page) {
   throw firstError || new Error(copy("Tieba feed is unavailable", "贴吧 Feed 不可用"));
 }
 
+function interleavePosts(groups) {
+  const queues = groups.map((group) => [...group]);
+  const seen = new Set();
+  const merged = [];
+  let remaining = queues.reduce((total, queue) => total + queue.length, 0);
+  while (remaining > 0) {
+    for (const queue of queues) {
+      const post = queue.shift();
+      if (!post) continue;
+      remaining -= 1;
+      const id = String(post.id || "");
+      if (!id || seen.has(id)) continue;
+      seen.add(id);
+      merged.push(post);
+    }
+  }
+  return merged;
+}
+
+async function fetchForumSelection(context, forumNames, selection, page) {
+  if (selection !== MIXED_FORUM) {
+    const result = await fetchFeed(context, selection, page);
+    return { ...result, loadedForums: 1, failedForums: 0 };
+  }
+  const settled = await Promise.allSettled(
+    forumNames.map((forumName) => fetchFeed(context, forumName, page)),
+  );
+  const successful = settled
+    .filter((result) => result.status === "fulfilled")
+    .map((result) => result.value);
+  if (!successful.length) {
+    const firstFailure = settled.find((result) => result.status === "rejected");
+    throw firstFailure?.reason || new Error(copy("All configured forums failed", "所有配置贴吧均加载失败"));
+  }
+  return {
+    items: interleavePosts(successful.map((result) => result.items)),
+    hasMore: successful.some((result) => result.hasMore),
+    loadedForums: successful.length,
+    failedForums: settled.length - successful.length,
+  };
+}
+
 async function fetchDetail(context, post) {
   const url = `${threadUrl(post.id)}?pn=1&see_lz=0&ie=utf-8`;
   const html = await fetchText(context, url, buildFeedUrl(post.forumName, 1));
@@ -392,10 +435,14 @@ function compactNumber(value) {
   }).format(number);
 }
 
+function forumDisplayName(selection) {
+  return selection === MIXED_FORUM ? copy("Mixed", "混合") : `${selection}吧`;
+}
+
 function createPanel(container, context) {
   setLocale(context);
   const state = {
-    forumName: DEFAULT_FORUM,
+    forumName: MIXED_FORUM,
     forumNames: [...DEFAULT_FORUMS],
     posts: [],
     visible: [],
@@ -484,7 +531,7 @@ function createPanel(container, context) {
     return {
       id,
       title: post.title,
-      subtitle: post.summary || `${post.author} · ${state.forumName}吧`,
+      subtitle: post.summary || `${post.author} · ${post.forumName}吧`,
       meta: [post.author, post.publishedAt].filter(Boolean).join(" · "),
       badge: `${compactNumber(post.replyCount)} ${copy("replies", "回复")}`,
       tone: read ? "neutral" : "accent",
@@ -505,13 +552,13 @@ function createPanel(container, context) {
     filterPosts();
     const snapshot = {
       revision: ++state.revision,
-      title: `QxTieba · ${state.forumName}吧`,
+      title: `QxTieba · ${forumDisplayName(state.forumName)}`,
       query: state.query,
       queryPlaceholder: copy("Search loaded Tieba posts…", "搜索已加载的贴吧帖子…"),
       layout: { kind: "list" },
-      tabs: state.forumNames.map((name) => ({
+      tabs: [MIXED_FORUM, ...state.forumNames].map((name) => ({
         id: name,
-        label: `${name}吧`,
+        label: forumDisplayName(name),
         active: name === state.forumName,
       })),
       loading: state.loading && state.posts.length === 0,
@@ -537,7 +584,7 @@ function createPanel(container, context) {
       }],
       island: state.loading || state.loadingMore
         ? {
-            primary: `${state.forumName}吧`,
+            primary: forumDisplayName(state.forumName),
             secondary: state.loadingMore ? copy("Loading more posts", "正在加载更多帖子") : copy("Refreshing community", "正在刷新社区"),
             activity: "spinner",
           }
@@ -553,8 +600,8 @@ function createPanel(container, context) {
         paint();
       },
       onTab(id) {
-        const name = normalizeForumName(id);
-        if (!state.forumNames.includes(name) || name === state.forumName) return;
+        const name = id === MIXED_FORUM ? MIXED_FORUM : normalizeForumName(id);
+        if ((name !== MIXED_FORUM && !state.forumNames.includes(name)) || name === state.forumName) return;
         state.generation += 1;
         state.loading = false;
         state.loadingMore = false;
@@ -671,7 +718,9 @@ function createPanel(container, context) {
         preference(context, "detailImageLayout", "horizontal"),
       ]);
       state.forumNames = parseForumNames(forumPreference);
-      if (!state.forumNames.includes(state.forumName)) state.forumName = state.forumNames[0];
+      if (state.forumName !== MIXED_FORUM && !state.forumNames.includes(state.forumName)) {
+        state.forumName = MIXED_FORUM;
+      }
       const ttl = Number(ttlPreference);
       state.ttlMs = Number.isFinite(ttl) && ttl > 0 ? Math.min(60, ttl) * 60 * 1000 : DEFAULT_TTL_MS;
       state.retentionDays = Number(retentionPreference) === 3 ? 3 : 7;
@@ -690,7 +739,10 @@ function createPanel(container, context) {
         state.cachedAt = cached.cachedAt;
         state.selectedId ||= state.posts[0]?.id || null;
         state.source = cacheAge <= state.ttlMs
-          ? copy(`Cached ${state.forumName} feed`, `${state.forumName}吧缓存`)
+          ? copy(
+              `Cached ${forumDisplayName(state.forumName)} feed`,
+              `${forumDisplayName(state.forumName)} Feed 缓存`,
+            )
           : copy("Stale cache · refreshing", "旧缓存 · 正在刷新");
         paint();
         if (cacheAge <= state.ttlMs) return;
@@ -702,7 +754,7 @@ function createPanel(container, context) {
         state.selectedId = null;
       }
 
-      const result = await fetchFeed(context, state.forumName, 1);
+      const result = await fetchForumSelection(context, state.forumNames, state.forumName, 1);
       if (state.dead || generation !== state.generation) return;
       const now = Date.now();
       state.posts = result.items;
@@ -712,7 +764,12 @@ function createPanel(container, context) {
       state.cachedAt = Object.fromEntries(result.items.map((post) => [String(post.id), now]));
       state.readAt = Object.fromEntries(Object.entries(state.readAt).filter(([id]) => result.items.some((post) => String(post.id) === id)));
       state.selectedId = result.items[0]?.id || null;
-      state.source = copy(`Live ${state.forumName} feed`, `${state.forumName}吧实时数据`);
+      state.source = state.forumName === MIXED_FORUM
+        ? copy(
+            `Mixed feed · ${result.loadedForums}/${state.forumNames.length} forums`,
+            `混合 Feed · ${result.loadedForums}/${state.forumNames.length} 个贴吧`,
+          )
+        : copy(`Live ${state.forumName} feed`, `${state.forumName}吧实时数据`);
       await persistCache(now);
     } catch (error) {
       if (!state.dead && generation === state.generation) {
@@ -738,7 +795,7 @@ function createPanel(container, context) {
     paint();
     try {
       const nextPage = state.page + 1;
-      const result = await fetchFeed(context, state.forumName, nextPage);
+      const result = await fetchForumSelection(context, state.forumNames, state.forumName, nextPage);
       if (state.dead || generation !== state.generation) return;
       const byId = new Map(state.posts.map((post) => [String(post.id), post]));
       const now = Date.now();
@@ -806,6 +863,7 @@ export {
   buildFeedUrl,
   normalizeForumName,
   parseForumNames,
+  interleavePosts,
   parseFeedHtml,
   parseThreadHtml,
   pruneCache,
