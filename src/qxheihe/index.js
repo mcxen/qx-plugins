@@ -13,7 +13,9 @@ const COMMENT_TREE_URL = "https://api.xiaoheihe.cn/bbs/app/link/tree";
 const LEGACY_CACHE_KEY = "qxheihe.feed.v1";
 const CACHE_KEY = "cache.community.v2";
 const DEFAULT_TTL_MS = 5 * 60 * 1000;
-const DETAIL_FORMAT_VERSION = 2;
+// Bump when the comment transport or normalized detail payload changes so an
+// older cached "commentsResolved" result cannot suppress the new tree fetch.
+const DETAIL_FORMAT_VERSION = 3;
 const SIGN_ALPHABET = "AB45STUVWZEFGJ6CH01D237IXYPQRKLMN89";
 
 let qxLocale = "en";

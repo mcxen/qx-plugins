@@ -121,6 +121,14 @@
     ],
     "qxheihe": [
       {
+        "version": "1.4.5",
+        "published_at": "2026-07-29",
+        "notes_localizations": {
+          "en": "Invalidated older detail caches after the anonymous comment-tree transport change so installed updates retry comments instead of reusing a resolved empty result.",
+          "zh-CN": "匿名评论树传输变更后升级详情缓存版本，确保安装更新会重新拉取评论，而不是继续复用已解析但为空的旧结果。"
+        }
+      },
+      {
         "version": "1.4.4",
         "published_at": "2026-07-29",
         "notes_localizations": {
