@@ -357,8 +357,8 @@
       "version": "1.4.5",
       "description": "浏览小黑盒社区推荐内容，在 Qx 内查看正文、多图、帖子信息与登录评论。",
       "download_url": "https://raw.githubusercontent.com/mcxen/qx-plugins/main/qxheihe.qx-plugin",
-      "size_bytes": 46186,
-      "checksum_sha256": "71fd587e5f4f8e2f1dd8294526796b2510d16a6149552f6e04670156e56d4191",
+      "size_bytes": 46280,
+      "checksum_sha256": "7a592985eb1e083be803a960db6313e4f8ec6bf22f44f2a89f76b4ca07a0963f",
       "required_permissions": [
         "http",
         "open-url"

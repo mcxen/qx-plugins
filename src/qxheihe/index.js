@@ -329,6 +329,10 @@ function commentText(comment) {
 }
 
 function commentRows(result) {
+  const tree = Array.isArray(result?.comments) ? result.comments : [];
+  if (tree.some((floor) => Array.isArray(floor?.comment))) {
+    return tree.flatMap((floor) => Array.isArray(floor?.comment) ? floor.comment : []);
+  }
   const candidates = [
     result?.comments,
     result?.comment_list,
@@ -338,8 +342,7 @@ function commentRows(result) {
   ];
   const direct = candidates.find(Array.isArray);
   if (direct) return direct;
-  return (Array.isArray(result?.comments) ? result.comments : [])
-    .flatMap((floor) => Array.isArray(floor?.comment) ? floor.comment : []);
+  return [];
 }
 
 function commentAuthor(comment) {
