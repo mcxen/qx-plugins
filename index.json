@@ -515,6 +515,40 @@
       ]
     },
     {
+      "id": "qxtieba",
+      "name": "QxTieba 贴吧",
+      "version": "1.0.1",
+      "description": "浏览指定百度贴吧的公开帖子流，在 Qx 内阅读正文与楼层评论。",
+      "download_url": "https://raw.githubusercontent.com/mcxen/qx-plugins/main/qxtieba.qx-plugin",
+      "size_bytes": 37440,
+      "checksum_sha256": "18359e89f98b7407acf833559542f53d47256e97af8313a2f44bf4455b21abae",
+      "required_permissions": [
+        "http",
+        "open-url"
+      ],
+      "updated_at": "2026-07-29",
+      "author": "Qx",
+      "min_app_version": "0.6.19",
+      "releases": [
+        {
+          "version": "1.0.1",
+          "published_at": "2026-07-29",
+          "notes_localizations": {
+            "en": "Added Tulading and Laptop as the default forums, with native tabs and comma/newline-separated multi-forum preferences.",
+            "zh-CN": "默认配置图拉丁吧和笔记本吧，新增原生标签切换，并支持用逗号或换行配置多个贴吧。"
+          }
+        },
+        {
+          "version": "1.0.0",
+          "published_at": "2026-07-29",
+          "notes_localizations": {
+            "en": "Initial QxTieba release with a configurable forum feed, first-page thread comments, Workbench detail reading, pagination and offline cache.",
+            "zh-CN": "首个 QxTieba 版本：支持配置贴吧名称、吧内 Feed、首屏楼层评论、Workbench 详情阅读、分页与离线缓存。"
+          }
+        }
+      ]
+    },
+    {
       "id": "qxweibo",
       "name": "QxWeibo 微博",
       "version": "1.1.1",

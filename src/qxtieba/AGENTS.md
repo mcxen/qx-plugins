@@ -1,0 +1,44 @@
+# QxTieba — Agent Guide
+
+## Surfaces
+
+| Surface | Role |
+|---|---|
+| Workbench panel | Configured-bar feed, local search, master-detail and comments |
+| Command | Launcher entry |
+| HTTP | Baidu Tieba anonymous mobile forum and public thread pages |
+| Persist storage | SWR feed/detail/read cache with 3/7-day pruning |
+
+## Invariants
+
+1. `manifest.panel` and `export default.panel` must remain paired.
+2. Parse `forumName` as a comma/newline-separated list, normalize each entry by
+   trimming a trailing `吧`, and preserve single-forum preferences.
+3. Use stable thread ids from `/p/<tid>` or Tieba `data-field`; never list indexes.
+4. Paint cached content before awaiting a network refresh.
+5. Thread pages provide the first page of public floors as Workbench `detail.replies`.
+6. Keep the main-post body separate from replies and mark matching authors as OP.
+7. Publish structured `detail.images`; do not draw a custom image viewer.
+8. Keep cache keys synchronized with `manifest.storage.cacheTargets`.
+9. Cache values use a top-level `savedAt` envelope for host retention cleanup.
+10. Anonymous endpoints may be rate-limited or risk-controlled; preserve cache and expose retry/open actions.
+
+## Permissions
+
+- `http`: public forum and thread pages.
+- `open-url`: open a thread on Tieba.
+
+## Edit checklist
+
+- [ ] Bump the plugin version and add `release-notes.json` history.
+- [ ] Run `npm run smoke:qxtieba`.
+- [ ] Run `npm run package:one -- --only=qxtieba`.
+- [ ] Reinstall the archive into `~/.qx/plugins/qxtieba`.
+- [ ] Verify configured forum, pagination, selection, comments, offline cache and external open.
+
+## Do not
+
+- Do not require login cookies for public browsing.
+- Do not invoke Python, MCP, a browser, or shell commands at runtime.
+- Do not register global Esc or Actions shortcuts inside the plugin.
+- Do not silently replace usable cache when Tieba returns a verification page.

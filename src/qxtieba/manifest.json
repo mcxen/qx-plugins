@@ -1,0 +1,90 @@
+{
+  "id": "qxtieba",
+  "name": "QxTieba 贴吧",
+  "version": "1.0.1",
+  "description": "浏览指定百度贴吧的公开帖子流，在 Qx 内阅读正文与楼层评论。",
+  "author": "Qx",
+  "icon": "icon.svg",
+  "keywords": [
+    "贴吧",
+    "百度贴吧",
+    "tieba",
+    "社区",
+    "帖子",
+    "评论"
+  ],
+  "permissions": [
+    "http",
+    "open-url"
+  ],
+  "preferences": [
+    {
+      "id": "forumName",
+      "label": "贴吧名称列表",
+      "type": "string",
+      "required": true,
+      "default": "图拉丁吧, 笔记本吧",
+      "description": "要浏览的贴吧名称，多个贴吧使用逗号或换行分隔；名称可带或不带末尾的“吧”。"
+    },
+    {
+      "id": "cacheTtlMinutes",
+      "label": "列表缓存（分钟）",
+      "type": "string",
+      "required": false,
+      "default": "5",
+      "description": "优先显示缓存，并在过期后后台刷新。"
+    },
+    {
+      "id": "retentionDays",
+      "label": "缓存自动清理",
+      "type": "select",
+      "required": false,
+      "default": "7",
+      "description": "帖子、正文、评论和短期已读状态的保留时间。",
+      "options": [
+        { "label": "3 天", "value": "3" },
+        { "label": "7 天", "value": "7" }
+      ]
+    },
+    {
+      "id": "detailImageLayout",
+      "label": "详情多图布局",
+      "type": "select",
+      "required": false,
+      "default": "horizontal",
+      "description": "横向胶片适合逐张查看；网格适合同时浏览多图。",
+      "options": [
+        { "label": "横向胶片", "value": "horizontal" },
+        { "label": "响应式网格", "value": "grid" }
+      ]
+    }
+  ],
+  "storage": {
+    "cacheTargets": [
+      {
+        "id": "community",
+        "label": "QxTieba 社区缓存",
+        "description": "配置贴吧的帖子列表、正文、楼层评论和短期已读状态。",
+        "keys": ["cache.community.v1"],
+        "retentionDays": 7
+      }
+    ]
+  },
+  "entry": "index.js",
+  "commands": [
+    {
+      "name": "open-qxtieba",
+      "title": "打开 QxTieba 贴吧",
+      "description": "浏览配置贴吧的帖子与评论",
+      "keywords": ["贴吧", "百度贴吧", "tieba", "社区", "帖子", "评论"]
+    }
+  ],
+  "panel": {
+    "title": "QxTieba 贴吧",
+    "icon": "icon.svg",
+    "keywords": ["贴吧", "百度贴吧", "tieba", "社区", "帖子", "评论"]
+  },
+  "min_app_version": "0.6.19",
+  "platforms": ["macos", "windows"],
+  "screenshots": []
+}
