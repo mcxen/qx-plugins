@@ -533,19 +533,27 @@
     {
       "id": "qxtieba",
       "name": "QxTieba 贴吧",
-      "version": "1.1.4",
+      "version": "1.1.5",
       "description": "聚合浏览多个百度贴吧的公开帖子流，在 Qx 内阅读正文与楼层评论。",
       "download_url": "https://raw.githubusercontent.com/mcxen/qx-plugins/main/qxtieba.qx-plugin",
-      "size_bytes": 47746,
-      "checksum_sha256": "5a50c00e202eae47d5a58d8d8fe5512456bc849c5766cba6f1da2ac9ff643fb8",
+      "size_bytes": 371844,
+      "checksum_sha256": "144905013941a6b039704dda746f6c0b2e8451ebabd78d86d36d6c9890fc2216",
       "required_permissions": [
         "http",
         "open-url"
       ],
       "updated_at": "2026-07-29",
       "author": "Qx",
-      "min_app_version": "0.6.46",
+      "min_app_version": "0.6.48",
       "releases": [
+        {
+          "version": "1.1.5",
+          "published_at": "2026-07-29",
+          "notes_localizations": {
+            "en": "Renders Tieba image_emoticon markers as compact inline images from the offline plugin package, with readable fallback text for missing assets.",
+            "zh-CN": "将评论中的 image_emoticon 表情代码渲染为插件安装包内的紧凑行内图片，资源缺失时仍保留可读文本。"
+          }
+        },
         {
           "version": "1.1.4",
           "published_at": "2026-07-29",

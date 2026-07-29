@@ -165,6 +165,38 @@ function contentText(contentValues) {
     .trim();
 }
 
+const AVAILABLE_EMOTION_IDS = new Set([
+  ...Array.from({ length: 50 }, (_, index) => index + 1),
+  ...Array.from({ length: 63 }, (_, index) => index + 62),
+]);
+
+/** Convert Tieba's Protobuf emotion markers into host-rendered package assets. */
+export function tiebaEmotionContent(value) {
+  const text = String(value || "");
+  const pattern = /image_emoticon(\d{1,3})?/g;
+  const content = [];
+  let cursor = 0;
+  let matchedAsset = false;
+  for (const match of text.matchAll(pattern)) {
+    const id = match[1] ? Number(match[1]) : 1;
+    if (!AVAILABLE_EMOTION_IDS.has(id)) continue;
+    if (match.index > cursor) {
+      content.push({ type: "text", text: text.slice(cursor, match.index) });
+    }
+    const marker = match[0];
+    content.push({
+      type: "asset-image",
+      assetPath: `assets/emotions/image_emoticon${id === 1 ? "" : id}.png`,
+      alt: marker,
+    });
+    cursor = match.index + marker.length;
+    matchedAsset = true;
+  }
+  if (!matchedAsset) return undefined;
+  if (cursor < text.length) content.push({ type: "text", text: text.slice(cursor) });
+  return content;
+}
+
 function contentImages(contentValues) {
   const result = [];
   for (const value of contentValues) {
@@ -256,7 +288,7 @@ function parseThreadResponse(input, fallbackPost = {}) {
       const likes = comment.likeCount > 0 ? `  ♥ ${comment.likeCount}` : "";
       return `↳ ${comment.author || "Reply"}：${comment.body}${likes}`;
     });
-    const legacyLikes = post.likeCount > 0 ? `\n\n♥ ${post.likeCount}` : "";
+    const body = `${post.body}${nestedLines.length ? `\n\n${nestedLines.join("\n")}` : ""}`.trim();
     return {
       id: post.id,
       floor: post.floor,
@@ -264,7 +296,8 @@ function parseThreadResponse(input, fallbackPost = {}) {
       likeCount: post.likeCount,
       createdAt: post.createdAt,
       originalPoster: Boolean((opId && post.authorId === opId) || (opName && post.author === opName)),
-      body: `${post.body}${nestedLines.length ? `\n\n${nestedLines.join("\n")}` : ""}${legacyLikes}`.trim(),
+      body,
+      content: tiebaEmotionContent(body),
     };
   }).filter((post) => post.body);
   const threadContent = contentText(values(thread, 142));

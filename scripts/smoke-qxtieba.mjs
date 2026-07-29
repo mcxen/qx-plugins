@@ -9,7 +9,12 @@ import {
   parseThreadHtml,
   pruneCache,
 } from "../src/qxtieba/index.source.js";
-import { decodeThreadResponse, multipartBody, parseThreadResponse } from "../src/qxtieba/tieba-protobuf.js";
+import {
+  decodeThreadResponse,
+  multipartBody,
+  parseThreadResponse,
+  tiebaEmotionContent,
+} from "../src/qxtieba/tieba-protobuf.js";
 
 function concat(...parts) {
   return Buffer.concat(parts.map((part) => Buffer.from(part)));
@@ -99,14 +104,14 @@ assert.equal(detail.body, "主楼正文\n第二行");
 assert.deepEqual(detail.images, ["https://imgsrc.baidu.com/a.jpg"]);
 assert.equal(detail.replies.length, 2);
 assert.equal(detail.replies[0].floor, 2);
-assert.equal(detail.replies[0].body, "有帮助的回复\n\n♥ 3");
+assert.equal(detail.replies[0].body, "有帮助的回复");
 assert.equal(detail.replies[1].originalPoster, true);
 
 const owner = concat(fieldVarint(2, 99), fieldText(4, "楼主"));
 const visitor = concat(fieldVarint(2, 100), fieldText(4, "吧友"));
 const mainContent = concat(fieldText(2, "Protobuf 主楼"), fieldText(25, "https://imgsrc.baidu.com/main.jpg"));
-const replyContent = fieldText(2, "Protobuf 楼层");
-const nestedContent = fieldText(2, "楼中楼评论");
+const replyContent = fieldText(2, "Protobuf 楼层image_emoticon8继续");
+const nestedContent = fieldText(2, "楼中楼评论image_emoticon124");
 const nestedComment = concat(
   fieldVarint(1, 3001),
   fieldBytes(2, nestedContent),
@@ -158,7 +163,14 @@ assert.equal(protoDetail.replies.length, 1);
 assert.equal(protoDetail.replies[0].author, "吧友");
 assert.equal(protoDetail.replies[0].likeCount, 7);
 assert.match(protoDetail.replies[0].body, /↳ 楼主：楼中楼评论/);
-assert.match(protoDetail.replies[0].body, /\n\n♥ 7$/);
+assert.doesNotMatch(protoDetail.replies[0].body, /♥ 7/);
+assert.deepEqual(protoDetail.replies[0].content, [
+  { type: "text", text: "Protobuf 楼层" },
+  { type: "asset-image", assetPath: "assets/emotions/image_emoticon8.png", alt: "image_emoticon8" },
+  { type: "text", text: "继续\n\n↳ 楼主：楼中楼评论" },
+  { type: "asset-image", assetPath: "assets/emotions/image_emoticon124.png", alt: "image_emoticon124" },
+]);
+assert.equal(tiebaEmotionContent("保留 image_emoticon55"), undefined);
 assert.equal(protoDetail.hasMore, true);
 const compressedResponse = {
   headers: { "content-encoding": "gzip", "content-type": "application/octet-stream" },

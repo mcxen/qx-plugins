@@ -121,6 +121,14 @@
     ],
     "qxtieba": [
       {
+        "version": "1.1.5",
+        "published_at": "2026-07-29",
+        "notes_localizations": {
+          "en": "Renders Tieba image_emoticon markers as compact inline images from the offline plugin package, with readable fallback text for missing assets.",
+          "zh-CN": "将评论中的 image_emoticon 表情代码渲染为插件安装包内的紧凑行内图片，资源缺失时仍保留可读文本。"
+        }
+      },
+      {
         "version": "1.1.4",
         "published_at": "2026-07-29",
         "notes_localizations": {

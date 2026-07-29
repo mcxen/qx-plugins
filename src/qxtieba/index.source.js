@@ -6,7 +6,7 @@
  * replaces usable local content.
  */
 
-import { fetchTiebaThreadDetail } from "./tieba-protobuf.js";
+import { fetchTiebaThreadDetail, tiebaEmotionContent } from "./tieba-protobuf.js";
 
 const BASE_URL = "https://tieba.baidu.com";
 const CACHE_KEY = "cache.community.v1";
@@ -264,7 +264,8 @@ function parseThreadHtml(html, fallbackPost = {}) {
     likeCount: post.likeCount,
     createdAt: post.publishedAt,
     originalPoster: Boolean(op && post.author === op),
-    body: post.likeCount > 0 ? `${post.body}\n\n♥ ${post.likeCount}` : post.body,
+    body: post.body,
+    content: tiebaEmotionContent(post.body),
   }));
   return {
     title,
@@ -507,7 +508,10 @@ function createPanel(container, context) {
       replies: {
         title: copy("Floor comments", "楼层评论"),
         total: Math.max(Number(post.replyCount) || 0, replies.length),
-        items: replies,
+        items: replies.map((reply) => ({
+          ...reply,
+          content: reply.content || tiebaEmotionContent(reply.body),
+        })),
         status: state.detailLoading.has(id)
           ? { state: "loading", label: copy("Loading comments…", "正在加载评论…") }
           : detail?.error
