@@ -20,7 +20,7 @@
 6. All Weibo API requests use the bounded serial scheduler and a randomized delay.
 7. Following aggregation is bounded by `followingUserLimit`; do not fan out unbounded work.
 8. Fetch comments and full-size media only after selection. Publish comments through
-   `detail.replies`; use an upstream floor when available and the stable response order
+   `detail.replies`; preserve `likeCount`, use an upstream floor when available and the stable response order
    only as a fallback. Do not rebuild replies from generic detail sections.
 9. Never publish direct Sina image URLs to Workbench. Proxy images through `context.http`,
    keep data previews session-only, and publish structured Workbench media.

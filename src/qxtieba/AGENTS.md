@@ -19,7 +19,7 @@
 4. Use stable thread ids from `/p/<tid>` or Tieba `data-field`; never list indexes.
 5. Paint cached content before awaiting a network refresh.
 6. The app-compatible Protobuf API provides the first page of public floors and nested comments as Workbench `detail.replies`.
-7. Keep the main-post body separate from replies and mark matching authors as OP.
+7. Keep the main-post body separate from replies, publish floor likes as `likeCount`, and mark matching authors as OP.
 8. Publish structured `detail.images`; do not draw a custom image viewer.
 9. Keep cache keys synchronized with `manifest.storage.cacheTargets`.
 10. Cache values use a top-level `savedAt` envelope for host retention cleanup.

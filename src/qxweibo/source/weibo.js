@@ -356,6 +356,7 @@ function createPanel(container, context) {
         id: comment.id,
         floor: comment.floor || index + 1,
         author: comment.user?.screenName || copy("Unknown user", "未知用户"),
+        likeCount: comment.likesCount,
         createdAt: formatDate(comment.createdAt),
         originalPoster: Boolean(
           post.user?.id

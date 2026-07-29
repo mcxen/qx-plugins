@@ -261,6 +261,7 @@ function parseThreadHtml(html, fallbackPost = {}) {
     id: post.id,
     floor: post.floor,
     author: post.author,
+    likeCount: post.likeCount,
     createdAt: post.publishedAt,
     originalPoster: Boolean(op && post.author === op),
     body: post.likeCount > 0 ? `${post.body}\n\n♥ ${post.likeCount}` : post.body,

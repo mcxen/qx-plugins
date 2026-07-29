@@ -256,14 +256,15 @@ function parseThreadResponse(input, fallbackPost = {}) {
       const likes = comment.likeCount > 0 ? `  ♥ ${comment.likeCount}` : "";
       return `↳ ${comment.author || "Reply"}：${comment.body}${likes}`;
     });
-    const likes = post.likeCount > 0 ? `\n\n♥ ${post.likeCount}` : "";
+    const legacyLikes = post.likeCount > 0 ? `\n\n♥ ${post.likeCount}` : "";
     return {
       id: post.id,
       floor: post.floor,
       author: post.author || "Unknown author",
+      likeCount: post.likeCount,
       createdAt: post.createdAt,
       originalPoster: Boolean((opId && post.authorId === opId) || (opName && post.author === opName)),
-      body: `${post.body}${likes}${nestedLines.length ? `\n\n${nestedLines.join("\n")}` : ""}`.trim(),
+      body: `${post.body}${nestedLines.length ? `\n\n${nestedLines.join("\n")}` : ""}${legacyLikes}`.trim(),
     };
   }).filter((post) => post.body);
   const threadContent = contentText(values(thread, 142));

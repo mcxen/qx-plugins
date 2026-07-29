@@ -82,6 +82,7 @@ async function mockFetch(url, options = {}) {
     return response([{
       id: "reply-1",
       rnum: 7,
+      likenum: 5,
       message: "<p>第一条回复</p>",
       dateline: 1_784_804_999,
       userInfo: { uid: feeds[0].userInfo.uid, username: "回复用户" },
@@ -202,6 +203,7 @@ assert.doesNotMatch(detailedWithImage.detail.content[1].image.url, /image\.coola
 assert.equal(detailed.detail.sections, undefined);
 assert.equal(detailed.detail.replies.items[0].floor, 7);
 assert.equal(detailed.detail.replies.items[0].author, "回复用户");
+assert.equal(detailed.detail.replies.items[0].likeCount, 5);
 assert.equal(detailed.detail.replies.items[0].originalPoster, true);
 assert.match(detailed.detail.replies.items[0].body, /第一条回复/);
 assert.equal(detailed.tone, "neutral");

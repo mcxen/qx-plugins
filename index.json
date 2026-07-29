@@ -193,21 +193,29 @@
     {
       "id": "qxcoolapk",
       "name": "QxCoolapk 酷安",
-      "version": "1.4.1",
+      "version": "1.4.2",
       "description": "Browse Coolapk hot, news, and digital feeds and read complete posts, images, and replies in Qx.",
       "download_url": "https://raw.githubusercontent.com/mcxen/qx-plugins/main/qxcoolapk.qx-plugin",
-      "size_bytes": 63893,
-      "checksum_sha256": "6217fdb0ea84463d5b61fe30bda0e906a244d7395db0dd868902fdcd66e9b7d9",
+      "size_bytes": 64295,
+      "checksum_sha256": "1f5c3e9507e00379d9fab84387f4ce3cb2d3676a7b1d646e1d72e72b5ce9e5e4",
       "required_permissions": [
         "http",
         "open-url",
         "system",
         "island"
       ],
-      "updated_at": "2026-07-25",
+      "updated_at": "2026-07-29",
       "author": "Qx",
       "min_app_version": "0.6.26",
       "releases": [
+        {
+          "version": "1.4.2",
+          "published_at": "2026-07-29",
+          "notes_localizations": {
+            "en": "Publishes reply like counts through the shared Workbench author metadata.",
+            "zh-CN": "通过 Workbench 通用作者元数据展示回复点赞数。"
+          }
+        },
         {
           "version": "1.4.1",
           "published_at": "2026-07-25",
@@ -525,11 +533,11 @@
     {
       "id": "qxtieba",
       "name": "QxTieba 贴吧",
-      "version": "1.1.3",
+      "version": "1.1.4",
       "description": "聚合浏览多个百度贴吧的公开帖子流，在 Qx 内阅读正文与楼层评论。",
       "download_url": "https://raw.githubusercontent.com/mcxen/qx-plugins/main/qxtieba.qx-plugin",
-      "size_bytes": 47209,
-      "checksum_sha256": "1fba4ec20ca46a0a43eb193523185a6cfa15d727dcfa85c98999964b4cb78f61",
+      "size_bytes": 47746,
+      "checksum_sha256": "5a50c00e202eae47d5a58d8d8fe5512456bc849c5766cba6f1da2ac9ff643fb8",
       "required_permissions": [
         "http",
         "open-url"
@@ -538,6 +546,14 @@
       "author": "Qx",
       "min_app_version": "0.6.46",
       "releases": [
+        {
+          "version": "1.1.4",
+          "published_at": "2026-07-29",
+          "notes_localizations": {
+            "en": "Publishes floor likes through the shared Workbench reply metadata so counts appear beside each author instead of below the reply body.",
+            "zh-CN": "楼层点赞数改用 Workbench 通用回复元数据发布，显示在作者右侧，不再单独占用正文下方一行。"
+          }
+        },
         {
           "version": "1.1.3",
           "published_at": "2026-07-29",
@@ -591,21 +607,29 @@
     {
       "id": "qxweibo",
       "name": "QxWeibo 微博",
-      "version": "1.1.1",
+      "version": "1.1.2",
       "description": "Read configured Weibo users, an aggregated following feed, comments, and proxied images in Qx.",
       "download_url": "https://raw.githubusercontent.com/mcxen/qx-plugins/main/qxweibo.qx-plugin",
-      "size_bytes": 72906,
-      "checksum_sha256": "b0ea5461be4a22d796f78b3f60383688c7e18035ef8b77a861b76e6d1f3881ec",
+      "size_bytes": 73296,
+      "checksum_sha256": "f297caae16f8c98e2fb0af0842c95be5b55ac6cda95ff3e54e1d1ee8329eaafe",
       "required_permissions": [
         "http",
         "open-url",
         "system",
         "island"
       ],
-      "updated_at": "2026-07-25",
+      "updated_at": "2026-07-29",
       "author": "Qx",
       "min_app_version": "0.6.26",
       "releases": [
+        {
+          "version": "1.1.2",
+          "published_at": "2026-07-29",
+          "notes_localizations": {
+            "en": "Publishes comment like counts beside authors in the shared Workbench reply surface.",
+            "zh-CN": "在 Workbench 通用回复区将评论点赞数显示到作者右侧。"
+          }
+        },
         {
           "version": "1.1.1",
           "published_at": "2026-07-25",

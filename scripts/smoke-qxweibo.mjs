@@ -174,6 +174,7 @@ assert.equal(snapshot.items[0].detail.sections, undefined);
 assert.equal(snapshot.items[0].detail.replies.total, 2);
 assert.equal(snapshot.items[0].detail.replies.items[0].floor, 7);
 assert.equal(snapshot.items[0].detail.replies.items[0].author, "主用户");
+assert.equal(snapshot.items[0].detail.replies.items[0].likeCount, 3);
 assert.equal(snapshot.items[0].detail.replies.items[0].originalPoster, true);
 assert.match(snapshot.items[0].detail.replies.items[0].body, /回复：回复关系/);
 await waitFor(() => snapshot.items[0].detail.images?.length, "proxied image");

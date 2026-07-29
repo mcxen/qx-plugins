@@ -128,6 +128,7 @@ const replyPost = concat(
   fieldVarint(3, 2),
   fieldVarint(4, 1_700_000_100),
   fieldBytes(5, replyContent),
+  fieldBytes(37, fieldVarint(1, 7)),
   fieldBytes(15, nestedWrapper),
   fieldVarint(19, 100),
   fieldBytes(23, visitor),
@@ -155,7 +156,9 @@ assert.equal(protoDetail.body, "Protobuf 主楼");
 assert.deepEqual(protoDetail.images, ["https://imgsrc.baidu.com/main.jpg"]);
 assert.equal(protoDetail.replies.length, 1);
 assert.equal(protoDetail.replies[0].author, "吧友");
+assert.equal(protoDetail.replies[0].likeCount, 7);
 assert.match(protoDetail.replies[0].body, /↳ 楼主：楼中楼评论/);
+assert.match(protoDetail.replies[0].body, /\n\n♥ 7$/);
 assert.equal(protoDetail.hasMore, true);
 const compressedResponse = {
   headers: { "content-encoding": "gzip", "content-type": "application/octet-stream" },

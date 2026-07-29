@@ -121,6 +121,14 @@
     ],
     "qxtieba": [
       {
+        "version": "1.1.4",
+        "published_at": "2026-07-29",
+        "notes_localizations": {
+          "en": "Publishes floor likes through the shared Workbench reply metadata so counts appear beside each author instead of below the reply body.",
+          "zh-CN": "楼层点赞数改用 Workbench 通用回复元数据发布，显示在作者右侧，不再单独占用正文下方一行。"
+        }
+      },
+      {
         "version": "1.1.3",
         "published_at": "2026-07-29",
         "notes_localizations": {
@@ -277,6 +285,14 @@
     ],
     "qxcoolapk": [
       {
+        "version": "1.4.2",
+        "published_at": "2026-07-29",
+        "notes_localizations": {
+          "en": "Publishes reply like counts through the shared Workbench author metadata.",
+          "zh-CN": "通过 Workbench 通用作者元数据展示回复点赞数。"
+        }
+      },
+      {
         "version": "1.4.1",
         "published_at": "2026-07-25",
         "notes_localizations": {
@@ -366,6 +382,14 @@
       }
     ],
     "qxweibo": [
+      {
+        "version": "1.1.2",
+        "published_at": "2026-07-29",
+        "notes_localizations": {
+          "en": "Publishes comment like counts beside authors in the shared Workbench reply surface.",
+          "zh-CN": "在 Workbench 通用回复区将评论点赞数显示到作者右侧。"
+        }
+      },
       {
         "version": "1.1.1",
         "published_at": "2026-07-25",

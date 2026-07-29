@@ -29,7 +29,7 @@
    filmstrip and host preview. Do not persist data URLs or draw a custom
    reader/lightbox.
 8. Publish first-page replies through structured `detail.replies`, preserving
-   the upstream floor when present. Do not flatten replies into `sections`.
+   the upstream floor and `likeCount` when present. Do not flatten replies into `sections`.
 9. Generate a fresh anonymous `X-App-Token` for API and image requests. Do not persist tokens.
 10. Keep the Coolapk signature implementation dependency-free at runtime. The packaged
    `index.js` includes the BSD-3-Clause-licensed `bcryptjs` implementation. Edit
