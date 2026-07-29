@@ -121,6 +121,14 @@
     ],
     "qxheihe": [
       {
+        "version": "1.4.6",
+        "published_at": "2026-07-29",
+        "notes_localizations": {
+          "en": "Aligned anonymous comment-tree requests with the browser post origin and web Referer instead of API share redirects.",
+          "zh-CN": "将匿名评论树请求改为使用浏览器帖子 Origin 和网页 Referer，避免复用 API 分享跳转地址。"
+        }
+      },
+      {
         "version": "1.4.5",
         "published_at": "2026-07-29",
         "notes_localizations": {

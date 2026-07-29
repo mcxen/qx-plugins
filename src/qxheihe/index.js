@@ -795,6 +795,11 @@ function createPanel(container, context) {
         { Referer: postUrl(post) },
       );
       const commentHeaders = { Referer: postUrl(post) };
+      // Feed share_url values can point at the API v3 redirect. The browser
+      // comment request originates from the public web post, so keep this
+      // request's origin aligned with that page instead of the API redirect.
+      commentHeaders.Referer = `https://www.xiaoheihe.cn/app/bbs/link/${encodeURIComponent(key)}`;
+      commentHeaders.Origin = "https://www.xiaoheihe.cn";
       if (cookie) commentHeaders.Cookie = cookie;
       const commentRequest = fetchJson(
         context,
