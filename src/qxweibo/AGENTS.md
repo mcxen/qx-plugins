@@ -24,6 +24,10 @@
    only as a fallback. Do not rebuild replies from generic detail sections.
 9. Never publish direct Sina image URLs to Workbench. Proxy images through `context.http`,
    keep data previews session-only, and publish structured Workbench media.
+   Preview storage is bounded to 128 entries / 30 MB of Data URL characters with a
+   dynamic per-image budget. Detail loading preserves every source image, uses a
+   four-request bounded concurrent queue, commits each group in source order, and
+   `destroy()` releases unreachable panel state.
 10. Do not implement a custom image viewer, preloader, list shell or Esc handler.
 11. Keep rebuildable persist keys synchronized with `manifest.storage.cacheTargets`.
 12. Do not add login, posting, reposting, liking, commenting or following actions without a
@@ -33,6 +37,15 @@
     depend on unresolved relative imports.
 14. Keep read state in `item.tone`; badges contain image/comment metrics without
     redundant `Read` / `Unread` text.
+15. Use `context.state` latest-writer/read-ledger/LRU/generation primitives.
+    Retain read ids by their own timestamp (bounded to
+    5,000 records and the configured retention window), even when switching feeds
+    or when an item rotates out of the latest response.
+16. Publish indeterminate feed, detail, and image loading only through Workbench
+    `island` activity. Do not duplicate loading in `detail.status` or reply content.
+17. After the selected detail settles, prefetch only the nearest three details
+    serially into persistent content cache. Never mark prefetched items read or
+    prefetch their full image groups.
 
 ## Source layout
 

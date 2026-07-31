@@ -11,9 +11,9 @@ export function bytesToBase64(bytes) {
   return btoa(output);
 }
 
-function dataUrl(bytes, type) {
+function dataUrl(bytes, type, maxChars) {
   const base64 = bytesToBase64(bytes);
-  return base64.length <= 1_900_000 ? `data:${type || "image/jpeg"};base64,${base64}` : "";
+  return base64.length <= maxChars ? `data:${type || "image/jpeg"};base64,${base64}` : "";
 }
 
 async function decodeImage(blob) {
@@ -61,8 +61,8 @@ async function canvasBlob(canvas, type, quality) {
   });
 }
 
-export async function safeImagePreview(bytes, type, kind) {
-  const direct = dataUrl(bytes, type);
+export async function safeImagePreview(bytes, type, kind, maxChars = 1_050_000) {
+  const direct = dataUrl(bytes, type, maxChars);
   if (direct && kind === "detail") return direct;
   let decoded;
   try {
@@ -94,7 +94,7 @@ export async function safeImagePreview(bytes, type, kind) {
       drawing.fillRect(0, 0, targetWidth, targetHeight);
       drawing.drawImage(decoded.source, 0, 0, targetWidth, targetHeight);
       const blob = await canvasBlob(canvas, "image/jpeg", quality);
-      const preview = dataUrl(new Uint8Array(await blob.arrayBuffer()), "image/jpeg");
+      const preview = dataUrl(new Uint8Array(await blob.arrayBuffer()), "image/jpeg", maxChars);
       if (preview) return preview;
       scale *= 0.72;
       quality = Math.max(0.56, quality - 0.07);

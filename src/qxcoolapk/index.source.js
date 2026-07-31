@@ -9,6 +9,10 @@ const V2_SALT_KEY = "dcf01e569c1e3db93a3d0fcf191a622c";
 const BCRYPT_BASE64 = "./ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
 const CACHE_KEY = "cache.community.v1";
 const DEFAULT_TTL_MS = 5 * 60 * 1000;
+const MAX_IMAGE_PREVIEW_ENTRIES = 128;
+const MAX_IMAGE_PREVIEW_CHARS = 30_000_000;
+const DETAIL_IMAGE_BUDGET_CHARS = 27_000_000;
+const MAX_READ_HISTORY = 5_000;
 const MODES = {
   hot: { label: ["Hot", "热门"], path: "/v6/page/dataList", board: "/feed/hotList" },
   news: { label: ["News", "快讯"], path: "/v6/page/dataList", board: "/page?url=V11_HOME_TAB_NEWS" },
@@ -331,9 +335,9 @@ function toBase64(bytes) {
   return btoa(binary);
 }
 
-function dataUrl(bytes, type) {
+function dataUrl(bytes, type, maxChars = 1_050_000) {
   const encoded = toBase64(bytes);
-  return encoded.length <= 1_900_000
+  return encoded.length <= maxChars
     ? `data:${type || "image/jpeg"};base64,${encoded}`
     : "";
 }
@@ -388,8 +392,8 @@ async function decodeImage(blob) {
   }
 }
 
-async function safeImagePreview(bytes, type, purpose) {
-  const direct = dataUrl(bytes, type);
+async function safeImagePreview(bytes, type, purpose, maxChars = 1_050_000) {
+  const direct = dataUrl(bytes, type, maxChars);
   const isThumbnail = purpose === "thumbnail";
   if (!isThumbnail && direct) return direct;
 
@@ -425,7 +429,11 @@ async function safeImagePreview(bytes, type, purpose) {
       drawing.fillRect(0, 0, width, height);
       drawing.drawImage(decoded.source, 0, 0, width, height);
       const output = await canvasBlob(canvas, "image/jpeg", quality);
-      const preview = dataUrl(new Uint8Array(await output.arrayBuffer()), "image/jpeg");
+      const preview = dataUrl(
+        new Uint8Array(await output.arrayBuffer()),
+        "image/jpeg",
+        maxChars,
+      );
       if (preview) return preview;
       scale *= 0.72;
       quality = Math.max(0.56, quality - 0.07);
@@ -593,11 +601,17 @@ function pruneCache(cache, retentionDays) {
     if (items.length) feeds[mode] = { ...entry, items };
   }
   const keep = ([id]) => keptIds.has(String(id));
+  const readAt = Object.fromEntries(
+    Object.entries(cache.readAt || {})
+      .filter(([, value]) => Number(value) >= cutoff)
+      .sort((left, right) => Number(right[1]) - Number(left[1]))
+      .slice(0, MAX_READ_HISTORY),
+  );
   return {
     savedAt: Number(cache.savedAt) || Date.now(),
     feeds,
     details: Object.fromEntries(Object.entries(cache.details || {}).filter(keep)),
-    readAt: Object.fromEntries(Object.entries(cache.readAt || {}).filter(keep)),
+    readAt,
     cachedAt: Object.fromEntries(Object.entries(cache.cachedAt || {}).filter(keep)),
   };
 }
@@ -628,7 +642,7 @@ function compactCache(cache, priority, maxItems) {
     ...cache,
     feeds,
     details: Object.fromEntries(Object.entries(cache.details || {}).filter(keep)),
-    readAt: Object.fromEntries(Object.entries(cache.readAt || {}).filter(keep)),
+    readAt: cache.readAt,
     cachedAt: Object.fromEntries(Object.entries(cache.cachedAt || {}).filter(keep)),
   };
 }
@@ -668,14 +682,24 @@ function createPanel(container, context) {
     detailLoading: new Set(),
     imageLoading: new Set(),
     imageReloadPending: new Set(),
-    imagePreviews: new Map(),
+    imagePreviews: context.state.createLru({
+      maxEntries: MAX_IMAGE_PREVIEW_ENTRIES,
+      maxSize: MAX_IMAGE_PREVIEW_CHARS,
+      sizeOf: (value) => String(value || "").length,
+    }),
     imageRequests: new Map(),
     imageFailures: new Set(),
-    requestSequence: 0,
     revision: 0,
     view: null,
     dead: false,
+    prefetchRevision: 0,
   };
+  const readLedger = context.state.createReadLedger({
+    retentionDays: state.retentionDays,
+    maxEntries: MAX_READ_HISTORY,
+  });
+  const cacheWriter = context.state.createLatestWriter((snapshot) => writeCache(context, snapshot));
+  const requestGate = context.state.createGenerationGate();
 
   function activeFeed() {
     return state.cache.feeds[state.mode] || { items: [], page: 1, savedAt: 0 };
@@ -688,7 +712,7 @@ function createPanel(container, context) {
   function visibleFeeds() {
     const needle = state.query.trim().toLocaleLowerCase();
     return activeFeed().items.filter((feed) => {
-      const read = Boolean(state.cache.readAt[feed.id]);
+      const read = readLedger.has(feed.id);
       if (state.readFilter === "read" && !read) return false;
       if (state.readFilter === "unread" && read) return false;
       if (!needle) return true;
@@ -702,6 +726,10 @@ function createPanel(container, context) {
       ].join(" ").toLocaleLowerCase().includes(needle)
       );
     });
+  }
+
+  function markRead(id) {
+    return readLedger.mark(String(id || ""));
   }
 
   function detailFor(feed) {
@@ -756,16 +784,7 @@ function createPanel(container, context) {
     return {
       title: feedTitle(feed),
       subtitle: detailMeta.join(" · "),
-      status: state.detailLoading.has(feed.id) || state.imageLoading.has(feed.id)
-        ? {
-            state: "loading",
-            label: state.detailLoading.has(feed.id)
-              ? copy("Loading full article…", "正在加载完整正文…")
-              : copy("Loading protected images…", "正在加载受保护图片…"),
-          }
-        : cached?.error
-          ? { state: "error", error: cached.error }
-          : undefined,
+      status: cached?.error ? { state: "error", error: cached.error } : undefined,
       body: cached?.body || cleanText(feed.message),
       content: hasInlineContent ? content : undefined,
       images: hasInlineContent ? [] : images,
@@ -786,7 +805,7 @@ function createPanel(container, context) {
     const coverPreview = coverUrl
       ? state.imagePreviews.get(`thumbnail:${coverUrl}`)
       : "";
-    const read = Boolean(state.cache.readAt[feed.id]);
+    const read = readLedger.has(feed.id);
     const imageCount = images.length;
     return {
       id: feed.id,
@@ -888,10 +907,13 @@ function createPanel(container, context) {
         onTab(id) {
           if (!MODES[id] || id === state.mode) return;
           state.mode = id;
+          state.prefetchRevision += 1;
           state.query = "";
           state.error = null;
           state.selectedId = activeFeed().items[0]?.id || null;
+          const changed = markRead(state.selectedId);
           paint();
+          if (changed) void persist();
           void loadMode({ force: false });
         },
         onFilter(id, value) {
@@ -902,13 +924,10 @@ function createPanel(container, context) {
         onSelect(id) {
           const key = String(id || "");
           state.selectedId = key;
-          if (key && !state.cache.readAt[key]) {
-            state.cache.readAt[key] = Date.now();
-            void persist();
-          }
+          state.prefetchRevision += 1;
+          if (markRead(key)) void persist();
           paint();
-          void loadDetail(key);
-          void loadDetailImages(key);
+          void loadSelectedFeed(key);
         },
         onDownload(id) {
           void downloadOriginalImage(id);
@@ -917,24 +936,27 @@ function createPanel(container, context) {
           if (id === "refresh") void loadMode({ force: true });
           else if (id === "load-more") void loadMore();
           else if (id === "mark-visible-read") {
-            const now = Date.now();
-            for (const feed of visibleFeeds()) state.cache.readAt[feed.id] = now;
-            paint();
-            void persist();
+            if (readLedger.markMany(visibleFeeds().map((feed) => feed.id))) {
+              paint();
+              void persist();
+            }
           } else if (id === "mark-visible-unread") {
-            for (const feed of visibleFeeds()) delete state.cache.readAt[feed.id];
-            paint();
-            void persist();
+            let changed = false;
+            for (const feed of visibleFeeds()) changed = readLedger.unmark(feed.id) || changed;
+            if (changed) {
+              paint();
+              void persist();
+            }
           } else if (id === "clear-read") {
-            const readIds = new Set(Object.keys(state.cache.readAt));
+            const readIds = new Set(readLedger.ids());
             for (const entry of Object.values(state.cache.feeds)) {
               entry.items = (entry.items || []).filter((feed) => !readIds.has(feed.id));
             }
             for (const id of readIds) {
               delete state.cache.details[id];
-              delete state.cache.readAt[id];
               delete state.cache.cachedAt[id];
             }
+            readLedger.clear();
             state.selectedId = null;
             paint();
             void persist();
@@ -956,31 +978,39 @@ function createPanel(container, context) {
               || selectedFeed();
             if (feed) void context.openUrl(originalUrl(feed));
           } else if (id.startsWith("read:")) {
-            state.cache.readAt[id.slice("read:".length)] = Date.now();
-            paint();
-            void persist();
+            if (readLedger.mark(id.slice("read:".length))) {
+              paint();
+              void persist();
+            }
           } else if (id.startsWith("unread:")) {
-            delete state.cache.readAt[id.slice("unread:".length)];
-            paint();
-            void persist();
+            if (readLedger.unmark(id.slice("unread:".length))) {
+              paint();
+              void persist();
+            }
           }
         },
       });
     }
   }
 
-  async function persist() {
+  function persist() {
+    state.cache.readAt = readLedger.snapshot();
     state.cache = compactCache(
       pruneCache(state.cache, state.retentionDays),
       state.cachePriority,
       state.hotCacheLimit,
     );
-    await writeCache(context, state.cache);
+    return cacheWriter.write(state.cache);
   }
 
-  async function proxyImage(url, purpose) {
+  async function proxyImage(
+    url,
+    purpose,
+    maxChars = purpose === "thumbnail" ? 120_000 : 1_050_000,
+  ) {
     const key = `${purpose}:${url}`;
-    if (state.imagePreviews.has(key)) return state.imagePreviews.get(key);
+    const cached = state.imagePreviews.get(key);
+    if (cached) return cached;
     if (state.imageFailures.has(key)) return "";
     if (state.imageRequests.has(key)) return state.imageRequests.get(key);
     const request = (async () => {
@@ -989,15 +1019,16 @@ function createPanel(container, context) {
           method: "GET",
           headers: await buildRequestHeaders(),
           timeoutMs: 120_000,
+          maxBytes: 8 * 1024 * 1024,
         });
         if (!response?.ok) throw new Error(`HTTP ${response?.status || "error"}`);
         const type = responseContentType(response);
         if (!type.startsWith("image/")) throw new Error("Response is not an image");
         const bytes = new Uint8Array(await response.arrayBuffer());
         if (!bytes.length) throw new Error("Image response was empty");
-        const preview = await safeImagePreview(bytes, type, purpose);
+        const preview = await safeImagePreview(bytes, type, purpose, maxChars);
         if (!preview) throw new Error("Image is too large for a safe preview");
-        state.imagePreviews.set(key, preview);
+        if (!state.dead) state.imagePreviews.set(key, preview);
         return preview;
       } catch {
         state.imageFailures.add(key);
@@ -1019,7 +1050,7 @@ function createPanel(container, context) {
     const worker = async () => {
       while (!state.dead && cursor < jobs.length) {
         const url = jobs[cursor++];
-        const preview = await proxyImage(url, "thumbnail");
+        const preview = await proxyImage(url, "thumbnail", 120_000);
         if (preview && !state.dead) paint();
       }
     };
@@ -1041,16 +1072,19 @@ function createPanel(container, context) {
     if (!originals.length) return;
     state.imageLoading.add(key);
     paint();
+    const maxChars = Math.max(
+      180_000,
+      Math.min(1_050_000, Math.floor(DETAIL_IMAGE_BUDGET_CHARS / originals.length)),
+    );
     let cursor = 0;
     const worker = async () => {
       while (!state.dead && cursor < originals.length) {
         const url = originals[cursor++];
-        const preview = await proxyImage(url, "detail");
-        if (preview && !state.dead) paint();
+        await proxyImage(url, "detail", maxChars);
       }
     };
     try {
-      await Promise.all(Array.from({ length: 2 }, worker));
+      await Promise.all(Array.from({ length: Math.min(4, originals.length) }, worker));
     } finally {
       state.imageLoading.delete(key);
       paint();
@@ -1080,6 +1114,7 @@ function createPanel(container, context) {
         method: "GET",
         headers: await buildRequestHeaders(),
         timeoutMs: 120_000,
+        maxBytes: 32 * 1024 * 1024,
       });
       if (!response?.ok) throw new Error(`Coolapk image HTTP ${response?.status || "error"}`);
       const mimeType = responseContentType(response) || "image/jpeg";
@@ -1097,7 +1132,7 @@ function createPanel(container, context) {
     }
   }
 
-  async function loadDetail(id) {
+  async function loadDetail(id, { quiet = false } = {}) {
     const key = String(id || "");
     if (!key || state.detailLoading.has(key)) return;
     const cached = state.cache.details[key];
@@ -1107,7 +1142,7 @@ function createPanel(container, context) {
     if (!feed) return;
     if (canReuseCachedDetail(cached, feed)) return;
     state.detailLoading.add(key);
-    paint();
+    if (!quiet) paint();
     try {
       const [detailRaw, repliesRaw] = await Promise.all([
         fetchData(context, detailUrl(key)),
@@ -1132,20 +1167,44 @@ function createPanel(container, context) {
         savedAt: Date.now(),
       };
       await persist();
-      void loadDetailImages(key);
+      if (!quiet) void loadDetailImages(key);
     } catch (error) {
       if (!state.dead) {
         state.cache.details[key] = { ...(cached || {}), error: errorMessage(error) };
       }
     } finally {
       state.detailLoading.delete(key);
-      paint();
+      if (!quiet) paint();
+    }
+  }
+
+  async function prefetchAround(feedId, revision) {
+    const feeds = activeFeed().items;
+    const index = feeds.findIndex((feed) => feed.id === String(feedId));
+    if (index < 0) return;
+    const neighbors = [feeds[index + 1], feeds[index - 1], feeds[index + 2]].filter(Boolean);
+    for (const feed of neighbors) {
+      if (
+        state.dead
+        || revision !== state.prefetchRevision
+        || state.selectedId !== String(feedId)
+      ) return;
+      await loadDetail(feed.id, { quiet: true });
+    }
+  }
+
+  async function loadSelectedFeed(feedId) {
+    const revision = state.prefetchRevision;
+    void loadDetailImages(feedId);
+    await loadDetail(feedId);
+    if (!state.dead && revision === state.prefetchRevision) {
+      void prefetchAround(feedId, revision);
     }
   }
 
   async function loadMode({ force = false } = {}) {
     const mode = state.mode;
-    const sequence = ++state.requestSequence;
+    const sequence = requestGate.next();
     state.loading = true;
     state.error = null;
     paint();
@@ -1164,25 +1223,28 @@ function createPanel(container, context) {
         if (Date.now() - cached.savedAt <= ttlMs) return;
       }
       const items = normalizeFeedList(await fetchData(context, feedUrl(mode, 1)));
-      if (state.dead || sequence !== state.requestSequence || mode !== state.mode) return;
+      if (state.dead || !requestGate.isCurrent(sequence) || mode !== state.mode) return;
       const now = Date.now();
       state.cache.feeds[mode] = { items, page: 1, savedAt: now };
       for (const feed of items) state.cache.cachedAt[feed.id] = state.cache.cachedAt[feed.id] || now;
       state.source = copy("Live Coolapk community", "酷安社区实时数据");
       state.selectedId = items[0]?.id || null;
+      state.prefetchRevision += 1;
+      markRead(state.selectedId);
       await persist();
       void loadThumbnails(items);
     } catch (error) {
-      if (!state.dead && sequence === state.requestSequence) {
+      if (!state.dead && requestGate.isCurrent(sequence)) {
         state.error = errorMessage(error);
         state.source = activeFeed().items.length
           ? copy("Offline · showing cache", "网络异常 · 显示缓存")
           : copy("Coolapk is unavailable", "酷安数据不可用");
       }
     } finally {
-      if (!state.dead && sequence === state.requestSequence) {
+      if (!state.dead && requestGate.isCurrent(sequence)) {
         state.loading = false;
         paint();
+        if (state.selectedId) void loadSelectedFeed(state.selectedId);
       }
     }
   }
@@ -1233,6 +1295,10 @@ function createPanel(container, context) {
       preference(context, "hotCacheLimit", "200"),
     ]);
     state.retentionDays = Number(retention) === 3 ? 3 : 7;
+    readLedger.configure({
+      retentionDays: state.retentionDays,
+      maxEntries: MAX_READ_HISTORY,
+    });
     state.imageLayout = imageLayout === "grid" ? "grid" : "horizontal";
     state.readFilter = ["all", "unread", "read"].includes(readFilter) ? readFilter : "all";
     state.cachePriority = ["read", "unread", "balanced"].includes(cachePriority)
@@ -1240,18 +1306,22 @@ function createPanel(container, context) {
       : "read";
     state.hotCacheLimit = Math.max(50, Math.min(500, Number(hotCacheLimit) || 200));
     state.mode = MODES[defaultTab] ? defaultTab : "hot";
+    const cached = await readCache(context);
+    readLedger.replace(cached.readAt);
+    cached.readAt = readLedger.snapshot();
     state.cache = compactCache(
-      pruneCache(await readCache(context), state.retentionDays),
+      pruneCache(cached, state.retentionDays),
       state.cachePriority,
       state.hotCacheLimit,
     );
     state.selectedId = activeFeed().items[0]?.id || null;
+    markRead(state.selectedId);
     if (activeFeed().items.length) {
       state.source = copy("Cached Coolapk feed", "酷安缓存");
       paint();
       void loadThumbnails(activeFeed().items);
     }
-    await writeCache(context, state.cache);
+    await persist();
     void loadMode();
   }
 
@@ -1261,8 +1331,12 @@ function createPanel(container, context) {
   return {
     destroy() {
       state.dead = true;
-      state.requestSequence += 1;
+      state.prefetchRevision += 1;
+      requestGate.invalidate();
       state.view = null;
+      state.imageRequests.clear();
+      state.imagePreviews.clear();
+      state.imageFailures.clear();
       container.innerHTML = "";
     },
   };

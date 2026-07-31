@@ -1,5 +1,6 @@
 import assert from "node:assert/strict";
 import plugin, { heiheHkey } from "../src/qxheihe/index.js";
+import { createPluginStateKit } from "./plugin-state-kit.mjs";
 
 Object.defineProperty(globalThis, "navigator", {
   configurable: true,
@@ -97,6 +98,7 @@ const controller = {
 };
 
 const context = {
+  state: createPluginStateKit(),
   locale: { current: "zh-CN", preference: "zh-CN", onChange: () => () => {} },
   http: { fetch: mockFetch },
   storage: {
@@ -142,8 +144,9 @@ await waitFor(
   () => snapshot.items[0]?.detail?.sections?.some((section) => /评论区/.test(section.title || "")),
   "initial post detail and comments",
 );
+assert.equal(snapshot.items[0].detail.status, undefined);
 const selected = snapshot.items[0];
-assert.equal(selected.tone, "accent");
+assert.equal(selected.tone, "neutral");
 assert.doesNotMatch(selected.badge, /已读|未读|\b(?:Read|Unread)\b/i);
 handlers.onSelect(selected.id);
 const detailed = snapshot.items.find((item) => item.id === selected.id);
@@ -158,6 +161,10 @@ const cache = persisted.get("cache.community.v2");
 assert.ok(cache.posts.length >= 5);
 assert.ok(cache.readAt[selected.id]);
 assert.ok(cache.details[selected.id]);
+await waitFor(
+  () => persisted.get("cache.community.v2")?.details?.[posts[1].linkid],
+  "adjacent detail prefetch",
+);
 
 handlers.onQuery("unlikely-query-with-no-results");
 assert.equal(snapshot.items.length, 0);
@@ -172,6 +179,12 @@ assert.ok(snapshot.items.length >= beforeMore);
 handlers.onAction(`open:${selected.id}`, { id: selected.id });
 assert.match(openedUrl, /^https:\/\/api\.xiaoheihe\.cn\/|^https:\/\/www\.xiaoheihe\.cn\//);
 
+const reopenTarget = snapshot.items[1];
+handlers.onSelect(reopenTarget.id);
+await waitFor(
+  () => persisted.get("cache.community.v2")?.readAt?.[reopenTarget.id],
+  "persist read state before close",
+);
 plugin.panel.destroy(container);
 assert.ok(updates >= 5);
 
@@ -183,6 +196,11 @@ const cachedContainer = { innerHTML: "" };
 plugin.panel.render(cachedContainer, offlineContext);
 await waitFor(() => snapshot && !snapshot.loading && snapshot.items?.length, "offline cache");
 assert.ok(snapshot.items.length >= 5);
+assert.equal(
+  snapshot.items.find((item) => item.id === reopenTarget.id)?.tone,
+  "neutral",
+  "read state must survive panel reopen",
+);
 plugin.panel.destroy(cachedContainer);
 
 const expiredAt = Date.now() - 8 * 24 * 60 * 60 * 1000;

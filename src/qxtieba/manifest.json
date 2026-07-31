@@ -1,7 +1,7 @@
 {
   "id": "qxtieba",
   "name": "QxTieba 贴吧",
-  "version": "1.1.5",
+  "version": "1.1.9",
   "description": "聚合浏览多个百度贴吧的公开帖子流，在 Qx 内阅读正文与楼层评论。",
   "author": "Qx",
   "icon": "icon.svg",
@@ -15,7 +15,8 @@
   ],
   "permissions": [
     "http",
-    "open-url"
+    "open-url",
+    "island"
   ],
   "preferences": [
     {
@@ -84,7 +85,7 @@
     "icon": "icon.svg",
     "keywords": ["贴吧", "百度贴吧", "tieba", "社区", "帖子", "评论"]
   },
-  "min_app_version": "0.6.48",
+  "min_app_version": "0.6.50",
   "platforms": ["macos", "windows"],
   "screenshots": []
 }

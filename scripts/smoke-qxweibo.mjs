@@ -1,5 +1,6 @@
 import assert from "node:assert/strict";
 import plugin from "../src/qxweibo/index.js";
+import { createPluginStateKit } from "./plugin-state-kit.mjs";
 
 Object.defineProperty(globalThis, "navigator", {
   configurable: true,
@@ -12,6 +13,8 @@ let handlers = null;
 let openedUrl = "";
 let visitorRequests = 0;
 let imageRequests = 0;
+let activeImageRequests = 0;
+let maxConcurrentImageRequests = 0;
 
 const users = {
   "10001": { id: 10001, screen_name: "主用户" },
@@ -20,6 +23,7 @@ const users = {
 };
 
 function post(uid, suffix) {
+  const imageCount = uid === "10001" ? 12 : 3;
   return {
     id: `${uid}${suffix}`,
     text: `<p>微博正文 ${uid}-${suffix}</p>`,
@@ -29,10 +33,10 @@ function post(uid, suffix) {
     comments_count: 2,
     attitudes_count: 8,
     reposts_count: 1,
-    pics: [{
-      url: `https://wx.example.test/thumb/${uid}${suffix}.jpg`,
-      large: { url: `https://wx.example.test/large/${uid}${suffix}.jpg` },
-    }],
+    pics: Array.from({ length: imageCount }, (_, index) => ({
+      url: `https://wx.example.test/thumb/${uid}${suffix}-${index + 1}.jpg`,
+      large: { url: `https://wx.example.test/large/${uid}${suffix}-${index + 1}.jpg` },
+    })),
   };
 }
 
@@ -58,12 +62,19 @@ async function mockFetch(url, options = {}) {
   assert.match(String(options.headers?.Cookie || ""), /SUB=/);
   if (value.includes("wx.example.test")) {
     imageRequests += 1;
-    return {
-      ok: true,
-      status: 200,
-      headers: { "content-type": "image/png" },
-      arrayBuffer: async () => Uint8Array.from([137, 80, 78, 71]).buffer,
-    };
+    activeImageRequests += 1;
+    maxConcurrentImageRequests = Math.max(maxConcurrentImageRequests, activeImageRequests);
+    try {
+      await new Promise((resolve) => setTimeout(resolve, 30));
+      return {
+        ok: true,
+        status: 200,
+        headers: { "content-type": "image/png" },
+        arrayBuffer: async () => Uint8Array.from([137, 80, 78, 71]).buffer,
+      };
+    } finally {
+      activeImageRequests -= 1;
+    }
   }
   if (value.includes("/api/comments/show")) {
     return jsonResponse({
@@ -115,6 +126,7 @@ const controller = {
 };
 
 const context = {
+  state: createPluginStateKit(),
   locale: { current: "zh-CN", preference: "zh-CN", onChange: () => () => {} },
   http: { fetch: mockFetch },
   storage: {
@@ -163,7 +175,7 @@ plugin.panel.render(container, context);
 await waitFor(() => snapshot && !snapshot.loading && snapshot.items?.length, "user feed");
 assert.equal(snapshot.items.length, 1);
 assert.equal(snapshot.items[0].id, "1000101");
-assert.equal(snapshot.items[0].tone, "accent");
+assert.equal(snapshot.items[0].tone, "neutral");
 assert.doesNotMatch(snapshot.items[0].badge, /已读|未读|\b(?:Read|Unread)\b/i);
 assert.ok(snapshot.items[0].detail);
 await waitFor(
@@ -177,10 +189,19 @@ assert.equal(snapshot.items[0].detail.replies.items[0].author, "主用户");
 assert.equal(snapshot.items[0].detail.replies.items[0].likeCount, 3);
 assert.equal(snapshot.items[0].detail.replies.items[0].originalPoster, true);
 assert.match(snapshot.items[0].detail.replies.items[0].body, /回复：回复关系/);
-await waitFor(() => snapshot.items[0].detail.images?.length, "proxied image");
+await waitFor(
+  () => snapshot.items[0].detail.images?.length === 12 && !snapshot.island,
+  "complete concurrent image group",
+);
+assert.equal(snapshot.items[0].detail.status, undefined);
+assert.equal(snapshot.items[0].detail.replies.status, undefined);
+assert.equal(snapshot.items[0].detail.images.length, 12);
 assert.match(snapshot.items[0].detail.images[0].url, /^data:image\/png;base64,/);
 assert.equal(visitorRequests, 1);
-assert.ok(imageRequests >= 1);
+assert.ok(imageRequests >= 12);
+assert.ok(maxConcurrentImageRequests >= 2);
+assert.ok(maxConcurrentImageRequests <= 4);
+const selectedImageConcurrency = maxConcurrentImageRequests;
 
 handlers.onTab("following");
 await waitFor(() => snapshot.tabs.find((tab) => tab.id === "following")?.active && !snapshot.loading, "following feed");
@@ -191,9 +212,29 @@ const selected = snapshot.items[0];
 handlers.onSelect(selected.id);
 assert.equal(snapshot.items.find((item) => item.id === selected.id).tone, "neutral");
 assert.ok(persisted.get("cache.weibo.v1").readAt[selected.id]);
+const reopenTarget = snapshot.items.find((item) => item.id !== selected.id);
+handlers.onSelect(reopenTarget.id);
+await waitFor(
+  () => persisted.get("cache.weibo.v1")?.readAt?.[reopenTarget.id],
+  "persist read state before close",
+);
 handlers.onAction(`open:${selected.id}`, selected);
 assert.equal(openedUrl, `https://m.weibo.cn/detail/${selected.id}`);
 
 plugin.panel.destroy(container);
 assert.ok(persisted.get("cache.weibo.v1").feeds.following.items.length === 2);
-console.log(`QxWeibo smoke ok: posts=3, comments=true, imageProxy=true, visitorPool=${visitorRequests + 1}`);
+const reopenedContainer = { innerHTML: "" };
+plugin.panel.render(reopenedContainer, context);
+await waitFor(() => snapshot && !snapshot.loading && snapshot.items?.length, "reopened user feed");
+handlers.onTab("following");
+await waitFor(
+  () => snapshot.tabs.find((tab) => tab.id === "following")?.active && snapshot.items?.length === 2,
+  "reopened following feed",
+);
+assert.equal(
+  snapshot.items.find((item) => item.id === reopenTarget.id)?.tone,
+  "neutral",
+  "read state must survive panel reopen",
+);
+plugin.panel.destroy(reopenedContainer);
+console.log(`QxWeibo smoke ok: posts=3, comments=true, images=12, imageConcurrency=${selectedImageConcurrency}, visitorPool=${visitorRequests + 1}`);

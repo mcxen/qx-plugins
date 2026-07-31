@@ -24,14 +24,22 @@
    always be discarded and regenerated for refresh and pagination.
 8. Keep rebuildable keys synchronized with `manifest.storage.cacheTargets`.
 9. Cache values use a top-level `savedAt` envelope for host retention cleanup.
-10. Reading a post writes `readAt` once; reopening it must not indefinitely extend retention.
+10. Use `context.state.createReadLedger` and `createLatestWriter` for read/cache state.
+    Reading a post writes `readAt` once; reopening it must not indefinitely extend retention.
+    Persist writes are serialized, and a feed refresh must not discard still-retained
+    read ids merely because they are absent from the newest page.
 11. Keep read state in `item.tone` only. Badges contain content metrics, never redundant
     `Read` / `Unread` text.
+12. Publish indeterminate feed and detail loading only through Workbench `island`
+    activity. Keep `detail.status` for errors; do not duplicate loading inside content.
+13. After the selected detail settles, prefetch only the nearest three details
+    serially into persistent cache without marking them read.
 
 ## Permissions
 
 - `http`: feed and public detail API.
 - `open-url`: open the original post.
+- `island`: show feed and detail loading through the host animation.
 
 ## Edit checklist
 

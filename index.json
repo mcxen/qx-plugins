@@ -193,27 +193,51 @@
     {
       "id": "qxcoolapk",
       "name": "QxCoolapk 酷安",
-      "version": "1.4.2",
+      "version": "1.4.5",
       "description": "Browse Coolapk hot, news, and digital feeds and read complete posts, images, and replies in Qx.",
       "download_url": "https://raw.githubusercontent.com/mcxen/qx-plugins/main/qxcoolapk.qx-plugin",
-      "size_bytes": 64295,
-      "checksum_sha256": "1f5c3e9507e00379d9fab84387f4ce3cb2d3676a7b1d646e1d72e72b5ce9e5e4",
+      "size_bytes": 67049,
+      "checksum_sha256": "e3974ac3ba0d259a77dbcceb47beb89b2b7481f0232c4327618139c09bd0feec",
       "required_permissions": [
         "http",
         "open-url",
         "system",
         "island"
       ],
-      "updated_at": "2026-07-29",
+      "updated_at": "2026-07-31",
       "author": "Qx",
-      "min_app_version": "0.6.26",
+      "min_app_version": "0.6.50",
       "releases": [
         {
-          "version": "1.4.2",
-          "published_at": "2026-07-29",
+          "version": "1.4.5",
+          "published_at": "2026-07-31",
           "notes_localizations": {
-            "en": "Publishes reply like counts through the shared Workbench author metadata.",
-            "zh-CN": "通过 Workbench 通用作者元数据展示回复点赞数。"
+            "en": "Preserves every source detail image with four-request bounded concurrency and prefetches nearby text and replies for offline reopen.",
+            "zh-CN": "完整保留原帖全部详情图片，以四路有界并发加载，并预取相邻正文与回复供离线重开。"
+          }
+        },
+        {
+          "version": "1.4.4",
+          "published_at": "2026-07-31",
+          "notes_localizations": {
+            "en": "Removed duplicate inline article and image loading indicators; loading now stays in the host Island.",
+            "zh-CN": "移除详情内重复的正文与图片加载提示，加载状态统一保留在宿主灵动岛。"
+          }
+        },
+        {
+          "version": "1.4.3",
+          "published_at": "2026-07-31",
+          "notes_localizations": {
+            "en": "Adopted the Qx state SDK for read history, latest-only cache writes, bounded image previews, and stale-request cancellation.",
+            "zh-CN": "接入 Qx 状态 SDK，统一已读历史、只写最新缓存快照、有界图片预览与过期请求失效。"
+          }
+        },
+        {
+          "version": "1.4.2",
+          "published_at": "2026-07-31",
+          "notes_localizations": {
+            "en": "Fixed read state surviving panel reopen and feed changes with serialized writes and bounded retention.",
+            "zh-CN": "修复已读状态在面板重开和信息流变化后丢失的问题，并采用串行写入与有界保留。"
           }
         },
         {
@@ -362,19 +386,52 @@
     {
       "id": "qxheihe",
       "name": "QxHeihe 小黑盒",
-      "version": "1.4.7",
+      "version": "1.4.11",
       "description": "浏览小黑盒社区推荐内容，在 Qx 内查看正文、多图、帖子信息与匿名优先评论。",
       "download_url": "https://raw.githubusercontent.com/mcxen/qx-plugins/main/qxheihe.qx-plugin",
-      "size_bytes": 47659,
-      "checksum_sha256": "1c94605a9b04f511408b09fd7cd4d1dcc5d668320a45246bd2ee9044411b6e6c",
+      "size_bytes": 51079,
+      "checksum_sha256": "9639ce9196f16336137c7a0a31d32bbc3d6ef44cca54175fa51238a673295b72",
       "required_permissions": [
         "http",
-        "open-url"
+        "open-url",
+        "island"
       ],
-      "updated_at": "2026-07-29",
+      "updated_at": "2026-07-31",
       "author": "mcx",
-      "min_app_version": "0.6.19",
+      "min_app_version": "0.6.50",
       "releases": [
+        {
+          "version": "1.4.11",
+          "published_at": "2026-07-31",
+          "notes_localizations": {
+            "en": "Prefetches the nearest post details and comments into persistent cache without marking them read.",
+            "zh-CN": "低优先级预取相邻正文与评论并写入持久缓存，且不会误标为已读。"
+          }
+        },
+        {
+          "version": "1.4.10",
+          "published_at": "2026-07-31",
+          "notes_localizations": {
+            "en": "Moved post and comment loading out of detail content and into the host Island animation.",
+            "zh-CN": "将正文与评论加载状态移出详情内容，统一使用宿主灵动岛动画。"
+          }
+        },
+        {
+          "version": "1.4.9",
+          "published_at": "2026-07-31",
+          "notes_localizations": {
+            "en": "Adopted the Qx state SDK for bounded read history, latest-only cache writes, and stale-request cancellation.",
+            "zh-CN": "接入 Qx 状态 SDK，统一有界已读历史、只写最新缓存快照与过期请求失效。"
+          }
+        },
+        {
+          "version": "1.4.8",
+          "published_at": "2026-07-31",
+          "notes_localizations": {
+            "en": "Fixed read state surviving panel reopen, refresh, and pagination with serialized writes and bounded retention.",
+            "zh-CN": "修复已读状态在面板重开、刷新和翻页后丢失的问题，并采用串行写入与有界保留。"
+          }
+        },
         {
           "version": "1.4.7",
           "published_at": "2026-07-29",
@@ -533,19 +590,52 @@
     {
       "id": "qxtieba",
       "name": "QxTieba 贴吧",
-      "version": "1.1.5",
+      "version": "1.1.9",
       "description": "聚合浏览多个百度贴吧的公开帖子流，在 Qx 内阅读正文与楼层评论。",
       "download_url": "https://raw.githubusercontent.com/mcxen/qx-plugins/main/qxtieba.qx-plugin",
-      "size_bytes": 371844,
-      "checksum_sha256": "144905013941a6b039704dda746f6c0b2e8451ebabd78d86d36d6c9890fc2216",
+      "size_bytes": 374349,
+      "checksum_sha256": "f2b1edc256b702affb812a8451f52de80427d7c5d4a4c5175803b3cc76e63163",
       "required_permissions": [
         "http",
-        "open-url"
+        "open-url",
+        "island"
       ],
-      "updated_at": "2026-07-29",
+      "updated_at": "2026-07-31",
       "author": "Qx",
-      "min_app_version": "0.6.48",
+      "min_app_version": "0.6.50",
       "releases": [
+        {
+          "version": "1.1.9",
+          "published_at": "2026-07-31",
+          "notes_localizations": {
+            "en": "Prefetches the nearest thread details into persistent cache without marking them read.",
+            "zh-CN": "低优先级预取相邻帖子详情并写入持久缓存，且不会误标为已读。"
+          }
+        },
+        {
+          "version": "1.1.8",
+          "published_at": "2026-07-31",
+          "notes_localizations": {
+            "en": "Moved thread and comment loading out of detail content and into the host Island animation.",
+            "zh-CN": "将帖子与评论加载状态移出详情内容，统一使用宿主灵动岛动画。"
+          }
+        },
+        {
+          "version": "1.1.7",
+          "published_at": "2026-07-31",
+          "notes_localizations": {
+            "en": "Adopted the Qx state SDK for bounded read history, latest-only cache writes, and stale-request cancellation.",
+            "zh-CN": "接入 Qx 状态 SDK，统一有界已读历史、只写最新缓存快照与过期请求失效。"
+          }
+        },
+        {
+          "version": "1.1.6",
+          "published_at": "2026-07-31",
+          "notes_localizations": {
+            "en": "Fixed read state surviving panel reopen, refresh, pagination, and forum switching with serialized writes and bounded retention.",
+            "zh-CN": "修复已读状态在面板重开、刷新、翻页和切换贴吧后丢失的问题，并采用串行写入与有界保留。"
+          }
+        },
         {
           "version": "1.1.5",
           "published_at": "2026-07-29",
@@ -615,27 +705,51 @@
     {
       "id": "qxweibo",
       "name": "QxWeibo 微博",
-      "version": "1.1.2",
+      "version": "1.1.5",
       "description": "Read configured Weibo users, an aggregated following feed, comments, and proxied images in Qx.",
       "download_url": "https://raw.githubusercontent.com/mcxen/qx-plugins/main/qxweibo.qx-plugin",
-      "size_bytes": 73296,
-      "checksum_sha256": "f297caae16f8c98e2fb0af0842c95be5b55ac6cda95ff3e54e1d1ee8329eaafe",
+      "size_bytes": 79380,
+      "checksum_sha256": "799b8271d229a95cf5cb4ab3cb2a1da63730209f69d54ee8286170c1c03b038c",
       "required_permissions": [
         "http",
         "open-url",
         "system",
         "island"
       ],
-      "updated_at": "2026-07-29",
+      "updated_at": "2026-07-31",
       "author": "Qx",
-      "min_app_version": "0.6.26",
+      "min_app_version": "0.6.50",
       "releases": [
         {
-          "version": "1.1.2",
-          "published_at": "2026-07-29",
+          "version": "1.1.5",
+          "published_at": "2026-07-31",
           "notes_localizations": {
-            "en": "Publishes comment like counts beside authors in the shared Workbench reply surface.",
-            "zh-CN": "在 Workbench 通用回复区将评论点赞数显示到作者右侧。"
+            "en": "Removes the detail image count limit, keeps ordered bounded-concurrent loading, and prefetches nearby post text and comments.",
+            "zh-CN": "取消详情图片数量截断，继续按原顺序有界并发加载，并预取相邻微博正文与评论。"
+          }
+        },
+        {
+          "version": "1.1.4",
+          "published_at": "2026-07-31",
+          "notes_localizations": {
+            "en": "Fixed multi-image details losing earlier images, added bounded concurrent image fetching with ordered group commits, and moved loading to the host Island.",
+            "zh-CN": "修复多图详情加载后只剩一张的问题，改为有界并发获取并按原顺序整组提交，同时将加载状态统一移到宿主灵动岛。"
+          }
+        },
+        {
+          "version": "1.1.3",
+          "published_at": "2026-07-31",
+          "notes_localizations": {
+            "en": "Adopted the Qx state SDK for read history, latest-only cache writes, bounded image previews, and stale-request cancellation.",
+            "zh-CN": "接入 Qx 状态 SDK，统一已读历史、只写最新缓存快照、有界图片预览与过期请求失效。"
+          }
+        },
+        {
+          "version": "1.1.2",
+          "published_at": "2026-07-31",
+          "notes_localizations": {
+            "en": "Fixed read state surviving panel reopen and feed switching with serialized writes and bounded retention.",
+            "zh-CN": "修复已读状态在面板重开和切换信息流后丢失的问题，并采用串行写入与有界保留。"
           }
         },
         {

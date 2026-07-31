@@ -1,4 +1,5 @@
 import assert from "node:assert/strict";
+import { createPluginStateKit } from "./plugin-state-kit.mjs";
 import plugin, {
   articleContentBlocks,
   buildRequestHeaders,
@@ -26,7 +27,7 @@ const feeds = Array.from({ length: 6 }, (_, index) => ({
   likenum: index + 2,
   replynum: 2,
   picArr: index === 1
-    ? Array.from({ length: 4 }, (_, imageIndex) =>
+    ? Array.from({ length: 12 }, (_, imageIndex) =>
         `http://image.coolapk.com/feed/${index + 1}-${imageIndex + 1}.jpg`)
     : [`http://image.coolapk.com/feed/${index + 1}.jpg`],
   userInfo: { uid: 100 + index, username: `作者-${index + 1}` },
@@ -103,6 +104,7 @@ const controller = {
 };
 
 const context = {
+  state: createPluginStateKit(),
   locale: { current: "zh-CN", preference: "zh-CN", onChange: () => () => {} },
   http: { fetch: mockFetch },
   storage: {
@@ -172,12 +174,17 @@ assert.equal(snapshot.items[0].images, undefined);
 assert.equal(snapshot.items[1].images, undefined);
 assert.match(snapshot.items[1].image.url, /^data:image\/png;base64,/);
 assert.doesNotMatch(snapshot.items[1].image.url, /image\.coolapk\.com/);
-assert.match(snapshot.items[1].badge, /4 图/);
+assert.match(snapshot.items[1].badge, /12 图/);
 
 const selected = snapshot.items[0];
 handlers.onSelect(selected.id);
 assert.equal(snapshot.island?.activity, "spinner");
-assert.match(snapshot.island?.secondary || "", /加载原始正文/);
+assert.match(snapshot.island?.secondary || "", /加载原始(?:正文|图片)/);
+assert.equal(
+  snapshot.items.find((item) => item.id === selected.id)?.detail?.status,
+  undefined,
+  "detail loading belongs in the island",
+);
 await waitFor(
   () => snapshot.items.find((item) => item.id === selected.id)?.detail?.body?.includes("完整正文"),
   "full article",
@@ -223,14 +230,18 @@ assert.ok(snapshot.items.every((item) => !/已读|未读|\b(?:Read|Unread)\b/i.t
 handlers.onAction(`read:${selected.id}`);
 
 const dynamic = snapshot.items.find((item) => item.id === feeds[1].id);
-handlers.onSelect(dynamic.id);
-assert.match(snapshot.island?.secondary || "", /加载原始正文/);
 await waitFor(
-  () => snapshot.items.find((item) => item.id === dynamic.id)?.detail?.images?.length === 4,
+  () => persisted.get("cache.community.v1")?.details?.[feeds[1].id]?.complete,
+  "adjacent detail prefetch",
+);
+handlers.onSelect(dynamic.id);
+assert.match(snapshot.island?.secondary || "", /加载原始(?:正文|图片)/);
+await waitFor(
+  () => snapshot.items.find((item) => item.id === dynamic.id)?.detail?.images?.length === 12,
   "complete dynamic detail filmstrip",
 );
 assert.equal(snapshot.items.find((item) => item.id === dynamic.id).images, undefined);
-assert.equal(snapshot.items.find((item) => item.id === dynamic.id).detail.images.length, 4);
+assert.equal(snapshot.items.find((item) => item.id === dynamic.id).detail.images.length, 12);
 
 handlers.onQuery("不存在的关键词");
 assert.equal(snapshot.items.length, 0);
@@ -265,6 +276,12 @@ await waitFor(
 );
 assert.equal(persisted.get("cache.community.v1").readAt[selected.id], undefined);
 
+const reopenTarget = snapshot.items[1];
+handlers.onSelect(reopenTarget.id);
+await waitFor(
+  () => persisted.get("cache.community.v1")?.readAt?.[reopenTarget.id],
+  "persist read state before close",
+);
 plugin.panel.destroy(container);
 
 const stale = persisted.get("cache.community.v1");
@@ -281,6 +298,11 @@ await waitFor(
   "offline cache",
 );
 assert.equal(snapshot.items.length, 4);
+assert.equal(
+  snapshot.items.find((item) => item.id === reopenTarget.id)?.tone,
+  "neutral",
+  "read state must survive panel reopen",
+);
 plugin.panel.destroy(offlineContainer);
 
 const expiredAt = Date.now() - 8 * 24 * 60 * 60 * 1000;

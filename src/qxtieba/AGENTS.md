@@ -24,11 +24,20 @@
 9. Keep cache keys synchronized with `manifest.storage.cacheTargets`.
 10. Cache values use a top-level `savedAt` envelope for host retention cleanup.
 11. Anonymous endpoints may be rate-limited or risk-controlled; preserve cache and expose retry/open actions.
+12. Use `context.state` latest-writer/read-ledger/generation primitives. Read ids
+    survive panel reopen, refresh, pagination,
+    and forum switching until the configured retention window expires, with a
+    5,000-record upper bound.
+13. Publish indeterminate feed and thread loading only through Workbench `island`
+    activity. Keep detail/reply status for errors; do not duplicate loading inside content.
+14. After the selected thread settles, prefetch only the nearest three details
+    serially into persistent cache without marking them read.
 
 ## Permissions
 
 - `http`: public forum page and anonymous thread-detail Protobuf API.
 - `open-url`: open a thread on Tieba.
+- `island`: show feed and thread loading through the host animation.
 
 ## Edit checklist
 

@@ -21,11 +21,14 @@
    as the fallback when ordered source blocks are unavailable. Never publish
    article media as list cards.
    Publish every non-article feed image through scrollable `item.images` compact
-   cards; do not impose a plugin-side image-count limit.
+   cards. Detail loading preserves every source image; the host byte budget remains
+   the final trust boundary.
 6. Fetch Coolapk CDN images with the same anonymous authenticated headers as API
    requests. Never publish direct `image.coolapk.com` URLs to Workbench.
 7. Publish bounded session-only image previews through item images and
-   `detail.images`; dynamic multi-image detail uses the host `horizontal`
+   `detail.images`; use a 128-entry / 30 MB Data URL LRU with a dynamic per-image
+   budget and clear unreachable panel state in `destroy()`.
+   Dynamic multi-image detail uses the host `horizontal`
    filmstrip and host preview. Do not persist data URLs or draw a custom
    reader/lightbox.
 8. Publish first-page replies through structured `detail.replies`, preserving
@@ -40,6 +43,15 @@
     security and privacy review.
 14. Keep read state in `item.tone`; badges contain image/like/reply metrics without
     redundant `Read` / `Unread` text.
+15. Use `context.state` latest-writer/read-ledger/LRU/generation primitives.
+    Retain read ids by their own timestamp (bounded to
+    5,000 records and the configured retention window), even when a feed rotates out.
+16. Publish indeterminate feed, article, and protected-image loading only through
+    Workbench `island` activity. Keep `detail.status` for errors; do not duplicate
+    loading inside content.
+17. After the selected detail settles, prefetch only the nearest three details
+    serially into persistent content cache. Never mark prefetched items read or
+    prefetch their full image groups.
 
 ## Permissions
 

@@ -13,6 +13,7 @@ const COMMENT_TREE_URL = "https://api.xiaoheihe.cn/bbs/app/link/tree";
 const LEGACY_CACHE_KEY = "qxheihe.feed.v1";
 const CACHE_KEY = "cache.community.v2";
 const DEFAULT_TTL_MS = 5 * 60 * 1000;
+const MAX_READ_HISTORY = 5_000;
 // Bump when the comment transport or normalized detail payload changes so an
 // older cached "commentsResolved" result cannot suppress the new tree fetch.
 const DETAIL_FORMAT_VERSION = 3;
@@ -452,11 +453,17 @@ function pruneCache(model, retentionDays) {
     return true;
   });
   const keepRecord = ([id]) => keptIds.has(String(id));
+  const readAt = Object.fromEntries(
+    Object.entries(model.readAt)
+      .filter(([, value]) => Number(value) >= cutoff)
+      .sort((left, right) => Number(right[1]) - Number(left[1]))
+      .slice(0, MAX_READ_HISTORY),
+  );
   return {
     posts,
     savedAt: model.savedAt,
     details: Object.fromEntries(Object.entries(model.details).filter(keepRecord)),
-    readAt: Object.fromEntries(Object.entries(model.readAt).filter(keepRecord)),
+    readAt,
     cachedAt: Object.fromEntries(Object.entries(model.cachedAt).filter(keepRecord)),
   };
 }
@@ -520,15 +527,20 @@ function createPanel(container, context) {
     savedAt: 0,
     retentionDays: 7,
     imageLayout: "horizontal",
-    readAt: {},
     cachedAt: {},
     revision: 0,
-    generation: 0,
     details: new Map(),
     detailLoading: new Set(),
     view: null,
     dead: false,
+    prefetchRevision: 0,
   };
+  const readLedger = context.state.createReadLedger({
+    retentionDays: state.retentionDays,
+    maxEntries: MAX_READ_HISTORY,
+  });
+  const cacheWriter = context.state.createLatestWriter((snapshot) => cacheSet(context, snapshot));
+  const requestGate = context.state.createGenerationGate();
 
   function cacheSnapshot(savedAt = state.savedAt || Date.now()) {
     const details = {};
@@ -539,34 +551,27 @@ function createPanel(container, context) {
       posts: state.all,
       savedAt,
       details,
-      readAt: state.readAt,
+      readAt: readLedger.snapshot(),
       cachedAt: state.cachedAt,
     }, state.retentionDays);
   }
 
-  async function persistCache(savedAt = state.savedAt || Date.now()) {
+  function persistCache(savedAt = state.savedAt || Date.now()) {
     const pruned = cacheSnapshot(savedAt);
     state.all = pruned.posts;
-    state.readAt = pruned.readAt;
     state.cachedAt = pruned.cachedAt;
     for (const id of [...state.details.keys()]) {
       if (!Object.prototype.hasOwnProperty.call(pruned.details, id)) state.details.delete(id);
     }
-    await cacheSet(context, pruned);
+    return cacheWriter.write(pruned);
   }
 
   function markRead(id) {
-    const key = String(id || "");
-    if (!key || state.readAt[key]) return false;
-    state.readAt[key] = Date.now();
-    return true;
+    return readLedger.mark(String(id || ""));
   }
 
   function markUnread(id) {
-    const key = String(id || "");
-    if (!key || !state.readAt[key]) return false;
-    delete state.readAt[key];
-    return true;
+    return readLedger.unmark(String(id || ""));
   }
 
   function selectedPost() {
@@ -634,11 +639,7 @@ function createPanel(container, context) {
     return {
       title: postTitle(post),
       subtitle: detailMeta.join(" · "),
-      status: state.detailLoading.has(id)
-        ? { state: "loading", label: copy("Loading post and comments…", "正在加载正文与评论…") }
-        : cached?.error
-          ? { state: "error", error: cached.error }
-          : undefined,
+      status: cached?.error ? { state: "error", error: cached.error } : undefined,
       body,
       images,
       imageLayout: state.imageLayout,
@@ -649,7 +650,7 @@ function createPanel(container, context) {
   function itemFor(post) {
     const images = feedImages(post);
     const topic = postTopic(post);
-    const isRead = Boolean(state.readAt[String(post.linkid)]);
+    const isRead = readLedger.has(String(post.linkid));
     return {
       id: String(post.linkid),
       title: postTitle(post),
@@ -680,6 +681,7 @@ function createPanel(container, context) {
   function paint() {
     if (state.dead) return;
     applyFilter();
+    const selected = selectedPost();
     const snapshot = {
       revision: ++state.revision,
       title: "QxHeihe 小黑盒",
@@ -702,7 +704,7 @@ function createPanel(container, context) {
         {
           id: "refresh",
           label: copy("Refresh", "刷新"),
-          primary: !selectedPost(),
+          primary: !selected,
           disabled: state.loading || state.loadingMore,
         },
         {
@@ -711,7 +713,13 @@ function createPanel(container, context) {
           disabled: state.loading || state.loadingMore,
         },
       ],
-      island: state.loading || state.loadingMore
+      island: selected && state.detailLoading.has(String(selected.linkid))
+        ? {
+            primary: postTitle(selected),
+            secondary: copy("Loading post and comments", "正在加载正文与评论"),
+            activity: "spinner",
+          }
+        : state.loading || state.loadingMore
         ? {
             primary: "QxHeihe",
             secondary: state.loadingMore ? copy("Loading more", "加载更多") : copy("Refreshing community", "刷新社区"),
@@ -732,10 +740,11 @@ function createPanel(container, context) {
         },
         onSelect(id) {
           state.selectedId = id;
+          state.prefetchRevision += 1;
           const changed = markRead(id);
           paint();
           if (changed) void persistCache();
-          void loadDetail(id);
+          void loadSelectedPost(id);
         },
         onAction(id, item) {
           if (id === "refresh") void loadFeed({ force: true });
@@ -766,7 +775,7 @@ function createPanel(container, context) {
     }
   }
 
-  async function loadDetail(id) {
+  async function loadDetail(id, { quiet = false } = {}) {
     const key = String(id || "");
     const previous = state.details.get(key);
     if (
@@ -781,9 +790,9 @@ function createPanel(container, context) {
     ) return;
     const post = state.all.find((entry) => String(entry.linkid) === key);
     if (!post) return;
-    const generation = state.generation;
+    const generation = requestGate.current();
     state.detailLoading.add(key);
-    paint();
+    if (!quiet) paint();
     try {
       const cookie = await preference(context, "commentCookie", "");
       // The public detail endpoint is the stable equivalent of opening the
@@ -823,7 +832,7 @@ function createPanel(container, context) {
         }
       });
       const [result, commentOutcome] = await Promise.all([detailRequest, commentRequest]);
-      if (state.dead || generation !== state.generation) return;
+      if (state.dead || !requestGate.isCurrent(generation)) return;
       const link = { ...post, ...(result.link || {}) };
       const parsed = parseDetailContent(link);
       const commentSections = commentOutcome.result ? parseComments(commentOutcome.result) : [];
@@ -858,12 +867,34 @@ function createPanel(container, context) {
       });
       await persistCache();
     } catch (error) {
-      if (!state.dead && generation === state.generation) {
+      if (!state.dead && requestGate.isCurrent(generation)) {
         state.details.set(key, { ...(previous || {}), error: message(error) });
       }
     } finally {
       state.detailLoading.delete(key);
-      paint();
+      if (!quiet) paint();
+    }
+  }
+
+  async function prefetchAround(postId, revision) {
+    const index = state.all.findIndex((post) => String(post.linkid) === String(postId));
+    if (index < 0) return;
+    const neighbors = [state.all[index + 1], state.all[index - 1], state.all[index + 2]].filter(Boolean);
+    for (const post of neighbors) {
+      if (
+        state.dead
+        || revision !== state.prefetchRevision
+        || state.selectedId !== String(postId)
+      ) return;
+      await loadDetail(post.linkid, { quiet: true });
+    }
+  }
+
+  async function loadSelectedPost(postId) {
+    const revision = state.prefetchRevision;
+    await loadDetail(postId);
+    if (!state.dead && revision === state.prefetchRevision) {
+      void prefetchAround(postId, revision);
     }
   }
 
@@ -871,7 +902,7 @@ function createPanel(container, context) {
     if (state.loading) return;
     state.loading = true;
     state.error = null;
-    const generation = ++state.generation;
+    const generation = requestGate.next();
     paint();
     try {
       const [configuredUrl, ttlPreference, retentionPreference, imageLayoutPreference] = await Promise.all([
@@ -887,16 +918,20 @@ function createPanel(container, context) {
         : DEFAULT_TTL_MS;
       const retentionRaw = Number(retentionPreference);
       state.retentionDays = retentionRaw === 3 ? 3 : 7;
+      readLedger.configure({
+        retentionDays: state.retentionDays,
+        maxEntries: MAX_READ_HISTORY,
+      });
       const cached = pruneCache(
         cacheModel(await cacheGet(context)) || cacheModel({}),
         state.retentionDays,
       );
+      readLedger.replace(cached.readAt);
       await cacheSet(context, cached);
       const cacheAge = cached?.savedAt ? Date.now() - cached.savedAt : Infinity;
       if (!force && cached.posts.length) {
         state.all = cached.posts;
         state.savedAt = cached.savedAt;
-        state.readAt = cached.readAt;
         state.cachedAt = cached.cachedAt;
         state.details = new Map(Object.entries(cached.details));
         state.source = cacheAge <= ttlMs
@@ -907,7 +942,7 @@ function createPanel(container, context) {
         if (cacheAge <= ttlMs) return;
       }
       const result = await fetchJson(context, feedUrlAtOffset(configuredUrl, 0));
-      if (state.dead || generation !== state.generation) return;
+      if (state.dead || !requestGate.isCurrent(generation)) return;
       const links = Array.isArray(result.links) ? result.links : [];
       const now = Date.now();
       state.all = links;
@@ -917,25 +952,26 @@ function createPanel(container, context) {
       state.cachedAt = Object.fromEntries(
         links.map((post) => [String(post.linkid), now]),
       );
-      state.readAt = Object.fromEntries(
-        Object.entries(state.readAt).filter(([id]) =>
-          links.some((post) => String(post.linkid) === id)
-        ),
-      );
       await persistCache(now);
       if (!state.selectedId && links[0]) state.selectedId = String(links[0].linkid);
     } catch (error) {
-      if (!state.dead && generation === state.generation) {
+      if (!state.dead && requestGate.isCurrent(generation)) {
         state.error = message(error);
         state.source = state.all.length
           ? copy("Offline · showing cache", "网络异常 · 显示缓存")
           : copy("Feed unavailable", "社区数据不可用");
       }
     } finally {
-      if (!state.dead && generation === state.generation) {
+      if (!state.dead && requestGate.isCurrent(generation)) {
         state.loading = false;
         paint();
-        if (state.selectedId) void loadDetail(state.selectedId);
+        if (state.selectedId) {
+          if (markRead(state.selectedId)) {
+            paint();
+            void persistCache();
+          }
+          void loadSelectedPost(state.selectedId);
+        }
       }
     }
   }
@@ -944,12 +980,12 @@ function createPanel(container, context) {
     if (state.loadingMore || state.loading) return;
     state.loadingMore = true;
     state.error = null;
-    const generation = state.generation;
+    const generation = requestGate.current();
     paint();
     try {
       const configuredUrl = await preference(context, "feedUrl", DEFAULT_FEED_URL);
       const result = await fetchJson(context, feedUrlAtOffset(configuredUrl, state.offset));
-      if (state.dead || generation !== state.generation) return;
+      if (state.dead || !requestGate.isCurrent(generation)) return;
       const incoming = Array.isArray(result.links) ? result.links : [];
       const byId = new Map(state.all.map((post) => [String(post.linkid), post]));
       const now = Date.now();
@@ -963,7 +999,7 @@ function createPanel(container, context) {
       state.source = copy(`${state.all.length} loaded posts`, `已加载 ${state.all.length} 个帖子`);
       await persistCache();
     } catch (error) {
-      if (!state.dead && generation === state.generation) state.error = message(error);
+      if (!state.dead && requestGate.isCurrent(generation)) state.error = message(error);
     } finally {
       state.loadingMore = false;
       paint();
@@ -976,7 +1012,8 @@ function createPanel(container, context) {
   return {
     destroy() {
       state.dead = true;
-      state.generation += 1;
+      state.prefetchRevision += 1;
+      requestGate.invalidate();
       state.view = null;
       container.innerHTML = "";
     },

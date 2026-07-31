@@ -16,6 +16,7 @@ const DEFAULT_FORUM_PREFERENCE = "图拉丁吧, 笔记本吧";
 const MIXED_FORUM = "__mixed__";
 const DEFAULT_TTL_MS = 5 * 60 * 1000;
 const DETAIL_TTL_MS = 10 * 60 * 1000;
+const MAX_READ_HISTORY = 5_000;
 const WEB_USER_AGENT = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36 QxTieba/1.0";
 
 let qxLocale = "en";
@@ -412,11 +413,17 @@ function pruneCache(model, retentionDays) {
     return true;
   });
   const keep = ([id]) => keptIds.has(String(id));
+  const readAt = Object.fromEntries(
+    Object.entries(model.readAt)
+      .filter(([, value]) => Number(value) >= cutoff)
+      .sort((left, right) => Number(right[1]) - Number(left[1]))
+      .slice(0, MAX_READ_HISTORY),
+  );
   return {
     ...model,
     posts,
     details: Object.fromEntries(Object.entries(model.details).filter(keep)),
-    readAt: Object.fromEntries(Object.entries(model.readAt).filter(keep)),
+    readAt,
     cachedAt: Object.fromEntries(Object.entries(model.cachedAt).filter(keep)),
   };
 }
@@ -454,13 +461,18 @@ function createPanel(container, context) {
     imageLayout: "horizontal",
     details: {},
     detailLoading: new Set(),
-    readAt: {},
     cachedAt: {},
-    generation: 0,
     revision: 0,
     view: null,
     dead: false,
+    prefetchRevision: 0,
   };
+  const readLedger = context.state.createReadLedger({
+    retentionDays: state.retentionDays,
+    maxEntries: MAX_READ_HISTORY,
+  });
+  const cacheWriter = context.state.createLatestWriter((snapshot) => cacheSet(context, snapshot));
+  const requestGate = context.state.createGenerationGate();
 
   function selectedPost() {
     return state.posts.find((post) => String(post.id) === String(state.selectedId));
@@ -496,11 +508,7 @@ function createPanel(container, context) {
       subtitle: [detail?.author || post.author, detail?.publishedAt || post.publishedAt, `${compactNumber(post.replyCount)} ${copy("replies", "回复")}`]
         .filter(Boolean)
         .join(" · "),
-      status: state.detailLoading.has(id)
-        ? { state: "loading", label: copy("Loading thread and comments…", "正在加载帖子与评论…") }
-        : detail?.error
-          ? { state: "error", error: detail.error }
-          : undefined,
+      status: detail?.error ? { state: "error", error: detail.error } : undefined,
       body: detail?.body || post.summary || post.title,
       images,
       imageLayout: state.imageLayout,
@@ -512,11 +520,7 @@ function createPanel(container, context) {
           ...reply,
           content: reply.content || tiebaEmotionContent(reply.body),
         })),
-        status: state.detailLoading.has(id)
-          ? { state: "loading", label: copy("Loading comments…", "正在加载评论…") }
-          : detail?.error
-            ? { state: "error", error: detail.error }
-            : undefined,
+        status: detail?.error ? { state: "error", error: detail.error } : undefined,
         emptyText: copy("No readable comments on the first page.", "首屏暂无可读取的评论。"),
       },
     };
@@ -524,7 +528,7 @@ function createPanel(container, context) {
 
   function itemFor(post) {
     const id = String(post.id);
-    const read = Boolean(state.readAt[id]);
+    const read = readLedger.has(id);
     return {
       id,
       title: post.title,
@@ -547,6 +551,7 @@ function createPanel(container, context) {
   function paint() {
     if (state.dead) return;
     filterPosts();
+    const selected = selectedPost();
     const snapshot = {
       revision: ++state.revision,
       title: `QxTieba · ${forumDisplayName(state.forumName)}`,
@@ -569,7 +574,7 @@ function createPanel(container, context) {
       actions: [{
         id: "refresh",
         label: copy("Refresh", "刷新"),
-        primary: !selectedPost(),
+        primary: !selected,
         disabled: state.loading || state.loadingMore,
       }, {
         id: "load-more",
@@ -579,7 +584,13 @@ function createPanel(container, context) {
         id: "mark-visible-read",
         label: copy("Mark Visible Read", "当前结果标为已读"),
       }],
-      island: state.loading || state.loadingMore
+      island: selected && state.detailLoading.has(String(selected.id))
+        ? {
+            primary: selected.title,
+            secondary: copy("Loading thread and comments", "正在加载帖子与评论"),
+            activity: "spinner",
+          }
+        : state.loading || state.loadingMore
         ? {
             primary: forumDisplayName(state.forumName),
             secondary: state.loadingMore ? copy("Loading more posts", "正在加载更多帖子") : copy("Refreshing community", "正在刷新社区"),
@@ -599,7 +610,7 @@ function createPanel(container, context) {
       onTab(id) {
         const name = id === MIXED_FORUM ? MIXED_FORUM : normalizeForumName(id);
         if ((name !== MIXED_FORUM && !state.forumNames.includes(name)) || name === state.forumName) return;
-        state.generation += 1;
+        requestGate.invalidate();
         state.loading = false;
         state.loadingMore = false;
         state.forumName = name;
@@ -609,7 +620,6 @@ function createPanel(container, context) {
         state.hasMore = true;
         state.selectedId = null;
         state.details = {};
-        state.readAt = {};
         state.cachedAt = {};
         state.savedAt = 0;
         state.query = "";
@@ -621,29 +631,31 @@ function createPanel(container, context) {
       onSelect(id) {
         const key = String(id || "");
         state.selectedId = key;
-        if (key && !state.readAt[key]) {
-          state.readAt[key] = Date.now();
+        state.prefetchRevision += 1;
+        if (readLedger.mark(key)) {
           void persistCache();
         }
         paint();
-        void loadDetail(key);
+        void loadSelectedPost(key);
       },
       onAction(id, item) {
         if (id === "refresh") void loadFeed({ force: true });
         else if (id === "load-more") void loadMore();
         else if (id === "mark-visible-read") {
-          const now = Date.now();
-          for (const post of state.visible) state.readAt[String(post.id)] = now;
-          paint();
-          void persistCache();
+          if (readLedger.markMany(state.visible.map((post) => String(post.id)))) {
+            paint();
+            void persistCache();
+          }
         } else if (id.startsWith("read:")) {
-          state.readAt[id.slice("read:".length)] = Date.now();
-          paint();
-          void persistCache();
+          if (readLedger.mark(id.slice("read:".length))) {
+            paint();
+            void persistCache();
+          }
         } else if (id.startsWith("unread:")) {
-          delete state.readAt[id.slice("unread:".length)];
-          paint();
-          void persistCache();
+          if (readLedger.unmark(id.slice("unread:".length))) {
+            paint();
+            void persistCache();
+          }
         } else if (id.startsWith("open:")) {
           const key = id.slice("open:".length);
           const post = state.posts.find((entry) => String(entry.id) === key)
@@ -663,41 +675,62 @@ function createPanel(container, context) {
       hasMore: state.hasMore,
       savedAt,
       details: state.details,
-      readAt: state.readAt,
+      readAt: readLedger.snapshot(),
       cachedAt: state.cachedAt,
     }, state.retentionDays);
   }
 
-  async function persistCache(savedAt = state.savedAt || Date.now()) {
+  function persistCache(savedAt = state.savedAt || Date.now()) {
     const pruned = snapshotCache(savedAt);
     state.posts = pruned.posts;
     state.details = pruned.details;
-    state.readAt = pruned.readAt;
     state.cachedAt = pruned.cachedAt;
-    await cacheSet(context, pruned);
+    return cacheWriter.write(pruned);
   }
 
-  async function loadDetail(id) {
+  async function loadDetail(id, { quiet = false } = {}) {
     const key = String(id || "");
     const post = state.posts.find((entry) => String(entry.id) === key);
     const previous = state.details[key];
     if (!post || state.detailLoading.has(key)) return;
     if (previous?.complete && Date.now() - Number(previous.savedAt || 0) <= DETAIL_TTL_MS) return;
-    const generation = state.generation;
+    const generation = requestGate.current();
     state.detailLoading.add(key);
-    paint();
+    if (!quiet) paint();
     try {
       const detail = await fetchDetail(context, post);
-      if (state.dead || generation !== state.generation) return;
+      if (state.dead || !requestGate.isCurrent(generation)) return;
       state.details[key] = { ...detail, complete: true, savedAt: Date.now() };
       await persistCache();
     } catch (error) {
-      if (!state.dead && generation === state.generation) {
+      if (!state.dead && requestGate.isCurrent(generation)) {
         state.details[key] = { ...(previous || {}), error: errorMessage(error), savedAt: previous?.savedAt || 0 };
       }
     } finally {
       state.detailLoading.delete(key);
-      paint();
+      if (!quiet) paint();
+    }
+  }
+
+  async function prefetchAround(postId, revision) {
+    const index = state.posts.findIndex((post) => String(post.id) === String(postId));
+    if (index < 0) return;
+    const neighbors = [state.posts[index + 1], state.posts[index - 1], state.posts[index + 2]].filter(Boolean);
+    for (const post of neighbors) {
+      if (
+        state.dead
+        || revision !== state.prefetchRevision
+        || state.selectedId !== String(postId)
+      ) return;
+      await loadDetail(post.id, { quiet: true });
+    }
+  }
+
+  async function loadSelectedPost(postId) {
+    const revision = state.prefetchRevision;
+    await loadDetail(postId);
+    if (!state.dead && revision === state.prefetchRevision) {
+      void prefetchAround(postId, revision);
     }
   }
 
@@ -705,7 +738,7 @@ function createPanel(container, context) {
     if (state.loading) return;
     state.loading = true;
     state.error = null;
-    const generation = ++state.generation;
+    const generation = requestGate.next();
     paint();
     try {
       const [forumPreference, ttlPreference, retentionPreference, imageLayoutPreference] = await Promise.all([
@@ -722,8 +755,13 @@ function createPanel(container, context) {
       state.ttlMs = Number.isFinite(ttl) && ttl > 0 ? Math.min(60, ttl) * 60 * 1000 : DEFAULT_TTL_MS;
       state.retentionDays = Number(retentionPreference) === 3 ? 3 : 7;
       state.imageLayout = imageLayoutPreference === "grid" ? "grid" : "horizontal";
+      readLedger.configure({
+        retentionDays: state.retentionDays,
+        maxEntries: MAX_READ_HISTORY,
+      });
 
       const cached = pruneCache(cacheModel(await cacheGet(context)), state.retentionDays);
+      readLedger.merge(cached.readAt);
       const sameForum = normalizeForumName(cached.forumName) === state.forumName;
       const cacheAge = cached.savedAt ? Date.now() - cached.savedAt : Infinity;
       if (!force && sameForum && cached.posts.length) {
@@ -732,7 +770,6 @@ function createPanel(container, context) {
         state.hasMore = cached.hasMore;
         state.savedAt = cached.savedAt;
         state.details = cached.details;
-        state.readAt = cached.readAt;
         state.cachedAt = cached.cachedAt;
         state.selectedId ||= state.posts[0]?.id || null;
         state.source = cacheAge <= state.ttlMs
@@ -746,20 +783,18 @@ function createPanel(container, context) {
       } else if (!sameForum) {
         state.posts = [];
         state.details = {};
-        state.readAt = {};
         state.cachedAt = {};
         state.selectedId = null;
       }
 
       const result = await fetchForumSelection(context, state.forumNames, state.forumName, 1);
-      if (state.dead || generation !== state.generation) return;
+      if (state.dead || !requestGate.isCurrent(generation)) return;
       const now = Date.now();
       state.posts = result.items;
       state.page = 1;
       state.hasMore = result.hasMore;
       state.savedAt = now;
       state.cachedAt = Object.fromEntries(result.items.map((post) => [String(post.id), now]));
-      state.readAt = Object.fromEntries(Object.entries(state.readAt).filter(([id]) => result.items.some((post) => String(post.id) === id)));
       state.selectedId = result.items[0]?.id || null;
       state.source = state.forumName === MIXED_FORUM
         ? copy(
@@ -769,17 +804,24 @@ function createPanel(container, context) {
         : copy(`Live ${state.forumName} feed`, `${state.forumName}吧实时数据`);
       await persistCache(now);
     } catch (error) {
-      if (!state.dead && generation === state.generation) {
+      if (!state.dead && requestGate.isCurrent(generation)) {
         state.error = errorMessage(error);
         state.source = state.posts.length
           ? copy("Offline · showing cache", "网络异常 · 显示缓存")
           : copy("Tieba feed unavailable", "贴吧 Feed 不可用");
       }
     } finally {
-      if (!state.dead && generation === state.generation) {
+      if (!state.dead && requestGate.isCurrent(generation)) {
         state.loading = false;
         paint();
-        if (state.selectedId) void loadDetail(state.selectedId);
+        if (state.selectedId) {
+          const key = String(state.selectedId);
+          if (readLedger.mark(key)) {
+            paint();
+            void persistCache();
+          }
+          void loadSelectedPost(state.selectedId);
+        }
       }
     }
   }
@@ -788,12 +830,12 @@ function createPanel(container, context) {
     if (state.loading || state.loadingMore || !state.hasMore) return;
     state.loadingMore = true;
     state.error = null;
-    const generation = state.generation;
+    const generation = requestGate.current();
     paint();
     try {
       const nextPage = state.page + 1;
       const result = await fetchForumSelection(context, state.forumNames, state.forumName, nextPage);
-      if (state.dead || generation !== state.generation) return;
+      if (state.dead || !requestGate.isCurrent(generation)) return;
       const byId = new Map(state.posts.map((post) => [String(post.id), post]));
       const now = Date.now();
       for (const post of result.items) {
@@ -806,7 +848,7 @@ function createPanel(container, context) {
       state.source = copy(`${state.posts.length} loaded posts`, `已加载 ${state.posts.length} 个帖子`);
       await persistCache();
     } catch (error) {
-      if (!state.dead && generation === state.generation) state.error = errorMessage(error);
+      if (!state.dead && requestGate.isCurrent(generation)) state.error = errorMessage(error);
     } finally {
       state.loadingMore = false;
       paint();
@@ -819,7 +861,8 @@ function createPanel(container, context) {
   return {
     destroy() {
       state.dead = true;
-      state.generation += 1;
+      state.prefetchRevision += 1;
+      requestGate.invalidate();
       state.view = null;
       container.innerHTML = "";
     },

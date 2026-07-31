@@ -1,5 +1,7 @@
 import assert from "node:assert/strict";
 import { gzipSync } from "node:zlib";
+import { createPluginStateKit } from "./plugin-state-kit.mjs";
+import plugin from "../src/qxtieba/index.source.js";
 import {
   buildFeedUrl,
   normalizeForumName,
@@ -202,10 +204,105 @@ const pruned = pruneCache({
   hasMore: true,
   savedAt: now,
   details: { old: { body: "old" }, new: { body: "new" } },
-  readAt: { old: now - 10 * 24 * 60 * 60 * 1000 },
+  readAt: {
+    old: now - 10 * 24 * 60 * 60 * 1000,
+    orphan: now,
+  },
   cachedAt: { new: now },
 }, 7);
 assert.deepEqual(pruned.posts.map((post) => post.id), ["new"]);
 assert.deepEqual(Object.keys(pruned.details), ["new"]);
+assert.equal(pruned.readAt.orphan, now, "recent read ids survive feed rotation");
 
-console.log(`QxTieba smoke ok: feed=${feed.items.length}, htmlReplies=${detail.replies.length}, protobufReplies=${protoDetail.replies.length}`);
+const panelPosts = [{
+  ...feed.items[0],
+  id: "panel-1",
+  title: "缓存帖子一",
+}, {
+  ...feed.items[0],
+  id: "panel-2",
+  title: "缓存帖子二",
+}];
+const persisted = new Map([["cache.community.v1", {
+  forumName: "__mixed__",
+  posts: panelPosts,
+  page: 1,
+  hasMore: true,
+  savedAt: now,
+  details: Object.fromEntries(panelPosts.map((post) => [post.id, {
+    title: post.title,
+    body: post.summary,
+    replies: [],
+    complete: true,
+    savedAt: now,
+  }])),
+  readAt: {},
+  cachedAt: Object.fromEntries(panelPosts.map((post) => [post.id, now])),
+}]]);
+let snapshot = null;
+let handlers = null;
+const controller = {
+  update(patch) {
+    snapshot = { ...(snapshot || {}), ...patch };
+  },
+  getState() {
+    return snapshot;
+  },
+};
+const context = {
+  state: createPluginStateKit(),
+  locale: { current: "zh-CN", preference: "zh-CN", onChange: () => () => {} },
+  http: { fetch: async () => { throw new Error("fresh cache must not fetch"); } },
+  storage: {
+    persist: {
+      get: (key) => persisted.get(key) || null,
+      set: (key, value) => persisted.set(key, value),
+    },
+  },
+  ui: {
+    mountWorkbench(state, nextHandlers) {
+      snapshot = state;
+      handlers = nextHandlers;
+      return controller;
+    },
+  },
+  getPreference(id) {
+    return id === "forumName" ? "Python吧" : "";
+  },
+  openUrl() {},
+  showToast() {},
+};
+
+async function waitFor(predicate, label, timeoutMs = 10_000) {
+  const started = Date.now();
+  while (!predicate()) {
+    if (Date.now() - started > timeoutMs) throw new Error(`Timed out: ${label}`);
+    await new Promise((resolve) => setTimeout(resolve, 15));
+  }
+}
+
+const container = { innerHTML: "" };
+plugin.panel.render(container, context);
+await waitFor(() => snapshot && !snapshot.loading && snapshot.items?.length === 2, "cached panel");
+assert.equal(snapshot.items[0].tone, "neutral", "visible default detail must be read");
+assert.equal(snapshot.items[0].detail.status, undefined);
+assert.equal(snapshot.items[0].detail.replies.status, undefined);
+const reopenTarget = snapshot.items[1];
+handlers.onSelect(reopenTarget.id);
+await waitFor(
+  () => persisted.get("cache.community.v1")?.readAt?.[reopenTarget.id],
+  "persist read state before close",
+);
+plugin.panel.destroy(container);
+
+const reopenedContainer = { innerHTML: "" };
+plugin.panel.render(reopenedContainer, context);
+await waitFor(() => snapshot && !snapshot.loading && snapshot.items?.length === 2, "cached reopen");
+assert.equal(
+  snapshot.items.find((item) => item.id === reopenTarget.id)?.tone,
+  "neutral",
+  "read state must survive panel reopen",
+);
+plugin.panel.destroy(reopenedContainer);
+
+console.log(`QxTieba smoke ok: feed=${feed.items.length}, htmlReplies=${detail.replies.length}, protobufReplies=${protoDetail.replies.length}, readReopen=true`);

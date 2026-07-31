@@ -5,6 +5,11 @@ const API_BASE = "https://m.weibo.cn";
 const VISITOR_URL = "https://visitor.passport.weibo.cn/visitor/genvisitor2";
 const USER_AGENT = "Mozilla/5.0 (iPhone; CPU iPhone OS 16_0 like Mac OS X) AppleWebKit/605.1.15";
 const DAY_MS = 24 * 60 * 60 * 1000;
+const MAX_IMAGE_PREVIEW_ENTRIES = 128;
+const MAX_IMAGE_PREVIEW_CHARS = 30_000_000;
+const DETAIL_IMAGE_BUDGET_CHARS = 27_000_000;
+const IMAGE_REQUEST_CONCURRENCY = 4;
+const MAX_READ_HISTORY = 5_000;
 
 let qxLocale = "en";
 let stopLocale = null;
@@ -87,6 +92,31 @@ function createSerialScheduler(context, range) {
     tail = result.catch(() => {});
     return result;
   };
+}
+
+function createConcurrentScheduler(context, range, concurrency) {
+  const queue = [];
+  let active = 0;
+  let lastDispatchAt = 0;
+  const runNext = () => {
+    while (active < concurrency && queue.length) {
+      const entry = queue.shift();
+      active += 1;
+      void (async () => {
+        const wait = Math.max(0, lastDispatchAt + randomBetween(...range) - Date.now());
+        if (wait) await sleep(context, wait);
+        lastDispatchAt = Date.now();
+        return entry.task();
+      })().then(entry.resolve, entry.reject).finally(() => {
+        active -= 1;
+        runNext();
+      });
+    }
+  };
+  return (task) => new Promise((resolve, reject) => {
+    queue.push({ task, resolve, reject });
+    runNext();
+  });
 }
 
 function emptyCache() {
@@ -246,11 +276,17 @@ function pruneCache(cache, retentionDays) {
     feeds[mode] = { ...feed, items };
   }
   const keep = ([id]) => keptIds.has(String(id));
+  const readAt = Object.fromEntries(
+    Object.entries(cache.readAt || {})
+      .filter(([, value]) => Number(value) >= cutoff)
+      .sort((left, right) => Number(right[1]) - Number(left[1]))
+      .slice(0, MAX_READ_HISTORY),
+  );
   return {
     savedAt: Date.now(),
     feeds,
     details: Object.fromEntries(Object.entries(cache.details || {}).filter(keep)),
-    readAt: Object.fromEntries(Object.entries(cache.readAt || {}).filter(keep)),
+    readAt,
     cachedAt: Object.fromEntries(Object.entries(cache.cachedAt || {}).filter(keep)),
   };
 }
@@ -313,17 +349,31 @@ function createPanel(container, context) {
     loading: false,
     detailLoading: new Set(),
     imageLoading: new Set(),
-    imagePreviews: new Map(),
+    imagePreviews: context.state.createLru({
+      maxEntries: MAX_IMAGE_PREVIEW_ENTRIES,
+      maxSize: MAX_IMAGE_PREVIEW_CHARS,
+      sizeOf: (value) => String(value || "").length,
+    }),
     imageRequests: new Map(),
     error: null,
     source: "",
-    requestSequence: 0,
     revision: 0,
     view: null,
     destroyed: false,
+    prefetchRevision: 0,
   };
   let apiSchedule = createSerialScheduler(context, state.delayRange);
-  let imageSchedule = createSerialScheduler(context, [150, 450]);
+  let imageSchedule = createConcurrentScheduler(context, [40, 120], IMAGE_REQUEST_CONCURRENCY);
+  const readLedger = context.state.createReadLedger({
+    retentionDays: state.retentionDays,
+    maxEntries: MAX_READ_HISTORY,
+  });
+  const cacheWriter = context.state.createLatestWriter(async (snapshot) => {
+    try {
+      await context.storage.persist.set(CACHE_KEY, snapshot);
+    } catch {}
+  });
+  const requestGate = context.state.createGenerationGate();
 
   function activeFeed() {
     return state.cache.feeds[state.mode] || { savedAt: 0, items: [], sourceIds: [] };
@@ -347,6 +397,10 @@ function createPanel(container, context) {
     ].join(" ").toLocaleLowerCase().includes(query));
   }
 
+  function markRead(id) {
+    return readLedger.mark(String(id || ""));
+  }
+
   function commentsReplies(post) {
     const comments = state.cache.details[post.id]?.comments || [];
     return {
@@ -368,10 +422,6 @@ function createPanel(container, context) {
           comment.replyText ? `${copy("Reply", "回复")}：${comment.replyText}` : "",
         ].filter(Boolean).join("\n"),
       })),
-      status: state.detailLoading.has(post.id) ? {
-        state: "loading",
-        label: copy("Loading comments…", "正在加载评论…"),
-      } : undefined,
       emptyText: copy("No comments yet.", "暂无评论。"),
     };
   }
@@ -390,16 +440,9 @@ function createPanel(container, context) {
         zoomable: true,
       } : null;
     }).filter(Boolean);
-    const busy = state.detailLoading.has(post.id) || state.imageLoading.has(post.id);
     return {
       title: postTitle(post),
       subtitle: `${post.user?.screenName || copy("Unknown author", "未知作者")} · ${formatDate(post.createdAt)}`,
-      status: busy ? {
-        state: "loading",
-        label: state.detailLoading.has(post.id)
-          ? copy("Loading comments and full post…", "正在加载完整微博与评论…")
-          : copy("Proxying original images…", "正在代理微博原图…"),
-      } : undefined,
       body: detail?.body || post.text,
       images,
       imageLayout: state.imageLayout,
@@ -420,7 +463,7 @@ function createPanel(container, context) {
   function itemFor(post) {
     const cover = post.pics[0];
     const preview = cover ? state.imagePreviews.get(`thumbnail:${cover}`) : "";
-    const read = Boolean(state.cache.readAt[post.id]);
+    const read = readLedger.has(post.id);
     return {
       id: post.id,
       title: postTitle(post),
@@ -502,22 +545,22 @@ function createPanel(container, context) {
       onTab(id) {
         if (!["user", "following"].includes(id) || id === state.mode) return;
         state.mode = id;
+        state.prefetchRevision += 1;
         state.query = "";
         state.error = null;
         state.selectedId = activeFeed().items[0]?.id || null;
+        const changed = markRead(state.selectedId);
         paint();
+        if (changed) persistCache();
         refresh({ force: false });
       },
       onSelect(id) {
         const postId = String(id || "");
         state.selectedId = postId;
-        if (postId && !state.cache.readAt[postId]) {
-          state.cache.readAt[postId] = Date.now();
-          persistCache();
-        }
+        state.prefetchRevision += 1;
+        if (markRead(postId)) persistCache();
         paint();
-        loadDetail(postId);
-        loadPostImages(postId);
+        void loadSelectedPost(postId);
       },
       onDownload(id) {
         void downloadOriginalImage(id);
@@ -526,13 +569,15 @@ function createPanel(container, context) {
         if (id === "refresh") {
           refresh({ force: true });
         } else if (id === "mark-visible-read") {
-          const now = Date.now();
-          for (const post of filteredPosts()) state.cache.readAt[post.id] = now;
-          paint();
-          persistCache();
+          if (readLedger.markMany(filteredPosts().map((post) => post.id))) {
+            paint();
+            persistCache();
+          }
         } else if (id === "clear-cache") {
           state.cache = emptyCache();
+          readLedger.clear();
           state.imagePreviews.clear();
+          state.prefetchRevision += 1;
           state.selectedId = null;
           state.source = copy("Cache cleared", "缓存已清理");
           paint();
@@ -542,23 +587,24 @@ function createPanel(container, context) {
             || allPosts().find((entry) => entry.id === String(item?.id));
           if (post) context.openUrl(postUrl(post));
         } else if (id.startsWith("read:")) {
-          state.cache.readAt[id.slice(5)] = Date.now();
-          paint();
-          persistCache();
+          if (readLedger.mark(id.slice(5))) {
+            paint();
+            persistCache();
+          }
         } else if (id.startsWith("unread:")) {
-          delete state.cache.readAt[id.slice(7)];
-          paint();
-          persistCache();
+          if (readLedger.unmark(id.slice(7))) {
+            paint();
+            persistCache();
+          }
         }
       },
     });
   }
 
-  async function persistCache() {
+  function persistCache() {
+    state.cache.readAt = readLedger.snapshot();
     state.cache = pruneCache(state.cache, state.retentionDays);
-    try {
-      await context.storage.persist.set(CACHE_KEY, { ...state.cache, savedAt: Date.now() });
-    } catch {}
+    return cacheWriter.write({ ...state.cache, savedAt: Date.now() });
   }
 
   async function generateVisitorCookie() {
@@ -680,9 +726,10 @@ function createPanel(container, context) {
     return { items, sourceIds };
   }
 
-  async function proxyImage(url, kind) {
+  async function proxyImage(url, kind, maxChars = kind === "thumbnail" ? 120_000 : 1_050_000) {
     const key = `${kind}:${url}`;
-    if (state.imagePreviews.has(key)) return state.imagePreviews.get(key);
+    const cached = state.imagePreviews.get(key);
+    if (cached) return cached;
     if (state.imageRequests.has(key)) return state.imageRequests.get(key);
     const request = (async () => {
       try {
@@ -696,14 +743,15 @@ function createPanel(container, context) {
             Accept: "image/avif,image/webp,image/apng,image/*,*/*;q=0.8",
           },
           timeoutMs: 90_000,
+          maxBytes: 8 * 1024 * 1024,
         }));
         if (!response?.ok) throw new Error(`Image HTTP ${response?.status || "error"}`);
         const type = responseContentType(response);
         if (!type.startsWith("image/")) throw new Error("Response is not an image");
         const bytes = new Uint8Array(await response.arrayBuffer());
         if (!bytes.length) throw new Error("Image response was empty");
-        const preview = await safeImagePreview(bytes, type, kind);
-        if (preview) state.imagePreviews.set(key, preview);
+        const preview = await safeImagePreview(bytes, type, kind, maxChars);
+        if (preview && !state.destroyed) state.imagePreviews.set(key, preview);
         return preview;
       } catch {
         return "";
@@ -729,10 +777,14 @@ function createPanel(container, context) {
     state.imageLoading.add(post.id);
     paint();
     try {
-      for (const url of post.pics) {
-        if (state.destroyed) break;
-        if (await proxyImage(url, "detail")) paint();
-      }
+      const urls = post.pics;
+      const maxChars = Math.max(
+        180_000,
+        Math.min(1_050_000, Math.floor(DETAIL_IMAGE_BUDGET_CHARS / Math.max(1, urls.length))),
+      );
+      await Promise.all(
+        urls.map((url) => proxyImage(url, "detail", maxChars)),
+      );
     } finally {
       state.imageLoading.delete(post.id);
       paint();
@@ -759,6 +811,7 @@ function createPanel(container, context) {
           Accept: "image/avif,image/webp,image/apng,image/*,*/*;q=0.8",
         },
         timeoutMs: 120_000,
+        maxBytes: 32 * 1024 * 1024,
       }));
       if (!response?.ok) throw new Error(`Weibo image HTTP ${response?.status || "error"}`);
       const mimeType = responseContentType(response) || "image/jpeg";
@@ -776,14 +829,14 @@ function createPanel(container, context) {
     }
   }
 
-  async function loadDetail(postId) {
+  async function loadDetail(postId, { quiet = false } = {}) {
     const id = String(postId || "");
     const post = allPosts().find((entry) => entry.id === id);
     if (!post || state.detailLoading.has(id)) return;
     const cached = state.cache.details[id];
     if (cached?.complete && Date.now() - cached.savedAt <= state.ttlMs) return;
     state.detailLoading.add(id);
-    paint();
+    if (!quiet) paint();
     try {
       let body = post.text;
       try {
@@ -803,16 +856,40 @@ function createPanel(container, context) {
       };
       await persistCache();
     } catch (error) {
-      state.error = errorMessage(error);
+      if (!quiet) state.error = errorMessage(error);
     } finally {
       state.detailLoading.delete(id);
-      paint();
+      if (!quiet) paint();
+    }
+  }
+
+  async function prefetchAround(postId, revision) {
+    const posts = activeFeed().items;
+    const index = posts.findIndex((post) => post.id === String(postId));
+    if (index < 0) return;
+    const neighbors = [posts[index + 1], posts[index - 1], posts[index + 2]].filter(Boolean);
+    for (const post of neighbors) {
+      if (
+        state.destroyed
+        || revision !== state.prefetchRevision
+        || state.selectedId !== String(postId)
+      ) return;
+      await loadDetail(post.id, { quiet: true });
+    }
+  }
+
+  async function loadSelectedPost(postId) {
+    const revision = state.prefetchRevision;
+    void loadPostImages(postId);
+    await loadDetail(postId);
+    if (!state.destroyed && revision === state.prefetchRevision) {
+      void prefetchAround(postId, revision);
     }
   }
 
   async function refresh({ force = false } = {}) {
     const mode = state.mode;
-    const sequence = ++state.requestSequence;
+    const sequence = requestGate.next();
     const cached = activeFeed();
     state.error = null;
     if (!state.userId) {
@@ -827,8 +904,7 @@ function createPanel(container, context) {
       paint();
       loadThumbnails(cached.items);
       if (state.selectedId) {
-        loadDetail(state.selectedId);
-        loadPostImages(state.selectedId);
+        void loadSelectedPost(state.selectedId);
       }
       return;
     }
@@ -839,29 +915,30 @@ function createPanel(container, context) {
     paint();
     try {
       const result = await fetchMode(mode);
-      if (state.destroyed || sequence !== state.requestSequence || mode !== state.mode) return;
+      if (state.destroyed || !requestGate.isCurrent(sequence) || mode !== state.mode) return;
       const now = Date.now();
       state.cache.feeds[mode] = { items: result.items, sourceIds: result.sourceIds, savedAt: now };
       for (const post of result.items) state.cache.cachedAt[post.id] ||= now;
       state.selectedId = result.items[0]?.id || null;
+      state.prefetchRevision += 1;
+      markRead(state.selectedId);
       state.source = mode === "following"
         ? copy(`${result.sourceIds.length} users · ${result.items.length} posts`, `${result.sourceIds.length} 位用户 · ${result.items.length} 条微博`)
         : copy(`${result.items.length} user posts`, `${result.items.length} 条用户微博`);
       await persistCache();
       loadThumbnails(result.items);
       if (state.selectedId) {
-        loadDetail(state.selectedId);
-        loadPostImages(state.selectedId);
+        void loadSelectedPost(state.selectedId);
       }
     } catch (error) {
-      if (!state.destroyed && sequence === state.requestSequence) {
+      if (!state.destroyed && requestGate.isCurrent(sequence)) {
         state.error = errorMessage(error);
         state.source = cached.items.length
           ? copy("Offline · showing cache", "网络异常 · 显示缓存")
           : copy("Weibo is unavailable", "微博数据不可用");
       }
     } finally {
-      if (!state.destroyed && sequence === state.requestSequence) {
+      if (!state.destroyed && requestGate.isCurrent(sequence)) {
         state.loading = false;
         paint();
       }
@@ -898,15 +975,22 @@ function createPanel(container, context) {
     state.delayRange = parseDelayRange(requestDelayMs);
     state.ttlMs = Math.max(1, Math.min(120, Number(cacheTtlMinutes) || 10)) * 60 * 1000;
     state.retentionDays = [3, 7, 14].includes(Number(retentionDays)) ? Number(retentionDays) : 7;
+    readLedger.configure({
+      retentionDays: state.retentionDays,
+      maxEntries: MAX_READ_HISTORY,
+    });
     state.imageLayout = detailImageLayout === "grid" ? "grid" : "horizontal";
     apiSchedule = createSerialScheduler(context, state.delayRange);
-    imageSchedule = createSerialScheduler(context, [
-      Math.round(state.delayRange[0] / 3),
-      Math.max(250, Math.round(state.delayRange[1] / 2)),
-    ]);
+    imageSchedule = createConcurrentScheduler(context, [
+      Math.min(120, Math.round(state.delayRange[0] / 8)),
+      Math.min(300, Math.max(80, Math.round(state.delayRange[1] / 5))),
+    ], IMAGE_REQUEST_CONCURRENCY);
     try {
+      const cachedState = normalizeCache(await context.storage.persist.get(CACHE_KEY));
+      readLedger.replace(cachedState.readAt);
+      cachedState.readAt = readLedger.snapshot();
       state.cache = pruneCache(
-        normalizeCache(await context.storage.persist.get(CACHE_KEY)),
+        cachedState,
         state.retentionDays,
       );
     } catch {
@@ -914,6 +998,7 @@ function createPanel(container, context) {
     }
     const cached = activeFeed();
     state.selectedId = cached.items[0]?.id || null;
+    markRead(state.selectedId);
     if (cached.items.length) {
       state.source = copy("Cached Weibo feed", "微博缓存");
       paint();
@@ -928,9 +1013,11 @@ function createPanel(container, context) {
   return {
     destroy() {
       state.destroyed = true;
-      state.requestSequence += 1;
+      state.prefetchRevision += 1;
+      requestGate.invalidate();
       state.view = null;
       state.imageRequests.clear();
+      state.imagePreviews.clear();
       container.innerHTML = "";
     },
   };
