@@ -474,10 +474,11 @@ function createPanel(container, context) {
       image: preview ? { url: preview, alt: postTitle(post), fit: "cover" } : undefined,
       detail: detailFor(post),
       actions: [
-        { id: `open:${post.id}`, label: copy("Open on Weibo", "在微博中打开"), primary: true },
+        { id: `open:${post.id}`, label: copy("Open on Weibo", "在微博中打开"), kbd: "CmdOrCtrl+O" },
         {
           id: `${read ? "unread" : "read"}:${post.id}`,
           label: read ? copy("Mark Unread", "标为未读") : copy("Mark Read", "标为已读"),
+          kbd: "CmdOrCtrl+Shift+U",
         },
       ],
     };
@@ -511,9 +512,9 @@ function createPanel(container, context) {
           ? copy("Loading Weibo…", "正在加载微博…")
           : copy("No matching posts", "没有匹配的微博"),
       actions: [
-        { id: "refresh", label: copy("Refresh", "刷新"), primary: !selected, disabled: state.loading },
-        { id: "mark-visible-read", label: copy("Mark Visible Read", "当前结果标为已读") },
-        { id: "clear-cache", label: copy("Clear Content Cache", "清理内容缓存"), tone: "danger" },
+        { id: "refresh", label: copy("Refresh", "刷新"), kbd: "CmdOrCtrl+R", primary: !selected, disabled: state.loading },
+        { id: "mark-visible-read", label: copy("Mark Visible Read", "当前结果标为已读"), kbd: "CmdOrCtrl+Shift+A" },
+        { id: "clear-cache", label: copy("Clear Content Cache", "清理内容缓存"), kbd: "CmdOrCtrl+Shift+Backspace", tone: "danger" },
       ],
       island: selected && (state.detailLoading.has(selected.id) || state.imageLoading.has(selected.id))
         ? {

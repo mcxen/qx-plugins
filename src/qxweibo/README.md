@@ -22,6 +22,15 @@ QxWeibo 是使用 Qx 原生 Workbench 的只读微博模块，支持：
 
 本插件仅提供公开内容的只读浏览，不支持登录写操作、发帖、点赞、评论或关注。
 
+## 键盘
+
+- `Enter`：在帖子列表打开详情；详情中返回帖子列表。
+- `Cmd/Ctrl + O`：在浏览器中打开所选微博。
+- `Cmd/Ctrl + Shift + U`：切换所选微博的已读状态。
+- `Cmd/Ctrl + R`：刷新当前信息流；未选中帖子时刷新当前流。
+- `Cmd/Ctrl + Shift + A`：将当前列表标为已读。
+- `Cmd/Ctrl + Shift + Backspace`：清理内容缓存。
+
 ## 源码结构
 
 - `index.source.js`：命令和 Panel 组合入口。

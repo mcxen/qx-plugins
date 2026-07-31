@@ -157,40 +157,6 @@
       ]
     },
     {
-      "id": "qxgold",
-      "name": "QX Gold 金价追踪",
-      "version": "1.1.0",
-      "description": "追踪京东金融积存金实时价格与历史曲线。",
-      "download_url": "https://raw.githubusercontent.com/mcxen/qx-plugins/main/qxgold.qx-plugin",
-      "size_bytes": 13849,
-      "checksum_sha256": "e772495edcf7cf39abce981b6bd2b4de50f8c4fa9c09bd110cbea6c06a442984",
-      "required_permissions": [
-        "http",
-        "island"
-      ],
-      "updated_at": "2026-07-29",
-      "author": "Qx",
-      "min_app_version": "0.6.19",
-      "releases": [
-        {
-          "version": "1.1.0",
-          "published_at": "2026-07-28",
-          "notes_localizations": {
-            "en": "Added an opt-in Qx Island price display with localized settings and slot release when disabled.",
-            "zh-CN": "新增可选的 Qx 灵动岛金价显示、双语设置，并在关闭时释放灵动岛信息位。"
-          }
-        },
-        {
-          "version": "1.0.0",
-          "published_at": "2026-07-28",
-          "notes_localizations": {
-            "en": "Initial QX Gold release with live JD accumulated-gold pricing, cached samples, and a Workbench line chart.",
-            "zh-CN": "首个 QX Gold 版本：接入京东积存金实时价格、历史采样缓存与 Workbench 金价曲线。"
-          }
-        }
-      ]
-    },
-    {
       "id": "qxcoolapk",
       "name": "QxCoolapk 酷安",
       "version": "1.4.5",
@@ -379,6 +345,40 @@
           "notes_localizations": {
             "en": "Improved public GitHub Actions and Releases parsing with clearer Workbench status.",
             "zh-CN": "改进公开 GitHub Actions 与 Releases 解析及 Workbench 状态展示。"
+          }
+        }
+      ]
+    },
+    {
+      "id": "qxgold",
+      "name": "QxGold",
+      "version": "1.1.0",
+      "description": "Live JD gold prices and history.",
+      "download_url": "https://raw.githubusercontent.com/mcxen/qx-plugins/main/qxgold.qx-plugin",
+      "size_bytes": 13695,
+      "checksum_sha256": "b2b8cb6dd30a520b06540cf18785210082c18212049bbd533c19cd5a5aa5ce55",
+      "required_permissions": [
+        "http",
+        "island"
+      ],
+      "updated_at": "2026-07-31",
+      "author": "Qx",
+      "min_app_version": "0.6.19",
+      "releases": [
+        {
+          "version": "1.1.0",
+          "published_at": "2026-07-28",
+          "notes_localizations": {
+            "en": "Added an opt-in Qx Island price display with localized settings and slot release when disabled.",
+            "zh-CN": "新增可选的 Qx 灵动岛金价显示、双语设置，并在关闭时释放灵动岛信息位。"
+          }
+        },
+        {
+          "version": "1.0.0",
+          "published_at": "2026-07-28",
+          "notes_localizations": {
+            "en": "Initial QX Gold release with live JD accumulated-gold pricing, cached samples, and a Workbench line chart.",
+            "zh-CN": "首个 QX Gold 版本：接入京东积存金实时价格、历史采样缓存与 Workbench 金价曲线。"
           }
         }
       ]
@@ -705,11 +705,11 @@
     {
       "id": "qxweibo",
       "name": "QxWeibo 微博",
-      "version": "1.1.5",
+      "version": "1.1.6",
       "description": "Read configured Weibo users, an aggregated following feed, comments, and proxied images in Qx.",
       "download_url": "https://raw.githubusercontent.com/mcxen/qx-plugins/main/qxweibo.qx-plugin",
-      "size_bytes": 79380,
-      "checksum_sha256": "799b8271d229a95cf5cb4ab3cb2a1da63730209f69d54ee8286170c1c03b038c",
+      "size_bytes": 80365,
+      "checksum_sha256": "f246b5c8370d3a143071c34efd8a6542d749ea9653e2d1f9cb0f2f970887a732",
       "required_permissions": [
         "http",
         "open-url",
@@ -720,6 +720,14 @@
       "author": "Qx",
       "min_app_version": "0.6.50",
       "releases": [
+        {
+          "version": "1.1.6",
+          "published_at": "2026-07-31",
+          "notes_localizations": {
+            "en": "Makes Enter open a post detail and return to the list from detail, with shortcuts for every Weibo action.",
+            "zh-CN": "回车在帖子列表打开详情、详情中返回列表，并为全部微博操作补齐快捷键。"
+          }
+        },
         {
           "version": "1.1.5",
           "published_at": "2026-07-31",

@@ -1,15 +1,15 @@
 {
   "id": "qxgold",
-  "name": "QX Gold 金价追踪",
+  "name": "QxGold",
   "names": {
-    "zh-CN": "QX Gold 金价追踪",
-    "en": "QX Gold Gold Price Tracker"
+    "zh-CN": "金价追踪",
+    "en": "QxGold"
   },
   "version": "1.1.0",
-  "description": "追踪京东金融积存金实时价格与历史曲线。",
+  "description": "Live JD gold prices and history.",
   "descriptions": {
-    "zh-CN": "追踪京东金融积存金实时价格与历史曲线。",
-    "en": "Track live JD accumulated-gold prices and a cached history chart."
+    "zh-CN": "京东积存金价格与走势。",
+    "en": "Live JD gold prices and history."
   },
   "author": "Qx",
   "keywords": ["黄金", "金价", "gold", "京东", "投资"],
@@ -64,13 +64,13 @@
   "commands": [
     {
       "name": "open-qxgold",
-      "title": "打开 QX Gold 金价追踪",
+      "title": "Open QxGold",
       "description": "查看京东金融积存金实时价格和走势",
       "keywords": ["黄金", "金价", "gold"]
     }
   ],
   "panel": {
-    "title": "QX Gold 金价追踪",
+    "title": "QxGold",
     "keywords": ["黄金", "金价", "gold", "京东"]
   },
   "min_app_version": "0.6.19",

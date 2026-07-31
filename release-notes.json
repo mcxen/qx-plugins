@@ -479,6 +479,14 @@
     ],
     "qxweibo": [
       {
+        "version": "1.1.6",
+        "published_at": "2026-07-31",
+        "notes_localizations": {
+          "en": "Makes Enter open a post detail and return to the list from detail, with shortcuts for every Weibo action.",
+          "zh-CN": "回车在帖子列表打开详情、详情中返回列表，并为全部微博操作补齐快捷键。"
+        }
+      },
+      {
         "version": "1.1.5",
         "published_at": "2026-07-31",
         "notes_localizations": {
