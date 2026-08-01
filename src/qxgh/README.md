@@ -1,4 +1,4 @@
-# QxGH
+# QxGH（中文名：Github助手）
 
 Watch **GitHub Actions** and **Releases** for public repos you pin in preferences.
 
@@ -43,6 +43,13 @@ When an active run is using QxIsland, open the QxGH Actions menu and choose
 **Hide Active Run from Island**. QxGH dismisses its Island session immediately
 and keeps it hidden across panel polling/refreshes for the current panel session.
 Use **Show Active Run on Island** to restore it.
+When no run is active, this toggle is omitted instead of presenting an action
+that cannot change anything.
+
+Every QxGH business action has a single-letter Actions key: open `Cmd/Ctrl+K`,
+then press `O` to open the selected GitHub item, `R` to refresh, `P` to open the
+repository page, or `I` to show/hide the active run on Island. Enter remains the
+host-owned list/detail navigation action.
 
 ## Tray deployment status
 

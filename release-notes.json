@@ -69,6 +69,30 @@
     ],
     "qxgh": [
       {
+        "version": "1.5.4",
+        "published_at": "2026-08-01",
+        "notes_localizations": {
+          "en": "Added complete English and Simplified Chinese plugin descriptions for the host-rendered Context About section.",
+          "zh-CN": "为宿主固定渲染的 Context“关于”区补齐英文与简体中文插件描述。"
+        }
+      },
+      {
+        "version": "1.5.3",
+        "published_at": "2026-08-01",
+        "notes_localizations": {
+          "en": "Added the localized Simplified Chinese plugin name Github助手 across Qx plugin surfaces.",
+          "zh-CN": "将插件简体中文名称统一为“Github助手”，并同步到 Qx 的插件入口与面板。"
+        }
+      },
+      {
+        "version": "1.5.2",
+        "published_at": "2026-08-01",
+        "notes_localizations": {
+          "en": "Made every Workbench action executable and keyboard-addressable, removed duplicate Enter semantics, and hid the Island toggle when no active run exists.",
+          "zh-CN": "让每个 Workbench 操作都可真实执行并支持菜单字母键，移除重复的 Enter 语义，并在没有活动运行时隐藏灵动岛开关。"
+        }
+      },
+      {
         "version": "1.5.1",
         "published_at": "2026-07-26",
         "notes_localizations": {

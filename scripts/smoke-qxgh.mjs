@@ -138,6 +138,10 @@ for (let attempt = 0; attempt < 100 && !(snapshot.items[0]?.progress >= 39); att
 }
 assert.ok(snapshot.items[0].progress >= 39 && snapshot.items[0].progress <= 42);
 assert.match(snapshot.items[0].detail.fields[4].value, /2 recent workflow runs/);
+const visibleActions = [...snapshot.items[0].actions, ...snapshot.actions];
+assert.ok(visibleActions.every((action) => /^[a-z]$/i.test(action.menuKey)), "every QxGH business action needs a menuKey");
+assert.equal(new Set(visibleActions.map((action) => action.menuKey.toLowerCase())).size, visibleActions.length, "QxGH menuKeys must be unique at the current level");
+assert.equal(snapshot.items[0].actions[0].primary, undefined, "host detail navigation must own Enter");
 assert.ok(trayItems.some((item) => item.id === "deployment-progress" && /Deployment \d+%/.test(item.title)));
 assert.ok(trayItems.some((item) => item.id === "deployment-progress" && item.presentation === "status"));
 handlers.onAction("open-item", snapshot.items[1]);

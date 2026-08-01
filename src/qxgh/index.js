@@ -585,7 +585,8 @@ async function publishTray(context, bundle) {
     }
     const runs = estimateRuns(bundle?.runs || []);
     const run = pickHottestRun(runs);
-    const group = run ? `QxGH · ${run.repo}` : `QxGH · ${text("Actions", "操作")}`;
+    const productName = text("QxGH", "Github助手");
+    const group = run ? `${productName} · ${run.repo}` : `${productName} · ${text("Actions", "操作")}`;
     const status = { group, presentation: "status" };
     const items = run
       ? [
@@ -660,10 +661,13 @@ function islandForRun(run, enabled) {
 }
 
 function islandToggleAction(run, enabled) {
+  if (!run) return null;
   const visible = Boolean(enabled && run);
   return {
     id: "toggle-island",
     label: visible ? text("Hide Active Run from Island", "从灵动岛隐藏当前运行") : text("Show Active Run on Island", "在灵动岛显示当前运行"),
+    menuKey: "i",
+    kbd: "CmdOrCtrl+Shift+I",
   };
 }
 
@@ -734,7 +738,12 @@ function runToItem(run) {
       { label: text("Source", "来源"), value: text("public HTML page", "公开 HTML 页面") },
     ],
   };
-  item.actions = [{ id: "open-item", label: text("Open Run", "打开运行"), primary: true, kbd: "Enter" }];
+  item.actions = [{
+    id: "open-item",
+    label: text("Open Run on GitHub", "在 GitHub 打开运行"),
+    menuKey: "o",
+    kbd: "CmdOrCtrl+O",
+  }];
   return item;
 }
 
@@ -761,7 +770,12 @@ function releaseToItem(rel) {
       { label: text("Source", "来源"), value: text("public HTML page", "公开 HTML 页面") },
     ],
   };
-  item.actions = [{ id: "open-item", label: text("Open Release", "打开发布"), primary: true, kbd: "Enter" }];
+  item.actions = [{
+    id: "open-item",
+    label: text("Open Release on GitHub", "在 GitHub 打开发布"),
+    menuKey: "o",
+    kbd: "CmdOrCtrl+O",
+  }];
   return item;
 }
 
@@ -816,7 +830,7 @@ function renderPanel(container, context) {
 
     context.ui.mountWorkbench(
       {
-        title: "QxGH",
+        title: text("QxGH", "Github助手"),
         meta,
         loading: loading && !bundle,
         error: bundle?.error || null,
@@ -828,10 +842,26 @@ function renderPanel(container, context) {
           { id: "both", label: text("Both", "全部"), active: tab === "both" },
         ],
         actions: [
-          { id: "refresh", label: loading ? text("Refreshing…", "刷新中…") : text("Refresh", "刷新"), primary: !selectedItem, disabled: loading },
-          { id: "open-web", label: text("Open Repository Page", "打开仓库页面") },
+          {
+            id: "refresh",
+            label: loading ? text("Refreshing…", "刷新中…") : text("Refresh", "刷新"),
+            primary: !selectedItem,
+            disabled: loading,
+            menuKey: "r",
+            kbd: "CmdOrCtrl+R",
+          },
+          {
+            id: "open-web",
+            label: tab === "actions"
+              ? text("Open Actions Page", "打开 Actions 页面")
+              : tab === "releases"
+                ? text("Open Releases Page", "打开 Releases 页面")
+                : text("Open Repository Page", "打开仓库页面"),
+            menuKey: "p",
+            kbd: "CmdOrCtrl+Shift+O",
+          },
           islandToggleAction(hottestRun, islandEnabled),
-        ],
+        ].filter(Boolean),
         items,
         selectedId,
         detail: selectedItem?.detail,
@@ -881,7 +911,7 @@ function renderPanel(container, context) {
             void (async () => {
               await publishIsland(context, hot, nextIslandEnabled);
               if (!nextIslandEnabled) {
-                context.showToast(text("QxGH removed from Island", "QxGH 已从灵动岛移除"));
+                context.showToast(text("QxGH removed from Island", "Github助手已从灵动岛移除"));
               } else {
                 context.showToast(hot ? `${text("Watching", "正在关注")} ${hot.repo}` : text("No in-progress runs", "没有进行中的运行"));
               }
@@ -1022,7 +1052,7 @@ export default {
       title: "QxGH",
       async run(context) {
         setLocale(context);
-        context.showToast(text("Open QxGH from Extensions, or search “QxGH”", "请从扩展打开 QxGH，或搜索“QxGH”"));
+        context.showToast(text("Open QxGH from Extensions, or search “QxGH”", "请从扩展打开 Github助手，或搜索“Github助手”"));
       },
     },
     {
