@@ -5,11 +5,11 @@
     "zh-CN": "金价追踪",
     "en": "QxGold"
   },
-  "version": "1.1.0",
-  "description": "Live JD gold prices and history.",
+  "version": "1.2.0",
+  "description": "Live JD accumulated-gold quotes with locally sampled history.",
   "descriptions": {
-    "zh-CN": "京东积存金价格与走势。",
-    "en": "Live JD gold prices and history."
+    "zh-CN": "京东积存金实时价格与本地真实采样曲线。",
+    "en": "Live JD accumulated-gold quotes with locally sampled history."
   },
   "author": "Qx",
   "keywords": ["黄金", "金价", "gold", "京东", "投资"],

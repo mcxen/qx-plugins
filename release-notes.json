@@ -127,6 +127,14 @@
     ],
     "qxgold": [
       {
+        "version": "1.2.0",
+        "published_at": "2026-08-01",
+        "notes_localizations": {
+          "en": "Replaced the embedded SVG with a host-rendered, theme-aware line chart and clarified that history contains only real locally sampled quotes.",
+          "zh-CN": "将内嵌 SVG 曲线改为宿主主题化结构化曲线，并明确历史数据仅包含本地采集的真实报价样本。"
+        }
+      },
+      {
         "version": "1.1.0",
         "published_at": "2026-07-28",
         "notes_localizations": {

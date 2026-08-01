@@ -376,19 +376,27 @@
     {
       "id": "qxgold",
       "name": "QxGold",
-      "version": "1.1.0",
-      "description": "Live JD gold prices and history.",
+      "version": "1.2.0",
+      "description": "Live JD accumulated-gold quotes with locally sampled history.",
       "download_url": "https://raw.githubusercontent.com/mcxen/qx-plugins/main/qxgold.qx-plugin",
-      "size_bytes": 13695,
-      "checksum_sha256": "b2b8cb6dd30a520b06540cf18785210082c18212049bbd533c19cd5a5aa5ce55",
+      "size_bytes": 15775,
+      "checksum_sha256": "caf9fc64c3ec7f6928c2b916ea4560becbcb3deee3c92ae15369ff72116c76bc",
       "required_permissions": [
         "http",
         "island"
       ],
-      "updated_at": "2026-07-31",
+      "updated_at": "2026-08-01",
       "author": "Qx",
       "min_app_version": "0.6.19",
       "releases": [
+        {
+          "version": "1.2.0",
+          "published_at": "2026-08-01",
+          "notes_localizations": {
+            "en": "Replaced the embedded SVG with a host-rendered, theme-aware line chart and clarified that history contains only real locally sampled quotes.",
+            "zh-CN": "将内嵌 SVG 曲线改为宿主主题化结构化曲线，并明确历史数据仅包含本地采集的真实报价样本。"
+          }
+        },
         {
           "version": "1.1.0",
           "published_at": "2026-07-28",

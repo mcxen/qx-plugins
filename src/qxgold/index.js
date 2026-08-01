@@ -18,29 +18,40 @@ function formatTime(value) {
   }).format(date);
 }
 function readHistory(raw) {
-  return Array.isArray(raw) ? raw.filter((item) => Number.isFinite(Number(item?.price))) : [];
+  if (!Array.isArray(raw)) return [];
+  return raw
+    .filter((item) => Number.isFinite(Number(item?.price)) && Number.isFinite(Number(item?.time)))
+    .map((item) => ({
+      price: Number(item.price),
+      yesterdayPrice: Number(item.yesterdayPrice),
+      change: Number(item.change),
+      changeRate: String(item.changeRate || ""),
+      time: Number(item.time),
+      productSku: String(item.productSku || ""),
+    }));
 }
 function trimHistory(history, days) {
   const cutoff = Date.now() - days * 24 * 60 * 60 * 1000;
-  return history.filter((item) => Number(item.time) >= cutoff).slice(-MAX_POINTS);
+  return [...history]
+    .filter((item) => Number(item.time) >= cutoff)
+    .sort((a, b) => Number(a.time) - Number(b.time))
+    .slice(-MAX_POINTS);
 }
-function chartDataUri(points) {
-  const values = points.map((point) => Number(point.price)).filter(Number.isFinite);
-  if (values.length < 2) return "";
-  const width = 720;
-  const height = 260;
-  const pad = 28;
-  const min = Math.min(...values);
-  const max = Math.max(...values);
-  const span = Math.max(0.01, max - min);
-  const coords = values.map((value, index) => {
-    const x = pad + index * (width - pad * 2) / Math.max(1, values.length - 1);
-    const y = height - pad - (value - min) * (height - pad * 2) / span;
-    return `${x.toFixed(1)},${y.toFixed(1)}`;
-  });
-  const area = `${pad},${height - pad} ${coords.join(" ")} ${width - pad},${height - pad}`;
-  const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}" viewBox="0 0 ${width} ${height}"><rect width="100%" height="100%" fill="#172033"/><path d="M ${area}" fill="#2f81f733"/><polyline points="${coords.join(" ")}" fill="none" stroke="#68a7ff" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/><text x="${pad}" y="20" fill="#b7c7e6" font-family="sans-serif" font-size="14">CNY / gram · ${number(min)} — ${number(max)}</text></svg>`;
-  return `data:image/svg+xml;charset=utf-8,${encodeURIComponent(svg)}`;
+function mergeHistory(history, sample, days) {
+  const byTime = new Map(readHistory(history).map((item) => [Number(item.time), item]));
+  byTime.set(Number(sample.time), sample);
+  return trimHistory([...byTime.values()], days);
+}
+function historyRange(history) {
+  if (history.length < 2) return text("Waiting for more real samples", "等待更多真实采样");
+  return `${formatTime(history[0].time)} – ${formatTime(history.at(-1).time)}`;
+}
+function historyStats(history) {
+  const prices = history.map((item) => Number(item.price)).filter(Number.isFinite);
+  return {
+    low: prices.length ? Math.min(...prices) : null,
+    high: prices.length ? Math.max(...prices) : null,
+  };
 }
 
 async function preference(context, id, fallback) {
@@ -89,7 +100,19 @@ export default {
         if (state.dead) return;
         const current = state.current || state.history.at(-1);
         const price = current?.price;
-        const chart = chartDataUri(state.history);
+        const stats = historyStats(state.history);
+        const chart = state.history.length >= 2 ? {
+          type: "line",
+          title: text("Real sampled history", "真实采样历史"),
+          subtitle: historyRange(state.history),
+          unit: text("CNY / gram", "元/克"),
+          valueLabel: text("Latest", "最新"),
+          value: `${number(price)} 元/克`,
+          points: state.history.map((point) => ({
+            label: formatTime(point.time),
+            value: point.price,
+          })),
+        } : undefined;
         const item = current ? {
           id: "gold",
           title: text("JD Gold · Accumulated Gold", "京东金融 · 积存金"),
@@ -100,14 +123,27 @@ export default {
             title: text("Gold Price Trend", "金价走势"),
             subtitle: `${number(price)} 元/克 · ${text("Updated", "更新于")} ${formatTime(current.time)}`,
             status: state.loading ? { state: "loading", label: text("Refreshing gold price…", "正在刷新金价…") } : undefined,
-            images: chart ? [{ url: chart, alt: text("Gold price line chart", "金价曲线") }] : [],
+            chart,
             fields: [
               { label: text("Current", "当前价"), value: `${number(price)} 元/克` },
               { label: text("Change", "涨跌额"), value: `${number(current.change)} 元` },
               { label: text("Change rate", "涨跌幅"), value: current.changeRate || "—" },
               { label: text("Yesterday", "昨收"), value: `${number(current.yesterdayPrice)} 元/克` },
+              { label: text("Sample high", "采样最高"), value: stats.high == null ? "—" : `${number(stats.high)} 元/克` },
+              { label: text("Sample low", "采样最低"), value: stats.low == null ? "—" : `${number(stats.low)} 元/克` },
               { label: text("Samples", "采样数"), value: String(state.history.length) },
             ],
+            sections: [{
+              title: text("Data provenance", "数据来源"),
+              body: text(
+                "The public JD endpoint provides the latest quote only. The chart is built from real samples collected by this plugin and retained locally.",
+                "京东公开接口只提供最新报价；曲线由插件实际采集的真实样本组成并保存在本地。",
+              ),
+              fields: [
+                { label: text("Endpoint", "接口"), value: "api.jdjygold.com" },
+                { label: text("History window", "历史范围"), value: historyRange(state.history) },
+              ],
+            }],
           },
         } : { id: "gold", title: text("JD Gold", "京东积存金"), subtitle: text("No data", "暂无数据") };
         const showIsland = state.islandEnabled && current;
@@ -115,7 +151,7 @@ export default {
           revision: Date.now(), title: "QX Gold 金价追踪", query: "", layout: { kind: "list" },
           loading: state.loading && !state.current, error: state.error, meta: current ? `${number(price)} 元/克` : text("Waiting for data", "等待数据"),
           selectedId: "gold", items: [item], emptyText: text("No gold price data", "暂无金价数据"),
-          actions: [{ id: "refresh", label: text("Refresh", "刷新"), primary: true, disabled: state.loading }],
+          actions: [{ id: "refresh", label: text("Refresh", "刷新"), menuKey: "R", kbd: "CmdOrCtrl+R", primary: true, disabled: state.loading }],
           // Workbench projects this through the community plugin Island port.
           // When disabled, publish null so the plugin releases its slot.
           island: showIsland ? {
@@ -134,7 +170,7 @@ export default {
         try {
           const sample = await fetchPrice(context);
           state.current = sample;
-          state.history = trimHistory([...state.history, sample], Number(await preference(context, "historyDays", "7")) || 7);
+          state.history = mergeHistory(state.history, sample, Number(await preference(context, "historyDays", "7")) || 7);
           await saveCache(context, state.history);
         } catch (error) { state.error = String(error?.message || error); }
         finally { state.loading = false; paint(); }
