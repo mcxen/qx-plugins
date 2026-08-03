@@ -922,15 +922,16 @@
     {
       "id": "v2ex",
       "name": "V2EX",
-      "version": "2.1.0",
-      "description": "Browse V2EX latest/hot topics with disk cache (stale-while-revalidate). Notifications & nodes need a token.",
+      "version": "3.0.0",
+      "description": "Browse V2EX latest, hot, and node topics with Workbench list/detail, replies, and cached host APIs.",
       "download_url": "https://raw.githubusercontent.com/mcxen/qx-plugins/main/v2ex.qx-plugin",
-      "size_bytes": 37435,
-      "checksum_sha256": "8b82c859ad10e19cfd163932959ef52a81fe7fb68174e8108e7570de53895324",
+      "size_bytes": 39546,
+      "checksum_sha256": "2dc0cc52bff4cec79c0b10418a57637bae829a6fb34da94d48f96fa60cde5906",
       "required_permissions": [
         "http",
         "open-url",
         "notifications",
+        "clipboard",
         "invoke:v2ex_fetch_topics",
         "invoke:v2ex_search_topics",
         "invoke:v2ex_fetch_node_topics",
@@ -938,10 +939,18 @@
         "invoke:v2ex_fetch_token_info",
         "invoke:v2ex_fetch_notifications"
       ],
-      "updated_at": "2026-07-25",
+      "updated_at": "2026-08-03",
       "author": "mcx",
-      "min_app_version": "0.5.18",
+      "min_app_version": "0.6.13",
       "releases": [
+        {
+          "version": "3.0.0",
+          "published_at": "2026-08-03",
+          "notes_localizations": {
+            "en": "Rebuilt on host Workbench: Latest/Hot/Nodes/Notifications tabs, structured detail + replies, open/copy actions, and shared host cache. Built-in V2EX panel removed from Qx.",
+            "zh-CN": "全面接入宿主 Workbench：最新/热门/节点/通知标签、结构化详情与回复、打开/复制等 Action，并共用宿主缓存。Qx 已移除内置 V2EX 面板。"
+          }
+        },
         {
           "version": "2.1.0",
           "published_at": "2026-07-23",

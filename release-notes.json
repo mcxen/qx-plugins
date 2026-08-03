@@ -663,6 +663,14 @@
     ],
     "v2ex": [
       {
+        "version": "3.0.0",
+        "published_at": "2026-08-03",
+        "notes_localizations": {
+          "en": "Rebuilt on host Workbench: Latest/Hot/Nodes/Notifications tabs, structured detail + replies, open/copy actions, and shared host cache. Built-in V2EX panel removed from Qx.",
+          "zh-CN": "全面接入宿主 Workbench：最新/热门/节点/通知标签、结构化详情与回复、打开/复制等 Action，并共用宿主缓存。Qx 已移除内置 V2EX 面板。"
+        }
+      },
+      {
         "version": "2.1.0",
         "published_at": "2026-07-23",
         "notes_localizations": {

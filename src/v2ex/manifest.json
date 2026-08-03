@@ -1,8 +1,16 @@
 {
   "id": "v2ex",
   "name": "V2EX",
-  "version": "2.1.0",
-  "description": "Browse V2EX latest/hot topics with disk cache (stale-while-revalidate). Notifications & nodes need a token.",
+  "names": {
+    "en": "V2EX",
+    "zh-CN": "V2EX"
+  },
+  "version": "3.0.0",
+  "description": "Browse V2EX latest, hot, and node topics with Workbench list/detail, replies, and cached host APIs.",
+  "descriptions": {
+    "en": "Browse V2EX latest, hot, and node topics with Workbench list/detail, replies, and cached host APIs.",
+    "zh-CN": "通过 Workbench 列表/详情浏览 V2EX 最新、热门与节点主题，支持回复与宿主缓存接口。"
+  },
   "author": "mcx",
   "icon": "",
   "keywords": [
@@ -10,15 +18,18 @@
     "forum",
     "topics",
     "tech",
+    "node",
     "社区",
     "帖子",
     "热门",
-    "最新"
+    "最新",
+    "节点"
   ],
   "permissions": [
     "http",
     "open-url",
     "notifications",
+    "clipboard",
     "invoke:v2ex_fetch_topics",
     "invoke:v2ex_search_topics",
     "invoke:v2ex_fetch_node_topics",
@@ -48,7 +59,7 @@
       "type": "string",
       "required": false,
       "default": "3",
-      "description": "How long latest/hot lists are considered fresh. Stale cache is still shown while refreshing."
+      "description": "How long latest/hot/node lists are considered fresh. Stale cache is still shown while refreshing."
     }
   ],
   "entry": "index.js",
@@ -85,11 +96,9 @@
     }
   ],
   "panel": {
-    "title": "V2EX",
-    "icon": "",
-    "keywords": ["v2ex", "forum", "topics", "tech", "社区", "帖子"]
+    "keywords": ["v2ex", "forum", "topics", "tech", "社区", "帖子", "节点"]
   },
-  "min_app_version": "0.5.18",
+  "min_app_version": "0.6.13",
   "platforms": ["macos", "windows"],
   "screenshots": []
 }

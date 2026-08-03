@@ -1,12 +1,14 @@
 # V2EX (Qx plugin)
 
-Marketplace panel for browsing V2EX topics with **stale-while-revalidate** caching.
+Marketplace panel for browsing V2EX through the host **Workbench** protocol.
 
 ## Features
 
 - Latest / Hot topic lists (public API, no token)
-- Optional Nodes / Notifications / Token status (API v2 token)
-- In-panel topic detail + replies
+- Nodes tab (API v2 token + space-separated node preference)
+- Notifications tab (token)
+- Structured topic detail + host-rendered replies
+- Actions: open in browser, copy link/title, refresh, check token
 - **Cache**: plugin `storage.persist` + host `invoke:v2ex_*` disk/memory cache  
   Reopen paints from cache immediately; network refresh runs in the background
 
@@ -20,10 +22,16 @@ Marketplace panel for browsing V2EX topics with **stale-while-revalidate** cachi
 
 ## Permissions
 
-- `http` — public API fallback
-- `invoke:v2ex_*` — preferred path (host-side cache shared with any built-in callers)
-- `open-url`, `notifications`
+- `http` — public API fallback for latest/hot
+- `invoke:v2ex_*` — preferred path (host-side cache shared across installs)
+- `open-url`, `notifications`, `clipboard`
 
 ## Host compatibility
 
-Requires Qx with `v2ex_fetch_*` commands (cached since app builds that include the V2EX host module). Token can be passed from plugin preferences into invoke args so host settings are optional.
+Requires Qx **0.6.13+** with Workbench + `v2ex_fetch_*` commands. Token is read from
+plugin preferences and passed into invoke args so global host settings are optional.
+
+## Module mode
+
+Business-only: the plugin publishes list/detail/actions/island data. QxShell owns
+Top Bar filters, keyboard, Esc cascade, Bottom Bar, and reply chrome.
