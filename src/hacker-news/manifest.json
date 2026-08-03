@@ -1,0 +1,88 @@
+{
+  "id": "hacker-news",
+  "name": "Hacker News",
+  "names": {
+    "en": "Hacker News",
+    "zh-CN": "Hacker News"
+  },
+  "version": "1.0.0",
+  "description": "Browse the latest Hacker News stories with details and comments.",
+  "descriptions": {
+    "en": "Browse the latest Hacker News stories with details and comments.",
+    "zh-CN": "浏览 Hacker News 最新帖子、正文与评论。"
+  },
+  "author": "mcx",
+  "icon": "",
+  "keywords": [
+    "hacker news",
+    "hn",
+    "news",
+    "technology",
+    "community",
+    "社区",
+    "帖子",
+    "评论"
+  ],
+  "permissions": [
+    "http",
+    "open-url",
+    "clipboard"
+  ],
+  "preferences": [
+    {
+      "id": "storyLimit",
+      "label": "Stories to load",
+      "type": "select",
+      "required": false,
+      "default": "30",
+      "description": "Number of newest stories to load from Hacker News.",
+      "options": [
+        { "label": "20", "value": "20" },
+        { "label": "30", "value": "30" },
+        { "label": "50", "value": "50" }
+      ]
+    },
+    {
+      "id": "cacheTtlMinutes",
+      "label": "Cache freshness (minutes)",
+      "type": "select",
+      "required": false,
+      "default": "5",
+      "description": "Cached stories and comments remain visible while a stale refresh runs.",
+      "options": [
+        { "label": "5", "value": "5" },
+        { "label": "15", "value": "15" },
+        { "label": "30", "value": "30" }
+      ]
+    }
+  ],
+  "storage": {
+    "cacheTargets": [
+      {
+        "id": "hacker-news",
+        "label": "Hacker News cache",
+        "description": "Latest stories and fetched comment trees. Safe to rebuild from the public Hacker News API.",
+        "keys": [
+          "hacker-news.stories.v1",
+          "hacker-news.comments.v1"
+        ],
+        "retentionDays": 7
+      }
+    ]
+  },
+  "entry": "index.js",
+  "commands": [
+    {
+      "name": "open-hacker-news",
+      "title": "Open Hacker News",
+      "description": "Browse the latest Hacker News stories and comments",
+      "keywords": ["hacker news", "hn", "news", "technology", "社区", "帖子"]
+    }
+  ],
+  "panel": {
+    "keywords": ["hacker news", "hn", "news", "technology", "社区", "帖子", "评论"]
+  },
+  "min_app_version": "0.6.13",
+  "platforms": ["macos", "windows"],
+  "screenshots": []
+}

@@ -176,6 +176,33 @@
       ]
     },
     {
+      "id": "hacker-news",
+      "name": "Hacker News",
+      "version": "1.0.0",
+      "description": "Browse the latest Hacker News stories with details and comments.",
+      "download_url": "https://raw.githubusercontent.com/mcxen/qx-plugins/main/hacker-news.qx-plugin",
+      "size_bytes": 25956,
+      "checksum_sha256": "955c6d6665d23bdbc00b79385536872f55c9b2e98932cbccb7ddec0ab6df8dee",
+      "required_permissions": [
+        "http",
+        "open-url",
+        "clipboard"
+      ],
+      "updated_at": "2026-08-03",
+      "author": "mcx",
+      "min_app_version": "0.6.13",
+      "releases": [
+        {
+          "version": "1.0.0",
+          "published_at": "2026-08-03",
+          "notes_localizations": {
+            "en": "Initial Hacker News Workbench panel with latest stories, lazy nested comments, and stale-while-revalidate caching.",
+            "zh-CN": "首个 Hacker News Workbench 面板：支持最新帖子、按需嵌套评论与 stale-while-revalidate 缓存。"
+          }
+        }
+      ]
+    },
+    {
       "id": "pomodoro-island",
       "name": "Pomodoro Island",
       "version": "1.6.2",
