@@ -153,6 +153,14 @@
     ],
     "qxtieba": [
       {
+        "version": "1.1.10",
+        "published_at": "2026-08-06",
+        "notes_localizations": {
+          "en": "Renders Tieba image_emoticon markers in the main post, floor replies, and nested comments through the shared Workbench inline-content protocol.",
+          "zh-CN": "将贴吧正文、楼层回复和楼中楼评论中的 image_emoticon 表情统一接入 Workbench 通用行内内容协议渲染。"
+        }
+      },
+      {
         "version": "1.1.9",
         "published_at": "2026-07-31",
         "notes_localizations": {
@@ -388,6 +396,22 @@
       }
     ],
     "qxcoolapk": [
+      {
+        "version": "1.4.7",
+        "published_at": "2026-08-06",
+        "notes_localizations": {
+          "en": "Adds an explicit Refresh Anonymous Device action that persists a replacement identity and refreshes the feed without clearing content cache; repeated rotation is discouraged to avoid worsening Coolapk risk control.",
+          "zh-CN": "新增“刷新匿名设备标识”手动操作：持久化新的匿名身份并刷新信息流，不清空内容缓存；提示不要连续轮换，以免加重酷安风控。"
+        }
+      },
+      {
+        "version": "1.4.6",
+        "published_at": "2026-08-06",
+        "notes_localizations": {
+          "en": "Stops all installations from sharing one Coolapk device identity by persisting a stable anonymous per-installation device code and deriving fresh request tokens from it; explains the account-limit response without retry storms.",
+          "zh-CN": "修复所有安装共用同一个酷安设备身份的问题：为每个安装持久化稳定的匿名设备标识，并据此生成动态请求 token；遇到设备关联账号过多时给出明确提示，避免连续重试触发风控。"
+        }
+      },
       {
         "version": "1.4.5",
         "published_at": "2026-07-31",

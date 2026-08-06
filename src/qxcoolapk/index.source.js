@@ -4,7 +4,10 @@ const API_BASE = "https://api.coolapk.com";
 const APP_ID = "com.coolapk.market";
 const APP_VERSION = "16.2.0";
 const APP_CODE = "2604201";
-const DEVICE_CODE = "AZmV2N4UzN0UmZ3kDOzEzYgsjMwAjL2IjMwUjMuE0MRFEI7MkMxITM4AjMyAyOp1GZlJFI7kWbvFWaYByOgsDI7AyOzYGO3okVq1GWOlEez8WYLlkWKVWbllzX3pUTjFTcjx2aPVFR";
+const LEGACY_DEVICE_CODE = "AZmV2N4UzN0UmZ3kDOzEzYgsjMwAjL2IjMwUjMuE0MRFEI7MkMxITM4AjMyAyOp1GZlJFI7kWbvFWaYByOgsDI7AyOzYGO3okVq1GWOlEez8WYLlkWKVWbllzX3pUTjFTcjx2aPVFR";
+const DEVICE_CODE_MIN_LENGTH = 64;
+const DEVICE_CODE_MAX_LENGTH = 192;
+const DEVICE_CODE_PATTERN = new RegExp(`^[A-Za-z0-9_-]{${DEVICE_CODE_MIN_LENGTH},${DEVICE_CODE_MAX_LENGTH}}$`);
 const V2_SALT_KEY = "dcf01e569c1e3db93a3d0fcf191a622c";
 const BCRYPT_BASE64 = "./ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
 const CACHE_KEY = "cache.community.v1";
@@ -116,6 +119,45 @@ function base64Ascii(value) {
   return btoa(String(value)).replace(/=+$/g, "");
 }
 
+function base64UrlBytes(bytes) {
+  let binary = "";
+  for (let offset = 0; offset < bytes.length; offset += 0x8000) {
+    binary += String.fromCharCode(...bytes.subarray(offset, offset + 0x8000));
+  }
+  return btoa(binary).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/g, "");
+}
+
+function createAnonymousDeviceCode() {
+  const bytes = new Uint8Array(96);
+  try {
+    if (typeof globalThis.crypto?.getRandomValues !== "function") throw new Error("Web Crypto is unavailable");
+    globalThis.crypto.getRandomValues(bytes);
+  } catch {
+    // Qx runs in a browser with Web Crypto. This fallback only keeps older hosts
+    // usable; it is still installation-scoped and never reused as an account.
+    const seed = `${Date.now()}-${Math.random()}-${Math.random()}`;
+    for (let index = 0; index < bytes.length; index += 1) {
+      bytes[index] = (seed.charCodeAt(index % seed.length) + index * 31) & 0xff;
+    }
+  }
+  const encoded = base64UrlBytes(bytes);
+  return encoded.length >= DEVICE_CODE_MIN_LENGTH ? encoded : LEGACY_DEVICE_CODE;
+}
+
+function createReplacementDeviceCode(previous) {
+  let next = createAnonymousDeviceCode();
+  for (let attempt = 0; next === previous && attempt < 3; attempt += 1) {
+    next = createAnonymousDeviceCode();
+  }
+  return next;
+}
+
+function normalizeAnonymousDeviceCode(value) {
+  const candidate = String(value ?? "").trim();
+  if (candidate === LEGACY_DEVICE_CODE) return "";
+  return DEVICE_CODE_PATTERN.test(candidate) ? candidate : "";
+}
+
 function bcryptBase64Decode(value, byteCount = 16) {
   const output = [];
   let index = 0;
@@ -147,22 +189,35 @@ function bcryptBase64Encode(bytes) {
   return output.slice(0, 22);
 }
 
-let tokenCache = { timestamp: 0, token: "" };
+let tokenCache = { deviceCode: "", timestamp: 0, token: "" };
+let activeDeviceCode = createAnonymousDeviceCode();
 
-async function generateToken(timestamp = Math.floor(Date.now() / 1000)) {
-  if (tokenCache.timestamp === timestamp && tokenCache.token) return tokenCache.token;
+async function generateToken(
+  timestamp = Math.floor(Date.now() / 1000),
+  deviceCode = activeDeviceCode,
+) {
+  const resolvedDeviceCode = normalizeAnonymousDeviceCode(deviceCode) || LEGACY_DEVICE_CODE;
+  if (
+    tokenCache.deviceCode === resolvedDeviceCode
+    && tokenCache.timestamp === timestamp
+    && tokenCache.token
+  ) return tokenCache.token;
   const time = String(timestamp);
-  const tokenSource = `token://${APP_ID}/${V2_SALT_KEY}?${md5Ascii(time)}$${md5Ascii(DEVICE_CODE)}&${APP_ID}`;
+  const tokenSource = `token://${APP_ID}/${V2_SALT_KEY}?${md5Ascii(time)}$${md5Ascii(resolvedDeviceCode)}&${APP_ID}`;
   const password = md5Ascii(base64Ascii(tokenSource));
   const saltCharacters = `${base64Ascii(time)}/${md5Ascii(tokenSource)}`.slice(0, 24) + "u";
   const salt = `$2b$10$${bcryptBase64Encode(bcryptBase64Decode(saltCharacters))}`;
   const hash = (await bcrypt.hash(password, salt)).replace("$2b$", "$2y$");
   const token = `v2${base64Ascii(hash)}`;
-  tokenCache = { timestamp, token };
+  tokenCache = { deviceCode: resolvedDeviceCode, timestamp, token };
   return token;
 }
 
-async function buildRequestHeaders(timestamp = Math.floor(Date.now() / 1000)) {
+async function buildRequestHeaders(
+  timestamp = Math.floor(Date.now() / 1000),
+  deviceCode = activeDeviceCode,
+) {
+  const resolvedDeviceCode = normalizeAnonymousDeviceCode(deviceCode) || LEGACY_DEVICE_CODE;
   return {
     Accept: "application/json",
     "X-Sdk-Int": "35",
@@ -170,14 +225,14 @@ async function buildRequestHeaders(timestamp = Math.floor(Date.now() / 1000)) {
     "X-App-Mode": "universal",
     "X-App-Channel": "coolapk",
     "X-App-Id": APP_ID,
-    "X-App-Device": DEVICE_CODE,
+    "X-App-Device": resolvedDeviceCode,
     "X-App-Version": APP_VERSION,
     "X-App-Code": APP_CODE,
     "X-Api-Version": "16",
     "X-App-Supported": APP_CODE,
     "X-Dark-Mode": "0",
     "X-Requested-With": "XMLHttpRequest",
-    "X-App-Token": await generateToken(timestamp),
+    "X-App-Token": await generateToken(timestamp, resolvedDeviceCode),
     "User-Agent": `Dalvik/2.1.0 (Linux; Android 16) +CoolMarket/${APP_VERSION}-${APP_CODE}-universal QxCoolapk/1.0`,
   };
 }
@@ -206,16 +261,41 @@ function repliesUrl(id) {
   return url.toString();
 }
 
-async function fetchData(context, url) {
+function coolapkErrorMessage(status, message = "") {
+  const detail = String(message || "").trim();
+  if (/当前设备最近登录账号过多|最近登录账号过多|登录账号过多/.test(detail)) {
+    return copy(
+      "Coolapk rejected this anonymous device identity because too many accounts were recently associated with it. Qx uses one stable anonymous identity per installation; wait for Coolapk's risk-control window to clear and avoid repeated refreshes.",
+      "酷安拒绝了当前匿名设备身份：该设备最近关联的账号过多。Qx 已为本安装使用独立且稳定的匿名设备标识，请等待酷安风控窗口解除后再试，避免连续刷新。",
+    );
+  }
+  return detail || copy(`Coolapk HTTP ${status || "error"}`, `酷安接口 HTTP ${status || "error"}`);
+}
+
+async function responseMessage(response) {
+  try {
+    const payload = await response.json();
+    return payload?.message || payload?.msg || payload?.error_msg || payload?.error || "";
+  } catch {
+    return "";
+  }
+}
+
+async function fetchData(context, url, deviceCode) {
   const response = await context.http.fetch(url, {
     method: "GET",
-    headers: await buildRequestHeaders(),
+    headers: await buildRequestHeaders(undefined, deviceCode),
     timeoutMs: 30_000,
   });
-  if (!response?.ok) throw new Error(`HTTP ${response?.status || "error"}`);
+  if (!response?.ok) {
+    throw new Error(coolapkErrorMessage(response?.status, await responseMessage(response)));
+  }
   const payload = await response.json();
   if (!Object.prototype.hasOwnProperty.call(payload || {}, "data")) {
-    throw new Error(payload?.message || copy("The Coolapk API rejected the request", "酷安接口拒绝了请求"));
+    throw new Error(coolapkErrorMessage(
+      response?.status,
+      payload?.message || payload?.msg || payload?.error_msg || payload?.error,
+    ));
   }
   return payload.data;
 }
@@ -563,7 +643,14 @@ async function preference(context, id, fallback = "") {
 }
 
 function emptyCache() {
-  return { savedAt: 0, feeds: {}, details: {}, readAt: {}, cachedAt: {} };
+  return {
+    savedAt: 0,
+    anonymousDeviceCode: "",
+    feeds: {},
+    details: {},
+    readAt: {},
+    cachedAt: {},
+  };
 }
 
 function normalizeCache(raw) {
@@ -580,6 +667,7 @@ function normalizeCache(raw) {
   }
   return {
     savedAt: Number(raw.savedAt) || 0,
+    anonymousDeviceCode: normalizeAnonymousDeviceCode(raw.anonymousDeviceCode),
     feeds,
     details: raw.details && typeof raw.details === "object" ? raw.details : {},
     readAt: raw.readAt && typeof raw.readAt === "object" ? raw.readAt : {},
@@ -609,6 +697,7 @@ function pruneCache(cache, retentionDays) {
   );
   return {
     savedAt: Number(cache.savedAt) || Date.now(),
+    anonymousDeviceCode: normalizeAnonymousDeviceCode(cache.anonymousDeviceCode),
     feeds,
     details: Object.fromEntries(Object.entries(cache.details || {}).filter(keep)),
     readAt,
@@ -693,6 +782,7 @@ function createPanel(container, context) {
     view: null,
     dead: false,
     prefetchRevision: 0,
+    deviceCode: activeDeviceCode,
   };
   const readLedger = context.state.createReadLedger({
     retentionDays: state.retentionDays,
@@ -879,6 +969,11 @@ function createPanel(container, context) {
         { id: "mark-visible-unread", label: copy("Mark Visible Unread", "当前结果标为未读") },
         { id: "clear-read", label: copy("Clear Read Posts", "清理已读"), tone: "danger" },
         { id: "clean-cache", label: copy("Clean Cache Garbage", "清理缓存垃圾") },
+        {
+          id: "refresh-device-identity",
+          label: copy("Refresh Anonymous Device", "刷新匿名设备标识"),
+          disabled: state.loading || state.loadingMore,
+        },
       ],
       island: selectedFeed()
         && (state.detailLoading.has(selectedFeed().id) || state.imageLoading.has(selectedFeed().id))
@@ -970,6 +1065,8 @@ function createPanel(container, context) {
             state.imageFailures.clear();
             paint();
             void persist();
+          } else if (id === "refresh-device-identity") {
+            void refreshAnonymousDevice();
           }
           else if (id.startsWith("open:")) {
             const key = id.slice("open:".length);
@@ -1003,6 +1100,25 @@ function createPanel(container, context) {
     return cacheWriter.write(state.cache);
   }
 
+  async function refreshAnonymousDevice() {
+    const previous = state.deviceCode;
+    state.deviceCode = createReplacementDeviceCode(previous);
+    state.cache.anonymousDeviceCode = state.deviceCode;
+    state.error = null;
+    state.source = copy(
+      "Anonymous device identity refreshed",
+      "匿名设备标识已刷新",
+    );
+    state.prefetchRevision += 1;
+    paint();
+    await persist();
+    await context.showToast(copy(
+      "Anonymous device identity refreshed. Avoid repeating this action; Coolapk may keep risk-control limits for a while.",
+      "匿名设备标识已刷新。请勿连续重复操作，酷安风控限制可能仍会持续一段时间。",
+    ));
+    await loadMode({ force: true });
+  }
+
   async function proxyImage(
     url,
     purpose,
@@ -1017,7 +1133,7 @@ function createPanel(container, context) {
       try {
         const response = await context.http.fetch(url, {
           method: "GET",
-          headers: await buildRequestHeaders(),
+          headers: await buildRequestHeaders(undefined, state.deviceCode),
           timeoutMs: 120_000,
           maxBytes: 8 * 1024 * 1024,
         });
@@ -1112,7 +1228,7 @@ function createPanel(container, context) {
     try {
       const response = await context.http.fetch(imageUrl, {
         method: "GET",
-        headers: await buildRequestHeaders(),
+        headers: await buildRequestHeaders(undefined, state.deviceCode),
         timeoutMs: 120_000,
         maxBytes: 32 * 1024 * 1024,
       });
@@ -1145,8 +1261,8 @@ function createPanel(container, context) {
     if (!quiet) paint();
     try {
       const [detailRaw, repliesRaw] = await Promise.all([
-        fetchData(context, detailUrl(key)),
-        fetchData(context, repliesUrl(key)).catch(() => []),
+        fetchData(context, detailUrl(key), state.deviceCode),
+        fetchData(context, repliesUrl(key), state.deviceCode).catch(() => []),
       ]);
       if (state.dead) return;
       const detail = normalizeFeed(Array.isArray(detailRaw) ? detailRaw[0] : detailRaw) || feed;
@@ -1222,7 +1338,7 @@ function createPanel(container, context) {
         paint();
         if (Date.now() - cached.savedAt <= ttlMs) return;
       }
-      const items = normalizeFeedList(await fetchData(context, feedUrl(mode, 1)));
+      const items = normalizeFeedList(await fetchData(context, feedUrl(mode, 1), state.deviceCode));
       if (state.dead || !requestGate.isCurrent(sequence) || mode !== state.mode) return;
       const now = Date.now();
       state.cache.feeds[mode] = { items, page: 1, savedAt: now };
@@ -1258,7 +1374,7 @@ function createPanel(container, context) {
     state.error = null;
     paint();
     try {
-      const incoming = normalizeFeedList(await fetchData(context, feedUrl(mode, nextPage)));
+      const incoming = normalizeFeedList(await fetchData(context, feedUrl(mode, nextPage), state.deviceCode));
       if (state.dead || mode !== state.mode) return;
       const byId = new Map(current.items.map((feed) => [feed.id, feed]));
       const now = Date.now();
@@ -1314,6 +1430,9 @@ function createPanel(container, context) {
       state.cachePriority,
       state.hotCacheLimit,
     );
+    state.deviceCode = normalizeAnonymousDeviceCode(state.cache.anonymousDeviceCode)
+      || createAnonymousDeviceCode();
+    state.cache.anonymousDeviceCode = state.deviceCode;
     state.selectedId = activeFeed().items[0]?.id || null;
     markRead(state.selectedId);
     if (activeFeed().items.length) {

@@ -18,6 +18,7 @@ const persisted = new Map();
 let snapshot = null;
 let handlers = null;
 let openedUrl = "";
+const observedDevices = new Set();
 const feeds = Array.from({ length: 6 }, (_, index) => ({
   id: String(9000 + index),
   entityType: "feed",
@@ -60,6 +61,7 @@ function imageResponse() {
 async function mockFetch(url, options = {}) {
   assert.match(String(options.headers?.["X-App-Token"] || ""), /^v2/);
   assert.equal(options.headers?.["X-App-Id"], "com.coolapk.market");
+  observedDevices.add(options.headers?.["X-App-Device"]);
   if (String(url).includes("image.coolapk.com")) return imageResponse();
   if (String(url).includes("/feed/detail")) {
     const id = new URL(url).searchParams.get("id");
@@ -160,12 +162,26 @@ assert.deepEqual(
 );
 const headers = await buildRequestHeaders(1_784_804_927);
 assert.match(headers["X-App-Token"], /^v2/);
+assert.match(headers["X-App-Device"], /^[A-Za-z0-9_-]{64,192}$/);
 
 const container = { innerHTML: "" };
 plugin.panel.render(container, context);
 await waitFor(() => snapshot && !snapshot.loading && snapshot.items?.length, "feed");
 assert.equal(snapshot.items.length, 5);
+let installationDeviceCode = persisted.get("cache.community.v1")?.anonymousDeviceCode;
+assert.match(installationDeviceCode || "", /^[A-Za-z0-9_-]{64,192}$/);
 assert.ok(snapshot.items.every((item) => item.id && item.detail));
+handlers.onAction("refresh-device-identity");
+await waitFor(
+  () => persisted.get("cache.community.v1")?.anonymousDeviceCode
+    && persisted.get("cache.community.v1").anonymousDeviceCode !== installationDeviceCode,
+  "manual anonymous device refresh",
+);
+const refreshedDeviceCode = persisted.get("cache.community.v1").anonymousDeviceCode;
+assert.match(refreshedDeviceCode, /^[A-Za-z0-9_-]{64,192}$/);
+assert.notEqual(refreshedDeviceCode, installationDeviceCode);
+await waitFor(() => observedDevices.has(refreshedDeviceCode), "refreshed device request");
+installationDeviceCode = refreshedDeviceCode;
 await waitFor(
   () => snapshot.items.some((item) => item.image?.url?.startsWith("data:image/")),
   "authenticated dynamic covers",
@@ -285,6 +301,7 @@ await waitFor(
 plugin.panel.destroy(container);
 
 const stale = persisted.get("cache.community.v1");
+assert.equal(stale.anonymousDeviceCode, installationDeviceCode);
 stale.feeds.hot.savedAt = Date.now() - 10 * 60 * 1000;
 persisted.set("cache.community.v1", stale);
 const offlineContext = {
@@ -307,6 +324,7 @@ plugin.panel.destroy(offlineContainer);
 
 const expiredAt = Date.now() - 8 * 24 * 60 * 60 * 1000;
 const expired = persisted.get("cache.community.v1");
+assert.equal(expired.anonymousDeviceCode, installationDeviceCode);
 expired.feeds.hot.savedAt = expiredAt;
 expired.cachedAt = Object.fromEntries(
   expired.feeds.hot.items.map((feed) => [feed.id, expiredAt]),

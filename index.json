@@ -159,21 +159,37 @@
     {
       "id": "qxcoolapk",
       "name": "QxCoolapk 酷安",
-      "version": "1.4.5",
+      "version": "1.4.7",
       "description": "Browse Coolapk hot, news, and digital feeds and read complete posts, images, and replies in Qx.",
       "download_url": "https://raw.githubusercontent.com/mcxen/qx-plugins/main/qxcoolapk.qx-plugin",
-      "size_bytes": 67049,
-      "checksum_sha256": "e3974ac3ba0d259a77dbcceb47beb89b2b7481f0232c4327618139c09bd0feec",
+      "size_bytes": 71961,
+      "checksum_sha256": "da4f3101261cd207df5728b9c3be9f1cd91fe4017e42a6e735a5017830ccffdb",
       "required_permissions": [
         "http",
         "open-url",
         "system",
         "island"
       ],
-      "updated_at": "2026-07-31",
+      "updated_at": "2026-08-06",
       "author": "Qx",
       "min_app_version": "0.6.50",
       "releases": [
+        {
+          "version": "1.4.7",
+          "published_at": "2026-08-06",
+          "notes_localizations": {
+            "en": "Adds an explicit Refresh Anonymous Device action that persists a replacement identity and refreshes the feed without clearing content cache; repeated rotation is discouraged to avoid worsening Coolapk risk control.",
+            "zh-CN": "新增“刷新匿名设备标识”手动操作：持久化新的匿名身份并刷新信息流，不清空内容缓存；提示不要连续轮换，以免加重酷安风控。"
+          }
+        },
+        {
+          "version": "1.4.6",
+          "published_at": "2026-08-06",
+          "notes_localizations": {
+            "en": "Stops all installations from sharing one Coolapk device identity by persisting a stable anonymous per-installation device code and deriving fresh request tokens from it; explains the account-limit response without retry storms.",
+            "zh-CN": "修复所有安装共用同一个酷安设备身份的问题：为每个安装持久化稳定的匿名设备标识，并据此生成动态请求 token；遇到设备关联账号过多时给出明确提示，避免连续重试触发风控。"
+          }
+        },
         {
           "version": "1.4.5",
           "published_at": "2026-07-31",
@@ -622,20 +638,28 @@
     {
       "id": "qxtieba",
       "name": "QxTieba 贴吧",
-      "version": "1.1.9",
+      "version": "1.1.10",
       "description": "聚合浏览多个百度贴吧的公开帖子流，在 Qx 内阅读正文与楼层评论。",
       "download_url": "https://raw.githubusercontent.com/mcxen/qx-plugins/main/qxtieba.qx-plugin",
-      "size_bytes": 374349,
-      "checksum_sha256": "f2b1edc256b702affb812a8451f52de80427d7c5d4a4c5175803b3cc76e63163",
+      "size_bytes": 375592,
+      "checksum_sha256": "25096bbd683e38698f589f889d46bf9a9a8d04ffb15708b1f2ba46f6d07965f5",
       "required_permissions": [
         "http",
         "open-url",
         "island"
       ],
-      "updated_at": "2026-07-31",
+      "updated_at": "2026-08-06",
       "author": "Qx",
       "min_app_version": "0.6.50",
       "releases": [
+        {
+          "version": "1.1.10",
+          "published_at": "2026-08-06",
+          "notes_localizations": {
+            "en": "Renders Tieba image_emoticon markers in the main post, floor replies, and nested comments through the shared Workbench inline-content protocol.",
+            "zh-CN": "将贴吧正文、楼层回复和楼中楼评论中的 image_emoticon 表情统一接入 Workbench 通用行内内容协议渲染。"
+          }
+        },
         {
           "version": "1.1.9",
           "published_at": "2026-07-31",

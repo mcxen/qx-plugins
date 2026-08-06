@@ -19,6 +19,12 @@ content.
 
 The plugin uses anonymous read-only API access. It does not collect Coolapk
 credentials and does not provide likes, replies, follows, or other write actions.
+Each installation uses a stable, randomly generated anonymous device identity,
+stored with the plugin cache, so different Qx installations are not presented as
+one Coolapk device. The identity is not an account and is not rotated per request;
+the panel provides an explicit Refresh Anonymous Device action when a user needs
+to replace it. Coolapk risk-control responses are surfaced without automatic retry
+storms, and repeated manual rotation is discouraged.
 Protected image responses are converted into session-only previews. List images
 are reduced to thumbnail size, article images are bounded for the host, and
 oversized animated images may appear as a still preview.

@@ -91,7 +91,7 @@ assert.equal(feed.hasMore, true);
 const threadHtml = `
   <h3 class="core_title_txt" title="如何学习 Python &amp; Rust">fallback</h3>
   <div class="l_post j_l_post" data-field="{&quot;author&quot;:{&quot;user_name&quot;:&quot;楼主&quot;},&quot;content&quot;:{&quot;post_id&quot;:1,&quot;post_no&quot;:1,&quot;date&quot;:&quot;2026-07-29 10:00&quot;}}">
-    <div id="post_content_1" class="d_post_content j_d_post_content">主楼正文<br>第二行<img class="BDE_Image" src="//imgsrc.baidu.com/a.jpg"></div>
+    <div id="post_content_1" class="d_post_content j_d_post_content">主楼正文<img class="BDE_Smiley" src="/static/image_emoticon8.png"><br>第二行<img class="BDE_Image" src="//imgsrc.baidu.com/a.jpg"></div>
   </div>
   <div class="l_post j_l_post" data-field="{&quot;author&quot;:{&quot;user_name&quot;:&quot;回复者&quot;},&quot;content&quot;:{&quot;post_id&quot;:2,&quot;post_no&quot;:2,&quot;date&quot;:&quot;2026-07-29 10:05&quot;,&quot;agree_num&quot;:3}}">
     <div id="post_content_2" class="d_post_content j_d_post_content">有帮助的回复</div>
@@ -102,7 +102,12 @@ const threadHtml = `
 `;
 const detail = parseThreadHtml(threadHtml, feed.items[0]);
 assert.equal(detail.title, "如何学习 Python & Rust");
-assert.equal(detail.body, "主楼正文\n第二行");
+assert.equal(detail.body, "主楼正文image_emoticon8\n第二行");
+assert.deepEqual(detail.content, [
+  { type: "text", text: "主楼正文" },
+  { type: "asset-image", assetPath: "assets/emotions/image_emoticon8.png", alt: "image_emoticon8" },
+  { type: "text", text: "\n第二行" },
+]);
 assert.deepEqual(detail.images, ["https://imgsrc.baidu.com/a.jpg"]);
 assert.equal(detail.replies.length, 2);
 assert.equal(detail.replies[0].floor, 2);
@@ -111,7 +116,7 @@ assert.equal(detail.replies[1].originalPoster, true);
 
 const owner = concat(fieldVarint(2, 99), fieldText(4, "楼主"));
 const visitor = concat(fieldVarint(2, 100), fieldText(4, "吧友"));
-const mainContent = concat(fieldText(2, "Protobuf 主楼"), fieldText(25, "https://imgsrc.baidu.com/main.jpg"));
+const mainContent = concat(fieldText(2, "Protobuf 主楼image_emoticon12"), fieldText(25, "https://imgsrc.baidu.com/main.jpg"));
 const replyContent = fieldText(2, "Protobuf 楼层image_emoticon8继续");
 const nestedContent = fieldText(2, "楼中楼评论image_emoticon124");
 const nestedComment = concat(
@@ -159,7 +164,11 @@ const responseData = concat(
 );
 const protoDetail = parseThreadResponse(fieldBytes(2, responseData), { id: "123456789" });
 assert.equal(protoDetail.title, "Protobuf 帖子");
-assert.equal(protoDetail.body, "Protobuf 主楼");
+assert.equal(protoDetail.body, "Protobuf 主楼image_emoticon12");
+assert.deepEqual(protoDetail.content, [
+  { type: "text", text: "Protobuf 主楼" },
+  { type: "asset-image", assetPath: "assets/emotions/image_emoticon12.png", alt: "image_emoticon12" },
+]);
 assert.deepEqual(protoDetail.images, ["https://imgsrc.baidu.com/main.jpg"]);
 assert.equal(protoDetail.replies.length, 1);
 assert.equal(protoDetail.replies[0].author, "吧友");

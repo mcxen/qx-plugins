@@ -64,7 +64,13 @@ function cleanText(value) {
   return decodeHtml(String(value || "")
     .replace(/<br\s*\/?>/gi, "\n")
     .replace(/<\/(?:p|div|section|article|h[1-6]|blockquote|li)>/gi, "\n\n")
-    .replace(/<img[^>]+(?:alt|title)=(?:"([^"]*)"|'([^']*)')[^>]*>/gi, (_, a, b) => a || b || "")
+    .replace(/<img\b([^>]*)>/gi, (_, attributes) => {
+      const label = extract(/\b(?:alt|title)=(?:"([^"]*)"|'([^']*)')/i, attributes, 1)
+        || extract(/\b(?:alt|title)=(?:"([^"]*)"|'([^']*)')/i, attributes, 2);
+      const source = extract(/\b(?:src|data-src|data-original)=(?:"([^"]*)"|'([^']*)')/i, attributes, 1)
+        || extract(/\b(?:src|data-src|data-original)=(?:"([^"]*)"|'([^']*)')/i, attributes, 2);
+      return label || source.match(/image_emoticon\d{0,3}/i)?.[0] || "";
+    })
     .replace(/<[^>]+>/g, ""))
     .replace(/[ \t]+\n/g, "\n")
     .replace(/\n{3,}/g, "\n\n")
@@ -271,6 +277,7 @@ function parseThreadHtml(html, fallbackPost = {}) {
   return {
     title,
     body: first?.body || cleanText(fallbackPost.summary) || title,
+    content: tiebaEmotionContent(first?.body || cleanText(fallbackPost.summary) || title),
     images: first?.images || [],
     author: op || copy("Unknown author", "未知作者"),
     publishedAt: first?.publishedAt || cleanText(fallbackPost.publishedAt),
@@ -510,6 +517,7 @@ function createPanel(container, context) {
         .join(" · "),
       status: detail?.error ? { state: "error", error: detail.error } : undefined,
       body: detail?.body || post.summary || post.title,
+      content: detail?.content || tiebaEmotionContent(detail?.body || post.summary || post.title),
       images,
       imageLayout: state.imageLayout,
       mediaPlacement: "after-body",

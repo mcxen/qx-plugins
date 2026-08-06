@@ -32,6 +32,9 @@
     activity. Keep detail/reply status for errors; do not duplicate loading inside content.
 14. After the selected thread settles, prefetch only the nearest three details
     serially into persistent cache without marking them read.
+15. Publish Tieba `image_emoticon*` markers as Workbench `content[]` for the main
+    body, floor replies, and flattened nested comments; do not rely on a reply-only
+    renderer or put the marker in a separate custom field.
 
 ## Permissions
 

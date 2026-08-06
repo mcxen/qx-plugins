@@ -173,7 +173,7 @@ const AVAILABLE_EMOTION_IDS = new Set([
 /** Convert Tieba's Protobuf emotion markers into host-rendered package assets. */
 export function tiebaEmotionContent(value) {
   const text = String(value || "");
-  const pattern = /image_emoticon(\d{1,3})?/g;
+  const pattern = /image_emoticon(\d{1,3})?/gi;
   const content = [];
   let cursor = 0;
   let matchedAsset = false;
@@ -306,6 +306,7 @@ function parseThreadResponse(input, fallbackPost = {}) {
   return {
     title: stringFieldValue(thread, 3) || fallbackPost.title || "Untitled thread",
     body: firstPost?.body || threadContent || fallbackPost.summary || fallbackPost.title || "",
+    content: tiebaEmotionContent(firstPost?.body || threadContent || fallbackPost.summary || fallbackPost.title || ""),
     images: [...new Set([...(firstPost?.images || []), ...threadImages])],
     author: opName || "Unknown author",
     publishedAt: isoTime(numberField(thread, 45)) || firstPost?.createdAt || fallbackPost.publishedAt || "",

@@ -33,7 +33,12 @@
    reader/lightbox.
 8. Publish first-page replies through structured `detail.replies`, preserving
    the upstream floor and `likeCount` when present. Do not flatten replies into `sections`.
-9. Generate a fresh anonymous `X-App-Token` for API and image requests. Do not persist tokens.
+9. Generate a stable random anonymous per-installation `X-App-Device` and a fresh
+   `X-App-Token` for API and image requests. Persist only the device identity with
+   the cache; never persist tokens, emulate accounts, or rotate identity per request.
+   An explicit user action may replace the identity and force one feed refresh, but
+   must warn against repeated rotation. A Coolapk account-limit response must be
+   surfaced without automatic retry loops.
 10. Keep the Coolapk signature implementation dependency-free at runtime. The packaged
    `index.js` includes the BSD-3-Clause-licensed `bcryptjs` implementation. Edit
    `index.source.js`; `npm run package:plugins` rebuilds the bundled entry.
