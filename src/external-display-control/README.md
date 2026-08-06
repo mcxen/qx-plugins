@@ -1,10 +1,8 @@
 # External Display Control
 
-View DDC/CI details for external monitors and adjust brightness, contrast, and volume from Qx.
+Adjust built-in and external display brightness from Qx.
 
-The plugin uses Qx native Rust commands and supports the open-source macOS DDC CLIs:
-
-- `m1ddc`: https://github.com/waydabber/m1ddc
-- `ddcctl`: https://github.com/kfix/ddcctl
-
-Qx searches common Homebrew/system paths and only executes fixed allowlisted display-control commands.
+The plugin calls Qx's typed `context.system` display-control port. Qx uses
+macOS DisplayServices for built-in panels and embeds a DDC/CI transport based
+on the MIT-licensed m1ddc packet/IOAVService implementation for compatible
+external monitors. No Homebrew package or external executable is required.

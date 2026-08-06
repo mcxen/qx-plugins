@@ -13,6 +13,14 @@
     ],
     "external-display-control": [
       {
+        "version": "1.1.0",
+        "published_at": "2026-08-06",
+        "notes_localizations": {
+          "en": "Moved display brightness into Qx native macOS capability; the plugin now controls built-in and DDC/CI displays without external CLIs.",
+          "zh-CN": "将显示器亮度下沉到 Qx 原生 macOS 能力层；插件现在无需外部命令行工具即可控制内置屏和支持 DDC/CI 的外接屏。"
+        }
+      },
+      {
         "version": "1.0.1",
         "published_at": "2026-07-23",
         "notes_localizations": {
