@@ -13,6 +13,14 @@
     ],
     "external-display-control": [
       {
+        "version": "1.1.1",
+        "published_at": "2026-08-06",
+        "notes_localizations": {
+          "en": "Preserved raw DDC brightness values and surfaced discovery/read/write diagnostics; added a safe single-external-display IOAVService fallback.",
+          "zh-CN": "保留 DDC 原始亮度值并显示发现、读写诊断；单外接屏场景增加安全的 IOAVService fallback。"
+        }
+      },
+      {
         "version": "1.1.0",
         "published_at": "2026-08-06",
         "notes_localizations": {

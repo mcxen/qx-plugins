@@ -31,11 +31,11 @@
     {
       "id": "external-display-control",
       "name": "External Display Control",
-      "version": "1.1.0",
+      "version": "1.1.1",
       "description": "Adjust built-in and external display brightness through Qx's native macOS display service.",
       "download_url": "https://raw.githubusercontent.com/mcxen/qx-plugins/main/external-display-control.qx-plugin",
-      "size_bytes": 15965,
-      "checksum_sha256": "b5caec5876b103ac13406d3191bfe7a1b542269a94eb373d14a83be425e1790f",
+      "size_bytes": 16755,
+      "checksum_sha256": "186831b0c6f2cc75c8fbd69d966cc7c30e31875929cfb6ccfaf25f3a5f63af8c",
       "required_permissions": [
         "system",
         "display-control",
@@ -45,6 +45,14 @@
       "author": "mcx",
       "min_app_version": "0.6.55",
       "releases": [
+        {
+          "version": "1.1.1",
+          "published_at": "2026-08-06",
+          "notes_localizations": {
+            "en": "Preserved raw DDC brightness values and surfaced discovery/read/write diagnostics; added a safe single-external-display IOAVService fallback.",
+            "zh-CN": "保留 DDC 原始亮度值并显示发现、读写诊断；单外接屏场景增加安全的 IOAVService fallback。"
+          }
+        },
         {
           "version": "1.1.0",
           "published_at": "2026-08-06",

@@ -9,6 +9,7 @@ const TEXT = {
     external: "External",
     brightness: "Brightness",
     unsupported: "Brightness control is unavailable for this display.",
+    raw: (current, max) => `DDC value ${current}/${max}`,
     noDisplays: "No controllable displays are available.",
     noDisplaysHint: "Built-in panels use macOS native brightness. External monitors use Qx's embedded DDC/CI transport when the monitor and connection expose it.",
     setting: "Setting brightness…",
@@ -25,6 +26,7 @@ const TEXT = {
     external: "外接",
     brightness: "亮度",
     unsupported: "此显示器暂不支持亮度控制。",
+    raw: (current, max) => `DDC 原始值 ${current}/${max}`,
     noDisplays: "没有可控制的显示器。",
     noDisplaysHint: "内置屏幕使用 macOS 原生亮度；外接显示器在硬件和连接支持时使用 Qx 内置的 DDC/CI 通道，无需安装外部命令行工具。",
     setting: "正在设置亮度…",
@@ -85,12 +87,16 @@ function renderControl(parent, state, display, refresh) {
   const control = document.createElement("div");
   control.className = "qx-display-control";
   if (!display.supported || display.current == null) {
-    control.innerHTML = `<div class="qx-display-unavailable">${escapeHtml(display.error || text("unsupported"))}</div>`;
+    const diagnostic = display.errorStage ? ` · ${display.errorStage}` : "";
+    control.innerHTML = `<div class="qx-display-unavailable">${escapeHtml(display.error || text("unsupported"))}${escapeHtml(diagnostic)}</div>`;
     parent.appendChild(control);
     return;
   }
   const value = clamp(display.current);
-  control.innerHTML = `<div class="qx-display-control-head"><div class="qx-display-control-label">${icon("sun")}${escapeHtml(text("brightness"))}</div><div class="qx-display-control-value">${value}%</div></div>`;
+  const raw = display.rawCurrent != null && display.rawMax != null
+    ? ` · ${text("raw", display.rawCurrent, display.rawMax)}`
+    : "";
+  control.innerHTML = `<div class="qx-display-control-head"><div class="qx-display-control-label">${icon("sun")}${escapeHtml(text("brightness"))}</div><div class="qx-display-control-value">${value}%${escapeHtml(raw)}</div></div>`;
   const row = document.createElement("div");
   row.className = "qx-display-control-row";
   const minus = button("−", "qx-display-step");
