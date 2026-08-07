@@ -4,7 +4,7 @@
   "version": "1.2.0",
   "description": "View calendar month-by-month",
   "author": "fuksman",
-  "icon": "command-icon.png",
+  "icon": "icon.svg",
   "screenshots": [
     "calendar-1.png",
     "calendar-2.png"

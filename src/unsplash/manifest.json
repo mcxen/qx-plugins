@@ -4,7 +4,7 @@
   "version": "1.2.0",
   "description": "Search Unsplash photos, download, and set desktop wallpaper. Ported for Qx (Access Key API; likes/OAuth not included).",
   "author": "qx (ported from Raycast unsplash)",
-  "icon": "icon.png",
+  "icon": "icon.svg",
   "screenshots": [
     "unsplash-1.png",
     "unsplash-2.png"

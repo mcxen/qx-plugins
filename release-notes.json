@@ -13,6 +13,86 @@
     ],
     "external-display-control": [
       {
+        "version": "1.2.1",
+        "published_at": "2026-08-07",
+        "notes_localizations": {
+          "en": "Ramps hardware brightness toward the latest drag target in small steps to avoid visible flashes during adjustment.",
+          "zh-CN": "拖拽调节时以小步平滑过渡到最新目标亮度，避免显示器硬件亮度跳变闪屏。"
+        }
+      },
+      {
+        "version": "1.2.0",
+        "published_at": "2026-08-06",
+        "notes_localizations": {
+          "en": "Adds host-rendered lightweight Tray and Home brightness providers without keeping the full plugin panel runtime active.",
+          "zh-CN": "新增宿主绘制的轻量 Tray 与主页亮度数据提供器，无需常驻完整插件面板运行时。"
+        }
+      },
+      {
+        "version": "1.1.9",
+        "published_at": "2026-08-06",
+        "notes_localizations": {
+          "en": "Keeps slider dragging continuous across direction changes and WebView pointer-capture cancellation without snapping or losing the thumb.",
+          "zh-CN": "修复滑块反向拖动和 WebView 指针捕获取消时跳变、丢失拖拽点的问题，拖拽过程保持连续。"
+        }
+      },
+      {
+        "version": "1.1.8",
+        "published_at": "2026-08-06",
+        "notes_localizations": {
+          "en": "Keeps display values synchronized with silent incremental polling, removes the in-panel refresh toolbar, and publishes manual refresh through host Actions.",
+          "zh-CN": "通过静默增量轮询持续同步显示器状态，移除面板内刷新工具栏，并将手动刷新发布到宿主 Actions。"
+        }
+      },
+      {
+        "version": "1.1.7",
+        "published_at": "2026-08-06",
+        "notes_localizations": {
+          "en": "Rebuilt the glow as a layered effect: a capsule fill, a masked tail only between current and previous values, and a soft endpoint bloom.",
+          "zh-CN": "将微光重构为分层效果：胶囊填充、仅位于新旧数值之间的渐隐尾迹，以及柔和的端点光斑。"
+        }
+      },
+      {
+        "version": "1.1.6",
+        "published_at": "2026-08-06",
+        "notes_localizations": {
+          "en": "Rounded the fill and fading trail into capsule ends, with a soft elliptical glow at the previous brightness position.",
+          "zh-CN": "将填充和消散残影改为胶囊圆端，并在原亮度位置增加柔和的椭圆光晕。"
+        }
+      },
+      {
+        "version": "1.1.5",
+        "published_at": "2026-08-06",
+        "notes_localizations": {
+          "en": "Extended firefly particles beyond the progress track so they float along its upper and lower edges while following brightness.",
+          "zh-CN": "将萤火虫粒子延伸到进度条外侧，使其沿上下边缘漂浮并跟随亮度进度。"
+        }
+      },
+      {
+        "version": "1.1.4",
+        "published_at": "2026-08-06",
+        "notes_localizations": {
+          "en": "Added pointer-captured, frame-following slider drag with throttled latest-value hardware writes.",
+          "zh-CN": "新增指针捕获的跟手拖拽，并以节流的最新值队列写入硬件。"
+        }
+      },
+      {
+        "version": "1.1.3",
+        "published_at": "2026-08-06",
+        "notes_localizations": {
+          "en": "Updates brightness values immediately after adjustment, rolls back failed writes, and reconciles delayed DDC readback in the background.",
+          "zh-CN": "调节后立即更新亮度数值，写入失败自动回滚，并在后台校准延迟的 DDC 回读。"
+        }
+      },
+      {
+        "version": "1.1.2",
+        "published_at": "2026-08-06",
+        "notes_localizations": {
+          "en": "Added a luminous firefly-style brightness track with trailing glow when brightness is reduced.",
+          "zh-CN": "新增萤火虫点状发光亮度条，降低亮度时保留并淡出右侧荧光残影。"
+        }
+      },
+      {
         "version": "1.1.1",
         "published_at": "2026-08-06",
         "notes_localizations": {

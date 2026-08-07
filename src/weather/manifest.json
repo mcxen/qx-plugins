@@ -4,7 +4,7 @@
   "version": "1.0.0",
   "description": "Current conditions and multi-day forecast via Open-Meteo (or OpenWeatherMap). Cached for fast reopen.",
   "author": "mcx",
-  "icon": "",
+  "icon": "icon.svg",
   "keywords": [
     "weather",
     "forecast",

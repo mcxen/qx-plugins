@@ -12,6 +12,7 @@
     "en": "Live JD accumulated-gold quotes with locally sampled history."
   },
   "author": "Qx",
+  "icon": "icon.svg",
   "keywords": ["黄金", "金价", "gold", "京东", "投资"],
   "permissions": ["http", "island"],
   "preferences": [

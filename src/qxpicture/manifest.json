@@ -12,6 +12,7 @@
     "en": "Browse random image APIs, save images, copy them, and set desktop wallpaper."
   },
   "author": "Qx",
+  "icon": "icon.svg",
   "platforms": ["macos", "windows"],
   "keywords": ["random image", "wallpaper", "picture", "api", "随机图片", "壁纸"],
   "permissions": [

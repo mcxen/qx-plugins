@@ -12,7 +12,7 @@
     "zh-CN": "通过 Workbench 列表/详情浏览 V2EX 最新、热门与节点主题，支持回复与宿主缓存接口。"
   },
   "author": "mcx",
-  "icon": "",
+  "icon": "icon.svg",
   "keywords": [
     "v2ex",
     "forum",

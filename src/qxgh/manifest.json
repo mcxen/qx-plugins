@@ -12,7 +12,7 @@
     "zh-CN": "监控公开 GitHub 仓库的 Actions 运行与 Releases，并显示构建状态、预计进度和灵动岛提醒。"
   },
   "author": "mcx",
-  "icon": "",
+  "icon": "icon.svg",
   "keywords": [
     "qxgh",
     "github",

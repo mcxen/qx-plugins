@@ -1,10 +1,10 @@
 {
   "id": "external-display-control",
   "name": "External Display Control",
-  "version": "1.1.1",
-  "description": "Adjust built-in and external display brightness through Qx's native macOS display service.",
+  "version": "1.2.1",
+  "description": "Adjust built-in and external display brightness through Qx's native macOS and Windows display service.",
   "author": "mcx",
-  "icon": "",
+  "icon": "icon.svg",
   "platforms": [
     "macos"
   ],
@@ -19,6 +19,7 @@
     "\u4eae\u5ea6"
   ],
   "permissions": [
+    "tray",
     "system",
     "display-control",
     "invoke:display_brightness_set"
@@ -51,6 +52,26 @@
       "\u4eae\u5ea6"
     ]
   },
+  "homeWidgets": [
+    {
+      "id": "display-brightness",
+      "source": "system.display-brightness"
+    }
+  ],
+  "surfaceProviders": [
+    {
+      "id": "brightness",
+      "source": "system.display-brightness",
+      "surfaces": ["tray", "home"],
+      "presentation": "standard",
+      "title": "Display Brightness",
+      "titles": {
+        "en": "Display Brightness",
+        "zh-CN": "显示器亮度"
+      },
+      "defaultEnabled": true
+    }
+  ],
   "min_app_version": "0.6.55",
   "screenshots": []
 }

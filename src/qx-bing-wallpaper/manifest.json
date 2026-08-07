@@ -4,7 +4,7 @@
   "version": "2.2.1",
   "description": "Browse Bing's daily images in a native Qx thumbnail list, then download or set them as wallpaper.",
   "author": "Qx",
-  "icon": "extension-icon.png",
+  "icon": "icon.svg",
   "screenshots": [
     "bing-wallpaper-1.png",
     "bing-wallpaper-2.png",

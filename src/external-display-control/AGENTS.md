@@ -2,7 +2,8 @@
 
 Brightness uses the host `context.system.displayBrightness()` and
 `context.system.setDisplayBrightness()` ports. Qx embeds the macOS DDC/CI
-transport; this plugin must not install or spawn m1ddc/ddcctl.
+transport and Windows WMI/Monitor Configuration adapters; this plugin must not
+install or spawn m1ddc/ddcctl, PowerShell, or another monitor utility.
 
 ## Invariants
 
