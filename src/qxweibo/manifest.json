@@ -5,7 +5,7 @@
     "zh-CN": "QxWeibo 微博",
     "en": "QxWeibo"
   },
-  "version": "1.1.6",
+  "version": "1.1.7",
   "description": "Read configured Weibo users, an aggregated following feed, comments, and proxied images in Qx.",
   "descriptions": {
     "zh-CN": "在 Qx 中阅读指定微博用户、聚合关注流、评论区和代理图片。",
@@ -60,9 +60,18 @@
       "default": "3",
       "description": "当前会话维持的游客 Cookie 数量。",
       "options": [
-        { "label": "2 个", "value": "2" },
-        { "label": "3 个", "value": "3" },
-        { "label": "4 个", "value": "4" }
+        {
+          "label": "2 个",
+          "value": "2"
+        },
+        {
+          "label": "3 个",
+          "value": "3"
+        },
+        {
+          "label": "4 个",
+          "value": "4"
+        }
       ]
     },
     {
@@ -97,9 +106,18 @@
       "default": "7",
       "description": "帖子、评论与已读状态的保留时间。",
       "options": [
-        { "label": "3 天", "value": "3" },
-        { "label": "7 天", "value": "7" },
-        { "label": "14 天", "value": "14" }
+        {
+          "label": "3 天",
+          "value": "3"
+        },
+        {
+          "label": "7 天",
+          "value": "7"
+        },
+        {
+          "label": "14 天",
+          "value": "14"
+        }
       ]
     },
     {
@@ -109,8 +127,14 @@
       "default": "horizontal",
       "description": "横向胶片可逐张浏览；网格适合同时查看多张图片。",
       "options": [
-        { "label": "横向胶片", "value": "horizontal" },
-        { "label": "响应式网格", "value": "grid" }
+        {
+          "label": "横向胶片",
+          "value": "horizontal"
+        },
+        {
+          "label": "响应式网格",
+          "value": "grid"
+        }
       ]
     }
   ],
@@ -133,15 +157,32 @@
       "name": "open-qxweibo",
       "title": "打开 QxWeibo 微博",
       "description": "阅读微博用户帖子、关注流和评论",
-      "keywords": ["weibo", "微博", "用户", "关注", "帖子", "评论"]
+      "keywords": [
+        "weibo",
+        "微博",
+        "用户",
+        "关注",
+        "帖子",
+        "评论"
+      ]
     }
   ],
   "panel": {
     "title": "QxWeibo 微博",
     "icon": "icon.svg",
-    "keywords": ["weibo", "微博", "用户", "关注", "帖子", "评论"]
+    "keywords": [
+      "weibo",
+      "微博",
+      "用户",
+      "关注",
+      "帖子",
+      "评论"
+    ]
   },
   "min_app_version": "0.6.50",
-  "platforms": ["macos", "windows"],
+  "platforms": [
+    "macos",
+    "windows"
+  ],
   "screenshots": []
 }

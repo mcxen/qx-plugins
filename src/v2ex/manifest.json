@@ -5,7 +5,7 @@
     "en": "V2EX",
     "zh-CN": "V2EX"
   },
-  "version": "3.0.0",
+  "version": "3.0.1",
   "description": "Browse V2EX latest, hot, and node topics with Workbench list/detail, replies, and cached host APIs.",
   "descriptions": {
     "en": "Browse V2EX latest, hot, and node topics with Workbench list/detail, replies, and cached host APIs.",
@@ -68,37 +68,73 @@
       "name": "open-v2ex",
       "title": "Open V2EX",
       "description": "Browse latest and hot V2EX topics",
-      "keywords": ["v2ex", "forum", "topics", "tech", "探索", "最新", "热门"]
+      "keywords": [
+        "v2ex",
+        "forum",
+        "topics",
+        "tech",
+        "探索",
+        "最新",
+        "热门"
+      ]
     },
     {
       "name": "view-hot",
       "title": "V2EX Hot",
       "description": "Open V2EX hot topics",
-      "keywords": ["v2ex", "hot", "热门"]
+      "keywords": [
+        "v2ex",
+        "hot",
+        "热门"
+      ]
     },
     {
       "name": "view-latest",
       "title": "V2EX Latest",
       "description": "Open V2EX latest topics",
-      "keywords": ["v2ex", "latest", "最新"]
+      "keywords": [
+        "v2ex",
+        "latest",
+        "最新"
+      ]
     },
     {
       "name": "view-notifications",
       "title": "View Notifications",
       "description": "View your V2EX notifications (requires token)",
-      "keywords": ["v2ex", "notifications", "通知", "消息"]
+      "keywords": [
+        "v2ex",
+        "notifications",
+        "通知",
+        "消息"
+      ]
     },
     {
       "name": "view-token",
       "title": "View Token Info",
       "description": "Check your V2EX API token status (requires token)",
-      "keywords": ["v2ex", "token", "令牌"]
+      "keywords": [
+        "v2ex",
+        "token",
+        "令牌"
+      ]
     }
   ],
   "panel": {
-    "keywords": ["v2ex", "forum", "topics", "tech", "社区", "帖子", "节点"]
+    "keywords": [
+      "v2ex",
+      "forum",
+      "topics",
+      "tech",
+      "社区",
+      "帖子",
+      "节点"
+    ]
   },
   "min_app_version": "0.6.13",
-  "platforms": ["macos", "windows"],
+  "platforms": [
+    "macos",
+    "windows"
+  ],
   "screenshots": []
 }

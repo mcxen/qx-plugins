@@ -181,6 +181,14 @@
     ],
     "qxgh": [
       {
+        "version": "1.5.5",
+        "published_at": "2026-08-07",
+        "notes_localizations": {
+          "en": "Mark Open Run/Release on GitHub as primary so Enter runs the open action in detail view.",
+          "zh-CN": "将「在 GitHub 打开运行/发布」标为 primary，详情态回车可打开链接。"
+        }
+      },
+      {
         "version": "1.5.4",
         "published_at": "2026-08-01",
         "notes_localizations": {
@@ -647,6 +655,14 @@
     ],
     "qxweibo": [
       {
+        "version": "1.1.7",
+        "published_at": "2026-08-07",
+        "notes_localizations": {
+          "en": "Mark Open on Weibo as primary so Enter opens the post from the detail surface.",
+          "zh-CN": "将「在微博中打开」标为 primary，详情态回车可打开原帖。"
+        }
+      },
+      {
         "version": "1.1.6",
         "published_at": "2026-07-31",
         "notes_localizations": {
@@ -798,6 +814,14 @@
       }
     ],
     "v2ex": [
+      {
+        "version": "3.0.1",
+        "published_at": "2026-08-07",
+        "notes_localizations": {
+          "en": "Mark Open in Browser as the primary detail action so Enter opens the topic after reading.",
+          "zh-CN": "将「在浏览器中打开」标为详情态 primary，阅读后回车即可打开原文。"
+        }
+      },
       {
         "version": "3.0.0",
         "published_at": "2026-08-03",

@@ -427,11 +427,11 @@
     {
       "id": "qxgh",
       "name": "QxGH",
-      "version": "1.5.4",
+      "version": "1.5.5",
       "description": "QxGH — watch GitHub Actions and Releases from public github.com pages (no REST API). Business-only workbench UI.",
       "download_url": "https://raw.githubusercontent.com/mcxen/qx-plugins/main/qxgh.qx-plugin",
-      "size_bytes": 51892,
-      "checksum_sha256": "f3a44970b71435dd94cfe17d5ff8bf2962ce7b4e94e9d3f18dc996e32f3f1f37",
+      "size_bytes": 52229,
+      "checksum_sha256": "a164537ff57788c2416894001803ec8a867a2c6acf3571ea2566bef03f8a8e91",
       "required_permissions": [
         "http",
         "open-url",
@@ -443,6 +443,14 @@
       "author": "mcx",
       "min_app_version": "0.5.38",
       "releases": [
+        {
+          "version": "1.5.5",
+          "published_at": "2026-08-07",
+          "notes_localizations": {
+            "en": "Mark Open Run/Release on GitHub as primary so Enter runs the open action in detail view.",
+            "zh-CN": "将「在 GitHub 打开运行/发布」标为 primary，详情态回车可打开链接。"
+          }
+        },
         {
           "version": "1.5.4",
           "published_at": "2026-08-01",
@@ -873,11 +881,11 @@
     {
       "id": "qxweibo",
       "name": "QxWeibo 微博",
-      "version": "1.1.6",
+      "version": "1.1.7",
       "description": "Read configured Weibo users, an aggregated following feed, comments, and proxied images in Qx.",
       "download_url": "https://raw.githubusercontent.com/mcxen/qx-plugins/main/qxweibo.qx-plugin",
-      "size_bytes": 80210,
-      "checksum_sha256": "bc7aaa0ae5419f838cd2fbeef61ce5df1d2f5699ef19fa7ff51dceabdba9f2d0",
+      "size_bytes": 80877,
+      "checksum_sha256": "2830c2108990c653e0d07bcc40a34b352392d4f46ba4007bf3c58a600229dbcc",
       "required_permissions": [
         "http",
         "open-url",
@@ -888,6 +896,14 @@
       "author": "Qx",
       "min_app_version": "0.6.50",
       "releases": [
+        {
+          "version": "1.1.7",
+          "published_at": "2026-08-07",
+          "notes_localizations": {
+            "en": "Mark Open on Weibo as primary so Enter opens the post from the detail surface.",
+            "zh-CN": "将「在微博中打开」标为 primary，详情态回车可打开原帖。"
+          }
+        },
         {
           "version": "1.1.6",
           "published_at": "2026-07-31",
@@ -1058,11 +1074,11 @@
     {
       "id": "v2ex",
       "name": "V2EX",
-      "version": "3.0.0",
+      "version": "3.0.1",
       "description": "Browse V2EX latest, hot, and node topics with Workbench list/detail, replies, and cached host APIs.",
       "download_url": "https://raw.githubusercontent.com/mcxen/qx-plugins/main/v2ex.qx-plugin",
-      "size_bytes": 40326,
-      "checksum_sha256": "02ff0e9a335147fe4fde971309d0bbe0c23c3ea34861678a2adeb8069c4e0ca6",
+      "size_bytes": 41033,
+      "checksum_sha256": "e92756503eb60c9c88dbff46f18c00abec9f0f2e5eb72603f86eb5bfa183b575",
       "required_permissions": [
         "http",
         "open-url",
@@ -1079,6 +1095,14 @@
       "author": "mcx",
       "min_app_version": "0.6.13",
       "releases": [
+        {
+          "version": "3.0.1",
+          "published_at": "2026-08-07",
+          "notes_localizations": {
+            "en": "Mark Open in Browser as the primary detail action so Enter opens the topic after reading.",
+            "zh-CN": "将「在浏览器中打开」标为详情态 primary，阅读后回车即可打开原文。"
+          }
+        },
         {
           "version": "3.0.0",
           "published_at": "2026-08-03",

@@ -5,8 +5,8 @@
     "zh-CN": "Github助手",
     "en": "QxGH"
   },
-  "version": "1.5.4",
-  "description": "QxGH \u2014 watch GitHub Actions and Releases from public github.com pages (no REST API). Business-only workbench UI.",
+  "version": "1.5.5",
+  "description": "QxGH — watch GitHub Actions and Releases from public github.com pages (no REST API). Business-only workbench UI.",
   "descriptions": {
     "en": "Monitor Actions runs and Releases for public GitHub repositories, with build status, estimated progress, and Island updates.",
     "zh-CN": "监控公开 GitHub 仓库的 Actions 运行与 Releases，并显示构建状态、预计进度和灵动岛提醒。"
@@ -23,9 +23,9 @@
     "workflow",
     "release",
     "Github助手",
-    "\u8fdb\u5ea6",
-    "\u6784\u5efa",
-    "\u53d1\u5e03"
+    "进度",
+    "构建",
+    "发布"
   ],
   "permissions": [
     "http",
@@ -41,7 +41,7 @@
       "type": "textarea",
       "required": false,
       "default": "mcxen/qx\nmcxen/qx-plugins",
-      "description": "Public owner/repo \u2014 one per line. Reads github.com HTML (no API token).",
+      "description": "Public owner/repo — one per line. Reads github.com HTML (no API token).",
       "rows": 5,
       "placeholder": "mcxen/qx\nmcxen/qx-plugins"
     },
@@ -90,7 +90,7 @@
         "actions",
         "ci",
         "release",
-        "\u8fdb\u5ea6"
+        "进度"
       ]
     },
     {

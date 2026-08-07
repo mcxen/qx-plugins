@@ -474,7 +474,7 @@ function createPanel(container, context) {
       image: preview ? { url: preview, alt: postTitle(post), fit: "cover" } : undefined,
       detail: detailFor(post),
       actions: [
-        { id: `open:${post.id}`, label: copy("Open on Weibo", "在微博中打开"), kbd: "CmdOrCtrl+O" },
+        { id: `open:${post.id}`, label: copy("Open on Weibo", "在微博中打开"), primary: true, kbd: "CmdOrCtrl+O" },
         {
           id: `${read ? "unread" : "read"}:${post.id}`,
           label: read ? copy("Mark Unread", "标为未读") : copy("Mark Read", "标为已读"),

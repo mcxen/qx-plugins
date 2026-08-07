@@ -399,6 +399,8 @@ function createPanel(context, initialMode = "latest") {
         {
           id: `open:${id}`,
           label: text("Open in Browser", "在浏览器中打开"),
+          // Host Enter opens detail first; once detail is open Enter runs this primary.
+          primary: true,
           menuKey: "o",
           kbd: "CmdOrCtrl+O",
         },
