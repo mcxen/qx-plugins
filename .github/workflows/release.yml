@@ -1,0 +1,78 @@
+name: Publish Qx Plugin Release
+
+on:
+  push:
+    tags:
+      - "v*"
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: Existing version tag to publish, for example v1.6.0
+        required: true
+        type: string
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    name: Package and publish release
+    runs-on: ubuntu-latest
+    env:
+      RELEASE_TAG: ${{ inputs.tag || github.ref_name }}
+
+    steps:
+      - name: Checkout tagged source
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.tag || github.ref }}
+          fetch-depth: 0
+
+      - name: Validate release tag
+        run: |
+          case "$RELEASE_TAG" in
+            v[0-9]*.[0-9]*.[0-9]*) ;;
+            *)
+              echo "Release tag must use semantic version form vX.Y.Z: $RELEASE_TAG"
+              exit 1
+              ;;
+          esac
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Package plugins
+        run: npm run package:plugins
+
+      - name: Verify generated marketplace files are committed
+        run: |
+          if ! git diff --quiet -- index.json '*.qx-plugin'; then
+            echo "Generated marketplace files are stale on $RELEASE_TAG."
+            echo "Run npm run package:plugins, commit the result, and tag that commit."
+            git diff --stat -- index.json '*.qx-plugin'
+            exit 1
+          fi
+
+      - name: Prepare release assets
+        run: |
+          mkdir -p release-assets
+          cp index.json release-assets/index.json
+          cp ./*.qx-plugin release-assets/
+          sha256sum release-assets/*.qx-plugin > release-assets/SHA256SUMS
+
+      - name: Create GitHub Release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh release create "$RELEASE_TAG" \
+            --repo "$GITHUB_REPOSITORY" \
+            --verify-tag \
+            --generate-notes \
+            --title "Qx Plugins ${RELEASE_TAG#v}" \
+            release-assets/*
