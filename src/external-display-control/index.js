@@ -564,8 +564,19 @@ export default {
     title: "Display Brightness",
     async run(context) {
       setLocale(context);
-      const displays = await context.system.displayBrightness();
-      context.showToast(`${text("title")}: ${displays.length}`);
+      // Avoid blocking command completion on DDC enumeration — the panel
+      // refresh path owns that work once the host opens this plugin surface.
+      try {
+        const displays = await Promise.race([
+          context.system.displayBrightness(),
+          new Promise((_, reject) => {
+            context.setTimeout(() => reject(new Error("display probe timeout")), 4000);
+          }),
+        ]);
+        context.showToast(`${text("title")}: ${Array.isArray(displays) ? displays.length : 0}`);
+      } catch (error) {
+        context.showToast(text("error", error));
+      }
     },
   }],
   panel: {

@@ -13,6 +13,14 @@
     ],
     "external-display-control": [
       {
+        "version": "1.2.2",
+        "published_at": "2026-08-07",
+        "notes_localizations": {
+          "en": "Bounds open-displays brightness probe so DDC delays cannot stall the command, and relies on the host panel for full enumeration.",
+          "zh-CN": "为 open-displays 亮度探测增加超时，避免 DDC 延迟卡住命令；完整枚举改由宿主面板负责。"
+        }
+      },
+      {
         "version": "1.2.1",
         "published_at": "2026-08-07",
         "notes_localizations": {
@@ -118,6 +126,14 @@
       }
     ],
     "pomodoro-island": [
+      {
+        "version": "1.6.2",
+        "published_at": "2026-08-07",
+        "notes_localizations": {
+          "en": "Island shows Pause/Resume and Stop together; idle background heartbeats no longer re-dismiss the island every five seconds.",
+          "zh-CN": "灵动岛同时提供暂停/继续与停止；空闲心跳不再每五秒重复 dismiss 灵动岛。"
+        }
+      },
       {
         "version": "1.6.1",
         "published_at": "2026-07-23",

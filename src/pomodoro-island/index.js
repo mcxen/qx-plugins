@@ -28,6 +28,8 @@ let runtimeTimerId = null;
 let runtimeContext = null;
 let runtimeState = null;
 let completingSessionId = null;
+/** Avoid spamming island.dismiss on idle heartbeats. */
+let islandIdlePublished = true;
 
 function defaultState() {
   return {
@@ -169,11 +171,19 @@ function islandModel(state) {
       secondary: recommendedKind === "break" ? text("Take a short break", "休息一下") : text("Ready to focus again", "准备再次专注"),
       progress: 100,
       tone: "success",
-      action: {
-        label: recommendedKind === "break" ? text("Start break", "开始休息") : text("Start focus", "开始专注"),
-        command: startCommand(recommendedKind),
-        icon: "play",
-      },
+      actions: [
+        {
+          label: recommendedKind === "break" ? text("Start break", "开始休息") : text("Start focus", "开始专注"),
+          command: startCommand(recommendedKind),
+          icon: "play",
+        },
+        {
+          label: text("Dismiss", "关闭"),
+          command: "stop-pomodoro",
+          icon: "stop",
+          variant: "danger",
+        },
+      ],
     };
   }
   return {
@@ -195,11 +205,21 @@ function islandModel(state) {
           paused: false,
         },
     tone: state.phase === "paused" ? "warning" : "neutral",
-    action: {
-      label: state.phase === "paused" ? text("Resume", "继续") : text("Pause", "暂停"),
-      command: "toggle-pomodoro",
-      icon: state.phase === "paused" ? "play" : "pause",
-    },
+    // Pause/resume + explicit stop so users can end a session from the island
+    // without opening the Workbench panel.
+    actions: [
+      {
+        label: state.phase === "paused" ? text("Resume", "继续") : text("Pause", "暂停"),
+        command: "toggle-pomodoro",
+        icon: state.phase === "paused" ? "play" : "pause",
+      },
+      {
+        label: text("Stop", "停止"),
+        command: "stop-pomodoro",
+        icon: "stop",
+        variant: "danger",
+      },
+    ],
   };
 }
 
@@ -207,9 +227,12 @@ async function publishIsland(context, state) {
   const model = islandModel(state);
   try {
     if (!model) {
+      if (islandIdlePublished) return;
       await context.island.dismiss();
+      islandIdlePublished = true;
       return;
     }
+    islandIdlePublished = false;
     await context.island.update(model).catch(() => context.island.show(model));
   } catch {
     /* Island is optional; timer/history remain valid. */
@@ -272,6 +295,12 @@ async function reconcileBackgroundTimer(context) {
   runtimeContext = context;
   const state = await readState(context);
   runtimeState = state;
+  if (state.phase === "idle") {
+    // Heartbeat every 5s must not re-hit storage/island when nothing is active.
+    clearRuntimeTicker(context);
+    if (!islandIdlePublished) await publishIsland(context, state);
+    return;
+  }
   if (state.phase === "running") {
     if (currentRemaining(state) <= 0) {
       await complete(context, state);

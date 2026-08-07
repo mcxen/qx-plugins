@@ -31,11 +31,11 @@
     {
       "id": "external-display-control",
       "name": "External Display Control",
-      "version": "1.2.1",
+      "version": "1.2.2",
       "description": "Adjust built-in and external display brightness through Qx's native macOS and Windows display service.",
       "download_url": "https://raw.githubusercontent.com/mcxen/qx-plugins/main/external-display-control.qx-plugin",
-      "size_bytes": 40730,
-      "checksum_sha256": "10fe5a19ec31a4bbbda2d76f1e113f4701bddb5c8e5069a1d0bd4cf9f884b62e",
+      "size_bytes": 41585,
+      "checksum_sha256": "0f8dfe40d546001b185ed91f21b76b27a3571ed7e1f3d6f5d0d596b4a3af081e",
       "required_permissions": [
         "tray",
         "system",
@@ -46,6 +46,14 @@
       "author": "mcx",
       "min_app_version": "0.6.55",
       "releases": [
+        {
+          "version": "1.2.2",
+          "published_at": "2026-08-07",
+          "notes_localizations": {
+            "en": "Bounds open-displays brightness probe so DDC delays cannot stall the command, and relies on the host panel for full enumeration.",
+            "zh-CN": "为 open-displays 亮度探测增加超时，避免 DDC 延迟卡住命令；完整枚举改由宿主面板负责。"
+          }
+        },
         {
           "version": "1.2.1",
           "published_at": "2026-08-07",
@@ -155,11 +163,11 @@
     {
       "id": "pomodoro-island",
       "name": "Pomodoro Island",
-      "version": "1.6.1",
+      "version": "1.6.2",
       "description": "Reference plugin for declarative Workbench and the structured QxIsland session protocol, with persistent background timing and history.",
       "download_url": "https://raw.githubusercontent.com/mcxen/qx-plugins/main/pomodoro-island.qx-plugin",
-      "size_bytes": 32883,
-      "checksum_sha256": "bc7d57b81318e3775e7873217f1f9c7f6e5ec65907e92fdc66414135508dc41e",
+      "size_bytes": 34150,
+      "checksum_sha256": "867ff75c4fb92cddca888ad9737225017123daa781de16fb99baad3ebb19a50c",
       "required_permissions": [
         "island",
         "notifications"
@@ -168,6 +176,14 @@
       "author": "mcx",
       "min_app_version": "0.5.43",
       "releases": [
+        {
+          "version": "1.6.2",
+          "published_at": "2026-08-07",
+          "notes_localizations": {
+            "en": "Island shows Pause/Resume and Stop together; idle background heartbeats no longer re-dismiss the island every five seconds.",
+            "zh-CN": "灵动岛同时提供暂停/继续与停止；空闲心跳不再每五秒重复 dismiss 灵动岛。"
+          }
+        },
         {
           "version": "1.6.1",
           "published_at": "2026-07-23",
