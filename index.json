@@ -17,6 +17,9 @@
       "updated_at": "2026-08-07",
       "author": "qx (ported from Raycast brew by nhojb et al.)",
       "min_app_version": "0.5.39",
+      "platforms": [
+        "macos"
+      ],
       "releases": [
         {
           "version": "1.1.0",
@@ -31,11 +34,11 @@
     {
       "id": "external-display-control",
       "name": "External Display Control",
-      "version": "1.2.2",
+      "version": "1.2.3",
       "description": "Adjust built-in and external display brightness through Qx's native macOS and Windows display service.",
       "download_url": "https://raw.githubusercontent.com/mcxen/qx-plugins/main/external-display-control.qx-plugin",
-      "size_bytes": 41585,
-      "checksum_sha256": "0f8dfe40d546001b185ed91f21b76b27a3571ed7e1f3d6f5d0d596b4a3af081e",
+      "size_bytes": 42088,
+      "checksum_sha256": "4da76649aa4601d11bd500c6663e7f7c4c5553585da8278332512c47c547914c",
       "required_permissions": [
         "tray",
         "system",
@@ -45,7 +48,19 @@
       "updated_at": "2026-08-07",
       "author": "mcx",
       "min_app_version": "0.6.55",
+      "platforms": [
+        "macos",
+        "windows"
+      ],
       "releases": [
+        {
+          "version": "1.2.3",
+          "published_at": "2026-08-07",
+          "notes_localizations": {
+            "en": "Enables the Display Brightness panel and tray/home providers on Windows (manifest platforms previously listed macOS only).",
+            "zh-CN": "在 Windows 上启用显示器亮度面板与托盘/主页提供器（此前 manifest 的 platforms 仅声明了 macOS）。"
+          }
+        },
         {
           "version": "1.2.2",
           "published_at": "2026-08-07",
@@ -175,6 +190,10 @@
       "updated_at": "2026-08-07",
       "author": "mcx",
       "min_app_version": "0.5.43",
+      "platforms": [
+        "macos",
+        "windows"
+      ],
       "releases": [
         {
           "version": "1.6.2",
@@ -210,6 +229,10 @@
       "updated_at": "2026-08-07",
       "author": "fuksman",
       "min_app_version": "0.4.28",
+      "platforms": [
+        "macos",
+        "windows"
+      ],
       "releases": [
         {
           "version": "1.2.0",
@@ -241,6 +264,10 @@
       "updated_at": "2026-08-07",
       "author": "Qx",
       "min_app_version": "0.6.13",
+      "platforms": [
+        "macos",
+        "windows"
+      ],
       "releases": [
         {
           "version": "2.2.1",
@@ -285,6 +312,10 @@
       "updated_at": "2026-08-07",
       "author": "Qx",
       "min_app_version": "0.6.50",
+      "platforms": [
+        "macos",
+        "windows"
+      ],
       "releases": [
         {
           "version": "1.4.7",
@@ -430,8 +461,8 @@
       "version": "1.5.5",
       "description": "QxGH — watch GitHub Actions and Releases from public github.com pages (no REST API). Business-only workbench UI.",
       "download_url": "https://raw.githubusercontent.com/mcxen/qx-plugins/main/qxgh.qx-plugin",
-      "size_bytes": 52229,
-      "checksum_sha256": "a164537ff57788c2416894001803ec8a867a2c6acf3571ea2566bef03f8a8e91",
+      "size_bytes": 52266,
+      "checksum_sha256": "357c4381731eb2d27ce983fbf89a389a3582c57b835ce4f35bba457865e236b3",
       "required_permissions": [
         "http",
         "open-url",
@@ -442,6 +473,10 @@
       "updated_at": "2026-08-07",
       "author": "mcx",
       "min_app_version": "0.5.38",
+      "platforms": [
+        "macos",
+        "windows"
+      ],
       "releases": [
         {
           "version": "1.5.5",
@@ -524,6 +559,10 @@
       "updated_at": "2026-08-07",
       "author": "Qx",
       "min_app_version": "0.6.19",
+      "platforms": [
+        "macos",
+        "windows"
+      ],
       "releases": [
         {
           "version": "1.2.0",
@@ -567,6 +606,10 @@
       "updated_at": "2026-08-07",
       "author": "mcx",
       "min_app_version": "0.6.50",
+      "platforms": [
+        "macos",
+        "windows"
+      ],
       "releases": [
         {
           "version": "1.4.11",
@@ -728,6 +771,10 @@
       "updated_at": "2026-08-07",
       "author": "Qx",
       "min_app_version": "0.6.22",
+      "platforms": [
+        "macos",
+        "windows"
+      ],
       "releases": [
         {
           "version": "0.5.0",
@@ -771,6 +818,10 @@
       "updated_at": "2026-08-07",
       "author": "Qx",
       "min_app_version": "0.6.50",
+      "platforms": [
+        "macos",
+        "windows"
+      ],
       "releases": [
         {
           "version": "1.1.10",
@@ -895,6 +946,10 @@
       "updated_at": "2026-08-07",
       "author": "Qx",
       "min_app_version": "0.6.50",
+      "platforms": [
+        "macos",
+        "windows"
+      ],
       "releases": [
         {
           "version": "1.1.7",
@@ -996,6 +1051,10 @@
       "updated_at": "2026-08-07",
       "author": "Qx",
       "min_app_version": "0.6.38",
+      "platforms": [
+        "macos",
+        "windows"
+      ],
       "releases": [
         {
           "version": "1.4.0",
@@ -1060,6 +1119,10 @@
       "updated_at": "2026-08-07",
       "author": "qx (ported from Raycast unsplash)",
       "min_app_version": "0.6.13",
+      "platforms": [
+        "macos",
+        "windows"
+      ],
       "releases": [
         {
           "version": "1.2.0",
@@ -1094,6 +1157,10 @@
       "updated_at": "2026-08-07",
       "author": "mcx",
       "min_app_version": "0.6.13",
+      "platforms": [
+        "macos",
+        "windows"
+      ],
       "releases": [
         {
           "version": "3.0.1",
@@ -1142,6 +1209,10 @@
       "updated_at": "2026-08-07",
       "author": "mcx",
       "min_app_version": "0.5.18",
+      "platforms": [
+        "macos",
+        "windows"
+      ],
       "releases": [
         {
           "version": "1.0.0",

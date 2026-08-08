@@ -166,6 +166,13 @@ async function main() {
       ? previousEntry.updated_at || today
       : today;
 
+    const platforms = Array.isArray(manifest.platforms)
+      ? [...new Set(
+        manifest.platforms
+          .map((value) => String(value || "").trim())
+          .filter((value) => value === "macos" || value === "windows" || value === "linux"),
+      )]
+      : [];
     const nextEntry = {
       id,
       name: manifest.name || id,
@@ -178,6 +185,8 @@ async function main() {
       updated_at: updatedAt,
       author: manifest.author || "",
       min_app_version: manifest.min_app_version || manifest.minAppVersion || previousEntry?.min_app_version || "0.4.28",
+      // Empty array is omitted so older hosts treat the package as universal.
+      ...(platforms.length > 0 ? { platforms } : {}),
       releases,
     };
     const previousIndex = plugins.findIndex((entry) => entry.id === id);

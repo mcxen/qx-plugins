@@ -13,6 +13,14 @@
     ],
     "external-display-control": [
       {
+        "version": "1.2.3",
+        "published_at": "2026-08-07",
+        "notes_localizations": {
+          "en": "Enables the Display Brightness panel and tray/home providers on Windows (manifest platforms previously listed macOS only).",
+          "zh-CN": "在 Windows 上启用显示器亮度面板与托盘/主页提供器（此前 manifest 的 platforms 仅声明了 macOS）。"
+        }
+      },
+      {
         "version": "1.2.2",
         "published_at": "2026-08-07",
         "notes_localizations": {

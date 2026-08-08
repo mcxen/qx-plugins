@@ -47,7 +47,7 @@ they do not claim that an old archive is still downloadable.
 | `qxheihe` | Native Workbench List | Xiaoheihe community feed, read state, managed retention and async multi-image detail |
 | `qxpicture` | Native Workbench List | Configurable random-image APIs with adaptive detail media |
 | `raycast-calendar` | Raycast generic convert | UI calendar; works on Qx ≥ 0.4.28 |
-| `external-display-control` | Native | DDC/CI brightness; macOS, needs Qx ≥ 0.4.61 |
+| `external-display-control` | Native | Built-in + DDC/CI brightness; macOS + Windows, needs Qx ≥ 0.6.55 |
 | `v2ex` | Native | Host `v2ex_*` commands |
 
 ## Legacy Raycast converter（Frozen）

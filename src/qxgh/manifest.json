@@ -13,6 +13,7 @@
   },
   "author": "mcx",
   "icon": "icon.svg",
+  "platforms": ["macos", "windows"],
   "keywords": [
     "qxgh",
     "github",
