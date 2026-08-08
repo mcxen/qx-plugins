@@ -25,6 +25,12 @@
 - Refresh is single-flight across timer ticks, tab changes, and manual actions.
   Disposable background ticks are skipped while a sample is active; user-driven
   navigation/refresh is queued once and runs after the active sample.
+- Hardware loading is failure-tolerant: a single `context.system.*` rejection
+  (e.g. Windows desktop without a battery WMI provider, or a Server Core SKU
+  missing the NetAdapter module) must never blank the whole panel. Use
+  `Promise.allSettled` and drop only the failed row; successful rows still
+  render with their real data. Selected-item refresh keeps the previous sample
+  when the new fetch rejects instead of replacing it with an error.
 - System identity/specification, storage capacity, and display inventory are cached per panel runtime;
   live polling must not rescan them. CPU/memory load, power, network counters,
   and processes refresh in the background without replacing content with loading UI.

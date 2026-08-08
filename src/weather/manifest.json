@@ -1,8 +1,16 @@
 {
   "id": "weather",
   "name": "Weather",
+  "names": {
+    "en": "Weather",
+    "zh-CN": "天气"
+  },
   "version": "1.0.0",
   "description": "Current conditions and multi-day forecast via Open-Meteo (or OpenWeatherMap). Cached for fast reopen.",
+  "descriptions": {
+    "en": "Current conditions and multi-day forecast via Open-Meteo or OpenWeatherMap.",
+    "zh-CN": "通过 Open-Meteo 或 OpenWeatherMap 查看当前天气和多日预报。"
+  },
   "author": "mcx",
   "icon": "icon.svg",
   "keywords": [
@@ -27,41 +35,81 @@
     {
       "id": "locations",
       "label": "Locations",
+      "labels": {
+        "en": "Locations",
+        "zh-CN": "位置"
+      },
       "type": "string",
       "required": false,
       "default": "",
-      "description": "Cities or lat,lon — one per line (or comma-separated). Leave empty for auto IP location."
+      "description": "Cities or lat,lon — one per line (or comma-separated). Leave empty for auto IP location.",
+      "descriptions": {
+        "en": "Cities or lat,lon — one per line (or comma-separated). Leave empty for auto IP location.",
+        "zh-CN": "城市或纬度、经度，每行一个或用逗号分隔；留空则自动使用 IP 定位。"
+      }
     },
     {
       "id": "units",
       "label": "Temperature units",
+      "labels": {
+        "en": "Temperature units",
+        "zh-CN": "温度单位"
+      },
       "type": "string",
       "required": false,
       "default": "celsius",
-      "description": "celsius or fahrenheit"
+      "description": "celsius or fahrenheit",
+      "descriptions": {
+        "en": "celsius or fahrenheit",
+        "zh-CN": "使用 celsius 或 fahrenheit。"
+      }
     },
     {
       "id": "provider",
       "label": "Provider",
+      "labels": {
+        "en": "Provider",
+        "zh-CN": "数据提供商"
+      },
       "type": "string",
       "required": false,
       "default": "open-meteo",
-      "description": "open-meteo (free) or openweathermap (needs API key)"
+      "description": "open-meteo (free) or openweathermap (needs API key)",
+      "descriptions": {
+        "en": "open-meteo (free) or openweathermap (needs API key)",
+        "zh-CN": "open-meteo（免费）或 openweathermap（需要 API 密钥）。"
+      }
     },
     {
       "id": "apiKey",
       "label": "OpenWeatherMap API key",
+      "labels": {
+        "en": "OpenWeatherMap API key",
+        "zh-CN": "OpenWeatherMap API 密钥"
+      },
       "type": "password",
       "required": false,
-      "description": "Only for provider=openweathermap"
+      "description": "Only for provider=openweathermap",
+      "descriptions": {
+        "en": "Only for provider=openweathermap",
+        "zh-CN": "仅在使用 openweathermap 时需要。"
+      }
     },
     {
       "id": "cacheMinutes",
       "label": "Cache minutes",
+      "labels": {
+        "en": "Cache minutes",
+        "zh-CN": "缓存时长（分钟）"
+      },
       "type": "string",
       "required": false,
       "default": "30",
-      "description": "How long plugin-local cache is treated as fresh"
+      "description": "How long plugin-local cache is treated as fresh",
+      "descriptions": {
+        "en": "How long plugin-local cache is treated as fresh",
+        "zh-CN": "插件本地缓存保持新鲜的时长。"
+      }
     }
   ],
   "entry": "index.js",
@@ -69,18 +117,38 @@
     {
       "name": "open-weather",
       "title": "Weather",
+      "titles": {
+        "en": "Weather",
+        "zh-CN": "天气"
+      },
       "description": "Open the weather panel",
+      "descriptions": {
+        "en": "Open the weather panel",
+        "zh-CN": "打开天气面板。"
+      },
       "keywords": ["weather", "forecast", "温度", "天气"]
     },
     {
       "name": "refresh-weather",
       "title": "Refresh Weather",
+      "titles": {
+        "en": "Refresh Weather",
+        "zh-CN": "刷新天气"
+      },
       "description": "Force refresh weather data",
+      "descriptions": {
+        "en": "Force refresh weather data",
+        "zh-CN": "强制刷新天气数据。"
+      },
       "keywords": ["weather", "refresh", "刷新"]
     }
   ],
   "panel": {
     "title": "Weather",
+    "titles": {
+      "en": "Weather",
+      "zh-CN": "天气"
+    },
     "icon": "",
     "keywords": ["weather", "forecast", "天气", "气温"]
   },

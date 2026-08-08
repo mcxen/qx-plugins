@@ -3,6 +3,14 @@
   "name": "Qx Bing Wallpaper",
   "version": "2.2.1",
   "description": "Browse Bing's daily images in a native Qx thumbnail list, then download or set them as wallpaper.",
+  "names": {
+    "en": "Qx Bing Wallpaper",
+    "zh-CN": "必应壁纸"
+  },
+  "descriptions": {
+    "en": "Browse Bing's daily images, download them, or set them as wallpaper.",
+    "zh-CN": "浏览必应每日图片，下载图片或将其设为壁纸。"
+  },
   "author": "Qx",
   "icon": "icon.svg",
   "screenshots": [
@@ -25,33 +33,57 @@
     {
       "id": "applyTo",
       "label": "Apply Wallpaper To",
+      "labels": {
+        "en": "Apply Wallpaper To",
+        "zh-CN": "应用壁纸到"
+      },
       "type": "select",
       "required": false,
       "default": "every",
       "description": "macOS: apply to every desktop or only the current desktop.",
+      "descriptions": {
+        "en": "macOS: apply to every desktop or only the current desktop.",
+        "zh-CN": "macOS：应用到所有桌面或仅当前桌面。"
+      },
       "options": [
-        { "label": "Every Desktop", "value": "every" },
-        { "label": "Current Desktop", "value": "current" }
+        { "label": "Every Desktop", "labels": { "en": "Every Desktop", "zh-CN": "所有桌面" }, "value": "every" },
+        { "label": "Current Desktop", "labels": { "en": "Current Desktop", "zh-CN": "当前桌面" }, "value": "current" }
       ]
     },
     {
       "id": "downloadDirectory",
       "label": "Download Directory",
+      "labels": {
+        "en": "Download Directory",
+        "zh-CN": "下载目录"
+      },
       "type": "string",
       "required": false,
       "default": "~/Downloads",
-      "description": "Folder used by the Download action."
+      "description": "Folder used by the Download action.",
+      "descriptions": {
+        "en": "Folder used by the Download action.",
+        "zh-CN": "下载操作使用的文件夹。"
+      }
     },
     {
       "id": "dailyWallpaperMode",
       "label": "Daily Wallpaper",
+      "labels": {
+        "en": "Daily Wallpaper",
+        "zh-CN": "每日壁纸"
+      },
       "type": "select",
       "required": false,
       "default": "latest",
       "description": "Choose whether the daily background task uses the latest or a random Bing image.",
+      "descriptions": {
+        "en": "Choose whether the daily background task uses the latest or a random Bing image.",
+        "zh-CN": "选择每日任务使用最新图片还是随机图片。"
+      },
       "options": [
-        { "label": "Latest Image", "value": "latest" },
-        { "label": "Random Recent Image", "value": "random" }
+        { "label": "Latest Image", "labels": { "en": "Latest Image", "zh-CN": "最新图片" }, "value": "latest" },
+        { "label": "Random Recent Image", "labels": { "en": "Random Recent Image", "zh-CN": "近期随机图片" }, "value": "random" }
       ]
     }
   ],
@@ -60,7 +92,15 @@
     {
       "name": "open-gallery",
       "title": "Qx Bing Wallpaper",
+      "titles": {
+        "en": "Qx Bing Wallpaper",
+        "zh-CN": "必应壁纸"
+      },
       "description": "Browse Bing daily wallpapers in a Qx Workbench list with thumbnails.",
+      "descriptions": {
+        "en": "Browse Bing daily wallpapers in a Qx Workbench list with thumbnails.",
+        "zh-CN": "在 Qx 列表中浏览带缩略图的必应每日壁纸。"
+      },
       "icon": "bing-wallpaper-icon.png",
       "keywords": ["bing", "wallpaper", "gallery", "必应", "壁纸", "图库"],
       "mode": "view"
@@ -68,7 +108,15 @@
     {
       "name": "set-random-wallpaper",
       "title": "Set Random Bing Wallpaper",
+      "titles": {
+        "en": "Set Random Bing Wallpaper",
+        "zh-CN": "设置随机必应壁纸"
+      },
       "description": "Set a random recent Bing wallpaper now.",
+      "descriptions": {
+        "en": "Set a random recent Bing wallpaper now.",
+        "zh-CN": "立即设置一张近期随机必应壁纸。"
+      },
       "icon": "random-wallpaper-icon.png",
       "keywords": ["random", "bing", "wallpaper"],
       "mode": "no-view"
@@ -76,7 +124,15 @@
     {
       "name": "set-latest-wallpaper",
       "title": "Set Latest Bing Wallpaper",
+      "titles": {
+        "en": "Set Latest Bing Wallpaper",
+        "zh-CN": "设置最新必应壁纸"
+      },
       "description": "Set the latest Bing wallpaper now.",
+      "descriptions": {
+        "en": "Set the latest Bing wallpaper now.",
+        "zh-CN": "立即设置最新必应壁纸。"
+      },
       "icon": "auto-switch-wallpaper-icon.png",
       "keywords": ["latest", "bing", "wallpaper"],
       "mode": "no-view"
@@ -84,7 +140,15 @@
     {
       "name": "daily-wallpaper",
       "title": "Daily Bing Wallpaper",
+      "titles": {
+        "en": "Daily Bing Wallpaper",
+        "zh-CN": "每日必应壁纸"
+      },
       "description": "Apply the configured Bing wallpaper once per day.",
+      "descriptions": {
+        "en": "Apply the configured Bing wallpaper once per day.",
+        "zh-CN": "每天应用一次配置的必应壁纸。"
+      },
       "icon": "auto-switch-wallpaper-icon.png",
       "keywords": ["daily", "automatic", "bing", "wallpaper"],
       "mode": "no-view",
@@ -93,6 +157,10 @@
   ],
   "panel": {
     "title": "Qx Bing Wallpaper",
+    "titles": {
+      "en": "Qx Bing Wallpaper",
+      "zh-CN": "必应壁纸"
+    },
     "icon": "extension-icon.png",
     "keywords": ["bing", "wallpaper", "gallery", "必应", "壁纸", "图库"]
   },

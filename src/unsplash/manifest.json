@@ -1,8 +1,16 @@
 {
   "id": "unsplash",
   "name": "Unsplash",
+  "names": {
+    "en": "Unsplash",
+    "zh-CN": "Unsplash"
+  },
   "version": "1.2.0",
   "description": "Search Unsplash photos, download, and set desktop wallpaper. Ported for Qx (Access Key API; likes/OAuth not included).",
+  "descriptions": {
+    "en": "Search Unsplash photos, download, and set desktop wallpaper.",
+    "zh-CN": "搜索 Unsplash 图片，下载并设置桌面壁纸。"
+  },
   "author": "qx (ported from Raycast unsplash)",
   "icon": "icon.svg",
   "screenshots": [
@@ -36,51 +44,91 @@
     {
       "id": "accessKey",
       "label": "Access Key",
+      "labels": {
+        "en": "Access Key",
+        "zh-CN": "访问密钥"
+      },
       "type": "password",
       "required": true,
       "default": "",
-      "description": "Unsplash API Access Key from https://unsplash.com/oauth/applications (Client-ID)."
+      "description": "Unsplash API Access Key from https://unsplash.com/oauth/applications (Client-ID).",
+      "descriptions": {
+        "en": "Unsplash API Access Key from the application settings (Client-ID).",
+        "zh-CN": "来自 Unsplash 应用设置的 API 访问密钥（Client-ID）。"
+      }
     },
     {
       "id": "downloadSize",
       "label": "Download Size",
+      "labels": {
+        "en": "Download Size",
+        "zh-CN": "下载尺寸"
+      },
       "type": "select",
       "required": false,
       "default": "full",
       "description": "Image size for download and wallpaper.",
+      "descriptions": {
+        "en": "Image size for download and wallpaper.",
+        "zh-CN": "下载和壁纸使用的图片尺寸。"
+      },
       "options": [
-        { "label": "Raw", "value": "raw" },
-        { "label": "Full", "value": "full" },
-        { "label": "Regular", "value": "regular" },
-        { "label": "Small", "value": "small" }
+        { "label": "Raw", "labels": { "en": "Raw", "zh-CN": "原图" }, "value": "raw" },
+        { "label": "Full", "labels": { "en": "Full", "zh-CN": "完整" }, "value": "full" },
+        { "label": "Regular", "labels": { "en": "Regular", "zh-CN": "标准" }, "value": "regular" },
+        { "label": "Small", "labels": { "en": "Small", "zh-CN": "小图" }, "value": "small" }
       ]
     },
     {
       "id": "downloadDir",
       "label": "Download Directory",
+      "labels": {
+        "en": "Download Directory",
+        "zh-CN": "下载目录"
+      },
       "type": "string",
       "required": false,
       "default": "~/Downloads",
-      "description": "Folder for saved images (~ expanded via /qx-home)."
+      "description": "Folder for saved images (~ expanded via /qx-home).",
+      "descriptions": {
+        "en": "Folder for saved images.",
+        "zh-CN": "保存图片的文件夹。"
+      }
     },
     {
       "id": "wallpaperDir",
       "label": "Wallpaper Cache Directory",
+      "labels": {
+        "en": "Wallpaper Cache Directory",
+        "zh-CN": "壁纸缓存目录"
+      },
       "type": "string",
       "required": false,
       "default": "~/Pictures/Unsplash",
-      "description": "Where wallpapers are stored before applying."
+      "description": "Where wallpapers are stored before applying.",
+      "descriptions": {
+        "en": "Where wallpapers are stored before applying.",
+        "zh-CN": "应用壁纸前的保存位置。"
+      }
     },
     {
       "id": "applyTo",
       "label": "Apply Wallpaper To",
+      "labels": {
+        "en": "Apply Wallpaper To",
+        "zh-CN": "应用壁纸到"
+      },
       "type": "select",
       "required": false,
       "default": "every",
       "description": "macOS: apply to every desktop or only the current desktop. Windows applies the system wallpaper.",
+      "descriptions": {
+        "en": "macOS: apply to every desktop or only the current desktop. Windows applies the system wallpaper.",
+        "zh-CN": "macOS：应用到所有桌面或仅当前桌面；Windows 使用系统壁纸。"
+      },
       "options": [
-        { "label": "Every Monitor", "value": "every" },
-        { "label": "Current Monitor", "value": "current" }
+        { "label": "Every Monitor", "labels": { "en": "Every Monitor", "zh-CN": "所有显示器" }, "value": "every" },
+        { "label": "Current Monitor", "labels": { "en": "Current Monitor", "zh-CN": "当前显示器" }, "value": "current" }
       ]
     }
   ],
@@ -89,13 +137,29 @@
     {
       "name": "open-search",
       "title": "Unsplash: Search Photos",
+      "titles": {
+        "en": "Unsplash: Search Photos",
+        "zh-CN": "Unsplash：搜索图片"
+      },
       "description": "Open Unsplash photo search panel",
+      "descriptions": {
+        "en": "Open Unsplash photo search panel",
+        "zh-CN": "打开 Unsplash 图片搜索面板。"
+      },
       "keywords": ["unsplash", "wallpaper", "photo", "search"]
     },
     {
       "name": "set-random-wallpaper",
       "title": "Unsplash: Set Random Wallpaper",
+      "titles": {
+        "en": "Unsplash: Set Random Wallpaper",
+        "zh-CN": "Unsplash：设置随机壁纸"
+      },
       "description": "Download a random Unsplash photo and set as wallpaper",
+      "descriptions": {
+        "en": "Download a random Unsplash photo and set as wallpaper",
+        "zh-CN": "下载一张随机 Unsplash 图片并设为壁纸。"
+      },
       "keywords": ["unsplash", "random", "wallpaper"],
       "mode": "no-view",
       "interval": "1d"
@@ -103,6 +167,10 @@
   ],
   "panel": {
     "title": "Unsplash",
+    "titles": {
+      "en": "Unsplash",
+      "zh-CN": "Unsplash"
+    },
     "icon": "icon.png",
     "keywords": ["unsplash", "wallpaper", "photos"]
   },

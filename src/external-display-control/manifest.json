@@ -15,9 +15,9 @@
     "brightness",
     "ddc",
     "external monitor",
-    "\u663e\u793a\u5668",
-    "\u5916\u63a5\u663e\u793a\u5668",
-    "\u4eae\u5ea6"
+    "显示器",
+    "外接显示器",
+    "亮度"
   ],
   "permissions": [
     "tray",
@@ -36,9 +36,17 @@
         "monitor",
         "brightness",
         "ddc",
-        "\u663e\u793a\u5668",
-        "\u4eae\u5ea6"
-      ]
+        "显示器",
+        "亮度"
+      ],
+      "titles": {
+        "en": "Display Brightness",
+        "zh-CN": "显示器亮度"
+      },
+      "descriptions": {
+        "en": "Adjust built-in and external display brightness.",
+        "zh-CN": "调节内置和外接显示器亮度。"
+      }
     }
   ],
   "panel": {
@@ -49,9 +57,13 @@
       "monitor",
       "brightness",
       "ddc",
-      "\u663e\u793a\u5668",
-      "\u4eae\u5ea6"
-    ]
+      "显示器",
+      "亮度"
+    ],
+    "titles": {
+      "en": "Display Brightness",
+      "zh-CN": "显示器亮度"
+    }
   },
   "homeWidgets": [
     {
@@ -63,7 +75,10 @@
     {
       "id": "brightness",
       "source": "system.display-brightness",
-      "surfaces": ["tray", "home"],
+      "surfaces": [
+        "tray",
+        "home"
+      ],
       "presentation": "standard",
       "title": "Display Brightness",
       "titles": {
@@ -74,5 +89,13 @@
     }
   ],
   "min_app_version": "0.6.55",
-  "screenshots": []
+  "screenshots": [],
+  "names": {
+    "en": "Display Brightness",
+    "zh-CN": "显示器亮度"
+  },
+  "descriptions": {
+    "en": "Adjust built-in and external display brightness through Qx's native display service.",
+    "zh-CN": "通过 Qx 原生显示器服务调节内置和外接显示器亮度。"
+  }
 }

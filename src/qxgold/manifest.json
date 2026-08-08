@@ -19,34 +19,50 @@
     {
       "id": "showInIsland",
       "label": "显示在灵动岛 / Show in Island",
+      "labels": {
+        "en": "Show in Island",
+        "zh-CN": "显示在灵动岛"
+      },
       "type": "select",
       "default": "on",
       "description": "开启后在 Qx 灵动岛显示当前金价；关闭后不占用灵动岛信息位。 / Show the current price in Qx Island; when off, do not reserve an Island slot.",
+      "descriptions": {
+        "en": "Show the current price in Qx Island; when off, do not reserve an Island slot.",
+        "zh-CN": "开启后在 Qx 灵动岛显示当前金价；关闭后不占用灵动岛信息位。"
+      },
       "options": [
-        { "label": "开启 / On", "value": "on" },
-        { "label": "关闭 / Off", "value": "off" }
+        { "label": "开启 / On", "labels": { "en": "On", "zh-CN": "开启" }, "value": "on" },
+        { "label": "关闭 / Off", "labels": { "en": "Off", "zh-CN": "关闭" }, "value": "off" }
       ]
     },
     {
       "id": "refreshIntervalSeconds",
       "label": "刷新间隔（秒）",
+      "labels": {
+        "en": "Refresh interval (seconds)",
+        "zh-CN": "刷新间隔（秒）"
+      },
       "type": "select",
       "default": "60",
       "options": [
-        { "label": "30 秒", "value": "30" },
-        { "label": "60 秒", "value": "60" },
-        { "label": "5 分钟", "value": "300" }
+        { "label": "30 秒", "labels": { "en": "30 seconds", "zh-CN": "30 秒" }, "value": "30" },
+        { "label": "60 秒", "labels": { "en": "60 seconds", "zh-CN": "60 秒" }, "value": "60" },
+        { "label": "5 分钟", "labels": { "en": "5 minutes", "zh-CN": "5 分钟" }, "value": "300" }
       ]
     },
     {
       "id": "historyDays",
       "label": "历史曲线保留",
+      "labels": {
+        "en": "History retention",
+        "zh-CN": "历史曲线保留"
+      },
       "type": "select",
       "default": "7",
       "options": [
-        { "label": "1 天", "value": "1" },
-        { "label": "7 天", "value": "7" },
-        { "label": "30 天", "value": "30" }
+        { "label": "1 天", "labels": { "en": "1 day", "zh-CN": "1 天" }, "value": "1" },
+        { "label": "7 天", "labels": { "en": "7 days", "zh-CN": "7 天" }, "value": "7" },
+        { "label": "30 天", "labels": { "en": "30 days", "zh-CN": "30 天" }, "value": "30" }
       ]
     }
   ],
@@ -66,12 +82,24 @@
     {
       "name": "open-qxgold",
       "title": "Open QxGold",
+      "titles": {
+        "en": "Open QxGold",
+        "zh-CN": "打开金价追踪"
+      },
       "description": "查看京东金融积存金实时价格和走势",
+      "descriptions": {
+        "en": "View live JD accumulated-gold prices and trends.",
+        "zh-CN": "查看京东金融积存金实时价格和走势。"
+      },
       "keywords": ["黄金", "金价", "gold"]
     }
   ],
   "panel": {
     "title": "QxGold",
+    "titles": {
+      "en": "QxGold",
+      "zh-CN": "金价追踪"
+    },
     "keywords": ["黄金", "金价", "gold", "京东"]
   },
   "min_app_version": "0.6.19",

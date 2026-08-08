@@ -38,12 +38,24 @@
     {
       "name": "open-sysinfo",
       "title": "Sysinfo",
+      "titles": {
+        "en": "Sysinfo",
+        "zh-CN": "系统信息"
+      },
       "description": "Open the native system information Workbench",
+      "descriptions": {
+        "en": "Open the native system information Workbench",
+        "zh-CN": "打开原生系统信息面板。"
+      },
       "keywords": ["system", "cpu", "memory", "storage", "network", "系统信息"]
     }
   ],
   "panel": {
     "title": "Sysinfo",
+    "titles": {
+      "en": "Sysinfo",
+      "zh-CN": "系统信息"
+    },
     "icon": "icon.svg",
     "keywords": ["system", "monitor", "processes", "系统", "性能"]
   },

@@ -32,27 +32,43 @@
     {
       "id": "storyLimit",
       "label": "Stories to load",
+      "labels": {
+        "en": "Stories to load",
+        "zh-CN": "加载帖子数量"
+      },
       "type": "select",
       "required": false,
       "default": "30",
       "description": "Number of newest stories to load from Hacker News.",
+      "descriptions": {
+        "en": "Number of newest stories to load from Hacker News.",
+        "zh-CN": "从 Hacker News 加载的最新帖子数量。"
+      },
       "options": [
-        { "label": "20", "value": "20" },
-        { "label": "30", "value": "30" },
-        { "label": "50", "value": "50" }
+        { "label": "20", "labels": { "en": "20", "zh-CN": "20" }, "value": "20" },
+        { "label": "30", "labels": { "en": "30", "zh-CN": "30" }, "value": "30" },
+        { "label": "50", "labels": { "en": "50", "zh-CN": "50" }, "value": "50" }
       ]
     },
     {
       "id": "cacheTtlMinutes",
       "label": "Cache freshness (minutes)",
+      "labels": {
+        "en": "Cache freshness (minutes)",
+        "zh-CN": "缓存有效期（分钟）"
+      },
       "type": "select",
       "required": false,
       "default": "5",
       "description": "Cached stories and comments remain visible while a stale refresh runs.",
+      "descriptions": {
+        "en": "Cached stories and comments remain visible while a stale refresh runs.",
+        "zh-CN": "后台刷新时仍显示缓存的帖子和评论。"
+      },
       "options": [
-        { "label": "5", "value": "5" },
-        { "label": "15", "value": "15" },
-        { "label": "30", "value": "30" }
+        { "label": "5", "labels": { "en": "5", "zh-CN": "5" }, "value": "5" },
+        { "label": "15", "labels": { "en": "15", "zh-CN": "15" }, "value": "15" },
+        { "label": "30", "labels": { "en": "30", "zh-CN": "30" }, "value": "30" }
       ]
     }
   ],
@@ -75,7 +91,15 @@
     {
       "name": "open-hacker-news",
       "title": "Open Hacker News",
+      "titles": {
+        "en": "Open Hacker News",
+        "zh-CN": "打开 Hacker News"
+      },
       "description": "Browse the latest Hacker News stories and comments",
+      "descriptions": {
+        "en": "Browse the latest Hacker News stories and comments",
+        "zh-CN": "浏览 Hacker News 最新帖子和评论。"
+      },
       "keywords": ["hacker news", "hn", "news", "technology", "社区", "帖子"]
     }
   ],

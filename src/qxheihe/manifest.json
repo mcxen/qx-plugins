@@ -1,8 +1,16 @@
 {
   "id": "qxheihe",
   "name": "QxHeihe 小黑盒",
+  "names": {
+    "en": "QxHeihe",
+    "zh-CN": "QxHeihe 小黑盒"
+  },
   "version": "1.4.11",
   "description": "浏览小黑盒社区推荐内容，在 Qx 内查看正文、多图、帖子信息与匿名优先评论。",
+  "descriptions": {
+    "en": "Browse Heybox community recommendations and read posts and comments in Qx.",
+    "zh-CN": "浏览小黑盒社区推荐内容，在 Qx 内查看正文、多图、帖子信息与匿名优先评论。"
+  },
   "author": "mcx",
   "icon": "icon.svg",
   "keywords": [
@@ -24,47 +32,57 @@
     {
       "id": "feedUrl",
       "label": "Feed API 基础地址",
+      "labels": { "en": "Feed API base URL", "zh-CN": "Feed API 基础地址" },
       "type": "string",
       "required": false,
-      "description": "可选。通常留空即可。支持粘贴旧的完整 feeds URL，插件会移除旧签名并在每次请求时重新生成。"
+      "description": "可选。通常留空即可。支持粘贴旧的完整 feeds URL，插件会移除旧签名并在每次请求时重新生成。",
+      "descriptions": { "en": "Optional. Usually leave empty. An old full feeds URL is accepted; the plugin removes its old signature and creates a new one for each request.", "zh-CN": "可选。通常留空即可。支持粘贴旧的完整 feeds URL，插件会移除旧签名并在每次请求时重新生成。" }
     },
     {
       "id": "commentCookie",
       "label": "评论 Cookie（可选）",
+      "labels": { "en": "Comment Cookie (optional)", "zh-CN": "评论 Cookie（可选）" },
       "type": "string",
       "required": false,
-      "description": "可选。评论会优先匿名加载；如实例要求登录，可粘贴网页版完整 Cookie 增强请求。Cookie 仅用于请求头，不写入帖子缓存。"
+      "description": "可选。评论会优先匿名加载；如实例要求登录，可粘贴网页版完整 Cookie 增强请求。Cookie 仅用于请求头，不写入帖子缓存。",
+      "descriptions": { "en": "Optional. Comments load anonymously first; paste the full web Cookie when the instance requires login. The Cookie is used only in request headers and is not stored in post cache.", "zh-CN": "可选。评论会优先匿名加载；如实例要求登录，可粘贴网页版完整 Cookie 增强请求。Cookie 仅用于请求头，不写入帖子缓存。" }
     },
     {
       "id": "cacheTtlMinutes",
       "label": "列表缓存（分钟）",
+      "labels": { "en": "List cache (minutes)", "zh-CN": "列表缓存（分钟）" },
       "type": "string",
       "required": false,
       "default": "5",
-      "description": "缓存仍会优先显示，随后在后台刷新。"
+      "description": "缓存仍会优先显示，随后在后台刷新。",
+      "descriptions": { "en": "Cached content remains visible first, then refreshes in the background.", "zh-CN": "缓存仍会优先显示，随后在后台刷新。" }
     },
     {
       "id": "retentionDays",
       "label": "缓存自动清理",
+      "labels": { "en": "Cache retention", "zh-CN": "缓存自动清理" },
       "type": "select",
       "required": false,
       "default": "7",
       "description": "帖子、详情和已读状态超过保留期后自动删除。",
+      "descriptions": { "en": "Remove posts, details, and read state after the retention period.", "zh-CN": "帖子、详情和已读状态超过保留期后自动删除。" },
       "options": [
-        { "label": "3 天", "value": "3" },
-        { "label": "7 天", "value": "7" }
+        { "label": "3 天", "labels": { "en": "3 days", "zh-CN": "3 天" }, "value": "3" },
+        { "label": "7 天", "labels": { "en": "7 days", "zh-CN": "7 天" }, "value": "7" }
       ]
     },
     {
       "id": "detailImageLayout",
       "label": "详情多图布局",
+      "labels": { "en": "Detail image layout", "zh-CN": "详情多图布局" },
       "type": "select",
       "required": false,
       "default": "horizontal",
       "description": "横向胶片可用左右键逐张浏览；响应式网格会同时展示更多图片。",
+      "descriptions": { "en": "Browse images one by one with the filmstrip or view more at once in the responsive grid.", "zh-CN": "横向胶片可用左右键逐张浏览；响应式网格会同时展示更多图片。" },
       "options": [
-        { "label": "横向胶片", "value": "horizontal" },
-        { "label": "响应式网格", "value": "grid" }
+        { "label": "横向胶片", "labels": { "en": "Filmstrip", "zh-CN": "横向胶片" }, "value": "horizontal" },
+        { "label": "响应式网格", "labels": { "en": "Responsive grid", "zh-CN": "响应式网格" }, "value": "grid" }
       ]
     }
   ],
@@ -87,12 +105,15 @@
     {
       "name": "open-qxheihe",
       "title": "打开 QxHeihe 小黑盒",
+      "titles": { "en": "Open QxHeihe", "zh-CN": "打开 QxHeihe 小黑盒" },
       "description": "浏览小黑盒社区推荐帖子",
+      "descriptions": { "en": "Browse recommended Heybox community posts.", "zh-CN": "浏览小黑盒社区推荐帖子。" },
       "keywords": ["小黑盒", "heybox", "社区", "帖子", "游戏"]
     }
   ],
   "panel": {
     "title": "QxHeihe 小黑盒",
+    "titles": { "en": "QxHeihe", "zh-CN": "QxHeihe 小黑盒" },
     "icon": "icon.svg",
     "keywords": ["小黑盒", "heybox", "社区", "帖子", "游戏"]
   },

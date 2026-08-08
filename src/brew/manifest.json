@@ -3,6 +3,14 @@
   "name": "Brew",
   "version": "1.1.0",
   "description": "Search, inspect, upgrade and uninstall Homebrew formulae & casks (macOS). Uses Qx context.cli.",
+  "names": {
+    "en": "Brew",
+    "zh-CN": "Homebrew"
+  },
+  "descriptions": {
+    "en": "Search, inspect, upgrade and uninstall Homebrew formulae and casks on macOS.",
+    "zh-CN": "在 macOS 上搜索、查看、更新和卸载 Homebrew formula 与 cask。"
+  },
   "author": "qx (ported from Raycast brew by nhojb et al.)",
   "icon": "icon.svg",
   "screenshots": [
@@ -31,10 +39,18 @@
     {
       "id": "brewPath",
       "label": "Brew executable",
+      "labels": {
+        "en": "Brew executable",
+        "zh-CN": "Brew 可执行文件"
+      },
       "type": "string",
       "required": false,
       "default": "",
-      "description": "Optional absolute path to brew. Empty = auto-detect (/opt/homebrew/bin/brew, /usr/local/bin/brew, PATH)."
+      "description": "Optional absolute path to brew. Empty = auto-detect (/opt/homebrew/bin/brew, /usr/local/bin/brew, PATH).",
+      "descriptions": {
+        "en": "Optional absolute path to brew. Empty = auto-detect.",
+        "zh-CN": "可选的 brew 绝对路径。留空时自动检测。"
+      }
     }
   ],
   "entry": "index.js",
@@ -42,7 +58,15 @@
     {
       "name": "open-brew",
       "title": "Brew",
+      "titles": {
+        "en": "Brew",
+        "zh-CN": "打开 Homebrew 管理器"
+      },
       "description": "Open Homebrew manager panel",
+      "descriptions": {
+        "en": "Open Homebrew manager panel",
+        "zh-CN": "打开 Homebrew 软件包管理面板。"
+      },
       "keywords": [
         "brew",
         "homebrew",
@@ -53,7 +77,15 @@
     {
       "name": "brew-outdated",
       "title": "Brew: Outdated",
+      "titles": {
+        "en": "Brew: Outdated",
+        "zh-CN": "Brew：待更新"
+      },
       "description": "Show outdated formulae & casks",
+      "descriptions": {
+        "en": "Show outdated formulae & casks",
+        "zh-CN": "显示待更新的 formula 和 cask。"
+      },
       "keywords": [
         "brew",
         "outdated",
@@ -63,7 +95,15 @@
     {
       "name": "brew-upgrade-all",
       "title": "Brew: Upgrade All Outdated",
+      "titles": {
+        "en": "Brew: Upgrade All Outdated",
+        "zh-CN": "Brew：更新全部过期软件包"
+      },
       "description": "Run brew upgrade for all outdated packages",
+      "descriptions": {
+        "en": "Run brew upgrade for all outdated packages",
+        "zh-CN": "更新所有过期的 Homebrew 软件包。"
+      },
       "keywords": [
         "brew",
         "upgrade"
@@ -72,6 +112,10 @@
   ],
   "panel": {
     "title": "Brew",
+    "titles": {
+      "en": "Brew",
+      "zh-CN": "Homebrew"
+    },
     "icon": "icon.png",
     "keywords": [
       "brew",

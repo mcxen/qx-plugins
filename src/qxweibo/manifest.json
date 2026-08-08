@@ -33,7 +33,15 @@
       "label": "主用户 UID",
       "type": "string",
       "required": true,
-      "description": "微博个人主页中的数字 UID，用于“用户帖子”和自动读取关注列表。"
+      "description": "微博个人主页中的数字 UID，用于“用户帖子”和自动读取关注列表。",
+      "labels": {
+        "en": "Primary user UID",
+        "zh-CN": "主用户 UID"
+      },
+      "descriptions": {
+        "en": "Numeric UID from the Weibo profile, used for the user-posts view and automatic following-list discovery.",
+        "zh-CN": "微博个人主页中的数字 UID，用于“用户帖子”和自动读取关注列表。"
+      }
     },
     {
       "id": "followedUserIds",
@@ -42,7 +50,19 @@
       "required": false,
       "rows": 5,
       "placeholder": "1749127163\n2803301701",
-      "description": "可选，每行一个 UID。填写后直接聚合这些用户；留空则从主 UID 的公开关注列表中选取。"
+      "description": "可选，每行一个 UID。填写后直接聚合这些用户；留空则从主 UID 的公开关注列表中选取。",
+      "labels": {
+        "en": "Followed user UIDs",
+        "zh-CN": "关注用户 UID"
+      },
+      "placeholders": {
+        "en": "1749127163\n2803301701",
+        "zh-CN": "1749127163\n2803301701"
+      },
+      "descriptions": {
+        "en": "Optional, one UID per line. Aggregate these users directly; leave empty to select from the primary UID's public following list.",
+        "zh-CN": "可选，每行一个 UID。填写后直接聚合这些用户；留空则从主 UID 的公开关注列表中选取。"
+      }
     },
     {
       "id": "visitorCookies",
@@ -51,7 +71,19 @@
       "required": false,
       "rows": 5,
       "placeholder": "SUB=...; SUBP=...\nSUB=...; SUBP=...",
-      "description": "可选，每行一组完整 Cookie。插件会轮换使用；不足时仅在当前会话自动补充游客 Cookie，不写入内容缓存。"
+      "description": "可选，每行一组完整 Cookie。插件会轮换使用；不足时仅在当前会话自动补充游客 Cookie，不写入内容缓存。",
+      "labels": {
+        "en": "Guest Cookie pool",
+        "zh-CN": "游客 Cookie 池"
+      },
+      "placeholders": {
+        "en": "SUB=...; SUBP=...\nSUB=...; SUBP=...",
+        "zh-CN": "SUB=...; SUBP=...\nSUB=...; SUBP=..."
+      },
+      "descriptions": {
+        "en": "Optional, one complete Cookie per line. Cookies rotate; missing entries are supplemented only in the current session and never written to content cache.",
+        "zh-CN": "可选，每行一组完整 Cookie。插件会轮换使用；不足时仅在当前会话自动补充游客 Cookie，不写入内容缓存。"
+      }
     },
     {
       "id": "visitorPoolSize",
@@ -62,17 +94,37 @@
       "options": [
         {
           "label": "2 个",
-          "value": "2"
+          "value": "2",
+          "labels": {
+            "en": "2",
+            "zh-CN": "2 个"
+          }
         },
         {
           "label": "3 个",
-          "value": "3"
+          "value": "3",
+          "labels": {
+            "en": "3",
+            "zh-CN": "3 个"
+          }
         },
         {
           "label": "4 个",
-          "value": "4"
+          "value": "4",
+          "labels": {
+            "en": "4",
+            "zh-CN": "4 个"
+          }
         }
-      ]
+      ],
+      "labels": {
+        "en": "Guest Cookie count",
+        "zh-CN": "游客 Cookie 数量"
+      },
+      "descriptions": {
+        "en": "Number of guest Cookies kept for the current session.",
+        "zh-CN": "当前会话维持的游客 Cookie 数量。"
+      }
     },
     {
       "id": "followingUserLimit",
@@ -83,21 +135,45 @@
       "min": 3,
       "max": 12,
       "step": 1,
-      "unit": " 人"
+      "unit": " 人",
+      "labels": {
+        "en": "Following feed user limit",
+        "zh-CN": "关注流用户上限"
+      },
+      "descriptions": {
+        "en": "Maximum number of users to aggregate from the public following list when followed UIDs are empty.",
+        "zh-CN": "留空关注 UID 时，最多聚合公开关注列表中的用户数量。"
+      }
     },
     {
       "id": "requestDelayMs",
       "label": "随机请求间隔",
       "type": "string",
       "default": "500-1200",
-      "description": "请求之间的随机等待范围（毫秒），例如 500-1200；降低并发并减少触发上游限制。"
+      "description": "请求之间的随机等待范围（毫秒），例如 500-1200；降低并发并减少触发上游限制。",
+      "labels": {
+        "en": "Random request delay",
+        "zh-CN": "随机请求间隔"
+      },
+      "descriptions": {
+        "en": "Random wait range between requests in milliseconds, for example 500-1200; lower concurrency helps avoid upstream limits.",
+        "zh-CN": "请求之间的随机等待范围（毫秒），例如 500-1200；降低并发并减少触发上游限制。"
+      }
     },
     {
       "id": "cacheTtlMinutes",
       "label": "列表缓存（分钟）",
       "type": "string",
       "default": "10",
-      "description": "先显示缓存；未过期时不重复拉取，过期后在后台刷新。"
+      "description": "先显示缓存；未过期时不重复拉取，过期后在后台刷新。",
+      "labels": {
+        "en": "List cache (minutes)",
+        "zh-CN": "列表缓存（分钟）"
+      },
+      "descriptions": {
+        "en": "Show cache first; do not fetch again while fresh, then refresh it in the background after expiry.",
+        "zh-CN": "先显示缓存；未过期时不重复拉取，过期后在后台刷新。"
+      }
     },
     {
       "id": "retentionDays",
@@ -108,17 +184,37 @@
       "options": [
         {
           "label": "3 天",
-          "value": "3"
+          "value": "3",
+          "labels": {
+            "en": "3 days",
+            "zh-CN": "3 天"
+          }
         },
         {
           "label": "7 天",
-          "value": "7"
+          "value": "7",
+          "labels": {
+            "en": "7 days",
+            "zh-CN": "7 天"
+          }
         },
         {
           "label": "14 天",
-          "value": "14"
+          "value": "14",
+          "labels": {
+            "en": "14 days",
+            "zh-CN": "14 天"
+          }
         }
-      ]
+      ],
+      "labels": {
+        "en": "Cache retention",
+        "zh-CN": "缓存自动清理"
+      },
+      "descriptions": {
+        "en": "Retention period for posts, comments, and read state.",
+        "zh-CN": "帖子、评论与已读状态的保留时间。"
+      }
     },
     {
       "id": "detailImageLayout",
@@ -129,13 +225,29 @@
       "options": [
         {
           "label": "横向胶片",
-          "value": "horizontal"
+          "value": "horizontal",
+          "labels": {
+            "en": "Filmstrip",
+            "zh-CN": "横向胶片"
+          }
         },
         {
           "label": "响应式网格",
-          "value": "grid"
+          "value": "grid",
+          "labels": {
+            "en": "Responsive grid",
+            "zh-CN": "响应式网格"
+          }
         }
-      ]
+      ],
+      "labels": {
+        "en": "Detail image layout",
+        "zh-CN": "详情多图布局"
+      },
+      "descriptions": {
+        "en": "Browse images one by one in a filmstrip or view several at once in a grid.",
+        "zh-CN": "横向胶片可逐张浏览；网格适合同时查看多张图片。"
+      }
     }
   ],
   "storage": {
@@ -164,7 +276,15 @@
         "关注",
         "帖子",
         "评论"
-      ]
+      ],
+      "titles": {
+        "en": "Open QxWeibo",
+        "zh-CN": "打开 QxWeibo 微博"
+      },
+      "descriptions": {
+        "en": "Read Weibo user posts, following feeds, and comments.",
+        "zh-CN": "阅读微博用户帖子、关注流和评论。"
+      }
     }
   ],
   "panel": {
@@ -177,7 +297,11 @@
       "关注",
       "帖子",
       "评论"
-    ]
+    ],
+    "titles": {
+      "en": "QxWeibo",
+      "zh-CN": "QxWeibo 微博"
+    }
   },
   "min_app_version": "0.6.50",
   "platforms": [

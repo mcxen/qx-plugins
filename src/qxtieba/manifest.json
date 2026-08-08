@@ -25,7 +25,15 @@
       "type": "string",
       "required": true,
       "default": "图拉丁吧, 笔记本吧",
-      "description": "要浏览的贴吧名称，多个贴吧使用逗号或换行分隔；名称可带或不带末尾的“吧”。"
+      "description": "要浏览的贴吧名称，多个贴吧使用逗号或换行分隔；名称可带或不带末尾的“吧”。",
+      "labels": {
+        "en": "Tieba names",
+        "zh-CN": "贴吧名称列表"
+      },
+      "descriptions": {
+        "en": "Tieba names to browse, separated by commas or new lines; names may include or omit the trailing “吧”.",
+        "zh-CN": "要浏览的贴吧名称，多个贴吧使用逗号或换行分隔；名称可带或不带末尾的“吧”。"
+      }
     },
     {
       "id": "cacheTtlMinutes",
@@ -33,7 +41,15 @@
       "type": "string",
       "required": false,
       "default": "5",
-      "description": "优先显示缓存，并在过期后后台刷新。"
+      "description": "优先显示缓存，并在过期后后台刷新。",
+      "labels": {
+        "en": "List cache (minutes)",
+        "zh-CN": "列表缓存（分钟）"
+      },
+      "descriptions": {
+        "en": "Show cached content first and refresh it in the background after it expires.",
+        "zh-CN": "优先显示缓存，并在过期后后台刷新。"
+      }
     },
     {
       "id": "retentionDays",
@@ -43,9 +59,31 @@
       "default": "7",
       "description": "帖子、正文、评论和短期已读状态的保留时间。",
       "options": [
-        { "label": "3 天", "value": "3" },
-        { "label": "7 天", "value": "7" }
-      ]
+        {
+          "label": "3 天",
+          "value": "3",
+          "labels": {
+            "en": "3 days",
+            "zh-CN": "3 天"
+          }
+        },
+        {
+          "label": "7 天",
+          "value": "7",
+          "labels": {
+            "en": "7 days",
+            "zh-CN": "7 天"
+          }
+        }
+      ],
+      "labels": {
+        "en": "Cache retention",
+        "zh-CN": "缓存自动清理"
+      },
+      "descriptions": {
+        "en": "Retention period for posts, content, comments, and short-lived read state.",
+        "zh-CN": "帖子、正文、评论和短期已读状态的保留时间。"
+      }
     },
     {
       "id": "detailImageLayout",
@@ -55,9 +93,31 @@
       "default": "horizontal",
       "description": "横向胶片适合逐张查看；网格适合同时浏览多图。",
       "options": [
-        { "label": "横向胶片", "value": "horizontal" },
-        { "label": "响应式网格", "value": "grid" }
-      ]
+        {
+          "label": "横向胶片",
+          "value": "horizontal",
+          "labels": {
+            "en": "Filmstrip",
+            "zh-CN": "横向胶片"
+          }
+        },
+        {
+          "label": "响应式网格",
+          "value": "grid",
+          "labels": {
+            "en": "Responsive grid",
+            "zh-CN": "响应式网格"
+          }
+        }
+      ],
+      "labels": {
+        "en": "Detail image layout",
+        "zh-CN": "详情多图布局"
+      },
+      "descriptions": {
+        "en": "Use the filmstrip for one-by-one viewing or the grid for several images at once.",
+        "zh-CN": "横向胶片适合逐张查看；网格适合同时浏览多图。"
+      }
     }
   ],
   "storage": {
@@ -66,7 +126,9 @@
         "id": "community",
         "label": "QxTieba 社区缓存",
         "description": "配置贴吧的帖子列表、正文、楼层评论和短期已读状态。",
-        "keys": ["cache.community.v1"],
+        "keys": [
+          "cache.community.v1"
+        ],
         "retentionDays": 7
       }
     ]
@@ -77,15 +139,52 @@
       "name": "open-qxtieba",
       "title": "打开 QxTieba 贴吧",
       "description": "浏览配置贴吧的帖子与评论",
-      "keywords": ["贴吧", "百度贴吧", "tieba", "社区", "帖子", "评论"]
+      "keywords": [
+        "贴吧",
+        "百度贴吧",
+        "tieba",
+        "社区",
+        "帖子",
+        "评论"
+      ],
+      "titles": {
+        "en": "Open QxTieba",
+        "zh-CN": "打开 QxTieba 贴吧"
+      },
+      "descriptions": {
+        "en": "Browse posts and comments from configured Tieba forums.",
+        "zh-CN": "浏览配置贴吧的帖子与评论。"
+      }
     }
   ],
   "panel": {
     "title": "QxTieba 贴吧",
     "icon": "icon.svg",
-    "keywords": ["贴吧", "百度贴吧", "tieba", "社区", "帖子", "评论"]
+    "keywords": [
+      "贴吧",
+      "百度贴吧",
+      "tieba",
+      "社区",
+      "帖子",
+      "评论"
+    ],
+    "titles": {
+      "en": "QxTieba",
+      "zh-CN": "QxTieba 贴吧"
+    }
   },
   "min_app_version": "0.6.50",
-  "platforms": ["macos", "windows"],
-  "screenshots": []
+  "platforms": [
+    "macos",
+    "windows"
+  ],
+  "screenshots": [],
+  "names": {
+    "en": "QxTieba",
+    "zh-CN": "QxTieba 贴吧"
+  },
+  "descriptions": {
+    "en": "Browse public Baidu Tieba feeds and read posts and replies in Qx.",
+    "zh-CN": "聚合浏览多个百度贴吧的公开帖子流，在 Qx 内阅读正文与楼层评论。"
+  }
 }
