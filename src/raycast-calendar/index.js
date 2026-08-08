@@ -13842,7 +13842,8 @@ var commandLoaders = {
   "index": () => Promise.resolve().then(() => (init_src2(), src_exports))
 };
 var commandModes = { "index": "view" };
-var manifestCommands = [{ "name": "index", "title": "Quick Calendar", "description": "Shows calendar for a month", "icon": "command-icon.png", "keywords": [], "mode": "view" }];
+var manifestCommands = [];
+var panelCommandName = "index";
 var preferences = { "weekStart": "1", "showWeeks": true, "viewMode": "1" };
 var root = null;
 var loadedCommandModules = /* @__PURE__ */ new Map();
@@ -13962,8 +13963,7 @@ var entry_default = {
   panel: {
     title: "Quick Calendar",
     render(container, context) {
-      const firstView = manifestCommands.find((command) => (commandModes[command.name] || "view") === "view") || manifestCommands[0];
-      return invokeCommand(firstView.name, container, context, { launchType: "userInitiated" });
+      return invokeCommand(panelCommandName, container, context, { launchType: "userInitiated" });
     },
     destroy() {
       if (root) {

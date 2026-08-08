@@ -2,7 +2,7 @@
 
 ## Surfaces
 
-- One `open-sysinfo` launcher command.
+- The panel name is the launcher/search entry; no duplicate `open-sysinfo` command.
 - One host-rendered Workbench panel. The Hardware view uses the left List for
   System, CPU, Memory, Power, Storage, Displays, and Network categories; Processes remains
   a separate top-level view because its rows are processes, not hardware types.

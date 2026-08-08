@@ -5,7 +5,7 @@
     "en": "QxHeihe",
     "zh-CN": "QxHeihe 小黑盒"
   },
-  "version": "1.4.11",
+  "version": "1.4.12",
   "description": "浏览小黑盒社区推荐内容，在 Qx 内查看正文、多图、帖子信息与匿名优先评论。",
   "descriptions": {
     "en": "Browse Heybox community recommendations and read posts and comments in Qx.",
@@ -101,16 +101,6 @@
     ]
   },
   "entry": "index.js",
-  "commands": [
-    {
-      "name": "open-qxheihe",
-      "title": "打开 QxHeihe 小黑盒",
-      "titles": { "en": "Open QxHeihe", "zh-CN": "打开 QxHeihe 小黑盒" },
-      "description": "浏览小黑盒社区推荐帖子",
-      "descriptions": { "en": "Browse recommended Heybox community posts.", "zh-CN": "浏览小黑盒社区推荐帖子。" },
-      "keywords": ["小黑盒", "heybox", "社区", "帖子", "游戏"]
-    }
-  ],
   "panel": {
     "title": "QxHeihe 小黑盒",
     "titles": { "en": "QxHeihe", "zh-CN": "QxHeihe 小黑盒" },

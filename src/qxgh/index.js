@@ -1050,14 +1050,6 @@ let destroyPanel = null;
 export default {
   commands: [
     {
-      name: "open-qxgh",
-      title: "QxGH",
-      async run(context) {
-        setLocale(context);
-        context.showToast(text("Open QxGH from Extensions, or search “QxGH”", "请从扩展打开 Github助手，或搜索“Github助手”"));
-      },
-    },
-    {
       name: "refresh-qxgh",
       title: "Refresh QxGH",
       async run(context) {

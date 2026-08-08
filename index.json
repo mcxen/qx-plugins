@@ -4,23 +4,39 @@
     {
       "id": "brew",
       "name": "Brew",
-      "version": "1.1.0",
+      "version": "1.1.1",
       "description": "Search, inspect, upgrade and uninstall Homebrew formulae & casks (macOS). Uses Qx context.cli.",
+      "names": {
+        "en": "Brew",
+        "zh-CN": "Homebrew"
+      },
+      "descriptions": {
+        "en": "Search, inspect, upgrade and uninstall Homebrew formulae and casks on macOS.",
+        "zh-CN": "在 macOS 上搜索、查看、更新和卸载 Homebrew formula 与 cask。"
+      },
       "download_url": "https://raw.githubusercontent.com/mcxen/qx-plugins/main/brew.qx-plugin",
-      "size_bytes": 4097523,
-      "checksum_sha256": "39c0244b3a8fed3fcdf3714e7a48f71b2f692220da8dc0ae06633a0005513a90",
+      "size_bytes": 4096417,
+      "checksum_sha256": "023af349eaf76e107c4dd55647283f90ec80d7026d90c587cd3df66d3187ec61",
       "required_permissions": [
         "cli",
         "notifications",
         "open-url"
       ],
-      "updated_at": "2026-08-07",
+      "updated_at": "2026-08-09",
       "author": "qx (ported from Raycast brew by nhojb et al.)",
       "min_app_version": "0.5.39",
       "platforms": [
         "macos"
       ],
       "releases": [
+        {
+          "version": "1.1.1",
+          "published_at": "2026-08-08",
+          "notes_localizations": {
+            "en": "Moved package refresh and upgrade operations into the panel and removed duplicate searchable commands.",
+            "zh-CN": "将软件包刷新与升级操作统一到面板，并移除重复的可搜索命令。"
+          }
+        },
         {
           "version": "1.1.0",
           "published_at": "2026-07-23",
@@ -34,18 +50,26 @@
     {
       "id": "external-display-control",
       "name": "External Display Control",
-      "version": "1.2.3",
+      "version": "1.2.4",
       "description": "Adjust built-in and external display brightness through Qx's native macOS and Windows display service.",
+      "names": {
+        "en": "Display Brightness",
+        "zh-CN": "显示器亮度"
+      },
+      "descriptions": {
+        "en": "Adjust built-in and external display brightness through Qx's native display service.",
+        "zh-CN": "通过 Qx 原生显示器服务调节内置和外接显示器亮度。"
+      },
       "download_url": "https://raw.githubusercontent.com/mcxen/qx-plugins/main/external-display-control.qx-plugin",
-      "size_bytes": 42088,
-      "checksum_sha256": "4da76649aa4601d11bd500c6663e7f7c4c5553585da8278332512c47c547914c",
+      "size_bytes": 41721,
+      "checksum_sha256": "87881c53d252d6bece1a33595ca6c2c75d48896c2456aae7157e0595aedbb805",
       "required_permissions": [
         "tray",
         "system",
         "display-control",
         "invoke:display_brightness_set"
       ],
-      "updated_at": "2026-08-07",
+      "updated_at": "2026-08-09",
       "author": "mcx",
       "min_app_version": "0.6.55",
       "platforms": [
@@ -53,6 +77,14 @@
         "windows"
       ],
       "releases": [
+        {
+          "version": "1.2.4",
+          "published_at": "2026-08-08",
+          "notes_localizations": {
+            "en": "Removed the duplicate panel-opening command; open the display controls through the plugin panel.",
+            "zh-CN": "移除重复的面板打开命令，显示器控制改由插件面板入口打开。"
+          }
+        },
         {
           "version": "1.2.3",
           "published_at": "2026-08-07",
@@ -178,20 +210,40 @@
     {
       "id": "hacker-news",
       "name": "Hacker News",
-      "version": "1.0.0",
+      "version": "1.0.1",
       "description": "Browse the latest Hacker News stories with details and comments.",
+      "names": {
+        "en": "Hacker News",
+        "zh-CN": "Hacker News"
+      },
+      "descriptions": {
+        "en": "Browse the latest Hacker News stories with details and comments.",
+        "zh-CN": "浏览 Hacker News 最新帖子、正文与评论。"
+      },
       "download_url": "https://raw.githubusercontent.com/mcxen/qx-plugins/main/hacker-news.qx-plugin",
-      "size_bytes": 25956,
-      "checksum_sha256": "955c6d6665d23bdbc00b79385536872f55c9b2e98932cbccb7ddec0ab6df8dee",
+      "size_bytes": 26525,
+      "checksum_sha256": "128ce713f8c98bf513bdd75611c919af79fe82fdaee78d42717ac6e057f426ce",
       "required_permissions": [
         "http",
         "open-url",
         "clipboard"
       ],
-      "updated_at": "2026-08-03",
+      "updated_at": "2026-08-09",
       "author": "mcx",
       "min_app_version": "0.6.13",
+      "platforms": [
+        "macos",
+        "windows"
+      ],
       "releases": [
+        {
+          "version": "1.0.1",
+          "published_at": "2026-08-08",
+          "notes_localizations": {
+            "en": "Removed the duplicate panel-opening command; story actions remain available in the Workbench.",
+            "zh-CN": "移除重复的面板打开命令，帖子操作继续保留在 Workbench 中。"
+          }
+        },
         {
           "version": "1.0.0",
           "published_at": "2026-08-03",
@@ -207,14 +259,22 @@
       "name": "Pomodoro Island",
       "version": "1.6.2",
       "description": "Reference plugin for declarative Workbench and the structured QxIsland session protocol, with persistent background timing and history.",
+      "names": {
+        "en": "Pomodoro Island",
+        "zh-CN": "番茄钟灵动岛"
+      },
+      "descriptions": {
+        "en": "Focus timer with breaks.",
+        "zh-CN": "带休息提醒的专注计时器。"
+      },
       "download_url": "https://raw.githubusercontent.com/mcxen/qx-plugins/main/pomodoro-island.qx-plugin",
-      "size_bytes": 34150,
-      "checksum_sha256": "867ff75c4fb92cddca888ad9737225017123daa781de16fb99baad3ebb19a50c",
+      "size_bytes": 36319,
+      "checksum_sha256": "f1cb8dbf3250ba1af0f73748c9d0799316545eed6a89552c9e094464924f0f5e",
       "required_permissions": [
         "island",
         "notifications"
       ],
-      "updated_at": "2026-08-07",
+      "updated_at": "2026-08-09",
       "author": "mcx",
       "min_app_version": "0.5.43",
       "platforms": [
@@ -243,17 +303,25 @@
     {
       "id": "raycast-calendar",
       "name": "Quick Calendar",
-      "version": "1.2.0",
+      "version": "1.2.1",
       "description": "View calendar month-by-month",
+      "names": {
+        "en": "Quick Calendar",
+        "zh-CN": "快捷日历"
+      },
+      "descriptions": {
+        "en": "View calendar month-by-month",
+        "zh-CN": "按月浏览日历。"
+      },
       "download_url": "https://raw.githubusercontent.com/mcxen/qx-plugins/main/raycast-calendar.qx-plugin",
-      "size_bytes": 3498771,
-      "checksum_sha256": "b371e7daeac43630e9e28a72db9b739d388cbc0381c0e1cc39a528a9abb8dc12",
+      "size_bytes": 3501506,
+      "checksum_sha256": "b1f0a8c493adaf8a551819e8b0d8f2fa9f2e054d27af170df086c6305e918e8d",
       "required_permissions": [
         "http",
         "open-url",
         "clipboard"
       ],
-      "updated_at": "2026-08-07",
+      "updated_at": "2026-08-09",
       "author": "fuksman",
       "min_app_version": "0.4.28",
       "platforms": [
@@ -261,6 +329,14 @@
         "windows"
       ],
       "releases": [
+        {
+          "version": "1.2.1",
+          "published_at": "2026-08-08",
+          "notes_localizations": {
+            "en": "Removed the duplicate panel-opening command; the calendar view is now opened through the plugin panel.",
+            "zh-CN": "移除重复的面板打开命令，日历视图改由插件面板入口打开。"
+          }
+        },
         {
           "version": "1.2.0",
           "published_at": "2026-07-23",
@@ -274,11 +350,19 @@
     {
       "id": "qx-bing-wallpaper",
       "name": "Qx Bing Wallpaper",
-      "version": "2.2.1",
+      "version": "2.2.2",
       "description": "Browse Bing's daily images in a native Qx thumbnail list, then download or set them as wallpaper.",
+      "names": {
+        "en": "Qx Bing Wallpaper",
+        "zh-CN": "必应壁纸"
+      },
+      "descriptions": {
+        "en": "Browse Bing's daily images, download them, or set them as wallpaper.",
+        "zh-CN": "浏览必应每日图片，下载图片或将其设为壁纸。"
+      },
       "download_url": "https://raw.githubusercontent.com/mcxen/qx-plugins/main/qx-bing-wallpaper.qx-plugin",
-      "size_bytes": 11774575,
-      "checksum_sha256": "222521af6c15e850c6cb3afd09248b0cd2aed4870ae95b74ffd229b3b28450a1",
+      "size_bytes": 11776515,
+      "checksum_sha256": "7bdb856c5a0a444134ec2cbc268aff16e3937070f81a4ef94180c306b490a40f",
       "required_permissions": [
         "http",
         "open-url",
@@ -288,7 +372,7 @@
         "invoke:plugin_file_write_base64",
         "invoke:plugin_file_ensure_dir"
       ],
-      "updated_at": "2026-08-07",
+      "updated_at": "2026-08-09",
       "author": "Qx",
       "min_app_version": "0.6.13",
       "platforms": [
@@ -296,6 +380,14 @@
         "windows"
       ],
       "releases": [
+        {
+          "version": "2.2.2",
+          "published_at": "2026-08-08",
+          "notes_localizations": {
+            "en": "Removed the duplicate gallery-opening command while retaining real wallpaper and background operations.",
+            "zh-CN": "移除重复的图库打开命令，同时保留真实的壁纸与后台操作。"
+          }
+        },
         {
           "version": "2.2.1",
           "published_at": "2026-07-25",
@@ -325,18 +417,26 @@
     {
       "id": "qxcoolapk",
       "name": "QxCoolapk 酷安",
-      "version": "1.4.7",
+      "version": "1.4.8",
       "description": "Browse Coolapk hot, news, and digital feeds and read complete posts, images, and replies in Qx.",
+      "names": {
+        "zh-CN": "QxCoolapk 酷安",
+        "en": "QxCoolapk"
+      },
+      "descriptions": {
+        "zh-CN": "浏览酷安社区热门、快讯与数码内容，并在 Qx 内阅读完整正文、图片和回复。",
+        "en": "Browse Coolapk community feeds and read complete posts, images, and replies in Qx."
+      },
       "download_url": "https://raw.githubusercontent.com/mcxen/qx-plugins/main/qxcoolapk.qx-plugin",
-      "size_bytes": 72155,
-      "checksum_sha256": "fa13b2fc21d39f1d6e9ac1de4df025508f0058b866fcb0b872febd2ccdb1e703",
+      "size_bytes": 75813,
+      "checksum_sha256": "16454821fc55a5bc7f2c5cdfc8290074393ae06f1b2bad2bb9e602d0a98b32b0",
       "required_permissions": [
         "http",
         "open-url",
         "system",
         "island"
       ],
-      "updated_at": "2026-08-07",
+      "updated_at": "2026-08-09",
       "author": "Qx",
       "min_app_version": "0.6.50",
       "platforms": [
@@ -344,6 +444,14 @@
         "windows"
       ],
       "releases": [
+        {
+          "version": "1.4.8",
+          "published_at": "2026-08-08",
+          "notes_localizations": {
+            "en": "Removed the duplicate launcher command and only show Mark Unread for posts already marked read.",
+            "zh-CN": "移除重复的启动命令，并仅对已读帖子显示“标为未读”操作。"
+          }
+        },
         {
           "version": "1.4.7",
           "published_at": "2026-08-06",
@@ -485,11 +593,19 @@
     {
       "id": "qxgh",
       "name": "QxGH",
-      "version": "1.5.5",
+      "version": "1.5.6",
       "description": "QxGH — watch GitHub Actions and Releases from public github.com pages (no REST API). Business-only workbench UI.",
+      "names": {
+        "zh-CN": "Github助手",
+        "en": "QxGH"
+      },
+      "descriptions": {
+        "en": "Monitor Actions runs and Releases for public GitHub repositories, with build status, estimated progress, and Island updates.",
+        "zh-CN": "监控公开 GitHub 仓库的 Actions 运行与 Releases，并显示构建状态、预计进度和灵动岛提醒。"
+      },
       "download_url": "https://raw.githubusercontent.com/mcxen/qx-plugins/main/qxgh.qx-plugin",
-      "size_bytes": 52266,
-      "checksum_sha256": "357c4381731eb2d27ce983fbf89a389a3582c57b835ce4f35bba457865e236b3",
+      "size_bytes": 54686,
+      "checksum_sha256": "c89ec530ef3bdc9b9d5070998e43ad0f2d59262962a519b912debcac2b4b817a",
       "required_permissions": [
         "http",
         "open-url",
@@ -497,7 +613,7 @@
         "island",
         "tray"
       ],
-      "updated_at": "2026-08-07",
+      "updated_at": "2026-08-09",
       "author": "mcx",
       "min_app_version": "0.5.38",
       "platforms": [
@@ -505,6 +621,14 @@
         "windows"
       ],
       "releases": [
+        {
+          "version": "1.5.6",
+          "published_at": "2026-08-08",
+          "notes_localizations": {
+            "en": "Removed the duplicate panel-opening command while retaining refresh, status, and Island operations.",
+            "zh-CN": "移除重复的面板打开命令，同时保留刷新、状态与灵动岛操作。"
+          }
+        },
         {
           "version": "1.5.5",
           "published_at": "2026-08-07",
@@ -574,16 +698,24 @@
     {
       "id": "qxgold",
       "name": "QxGold",
-      "version": "1.2.0",
+      "version": "1.2.1",
       "description": "Live JD accumulated-gold quotes with locally sampled history.",
+      "names": {
+        "zh-CN": "金价追踪",
+        "en": "QxGold"
+      },
+      "descriptions": {
+        "zh-CN": "京东积存金实时价格与本地真实采样曲线。",
+        "en": "Live JD accumulated-gold quotes with locally sampled history."
+      },
       "download_url": "https://raw.githubusercontent.com/mcxen/qx-plugins/main/qxgold.qx-plugin",
-      "size_bytes": 16562,
-      "checksum_sha256": "89bb494ea37c666ce74c98e958efbab5e470b49b8da8f3fcdb6aefc7c417a8f7",
+      "size_bytes": 17441,
+      "checksum_sha256": "572c69386b87135637254823785799a8fa6ad4d8e2c92ee882bb2619b8aab496",
       "required_permissions": [
         "http",
         "island"
       ],
-      "updated_at": "2026-08-07",
+      "updated_at": "2026-08-09",
       "author": "Qx",
       "min_app_version": "0.6.19",
       "platforms": [
@@ -591,6 +723,14 @@
         "windows"
       ],
       "releases": [
+        {
+          "version": "1.2.1",
+          "published_at": "2026-08-08",
+          "notes_localizations": {
+            "en": "Removed the duplicate panel-opening command; price tracking remains in the plugin panel.",
+            "zh-CN": "移除重复的面板打开命令，金价追踪继续通过插件面板提供。"
+          }
+        },
         {
           "version": "1.2.0",
           "published_at": "2026-08-01",
@@ -620,17 +760,25 @@
     {
       "id": "qxheihe",
       "name": "QxHeihe 小黑盒",
-      "version": "1.4.11",
+      "version": "1.4.12",
       "description": "浏览小黑盒社区推荐内容，在 Qx 内查看正文、多图、帖子信息与匿名优先评论。",
+      "names": {
+        "en": "QxHeihe",
+        "zh-CN": "QxHeihe 小黑盒"
+      },
+      "descriptions": {
+        "en": "Browse Heybox community recommendations and read posts and comments in Qx.",
+        "zh-CN": "浏览小黑盒社区推荐内容，在 Qx 内查看正文、多图、帖子信息与匿名优先评论。"
+      },
       "download_url": "https://raw.githubusercontent.com/mcxen/qx-plugins/main/qxheihe.qx-plugin",
-      "size_bytes": 51477,
-      "checksum_sha256": "0c640ac04b6dd4e80629a640b07f0b4955a7c149951dd9e70d1bff2b7fe723a9",
+      "size_bytes": 53038,
+      "checksum_sha256": "0824c548f292da210191663d848edfe0a3f466a1b5ec41e9f312e85c84c54361",
       "required_permissions": [
         "http",
         "open-url",
         "island"
       ],
-      "updated_at": "2026-08-07",
+      "updated_at": "2026-08-09",
       "author": "mcx",
       "min_app_version": "0.6.50",
       "platforms": [
@@ -638,6 +786,14 @@
         "windows"
       ],
       "releases": [
+        {
+          "version": "1.4.12",
+          "published_at": "2026-08-08",
+          "notes_localizations": {
+            "en": "Removed duplicate panel and comments-opening actions; only show Mark Unread for posts already marked read.",
+            "zh-CN": "移除重复的面板与评论打开操作，并仅对已读帖子显示“标为未读”。"
+          }
+        },
         {
           "version": "1.4.11",
           "published_at": "2026-07-31",
@@ -779,11 +935,19 @@
     {
       "id": "qxpicture",
       "name": "Qxpicture",
-      "version": "0.5.0",
+      "version": "0.5.1",
       "description": "Browse random image APIs, save images, copy them, and set desktop wallpaper.",
+      "names": {
+        "zh-CN": "Qxpicture 随机图片",
+        "en": "Qxpicture"
+      },
+      "descriptions": {
+        "zh-CN": "浏览随机图片 API，保存或复制图片，并设置桌面壁纸。",
+        "en": "Browse random image APIs, save images, copy them, and set desktop wallpaper."
+      },
       "download_url": "https://raw.githubusercontent.com/mcxen/qx-plugins/main/qxpicture.qx-plugin",
-      "size_bytes": 68961,
-      "checksum_sha256": "c9ceb080b9b1c2bd15e006ce3feb2b0b753c75bfd0a9241f3b6c0a090f061ffe",
+      "size_bytes": 68930,
+      "checksum_sha256": "51946766d3b53d3a17b674e457c865a0eb2a86646eb9abed62dc3bb23fff8ff5",
       "required_permissions": [
         "storage",
         "http",
@@ -795,7 +959,7 @@
         "invoke:plugin_file_write_base64",
         "invoke:clipboard_write_image_file"
       ],
-      "updated_at": "2026-08-07",
+      "updated_at": "2026-08-09",
       "author": "Qx",
       "min_app_version": "0.6.22",
       "platforms": [
@@ -803,6 +967,14 @@
         "windows"
       ],
       "releases": [
+        {
+          "version": "0.5.1",
+          "published_at": "2026-08-08",
+          "notes_localizations": {
+            "en": "Removed the duplicate panel-opening command; image management remains available through the panel actions.",
+            "zh-CN": "移除重复的面板打开命令，图片管理继续通过面板操作提供。"
+          }
+        },
         {
           "version": "0.5.0",
           "published_at": "2026-07-25",
@@ -832,17 +1004,25 @@
     {
       "id": "qxtieba",
       "name": "QxTieba 贴吧",
-      "version": "1.1.10",
+      "version": "1.1.11",
       "description": "聚合浏览多个百度贴吧的公开帖子流，在 Qx 内阅读正文与楼层评论。",
+      "names": {
+        "en": "QxTieba",
+        "zh-CN": "QxTieba 贴吧"
+      },
+      "descriptions": {
+        "en": "Browse public Baidu Tieba feeds and read posts and replies in Qx.",
+        "zh-CN": "聚合浏览多个百度贴吧的公开帖子流，在 Qx 内阅读正文与楼层评论。"
+      },
       "download_url": "https://raw.githubusercontent.com/mcxen/qx-plugins/main/qxtieba.qx-plugin",
-      "size_bytes": 375843,
-      "checksum_sha256": "bb98893bd600044d37d34df97a3d83823d96823490067bd630c2f7bd96ca75a7",
+      "size_bytes": 377883,
+      "checksum_sha256": "27600dfebf15a3e746be22e17892bfbb6eaff50a025ee3209c99126c54a93cf9",
       "required_permissions": [
         "http",
         "open-url",
         "island"
       ],
-      "updated_at": "2026-08-07",
+      "updated_at": "2026-08-09",
       "author": "Qx",
       "min_app_version": "0.6.50",
       "platforms": [
@@ -850,6 +1030,14 @@
         "windows"
       ],
       "releases": [
+        {
+          "version": "1.1.11",
+          "published_at": "2026-08-08",
+          "notes_localizations": {
+            "en": "Removed the duplicate launcher command and only show Mark Unread for posts already marked read.",
+            "zh-CN": "移除重复的启动命令，并仅对已读帖子显示“标为未读”操作。"
+          }
+        },
         {
           "version": "1.1.10",
           "published_at": "2026-08-06",
@@ -959,18 +1147,26 @@
     {
       "id": "qxweibo",
       "name": "QxWeibo 微博",
-      "version": "1.1.7",
+      "version": "1.1.8",
       "description": "Read configured Weibo users, an aggregated following feed, comments, and proxied images in Qx.",
+      "names": {
+        "zh-CN": "QxWeibo 微博",
+        "en": "QxWeibo"
+      },
+      "descriptions": {
+        "zh-CN": "在 Qx 中阅读指定微博用户、聚合关注流、评论区和代理图片。",
+        "en": "Read configured Weibo users, an aggregated following feed, comments, and proxied images in Qx."
+      },
       "download_url": "https://raw.githubusercontent.com/mcxen/qx-plugins/main/qxweibo.qx-plugin",
-      "size_bytes": 80877,
-      "checksum_sha256": "2830c2108990c653e0d07bcc40a34b352392d4f46ba4007bf3c58a600229dbcc",
+      "size_bytes": 84701,
+      "checksum_sha256": "b789c130dcfc2d4d26ee6b8bdf2f4c443fce8f23e31ad6f8b96176567f9c1763",
       "required_permissions": [
         "http",
         "open-url",
         "system",
         "island"
       ],
-      "updated_at": "2026-08-07",
+      "updated_at": "2026-08-09",
       "author": "Qx",
       "min_app_version": "0.6.50",
       "platforms": [
@@ -978,6 +1174,14 @@
         "windows"
       ],
       "releases": [
+        {
+          "version": "1.1.8",
+          "published_at": "2026-08-08",
+          "notes_localizations": {
+            "en": "Removed the duplicate launcher command and only show Mark Unread for posts already marked read.",
+            "zh-CN": "移除重复的启动命令，并仅对已读帖子显示“标为未读”操作。"
+          }
+        },
         {
           "version": "1.1.7",
           "published_at": "2026-08-07",
@@ -1063,11 +1267,19 @@
     {
       "id": "sysinfo",
       "name": "Sysinfo",
-      "version": "1.4.0",
+      "version": "1.4.1",
       "description": "Native Qx System Monitor for CPU, memory, power, storage, displays, network, and processes on macOS and Windows.",
+      "names": {
+        "en": "Sysinfo",
+        "zh-CN": "系统信息"
+      },
+      "descriptions": {
+        "en": "Lightweight native hardware monitor for CPU, memory, power, storage, displays, network, and processes.",
+        "zh-CN": "轻量原生硬件监视器：查看 CPU、内存、电源、存储、显示器、网络与进程信息。"
+      },
       "download_url": "https://raw.githubusercontent.com/mcxen/qx-plugins/main/sysinfo.qx-plugin",
-      "size_bytes": 40513,
-      "checksum_sha256": "0412f80491592dc7786e700680ab298a36b053de4847a06bb32519c166814c58",
+      "size_bytes": 40915,
+      "checksum_sha256": "f8e133f2c222fc50a4681739f8ee178ae7998f4777545037090f7e5376ebbc22",
       "required_permissions": [
         "system",
         "system-stats",
@@ -1075,7 +1287,7 @@
         "processes",
         "invoke:qx_system_information_kill_process"
       ],
-      "updated_at": "2026-08-07",
+      "updated_at": "2026-08-09",
       "author": "Qx",
       "min_app_version": "0.6.38",
       "platforms": [
@@ -1083,6 +1295,14 @@
         "windows"
       ],
       "releases": [
+        {
+          "version": "1.4.1",
+          "published_at": "2026-08-08",
+          "notes_localizations": {
+            "en": "Removed the duplicate launcher command; system information is opened through the plugin panel.",
+            "zh-CN": "移除重复的启动命令，系统信息改由插件面板入口打开。"
+          }
+        },
         {
           "version": "1.4.0",
           "published_at": "2026-07-26",
@@ -1128,11 +1348,19 @@
     {
       "id": "unsplash",
       "name": "Unsplash",
-      "version": "1.2.0",
+      "version": "1.2.1",
       "description": "Search Unsplash photos, download, and set desktop wallpaper. Ported for Qx (Access Key API; likes/OAuth not included).",
+      "names": {
+        "en": "Unsplash",
+        "zh-CN": "Unsplash"
+      },
+      "descriptions": {
+        "en": "Search Unsplash photos, download, and set desktop wallpaper.",
+        "zh-CN": "搜索 Unsplash 图片，下载并设置桌面壁纸。"
+      },
       "download_url": "https://raw.githubusercontent.com/mcxen/qx-plugins/main/unsplash.qx-plugin",
-      "size_bytes": 6346699,
-      "checksum_sha256": "d5262b640e50a4b61a6fb9d9b41139d767e83a3508c83578535c88a798481982",
+      "size_bytes": 6348856,
+      "checksum_sha256": "631d93f579d8efb6176c0cecb6053dd2378acbd6c839d2a97d15e902cfe2d7a3",
       "required_permissions": [
         "http",
         "open-url",
@@ -1143,7 +1371,7 @@
         "invoke:plugin_file_ensure_dir",
         "invoke:plugin_file_exists"
       ],
-      "updated_at": "2026-08-07",
+      "updated_at": "2026-08-09",
       "author": "qx (ported from Raycast unsplash)",
       "min_app_version": "0.6.13",
       "platforms": [
@@ -1151,6 +1379,14 @@
         "windows"
       ],
       "releases": [
+        {
+          "version": "1.2.1",
+          "published_at": "2026-08-08",
+          "notes_localizations": {
+            "en": "Removed the duplicate search-opening command while retaining real photo and wallpaper operations.",
+            "zh-CN": "移除重复的搜索打开命令，同时保留真实的照片与壁纸操作。"
+          }
+        },
         {
           "version": "1.2.0",
           "published_at": "2026-07-23",
@@ -1164,11 +1400,19 @@
     {
       "id": "v2ex",
       "name": "V2EX",
-      "version": "3.0.1",
+      "version": "3.0.2",
       "description": "Browse V2EX latest, hot, and node topics with Workbench list/detail, replies, and cached host APIs.",
+      "names": {
+        "en": "V2EX",
+        "zh-CN": "V2EX"
+      },
+      "descriptions": {
+        "en": "Browse V2EX latest, hot, and node topics with Workbench list/detail, replies, and cached host APIs.",
+        "zh-CN": "通过 Workbench 列表/详情浏览 V2EX 最新、热门与节点主题，支持回复与宿主缓存接口。"
+      },
       "download_url": "https://raw.githubusercontent.com/mcxen/qx-plugins/main/v2ex.qx-plugin",
-      "size_bytes": 41033,
-      "checksum_sha256": "e92756503eb60c9c88dbff46f18c00abec9f0f2e5eb72603f86eb5bfa183b575",
+      "size_bytes": 41308,
+      "checksum_sha256": "4318e7b7f1f222b7a3ce602a528eab535a51ad149d91944afe936da79a316892",
       "required_permissions": [
         "http",
         "open-url",
@@ -1181,7 +1425,7 @@
         "invoke:v2ex_fetch_token_info",
         "invoke:v2ex_fetch_notifications"
       ],
-      "updated_at": "2026-08-07",
+      "updated_at": "2026-08-09",
       "author": "mcx",
       "min_app_version": "0.6.13",
       "platforms": [
@@ -1189,6 +1433,14 @@
         "windows"
       ],
       "releases": [
+        {
+          "version": "3.0.2",
+          "published_at": "2026-08-08",
+          "notes_localizations": {
+            "en": "Removed panel-opening and tab-navigation commands; notification and token commands still return real output.",
+            "zh-CN": "移除面板打开与标签切换命令，通知和令牌命令继续返回真实结果。"
+          }
+        },
         {
           "version": "3.0.1",
           "published_at": "2026-08-07",
@@ -1218,11 +1470,19 @@
     {
       "id": "weather",
       "name": "Weather",
-      "version": "1.0.0",
+      "version": "1.0.1",
       "description": "Current conditions and multi-day forecast via Open-Meteo (or OpenWeatherMap). Cached for fast reopen.",
+      "names": {
+        "en": "Weather",
+        "zh-CN": "天气"
+      },
+      "descriptions": {
+        "en": "Current conditions and multi-day forecast via Open-Meteo or OpenWeatherMap.",
+        "zh-CN": "通过 Open-Meteo 或 OpenWeatherMap 查看当前天气和多日预报。"
+      },
       "download_url": "https://raw.githubusercontent.com/mcxen/qx-plugins/main/weather.qx-plugin",
-      "size_bytes": 26766,
-      "checksum_sha256": "b29578f7bfecff39181f3ef0067995c5473a7c7c44d9d5c7c239e4e6949435f5",
+      "size_bytes": 28623,
+      "checksum_sha256": "d719a47b0bbf339bee51307c500fb5111f03db45ef42d576623230cd74e55f23",
       "required_permissions": [
         "http",
         "open-url",
@@ -1233,7 +1493,7 @@
         "invoke:get_cached_weather_for_location",
         "invoke:detect_location"
       ],
-      "updated_at": "2026-08-07",
+      "updated_at": "2026-08-09",
       "author": "mcx",
       "min_app_version": "0.5.18",
       "platforms": [
@@ -1241,6 +1501,14 @@
         "windows"
       ],
       "releases": [
+        {
+          "version": "1.0.1",
+          "published_at": "2026-08-08",
+          "notes_localizations": {
+            "en": "Removed the duplicate panel-opening command; the refresh command remains available for real weather output.",
+            "zh-CN": "移除重复的面板打开命令，刷新命令继续提供真实天气结果。"
+          }
+        },
         {
           "version": "1.0.0",
           "published_at": "2026-07-23",

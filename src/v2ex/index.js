@@ -852,39 +852,6 @@ let activePanel = null;
 export default {
   commands: [
     {
-      name: "open-v2ex",
-      title: "Open V2EX",
-      async run(context) {
-        setLocale(context);
-        context.showToast?.(text(
-          "Open the V2EX panel from Extensions or search results",
-          "请从扩展或搜索结果打开 V2EX 面板",
-        ));
-      },
-    },
-    {
-      name: "view-hot",
-      title: "V2EX Hot",
-      async run(context) {
-        setLocale(context);
-        if (activePanel) activePanel.setMode("hot");
-        else {
-          context.showToast?.(text("Open V2EX panel → Hot", "打开 V2EX 面板 → 热门"));
-        }
-      },
-    },
-    {
-      name: "view-latest",
-      title: "V2EX Latest",
-      async run(context) {
-        setLocale(context);
-        if (activePanel) activePanel.setMode("latest");
-        else {
-          context.showToast?.(text("Open V2EX panel → Latest", "打开 V2EX 面板 → 最新"));
-        }
-      },
-    },
-    {
       name: "view-notifications",
       title: "View Notifications",
       async run(context) {

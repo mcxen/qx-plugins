@@ -160,6 +160,10 @@ README abstract (what / why / which version), not a dump of esbuild internals.
 - `min_app_version`: minimum Qx app that provides required host APIs
 - `permissions`: capability groups (`http`, `open-url`) and/or
   `invoke:<cmd>` for exact commands
+- `commands`: optional searchable operations only. Use a command for a real
+  input/output or background operation; do not add an `open-*` or plugin-name
+  command that only opens the plugin panel. Panel operations belong to
+  Workbench Actions, and the panel itself is the launcher entry.
 - `screenshots`: filenames packaged next to `index.js`
 - `raycast`: conversion metadata + platform compatibility report
 

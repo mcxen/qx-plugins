@@ -5,7 +5,7 @@
     "zh-CN": "金价追踪",
     "en": "QxGold"
   },
-  "version": "1.2.0",
+  "version": "1.2.1",
   "description": "Live JD accumulated-gold quotes with locally sampled history.",
   "descriptions": {
     "zh-CN": "京东积存金实时价格与本地真实采样曲线。",
@@ -78,22 +78,6 @@
     ]
   },
   "entry": "index.js",
-  "commands": [
-    {
-      "name": "open-qxgold",
-      "title": "Open QxGold",
-      "titles": {
-        "en": "Open QxGold",
-        "zh-CN": "打开金价追踪"
-      },
-      "description": "查看京东金融积存金实时价格和走势",
-      "descriptions": {
-        "en": "View live JD accumulated-gold prices and trends.",
-        "zh-CN": "查看京东金融积存金实时价格和走势。"
-      },
-      "keywords": ["黄金", "金价", "gold"]
-    }
-  ],
   "panel": {
     "title": "QxGold",
     "titles": {

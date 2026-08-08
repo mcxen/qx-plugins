@@ -5,7 +5,7 @@
     "zh-CN": "QxWeibo 微博",
     "en": "QxWeibo"
   },
-  "version": "1.1.7",
+  "version": "1.1.8",
   "description": "Read configured Weibo users, an aggregated following feed, comments, and proxied images in Qx.",
   "descriptions": {
     "zh-CN": "在 Qx 中阅读指定微博用户、聚合关注流、评论区和代理图片。",
@@ -264,29 +264,6 @@
     ]
   },
   "entry": "index.js",
-  "commands": [
-    {
-      "name": "open-qxweibo",
-      "title": "打开 QxWeibo 微博",
-      "description": "阅读微博用户帖子、关注流和评论",
-      "keywords": [
-        "weibo",
-        "微博",
-        "用户",
-        "关注",
-        "帖子",
-        "评论"
-      ],
-      "titles": {
-        "en": "Open QxWeibo",
-        "zh-CN": "打开 QxWeibo 微博"
-      },
-      "descriptions": {
-        "en": "Read Weibo user posts, following feeds, and comments.",
-        "zh-CN": "阅读微博用户帖子、关注流和评论。"
-      }
-    }
-  ],
   "panel": {
     "title": "QxWeibo 微博",
     "icon": "icon.svg",

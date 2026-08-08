@@ -5,7 +5,7 @@
     "zh-CN": "Github助手",
     "en": "QxGH"
   },
-  "version": "1.5.5",
+  "version": "1.5.6",
   "description": "QxGH — watch GitHub Actions and Releases from public github.com pages (no REST API). Business-only workbench UI.",
   "descriptions": {
     "en": "Monitor Actions runs and Releases for public GitHub repositories, with build status, estimated progress, and Island updates.",
@@ -128,27 +128,6 @@
   ],
   "entry": "index.js",
   "commands": [
-    {
-      "name": "open-qxgh",
-      "title": "QxGH",
-      "description": "Open the QxGH Actions & Releases panel",
-      "keywords": [
-        "qxgh",
-        "github",
-        "actions",
-        "ci",
-        "release",
-        "进度"
-      ],
-      "titles": {
-        "en": "QxGH",
-        "zh-CN": "QxGH"
-      },
-      "descriptions": {
-        "en": "Open the QxGH Actions & Releases panel",
-        "zh-CN": "打开 QxGH Actions 与 Releases 面板。"
-      }
-    },
     {
       "name": "refresh-qxgh",
       "title": "Refresh QxGH",

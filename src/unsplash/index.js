@@ -354,14 +354,6 @@ function createPanel(context) {
 export default {
   commands: [
     {
-      name: "open-search",
-      title: "Unsplash: Search Photos",
-      async run(context) {
-        setLocale(context);
-        context.showToast(text("Open Unsplash from Extensions", "请从扩展中打开 Unsplash"));
-      },
-    },
-    {
       name: "set-random-wallpaper",
       title: "Unsplash: Set Random Wallpaper",
       mode: "no-view",

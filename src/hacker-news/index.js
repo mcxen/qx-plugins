@@ -534,20 +534,6 @@ function createPanel(context) {
 let activePanel = null;
 
 export default {
-  commands: [
-    {
-      name: "open-hacker-news",
-      title: "Open Hacker News",
-      async run(context) {
-        setLocale(context);
-        context.showToast?.(text(
-          "Open Hacker News from Extensions or search results",
-          "请从扩展或搜索结果打开 Hacker News 面板",
-        ));
-      },
-    },
-  ],
-
   panel: {
     title: "Hacker News",
 

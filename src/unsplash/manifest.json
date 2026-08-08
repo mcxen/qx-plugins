@@ -5,7 +5,7 @@
     "en": "Unsplash",
     "zh-CN": "Unsplash"
   },
-  "version": "1.2.0",
+  "version": "1.2.1",
   "description": "Search Unsplash photos, download, and set desktop wallpaper. Ported for Qx (Access Key API; likes/OAuth not included).",
   "descriptions": {
     "en": "Search Unsplash photos, download, and set desktop wallpaper.",
@@ -134,20 +134,6 @@
   ],
   "entry": "index.js",
   "commands": [
-    {
-      "name": "open-search",
-      "title": "Unsplash: Search Photos",
-      "titles": {
-        "en": "Unsplash: Search Photos",
-        "zh-CN": "Unsplash：搜索图片"
-      },
-      "description": "Open Unsplash photo search panel",
-      "descriptions": {
-        "en": "Open Unsplash photo search panel",
-        "zh-CN": "打开 Unsplash 图片搜索面板。"
-      },
-      "keywords": ["unsplash", "wallpaper", "photo", "search"]
-    },
     {
       "name": "set-random-wallpaper",
       "title": "Unsplash: Set Random Wallpaper",

@@ -545,14 +545,17 @@ function createPanel(container, context) {
       badge: `${compactNumber(post.replyCount)} ${copy("replies", "回复")}`,
       tone: read ? "neutral" : "accent",
       detail: detailFor(post),
-      actions: [{
-        id: `open:${id}`,
-        label: copy("Open on Tieba", "在贴吧中打开"),
-        primary: true,
-      }, {
-        id: `${read ? "unread" : "read"}:${id}`,
-        label: read ? copy("Mark Unread", "标为未读") : copy("Mark Read", "标为已读"),
-      }],
+      actions: [
+        {
+          id: `open:${id}`,
+          label: copy("Open on Tieba", "在贴吧中打开"),
+          primary: true,
+        },
+        ...(read ? [{
+          id: `unread:${id}`,
+          label: copy("Mark Unread", "标为未读"),
+        }] : []),
+      ],
     };
   }
 
@@ -651,11 +654,6 @@ function createPanel(container, context) {
         else if (id === "load-more") void loadMore();
         else if (id === "mark-visible-read") {
           if (readLedger.markMany(state.visible.map((post) => String(post.id)))) {
-            paint();
-            void persistCache();
-          }
-        } else if (id.startsWith("read:")) {
-          if (readLedger.mark(id.slice("read:".length))) {
             paint();
             void persistCache();
           }
@@ -880,17 +878,6 @@ function createPanel(container, context) {
 const activePanels = new WeakMap();
 
 const plugin = {
-  commands: [{
-    name: "open-qxtieba",
-    title: "打开 QxTieba 贴吧",
-    async run(context) {
-      setLocale(context);
-      await context.showToast(copy(
-        "Open QxTieba from Extensions or search.",
-        "请从扩展模块或搜索中打开 QxTieba。",
-      ));
-    },
-  }],
   panel: {
     title: "QxTieba 贴吧",
     render(container, context) {

@@ -5,7 +5,7 @@
 | Surface | Role |
 |---|---|
 | Workbench panel | Configured-bar feed, local search, master-detail and comments |
-| Command | Launcher entry |
+| Launcher | The panel name is the launcher/search entry; no duplicate open command |
 | HTTP | Baidu Tieba anonymous mobile forum and app-compatible Protobuf thread detail API |
 | Persist storage | SWR feed/detail/read cache with 3/7-day pruning |
 

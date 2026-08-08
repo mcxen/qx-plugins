@@ -1,7 +1,7 @@
 {
   "id": "qx-bing-wallpaper",
   "name": "Qx Bing Wallpaper",
-  "version": "2.2.1",
+  "version": "2.2.2",
   "description": "Browse Bing's daily images in a native Qx thumbnail list, then download or set them as wallpaper.",
   "names": {
     "en": "Qx Bing Wallpaper",
@@ -89,22 +89,6 @@
   ],
   "entry": "index.js",
   "commands": [
-    {
-      "name": "open-gallery",
-      "title": "Qx Bing Wallpaper",
-      "titles": {
-        "en": "Qx Bing Wallpaper",
-        "zh-CN": "必应壁纸"
-      },
-      "description": "Browse Bing daily wallpapers in a Qx Workbench list with thumbnails.",
-      "descriptions": {
-        "en": "Browse Bing daily wallpapers in a Qx Workbench list with thumbnails.",
-        "zh-CN": "在 Qx 列表中浏览带缩略图的必应每日壁纸。"
-      },
-      "icon": "bing-wallpaper-icon.png",
-      "keywords": ["bing", "wallpaper", "gallery", "必应", "壁纸", "图库"],
-      "mode": "view"
-    },
     {
       "name": "set-random-wallpaper",
       "title": "Set Random Bing Wallpaper",

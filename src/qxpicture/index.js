@@ -1629,16 +1629,6 @@ function createPanel(context, container) {
 }
 
 export default {
-  commands: [
-    {
-      name: "open",
-      title: "Open Qxpicture",
-      async run(context) {
-        setLocale(context);
-        context.showToast(text("Open Qxpicture from Extensions", "请从扩展中打开 Qxpicture"));
-      }
-    }
-  ],
   panel: {
     title: "Qxpicture",
     render(container, context) {

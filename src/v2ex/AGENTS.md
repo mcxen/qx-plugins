@@ -7,7 +7,7 @@
 | Surface | Role |
 |---------|------|
 | **Panel** | Host Workbench list + structured detail + replies |
-| **Commands** | Open / hot / latest / notifications / token |
+| **Commands** | Notifications / token output only; the panel name opens the panel |
 | **Cache** | persist SWR + host `invoke:v2ex_*` disk cache |
 | **HTTP** | Public API fallback for latest/hot only |
 

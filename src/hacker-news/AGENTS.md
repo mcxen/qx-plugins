@@ -5,7 +5,7 @@
 | Surface | Role |
 |---------|------|
 | **Panel** | Host Workbench latest-story list, structured detail, and comments |
-| **Command** | Opens the Hacker News panel from launcher/search |
+| **Launcher** | The panel name is the launcher/search entry; no duplicate open command |
 | **HTTP** | Public Firebase Hacker News API (`newstories` and `item`) |
 | **Cache** | `context.storage.persist` stale-while-revalidate story and comment cache |
 

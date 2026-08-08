@@ -559,26 +559,6 @@ function renderPanel(container, context) {
 }
 
 export default {
-  commands: [{
-    name: "open-displays",
-    title: "Display Brightness",
-    async run(context) {
-      setLocale(context);
-      // Avoid blocking command completion on DDC enumeration — the panel
-      // refresh path owns that work once the host opens this plugin surface.
-      try {
-        const displays = await Promise.race([
-          context.system.displayBrightness(),
-          new Promise((_, reject) => {
-            context.setTimeout(() => reject(new Error("display probe timeout")), 4000);
-          }),
-        ]);
-        context.showToast(`${text("title")}: ${Array.isArray(displays) ? displays.length : 0}`);
-      } catch (error) {
-        context.showToast(text("error", error));
-      }
-    },
-  }],
   panel: {
     title: "Display Brightness",
     render(container, context) { renderPanel(container, context); },

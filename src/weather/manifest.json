@@ -5,7 +5,7 @@
     "en": "Weather",
     "zh-CN": "天气"
   },
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Current conditions and multi-day forecast via Open-Meteo (or OpenWeatherMap). Cached for fast reopen.",
   "descriptions": {
     "en": "Current conditions and multi-day forecast via Open-Meteo or OpenWeatherMap.",
@@ -114,20 +114,6 @@
   ],
   "entry": "index.js",
   "commands": [
-    {
-      "name": "open-weather",
-      "title": "Weather",
-      "titles": {
-        "en": "Weather",
-        "zh-CN": "天气"
-      },
-      "description": "Open the weather panel",
-      "descriptions": {
-        "en": "Open the weather panel",
-        "zh-CN": "打开天气面板。"
-      },
-      "keywords": ["weather", "forecast", "温度", "天气"]
-    },
     {
       "name": "refresh-weather",
       "title": "Refresh Weather",

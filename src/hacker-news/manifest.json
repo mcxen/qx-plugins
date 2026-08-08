@@ -5,7 +5,7 @@
     "en": "Hacker News",
     "zh-CN": "Hacker News"
   },
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Browse the latest Hacker News stories with details and comments.",
   "descriptions": {
     "en": "Browse the latest Hacker News stories with details and comments.",
@@ -87,22 +87,6 @@
     ]
   },
   "entry": "index.js",
-  "commands": [
-    {
-      "name": "open-hacker-news",
-      "title": "Open Hacker News",
-      "titles": {
-        "en": "Open Hacker News",
-        "zh-CN": "打开 Hacker News"
-      },
-      "description": "Browse the latest Hacker News stories and comments",
-      "descriptions": {
-        "en": "Browse the latest Hacker News stories and comments",
-        "zh-CN": "浏览 Hacker News 最新帖子和评论。"
-      },
-      "keywords": ["hacker news", "hn", "news", "technology", "社区", "帖子"]
-    }
-  ],
   "panel": {
     "keywords": ["hacker news", "hn", "news", "technology", "社区", "帖子", "评论"]
   },

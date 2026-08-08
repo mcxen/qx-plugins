@@ -7,7 +7,7 @@
 | Surface | Role |
 |---------|------|
 | **Panel** | Multi-location cards + forecast (required) |
-| **Commands** | Open / force refresh |
+| **Commands** | Force refresh output only; the panel name opens the panel |
 | **Cache** | `storage.persist` SWR + host `fetch_weather_*` when available |
 | **HTTP** | Open-Meteo / geocoding / optional OpenWeatherMap |
 

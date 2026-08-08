@@ -38,15 +38,6 @@ function titleCase(input) {
 function fallbackIndexJs(pkg) {
   const name = pkg.title || titleCase(pkg.name || "Raycast Extension");
   return `export default {
-  commands: [
-    {
-      name: "index",
-      title: ${JSON.stringify(name)},
-      async run(context) {
-        context.showToast(${JSON.stringify(`${name} was converted, but needs a custom adapter.`)});
-      },
-    },
-  ],
   panel: {
     title: ${JSON.stringify(name)},
     render(container) {
@@ -199,7 +190,8 @@ const commandLoaders = {
 ${commandNames.map((item) => JSON.stringify(item.name) + ": () => import(" + JSON.stringify(item.sourcePath) + ")").join(",\n")}
 };
 const commandModes = ${JSON.stringify(Object.fromEntries(commandNames.map((item) => [item.name, item.mode])))};
-const manifestCommands = ${JSON.stringify(manifest.commands)};
+const manifestCommands = ${JSON.stringify(Array.isArray(manifest.commands) ? manifest.commands : [])};
+const panelCommandName = ${JSON.stringify(commandNames.find((item) => item.mode === "view")?.name || commandNames[0]?.name || "")};
 const preferences = ${JSON.stringify(preferencesObject(pkg))};
 let root = null;
 const loadedCommandModules = new Map();
@@ -329,8 +321,11 @@ export default {
   panel: {
     title: ${JSON.stringify(manifest.panel.title)},
     render(container, context) {
-      const firstView = manifestCommands.find((command) => (commandModes[command.name] || "view") === "view") || manifestCommands[0];
-      return invokeCommand(firstView.name, container, context, { launchType: "userInitiated" });
+      if (!panelCommandName) {
+        container.innerHTML = "<div style='padding:16px;color:var(--qx-text-secondary)'>No panel command is bundled.</div>";
+        return undefined;
+      }
+      return invokeCommand(panelCommandName, container, context, { launchType: "userInitiated" });
     },
     destroy() {
       if (root) {

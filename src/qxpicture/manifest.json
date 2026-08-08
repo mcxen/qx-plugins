@@ -5,7 +5,7 @@
     "zh-CN": "Qxpicture 随机图片",
     "en": "Qxpicture"
   },
-  "version": "0.5.0",
+  "version": "0.5.1",
   "description": "Browse random image APIs, save images, copy them, and set desktop wallpaper.",
   "descriptions": {
     "zh-CN": "浏览随机图片 API，保存或复制图片，并设置桌面壁纸。",
@@ -47,22 +47,6 @@
     "transports": ["query", "json-body"]
   },
   "entry": "index.js",
-  "commands": [
-    {
-      "name": "open",
-      "title": "Open Qxpicture",
-      "titles": {
-        "en": "Open Qxpicture",
-        "zh-CN": "打开随机图片"
-      },
-      "description": "Browse random image APIs",
-      "descriptions": {
-        "en": "Browse random image APIs",
-        "zh-CN": "浏览随机图片 API。"
-      },
-      "keywords": ["random", "image", "wallpaper", "api", "随机图片"]
-    }
-  ],
   "panel": {
     "title": "Qxpicture",
     "titles": {

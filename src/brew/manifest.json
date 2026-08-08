@@ -1,7 +1,7 @@
 {
   "id": "brew",
   "name": "Brew",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "description": "Search, inspect, upgrade and uninstall Homebrew formulae & casks (macOS). Uses Qx context.cli.",
   "names": {
     "en": "Brew",
@@ -54,62 +54,6 @@
     }
   ],
   "entry": "index.js",
-  "commands": [
-    {
-      "name": "open-brew",
-      "title": "Brew",
-      "titles": {
-        "en": "Brew",
-        "zh-CN": "打开 Homebrew 管理器"
-      },
-      "description": "Open Homebrew manager panel",
-      "descriptions": {
-        "en": "Open Homebrew manager panel",
-        "zh-CN": "打开 Homebrew 软件包管理面板。"
-      },
-      "keywords": [
-        "brew",
-        "homebrew",
-        "installed",
-        "packages"
-      ]
-    },
-    {
-      "name": "brew-outdated",
-      "title": "Brew: Outdated",
-      "titles": {
-        "en": "Brew: Outdated",
-        "zh-CN": "Brew：待更新"
-      },
-      "description": "Show outdated formulae & casks",
-      "descriptions": {
-        "en": "Show outdated formulae & casks",
-        "zh-CN": "显示待更新的 formula 和 cask。"
-      },
-      "keywords": [
-        "brew",
-        "outdated",
-        "upgrade"
-      ]
-    },
-    {
-      "name": "brew-upgrade-all",
-      "title": "Brew: Upgrade All Outdated",
-      "titles": {
-        "en": "Brew: Upgrade All Outdated",
-        "zh-CN": "Brew：更新全部过期软件包"
-      },
-      "description": "Run brew upgrade for all outdated packages",
-      "descriptions": {
-        "en": "Run brew upgrade for all outdated packages",
-        "zh-CN": "更新所有过期的 Homebrew 软件包。"
-      },
-      "keywords": [
-        "brew",
-        "upgrade"
-      ]
-    }
-  ],
   "panel": {
     "title": "Brew",
     "titles": {

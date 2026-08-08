@@ -5,7 +5,7 @@
     "en": "Quick Calendar",
     "zh-CN": "快捷日历"
   },
-  "version": "1.2.0",
+  "version": "1.2.1",
   "description": "View calendar month-by-month",
   "descriptions": {
     "en": "View calendar month-by-month",
@@ -114,24 +114,6 @@
     "clipboard"
   ],
   "entry": "index.js",
-  "commands": [
-    {
-      "name": "index",
-      "title": "Quick Calendar",
-      "titles": {
-        "en": "Quick Calendar",
-        "zh-CN": "快捷日历"
-      },
-      "description": "Shows calendar for a month",
-      "descriptions": {
-        "en": "Shows calendar for a month",
-        "zh-CN": "显示指定月份的日历。"
-      },
-      "icon": "command-icon.png",
-      "keywords": [],
-      "mode": "view"
-    }
-  ],
   "panel": {
     "title": "Quick Calendar",
     "titles": {

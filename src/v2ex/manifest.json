@@ -5,7 +5,7 @@
     "en": "V2EX",
     "zh-CN": "V2EX"
   },
-  "version": "3.0.1",
+  "version": "3.0.2",
   "description": "Browse V2EX latest, hot, and node topics with Workbench list/detail, replies, and cached host APIs.",
   "descriptions": {
     "en": "Browse V2EX latest, hot, and node topics with Workbench list/detail, replies, and cached host APIs.",
@@ -88,64 +88,6 @@
   ],
   "entry": "index.js",
   "commands": [
-    {
-      "name": "open-v2ex",
-      "title": "Open V2EX",
-      "description": "Browse latest and hot V2EX topics",
-      "keywords": [
-        "v2ex",
-        "forum",
-        "topics",
-        "tech",
-        "探索",
-        "最新",
-        "热门"
-      ],
-      "titles": {
-        "en": "Open V2EX",
-        "zh-CN": "打开 V2EX"
-      },
-      "descriptions": {
-        "en": "Browse latest and hot V2EX topics",
-        "zh-CN": "浏览 V2EX 最新和热门主题。"
-      }
-    },
-    {
-      "name": "view-hot",
-      "title": "V2EX Hot",
-      "description": "Open V2EX hot topics",
-      "keywords": [
-        "v2ex",
-        "hot",
-        "热门"
-      ],
-      "titles": {
-        "en": "V2EX Hot",
-        "zh-CN": "V2EX 热门"
-      },
-      "descriptions": {
-        "en": "Open V2EX hot topics",
-        "zh-CN": "打开 V2EX 热门主题。"
-      }
-    },
-    {
-      "name": "view-latest",
-      "title": "V2EX Latest",
-      "description": "Open V2EX latest topics",
-      "keywords": [
-        "v2ex",
-        "latest",
-        "最新"
-      ],
-      "titles": {
-        "en": "V2EX Latest",
-        "zh-CN": "V2EX 最新"
-      },
-      "descriptions": {
-        "en": "Open V2EX latest topics",
-        "zh-CN": "打开 V2EX 最新主题。"
-      }
-    },
     {
       "name": "view-notifications",
       "title": "View Notifications",

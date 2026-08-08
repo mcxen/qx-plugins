@@ -910,10 +910,10 @@ function createPanel(container, context) {
       detail: detailFor(feed),
       actions: [
         { id: `open:${feed.id}`, label: copy("Open on Coolapk", "在酷安中打开"), primary: true },
-        {
-          id: `${read ? "unread" : "read"}:${feed.id}`,
-          label: read ? copy("Mark Unread", "标为未读") : copy("Mark Read", "标为已读"),
-        },
+        ...(read ? [{
+          id: `unread:${feed.id}`,
+          label: copy("Mark Unread", "标为未读"),
+        }] : []),
       ],
     };
   }
@@ -1074,11 +1074,6 @@ function createPanel(container, context) {
               || activeFeed().items.find((entry) => entry.id === String(item?.id))
               || selectedFeed();
             if (feed) void context.openUrl(originalUrl(feed));
-          } else if (id.startsWith("read:")) {
-            if (readLedger.mark(id.slice("read:".length))) {
-              paint();
-              void persist();
-            }
           } else if (id.startsWith("unread:")) {
             if (readLedger.unmark(id.slice("unread:".length))) {
               paint();
@@ -1464,17 +1459,6 @@ function createPanel(container, context) {
 const activePanels = new WeakMap();
 
 const plugin = {
-  commands: [{
-    name: "open-qxcoolapk",
-    title: "打开 QxCoolapk 酷安",
-    async run(context) {
-      setLocale(context);
-      await context.showToast(copy(
-        "Open QxCoolapk from Extensions or search.",
-        "请从扩展模块或搜索中打开 QxCoolapk。",
-      ));
-    },
-  }],
   panel: {
     title: "QxCoolapk 酷安",
     render(container, context) {

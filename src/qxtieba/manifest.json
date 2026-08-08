@@ -1,7 +1,7 @@
 {
   "id": "qxtieba",
   "name": "QxTieba 贴吧",
-  "version": "1.1.10",
+  "version": "1.1.11",
   "description": "聚合浏览多个百度贴吧的公开帖子流，在 Qx 内阅读正文与楼层评论。",
   "author": "Qx",
   "icon": "icon.svg",
@@ -134,29 +134,6 @@
     ]
   },
   "entry": "index.js",
-  "commands": [
-    {
-      "name": "open-qxtieba",
-      "title": "打开 QxTieba 贴吧",
-      "description": "浏览配置贴吧的帖子与评论",
-      "keywords": [
-        "贴吧",
-        "百度贴吧",
-        "tieba",
-        "社区",
-        "帖子",
-        "评论"
-      ],
-      "titles": {
-        "en": "Open QxTieba",
-        "zh-CN": "打开 QxTieba 贴吧"
-      },
-      "descriptions": {
-        "en": "Browse posts and comments from configured Tieba forums.",
-        "zh-CN": "浏览配置贴吧的帖子与评论。"
-      }
-    }
-  ],
   "panel": {
     "title": "QxTieba 贴吧",
     "icon": "icon.svg",

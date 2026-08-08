@@ -5,7 +5,7 @@
 | Surface | Role |
 |---|---|
 | Workbench panel | Configured-user posts, aggregated following feed, comments and multi-image detail |
-| Command | Launcher entry |
+| Launcher | The panel name is the launcher/search entry; no duplicate open command |
 | HTTP | Weibo mobile API, visitor passport and protected image requests |
 | Persist storage | SWR feed/comment/read cache |
 | Session storage | Rotating visitor cookies and proxied image previews |
