@@ -1,6 +1,16 @@
 {
   "schema_version": 1,
   "plugins": {
+    "clipboard-actions": [
+      {
+        "version": "1.0.0",
+        "published_at": "2026-08-08",
+        "notes_localizations": {
+          "en": "Added opt-in no-view commands to paste clipboard text as plain text and save clipboard images as unique offline PNG files.",
+          "zh-CN": "新增可选的无界面命令：将剪贴板文字以纯文本粘贴，并把剪贴板图片离线保存为不覆盖的唯一 PNG 文件。"
+        }
+      }
+    ],
     "hacker-news": [
       {
         "version": "1.0.1",

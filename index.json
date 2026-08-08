@@ -48,6 +48,43 @@
       ]
     },
     {
+      "id": "clipboard-actions",
+      "name": "Clipboard Actions",
+      "version": "1.0.0",
+      "description": "Paste clipboard text as plain text or save the current clipboard image without overwriting existing files.",
+      "names": {
+        "en": "Clipboard Actions",
+        "zh-CN": "剪贴板动作"
+      },
+      "descriptions": {
+        "en": "Paste clipboard text as plain text or save the current clipboard image without overwriting existing files.",
+        "zh-CN": "将剪贴板文字以纯文本粘贴，或将当前剪贴板图片保存为不会覆盖旧文件的新 PNG。"
+      },
+      "download_url": "https://raw.githubusercontent.com/mcxen/qx-plugins/main/clipboard-actions.qx-plugin",
+      "size_bytes": 13271,
+      "checksum_sha256": "99049fb3dde5ea7b4d18821d54863a78e322e1b0f2da4914d0764ebc14b2516e",
+      "required_permissions": [
+        "clipboard",
+        "invoke:plugin_perform_paste",
+        "invoke:plugin_file_read_base64",
+        "invoke:plugin_file_write_base64",
+        "invoke:plugin_file_exists"
+      ],
+      "updated_at": "2026-08-08",
+      "author": "mcx",
+      "min_app_version": "0.6.67",
+      "releases": [
+        {
+          "version": "1.0.0",
+          "published_at": "2026-08-08",
+          "notes_localizations": {
+            "en": "Added opt-in no-view commands to paste clipboard text as plain text and save clipboard images as unique offline PNG files.",
+            "zh-CN": "新增可选的无界面命令：将剪贴板文字以纯文本粘贴，并把剪贴板图片离线保存为不覆盖的唯一 PNG 文件。"
+          }
+        }
+      ]
+    },
+    {
       "id": "external-display-control",
       "name": "External Display Control",
       "version": "1.2.4",

@@ -21,6 +21,7 @@
     "smoke:qxweibo": "npm run build:qxweibo && node scripts/smoke-qxweibo.mjs",
     "smoke:qxgh": "node scripts/smoke-qxgh.mjs",
     "smoke:qxpicture": "node scripts/smoke-qxpicture.mjs",
+    "smoke:clipboard-actions": "node scripts/smoke-clipboard-actions.mjs",
     "smoke:bing-wallpaper": "node scripts/smoke-qx-bing-wallpaper.mjs",
     "smoke:sysinfo": "node scripts/smoke-sysinfo.mjs"
   },
