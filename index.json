@@ -73,6 +73,10 @@
       "updated_at": "2026-08-08",
       "author": "mcx",
       "min_app_version": "0.6.67",
+      "platforms": [
+        "macos",
+        "windows"
+      ],
       "releases": [
         {
           "version": "1.0.0",
@@ -641,8 +645,8 @@
         "zh-CN": "监控公开 GitHub 仓库的 Actions 运行与 Releases，并显示构建状态、预计进度和灵动岛提醒。"
       },
       "download_url": "https://raw.githubusercontent.com/mcxen/qx-plugins/main/qxgh.qx-plugin",
-      "size_bytes": 54686,
-      "checksum_sha256": "c89ec530ef3bdc9b9d5070998e43ad0f2d59262962a519b912debcac2b4b817a",
+      "size_bytes": 54648,
+      "checksum_sha256": "72e654662c64e6cd61e0de8dfceeb1a62fb3afb33b327ccffbb3eba7565ebf01",
       "required_permissions": [
         "http",
         "open-url",

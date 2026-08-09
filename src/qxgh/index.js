@@ -741,7 +741,6 @@ function runToItem(run) {
   item.actions = [{
     id: "open-item",
     label: text("Open Run on GitHub", "在 GitHub 打开运行"),
-    primary: true,
     menuKey: "o",
     kbd: "CmdOrCtrl+O",
   }];
@@ -774,7 +773,6 @@ function releaseToItem(rel) {
   item.actions = [{
     id: "open-item",
     label: text("Open Release on GitHub", "在 GitHub 打开发布"),
-    primary: true,
     menuKey: "o",
     kbd: "CmdOrCtrl+O",
   }];
