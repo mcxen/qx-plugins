@@ -4,7 +4,7 @@
     {
       "id": "agent-usage",
       "name": "Agent Usage",
-      "version": "1.0.0",
+      "version": "1.0.1",
       "description": "Lightweight Qx-native Codex and Grok quota overview using local CLI sessions.",
       "names": {
         "en": "Agent Usage",
@@ -15,8 +15,8 @@
         "zh-CN": "在轻量原生 Workbench 中读取本机 CLI 登录态，查看 Codex 与 Grok 配额窗口。"
       },
       "download_url": "https://raw.githubusercontent.com/mcxen/qx-plugins/main/agent-usage.qx-plugin",
-      "size_bytes": 37944,
-      "checksum_sha256": "45cc0f7168555b8f80e60a83e4ff6a6911818953812e497fab58ada2a80ae55a",
+      "size_bytes": 38523,
+      "checksum_sha256": "c559b9b69865b16a39da7f96d15a5d882e831d2449c3d8e8d736a65ddcec0099",
       "required_permissions": [
         "http",
         "open-url",
@@ -25,12 +25,20 @@
       ],
       "updated_at": "2026-08-13",
       "author": "mcx",
-      "min_app_version": "0.6.86",
+      "min_app_version": "0.6.50",
       "platforms": [
         "macos",
         "windows"
       ],
       "releases": [
+        {
+          "version": "1.0.1",
+          "published_at": "2026-08-13",
+          "notes_localizations": {
+            "en": "Fixes marketplace installation by correcting the cache-target manifest schema, and declares the actual v0.6.50 host API baseline.",
+            "zh-CN": "修正缓存目标的 manifest schema，解决市场安装失败；同时将宿主 API 下限声明为实际所需的 v0.6.50。"
+          }
+        },
         {
           "version": "1.0.0",
           "published_at": "2026-08-13",

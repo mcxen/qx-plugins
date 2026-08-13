@@ -1,5 +1,21 @@
 import assert from "node:assert/strict";
 import { Buffer } from "node:buffer";
+import { readFile } from "node:fs/promises";
+
+const manifest = JSON.parse(await readFile(new URL("../src/agent-usage/manifest.json", import.meta.url), "utf8"));
+assert.equal(manifest.version, "1.0.1");
+assert.equal(
+  manifest.min_app_version,
+  "0.6.50",
+  "marketplace compatibility must match the newest host API actually used by the plugin",
+);
+assert.deepEqual(manifest.storage?.cacheTargets, [{
+  id: "usage-snapshot",
+  label: "Agent usage snapshot",
+  description: "Normalized Codex and Grok quota snapshots without local tokens or raw responses.",
+  keys: ["agent-usage.snapshot.v1"],
+  retentionDays: 7,
+}], "cacheTargets must use the host's required id/keys schema");
 
 const moduleUrl = new URL("../src/agent-usage/index.js", import.meta.url);
 moduleUrl.searchParams.set("smoke", String(Date.now()));

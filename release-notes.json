@@ -13,6 +13,14 @@
     ],
     "agent-usage": [
       {
+        "version": "1.0.1",
+        "published_at": "2026-08-13",
+        "notes_localizations": {
+          "en": "Fixes marketplace installation by correcting the cache-target manifest schema, and declares the actual v0.6.50 host API baseline.",
+          "zh-CN": "修正缓存目标的 manifest schema，解决市场安装失败；同时将宿主 API 下限声明为实际所需的 v0.6.50。"
+        }
+      },
+      {
         "version": "1.0.0",
         "published_at": "2026-08-13",
         "notes_localizations": {
