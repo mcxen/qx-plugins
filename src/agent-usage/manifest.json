@@ -1,0 +1,50 @@
+{
+  "id": "agent-usage",
+  "name": "Agent Usage",
+  "names": {
+    "en": "Agent Usage",
+    "zh-CN": "Agent 用量"
+  },
+  "version": "1.0.0",
+  "description": "Lightweight Qx-native Codex and Grok quota overview using local CLI sessions.",
+  "descriptions": {
+    "en": "Check Codex and Grok quota windows from local CLI sessions in a lightweight native Workbench.",
+    "zh-CN": "在轻量原生 Workbench 中读取本机 CLI 登录态，查看 Codex 与 Grok 配额窗口。"
+  },
+  "author": "mcx",
+  "icon": "icon.svg",
+  "keywords": [
+    "agent",
+    "usage",
+    "quota",
+    "codex",
+    "grok",
+    "ai",
+    "用量",
+    "额度",
+    "配额"
+  ],
+  "permissions": [
+    "http",
+    "open-url",
+    "clipboard",
+    "invoke:plugin_file_read_base64"
+  ],
+  "storage": {
+    "cacheTargets": [
+      {
+        "key": "agent-usage.snapshot.v1",
+        "label": "Agent usage snapshot"
+      }
+    ]
+  },
+  "entry": "index.js",
+  "panel": {
+    "title": "Agent Usage",
+    "icon": "icon.svg",
+    "keywords": ["agent", "usage", "quota", "codex", "grok", "用量", "额度"]
+  },
+  "min_app_version": "0.6.86",
+  "platforms": ["macos", "windows"],
+  "screenshots": []
+}

@@ -1,7 +1,7 @@
 {
   "name": "qx-plugins",
   "private": true,
-  "version": "1.5.0",
+  "version": "1.6.0",
   "type": "module",
   "scripts": {
     "convert:raycast": "node scripts/convert-raycast-extension.mjs",
@@ -9,7 +9,8 @@
     "build:qxcoolapk": "esbuild src/qxcoolapk/index.source.js --bundle --format=esm --platform=browser --target=es2022 --minify --legal-comments=inline --outfile=src/qxcoolapk/index.js",
     "build:qxtieba": "esbuild src/qxtieba/index.source.js --bundle --format=esm --platform=browser --target=es2022 --minify --legal-comments=inline --outfile=src/qxtieba/index.js",
     "build:qxweibo": "esbuild src/qxweibo/index.source.js --bundle --format=esm --platform=browser --target=es2022 --minify --legal-comments=inline --outfile=src/qxweibo/index.js",
-    "build:plugins": "npm run build:qxcoolapk && npm run build:qxtieba && npm run build:qxweibo",
+    "build:agent-usage": "esbuild src/agent-usage/index.source.js --bundle --format=esm --platform=browser --target=es2022 --minify --legal-comments=inline --outfile=src/agent-usage/index.js",
+    "build:plugins": "npm run build:qxcoolapk && npm run build:qxtieba && npm run build:qxweibo && npm run build:agent-usage",
     "package:plugins": "npm run build:plugins && node scripts/package-plugins.mjs",
     "package:one": "node scripts/package-plugins.mjs",
     "smoke:qxheihe": "node scripts/smoke-qxheihe.mjs",
@@ -19,7 +20,8 @@
     "smoke:qxgh": "node scripts/smoke-qxgh.mjs",
     "smoke:qxpicture": "node scripts/smoke-qxpicture.mjs",
     "smoke:bing-wallpaper": "node scripts/smoke-qx-bing-wallpaper.mjs",
-    "smoke:sysinfo": "node scripts/smoke-sysinfo.mjs"
+    "smoke:sysinfo": "node scripts/smoke-sysinfo.mjs",
+    "smoke:agent-usage": "npm run build:agent-usage && node scripts/smoke-agent-usage.mjs"
   },
   "dependencies": {
     "bcryptjs": "^3.0.2",

@@ -2,6 +2,38 @@
   "schema_version": 1,
   "plugins": [
     {
+      "id": "agent-usage",
+      "name": "Agent Usage",
+      "version": "1.0.0",
+      "description": "Lightweight Qx-native Codex and Grok quota overview using local CLI sessions.",
+      "download_url": "https://raw.githubusercontent.com/mcxen/qx-plugins/main/agent-usage.qx-plugin",
+      "size_bytes": 37944,
+      "checksum_sha256": "45cc0f7168555b8f80e60a83e4ff6a6911818953812e497fab58ada2a80ae55a",
+      "required_permissions": [
+        "http",
+        "open-url",
+        "clipboard",
+        "invoke:plugin_file_read_base64"
+      ],
+      "updated_at": "2026-08-13",
+      "author": "mcx",
+      "min_app_version": "0.6.86",
+      "platforms": [
+        "macos",
+        "windows"
+      ],
+      "releases": [
+        {
+          "version": "1.0.0",
+          "published_at": "2026-08-13",
+          "notes_localizations": {
+            "en": "First Qx-native release with live-verified Codex JSON and Grok gRPC-Web quota paths, local CLI session discovery, cached-first refresh, native details, and Actions.",
+            "zh-CN": "首个 Qx 原生版本：接入已完成真实验证的 Codex JSON 与 Grok gRPC-Web 配额链路，支持本机 CLI 登录态发现、缓存优先刷新、原生详情与 Actions。"
+          }
+        }
+      ]
+    },
+    {
       "id": "brew",
       "name": "Brew",
       "version": "1.1.0",

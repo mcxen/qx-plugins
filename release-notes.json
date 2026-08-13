@@ -1,6 +1,16 @@
 {
   "schema_version": 1,
   "plugins": {
+    "agent-usage": [
+      {
+        "version": "1.0.0",
+        "published_at": "2026-08-13",
+        "notes_localizations": {
+          "en": "First Qx-native release with live-verified Codex JSON and Grok gRPC-Web quota paths, local CLI session discovery, cached-first refresh, native details, and Actions.",
+          "zh-CN": "首个 Qx 原生版本：接入已完成真实验证的 Codex JSON 与 Grok gRPC-Web 配额链路，支持本机 CLI 登录态发现、缓存优先刷新、原生详情与 Actions。"
+        }
+      }
+    ],
     "brew": [
       {
         "version": "1.1.0",

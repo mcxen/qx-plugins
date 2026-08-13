@@ -43,6 +43,7 @@ they do not claim that an old archive is still downloadable.
 
 | Plugin | Kind | Notes |
 |--------|------|--------|
+| `agent-usage` | Native Workbench List | Live-verified Codex + Grok quota windows from local CLI sessions; cached-first and token-free persistence |
 | `qx-bing-wallpaper` | Native Workbench Gallery | Qx-owned Bing gallery and wallpaper actions |
 | `qxheihe` | Native Workbench List | Xiaoheihe community feed, read state, managed retention and async multi-image detail |
 | `qxpicture` | Native Workbench List | Configurable random-image APIs with adaptive detail media |
