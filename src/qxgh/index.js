@@ -741,7 +741,6 @@ function runToItem(run) {
   item.actions = [{
     id: "open-item",
     label: text("Open Run on GitHub", "在 GitHub 打开运行"),
-    primary: true,
     menuKey: "o",
     kbd: "CmdOrCtrl+O",
   }];
@@ -774,7 +773,6 @@ function releaseToItem(rel) {
   item.actions = [{
     id: "open-item",
     label: text("Open Release on GitHub", "在 GitHub 打开发布"),
-    primary: true,
     menuKey: "o",
     kbd: "CmdOrCtrl+O",
   }];
@@ -1049,14 +1047,6 @@ let destroyPanel = null;
 
 export default {
   commands: [
-    {
-      name: "open-qxgh",
-      title: "QxGH",
-      async run(context) {
-        setLocale(context);
-        context.showToast(text("Open QxGH from Extensions, or search “QxGH”", "请从扩展打开 Github助手，或搜索“Github助手”"));
-      },
-    },
     {
       name: "refresh-qxgh",
       title: "Refresh QxGH",

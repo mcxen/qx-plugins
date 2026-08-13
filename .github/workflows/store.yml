@@ -1,0 +1,47 @@
+name: Plugin Store
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "store/**"
+      - "index.json"
+      - "src/**/icon.*"
+      - "src/**/extension-icon.png"
+      - "src/**/command-icon.png"
+      - "src/**/bing-wallpaper-icon.png"
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    env:
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+          cache-dependency-path: store/package-lock.json
+      - name: Install store dependencies
+        working-directory: store
+        run: npm ci
+      - name: Build static store
+        working-directory: store
+        run: npm run build
+      - name: Upload dist artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: qx-plugin-store
+          path: store/dist
+      # Optional: set repo secrets CLOUDFLARE_API_TOKEN + CLOUDFLARE_ACCOUNT_ID to deploy.
+      - name: Deploy to Cloudflare Pages
+        if: ${{ env.CLOUDFLARE_API_TOKEN != '' }}
+        uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ env.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ env.CLOUDFLARE_ACCOUNT_ID }}
+          workingDirectory: store
+          command: pages deploy dist --project-name=qx-plugin-store

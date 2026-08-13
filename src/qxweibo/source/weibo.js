@@ -475,11 +475,11 @@ function createPanel(container, context) {
       detail: detailFor(post),
       actions: [
         { id: `open:${post.id}`, label: copy("Open on Weibo", "在微博中打开"), primary: true, kbd: "CmdOrCtrl+O" },
-        {
-          id: `${read ? "unread" : "read"}:${post.id}`,
-          label: read ? copy("Mark Unread", "标为未读") : copy("Mark Read", "标为已读"),
+        ...(read ? [{
+          id: `unread:${post.id}`,
+          label: copy("Mark Unread", "标为未读"),
           kbd: "CmdOrCtrl+Shift+U",
-        },
+        }] : []),
       ],
     };
   }
@@ -587,11 +587,6 @@ function createPanel(container, context) {
           const post = allPosts().find((entry) => entry.id === id.slice(5))
             || allPosts().find((entry) => entry.id === String(item?.id));
           if (post) context.openUrl(postUrl(post));
-        } else if (id.startsWith("read:")) {
-          if (readLedger.mark(id.slice(5))) {
-            paint();
-            persistCache();
-          }
         } else if (id.startsWith("unread:")) {
           if (readLedger.unmark(id.slice(7))) {
             paint();

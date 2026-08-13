@@ -3,6 +3,14 @@
   "name": "Pomodoro Island",
   "version": "1.6.2",
   "description": "Reference plugin for declarative Workbench and the structured QxIsland session protocol, with persistent background timing and history.",
+  "names": {
+    "en": "Pomodoro Island",
+    "zh-CN": "番茄钟灵动岛"
+  },
+  "descriptions": {
+    "en": "Focus timer with breaks.",
+    "zh-CN": "带休息提醒的专注计时器。"
+  },
   "author": "mcx",
   "icon": "icon.svg",
   "platforms": ["macos", "windows"],
@@ -13,49 +21,105 @@
     {
       "id": "focusMinutes",
       "label": "Focus minutes",
+      "labels": {
+        "en": "Focus minutes",
+        "zh-CN": "专注时长（分钟）"
+      },
       "type": "number",
       "required": false,
       "default": 25,
-      "description": "Length of a focus session in minutes."
+      "description": "Length of a focus session in minutes.",
+      "descriptions": {
+        "en": "Length of a focus session in minutes.",
+        "zh-CN": "单次专注的时长。"
+      }
     },
     {
       "id": "shortBreakMinutes",
       "label": "Short break minutes",
+      "labels": {
+        "en": "Short break minutes",
+        "zh-CN": "短休息时长（分钟）"
+      },
       "type": "number",
       "required": false,
       "default": 5,
-      "description": "Length of a short break in minutes."
+      "description": "Length of a short break in minutes.",
+      "descriptions": {
+        "en": "Length of a short break in minutes.",
+        "zh-CN": "单次短休息的时长。"
+      }
     }
   ],
   "commands": [
     {
       "name": "start-focus",
       "title": "Pomodoro: Start Focus",
+      "titles": {
+        "en": "Pomodoro: Start Focus",
+        "zh-CN": "番茄钟：开始专注"
+      },
       "description": "Start a focus timer in the Qx-managed island.",
+      "descriptions": {
+        "en": "Start a focus timer in the Qx-managed island.",
+        "zh-CN": "在 Qx 灵动岛中开始专注计时。"
+      },
       "keywords": ["pomodoro", "focus", "timer", "番茄钟", "专注"]
     },
     {
       "name": "start-short-break",
       "title": "Pomodoro: Start Short Break",
+      "titles": {
+        "en": "Pomodoro: Start Short Break",
+        "zh-CN": "番茄钟：开始短休息"
+      },
       "description": "Start a short break in the Qx-managed island.",
+      "descriptions": {
+        "en": "Start a short break in the Qx-managed island.",
+        "zh-CN": "在 Qx 灵动岛中开始短休息计时。"
+      },
       "keywords": ["pomodoro", "break", "timer", "休息"]
     },
     {
       "name": "toggle-pomodoro",
       "title": "Pomodoro: Pause or Resume",
+      "titles": {
+        "en": "Pomodoro: Pause or Resume",
+        "zh-CN": "番茄钟：暂停或继续"
+      },
       "description": "Pause or resume the timer; after completion, start the recommended next phase.",
+      "descriptions": {
+        "en": "Pause or resume the timer; after completion, start the recommended next phase.",
+        "zh-CN": "暂停或继续计时；完成后开始建议的下一阶段。"
+      },
       "keywords": ["pomodoro", "pause", "resume", "暂停", "继续"]
     },
     {
       "name": "stop-pomodoro",
       "title": "Pomodoro: Stop",
+      "titles": {
+        "en": "Pomodoro: Stop",
+        "zh-CN": "番茄钟：停止"
+      },
       "description": "Stop the timer and dismiss its island display.",
+      "descriptions": {
+        "en": "Stop the timer and dismiss its island display.",
+        "zh-CN": "停止计时并关闭灵动岛显示。"
+      },
       "keywords": ["pomodoro", "stop", "reset", "停止"]
     },
     {
       "name": "pomodoro-heartbeat",
       "title": "Pomodoro: Background Heartbeat",
+      "titles": {
+        "en": "Pomodoro: Background Heartbeat",
+        "zh-CN": "番茄钟：后台心跳"
+      },
       "description": "Reconcile the persisted timer while its Workbench is closed.",
+      "descriptions": {
+        "en": "Reconcile the persisted timer while its Workbench is closed.",
+        "zh-CN": "面板关闭时校准已保存的计时器。"
+      },
       "mode": "no-view",
       "interval": "5s",
       "keywords": ["pomodoro", "background", "timer"]
@@ -63,6 +127,10 @@
   ],
   "panel": {
     "title": "Pomodoro",
+    "titles": {
+      "en": "Pomodoro",
+      "zh-CN": "番茄钟"
+    },
     "icon": "icon.svg",
     "keywords": ["pomodoro", "timer", "focus", "番茄钟", "专注"]
   },

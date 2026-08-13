@@ -12963,6 +12963,12 @@ async function showToast(input, title, message) {
     }
   };
 }
+function isChineseLocale(value) {
+  return value === "zh-CN" || value === "zh" || String(value || "").toLowerCase().startsWith("zh-");
+}
+function raycastText(en, zh) {
+  return isChineseLocale(runtime()?.context?.locale?.current) ? zh : en;
+}
 async function open(target) {
   return runtime()?.context?.openUrl?.(String(target || ""));
 }
@@ -12970,7 +12976,10 @@ async function showInFinder(target) {
   return runtime()?.context?.openUrl?.(String(target || ""));
 }
 async function openExtensionPreferences() {
-  runtime()?.context?.showToast?.("Preferences are managed in Qx Extensions settings.");
+  runtime()?.context?.showToast?.(raycastText(
+    "Preferences are managed in Qx Extensions settings.",
+    "请前往 Qx 的扩展设置管理偏好。",
+  ));
 }
 function getPreferenceValues() {
   return runtime()?.preferences || defaultPreferenceValues;
@@ -13007,7 +13016,7 @@ function Action(props) {
   return import_react.default.createElement("button", {
     type: "button",
     className: "qx-raycast-action-button",
-    title: props.title || "Action",
+    title: props.title || raycastText("Action", "操作"),
     onClick: (event) => {
       event?.stopPropagation?.();
       if (typeof props.onAction === "function") {
@@ -13017,7 +13026,7 @@ function Action(props) {
         });
       }
     }
-  }, props.title || "Action");
+  }, props.title || raycastText("Action", "操作"));
 }
 function SearchInput({ placeholder, value, onChange }) {
   return import_react.default.createElement("input", {
@@ -13342,7 +13351,7 @@ function List(props) {
         props.onSearchTextChange?.(value);
       }
     }),
-    props.isLoading ? import_react.default.createElement("div", { className: "qx-raycast-loading" }, "Loading...") : null,
+    props.isLoading ? import_react.default.createElement("div", { className: "qx-raycast-loading" }, raycastText("Loading...", "加载中…")) : null,
     import_react.default.createElement("div", { className: "qx-raycast-list", role: "listbox" }, children)
   );
 }
@@ -13363,7 +13372,7 @@ function Grid(props) {
         props.onSearchTextChange?.(value);
       }
     }),
-    props.isLoading ? import_react.default.createElement("div", { className: "qx-raycast-loading" }, "Loading...") : null,
+    props.isLoading ? import_react.default.createElement("div", { className: "qx-raycast-loading" }, raycastText("Loading...", "加载中…")) : null,
     import_react.default.createElement("div", {
       className: "qx-raycast-grid",
       role: "listbox",
@@ -13418,22 +13427,22 @@ var init_api = __esm({
       return import_react.default.createElement(import_react.default.Fragment, null, children);
     };
     Action.OpenInBrowser = function ActionOpenInBrowser(props) {
-      return import_react.default.createElement(Action, { ...props, onAction: () => open(props.url), title: props.title || "Open in Browser" });
+      return import_react.default.createElement(Action, { ...props, onAction: () => open(props.url), title: props.title || raycastText("Open in Browser", "在浏览器中打开") });
     };
     Action.Open = function ActionOpen(props) {
-      return import_react.default.createElement(Action, { ...props, onAction: () => open(props.target), title: props.title || "Open" });
+      return import_react.default.createElement(Action, { ...props, onAction: () => open(props.target), title: props.title || raycastText("Open", "打开") });
     };
     Action.ShowInFinder = function ActionShowInFinder(props) {
-      return import_react.default.createElement(Action, { ...props, onAction: () => showInFinder(props.path), title: props.title || "Show in Finder" });
+      return import_react.default.createElement(Action, { ...props, onAction: () => showInFinder(props.path), title: props.title || raycastText("Show in Finder", "在 Finder 中显示") });
     };
     Action.CopyToClipboard = function ActionCopyToClipboard(props) {
-      return import_react.default.createElement(Action, { ...props, onAction: () => Clipboard.copy(props.content), title: props.title || "Copy" });
+      return import_react.default.createElement(Action, { ...props, onAction: () => Clipboard.copy(props.content), title: props.title || raycastText("Copy", "复制") });
     };
     Action.Push = function ActionPush(props) {
       return import_react.default.createElement(Action, {
         ...props,
         onAction: () => useNavigation().push(props.target),
-        title: props.title || "Open"
+        title: props.title || raycastText("Open", "打开")
       });
     };
     List.Item = function ListItem(props) {
@@ -13448,7 +13457,7 @@ var init_api = __esm({
       );
     };
     List.EmptyView = function ListEmptyView(props) {
-      return import_react.default.createElement("div", { className: "qx-raycast-empty" }, props.title || "No results");
+      return import_react.default.createElement("div", { className: "qx-raycast-empty" }, props.title || raycastText("No results", "没有结果"));
     };
     List.Dropdown = function ListDropdown() {
       return null;
@@ -13633,12 +13642,20 @@ function main() {
   const [calendar, setCalendar] = (0, import_react2.useState)("");
   const [header, setHeader] = (0, import_react2.useState)("");
   const [date, setDate] = (0, import_react2.useState)(currentMonth);
+  const [locale, setLocale] = (0, import_react2.useState)(() => runtime()?.context?.locale?.current || "en");
+  (0, import_react2.useEffect)(() => {
+    const unsubscribe = runtime()?.context?.locale?.onChange?.(({ current }) => setLocale(current || "en"));
+    return () => unsubscribe?.();
+  }, []);
+  const chinese = isChineseLocale(locale);
   (0, import_react2.useEffect)(() => {
     const cal = new import_calendar.Calendar(weekStart);
     const m = cal.monthDates(date.getFullYear(), date.getMonth());
     const today = (/* @__PURE__ */ new Date()).toDateString();
-    const header2 = date.toLocaleString("en", { month: "long", year: "numeric" });
-    const daysArray = days[weekStart];
+    const header2 = date.toLocaleString(chinese ? "zh-CN" : "en", { month: "long", year: "numeric" });
+    const daysArray = chinese
+      ? [["周日", "周一", "周二", "周三", "周四", "周五", "周六"], ["周一", "周二", "周三", "周四", "周五", "周六", "周日"]][weekStart]
+      : days[weekStart];
     if (viewMode == 1) {
       const table = m.map((week) => {
         let row = showWeeks ? `| **${weekStart === 0 ? weekNumberSun(week[0]) : weekNumber(week[0])}** |` : "|";
@@ -13681,13 +13698,13 @@ ${table}`);
         return `${row}
 `;
       }).join("\n\n");
-      const header3 = date.toLocaleString("en", { month: "long", year: "numeric" });
+      const header3 = date.toLocaleString(chinese ? "zh-CN" : "en", { month: "long", year: "numeric" });
       const weeksHeader = showWeeks ? "`# `    " : "";
       const daysHeader = daysArray.map((day) => `\` ${day}\``).join(" ");
       setHeader(header3);
       setCalendar("# " + header3 + "\n***\n" + weeksHeader + daysHeader + "\n\n" + table);
     }
-  }, [date]);
+  }, [chinese, date]);
   const changeMonth = (change) => {
     const newDate = new Date(date.getFullYear(), date.getMonth() + change, 1);
     setDate(newDate);
@@ -13698,7 +13715,7 @@ ${table}`);
   };
   const setCurrent = () => {
     if (date === currentMonth) {
-      showToast(Toast.Style.Success, "Current month is on screen");
+      showToast(Toast.Style.Success, chinese ? "当前月份已显示" : "Current month is on screen");
     } else {
       setDate(currentMonth);
     }
@@ -13712,7 +13729,7 @@ ${table}`);
           /* @__PURE__ */ (0, import_jsx_runtime.jsx)(
             Action,
             {
-              title: "Current Month",
+              title: chinese ? "当前月份" : "Current Month",
               shortcut: { modifiers: [], key: "c" },
               icon: { source: { dark: "up-dark.png", light: "up.png" }, tintColor: Color.PrimaryText },
               onAction: () => setCurrent()
@@ -13720,11 +13737,11 @@ ${table}`);
           ),
           /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Action.CopyToClipboard, { content: calendar })
         ] }),
-        /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(ActionPanel.Section, { title: "Change Month", children: [
+        /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(ActionPanel.Section, { title: chinese ? "切换月份" : "Change Month", children: [
           /* @__PURE__ */ (0, import_jsx_runtime.jsx)(
             Action,
             {
-              title: "Previous Month",
+              title: chinese ? "上个月" : "Previous Month",
               shortcut: { modifiers: [], key: "arrowLeft" },
               icon: { source: { dark: "left-dark.png", light: "left.png" }, tintColor: Color.PrimaryText },
               onAction: () => changeMonth(-1)
@@ -13733,18 +13750,18 @@ ${table}`);
           /* @__PURE__ */ (0, import_jsx_runtime.jsx)(
             Action,
             {
-              title: "Next Month",
+              title: chinese ? "下个月" : "Next Month",
               shortcut: { modifiers: [], key: "arrowRight" },
               icon: { source: { dark: "right-dark.png", light: "right.png" }, tintColor: Color.PrimaryText },
               onAction: () => changeMonth(1)
             }
           )
         ] }),
-        /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(ActionPanel.Section, { title: "Change Year", children: [
+        /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(ActionPanel.Section, { title: chinese ? "切换年份" : "Change Year", children: [
           /* @__PURE__ */ (0, import_jsx_runtime.jsx)(
             Action,
             {
-              title: "Previous Year",
+              title: chinese ? "上一年" : "Previous Year",
               shortcut: { modifiers: ["shift"], key: "arrowLeft" },
               icon: {
                 source: { dark: "double-left-dark.png", light: "double-left.png" },
@@ -13756,7 +13773,7 @@ ${table}`);
           /* @__PURE__ */ (0, import_jsx_runtime.jsx)(
             Action,
             {
-              title: "Next Year",
+              title: chinese ? "下一年" : "Next Year",
               shortcut: { modifiers: ["shift"], key: "arrowRight" },
               icon: {
                 source: { dark: "double-right-dark.png", light: "double-right.png" },
@@ -13769,7 +13786,7 @@ ${table}`);
         /* @__PURE__ */ (0, import_jsx_runtime.jsx)(ActionPanel.Section, { children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(
           Action,
           {
-            title: "Open Extension Preferences",
+            title: chinese ? "打开扩展偏好设置" : "Open Extension Preferences",
             onAction: openExtensionPreferences,
             shortcut: { modifiers: ["cmd", "shift"], key: "," }
           }
@@ -13825,7 +13842,8 @@ var commandLoaders = {
   "index": () => Promise.resolve().then(() => (init_src2(), src_exports))
 };
 var commandModes = { "index": "view" };
-var manifestCommands = [{ "name": "index", "title": "Quick Calendar", "description": "Shows calendar for a month", "icon": "command-icon.png", "keywords": [], "mode": "view" }];
+var manifestCommands = [];
+var panelCommandName = "index";
 var preferences = { "weekStart": "1", "showWeeks": true, "viewMode": "1" };
 var root = null;
 var loadedCommandModules = /* @__PURE__ */ new Map();
@@ -13934,7 +13952,9 @@ var entry_default = {
         await invokeCommand(command.name, hidden, context, {
           launchType: runOptions.launchType || (mode === "no-view" ? "background" : "userInitiated")
         });
-        if (mode === "view") context.showToast("Open " + command.title + " from the plugin panel.");
+        if (mode === "view") context.showToast(
+          raycastText("Open " + command.title + " from the plugin panel.", "请从插件面板打开" + command.title + "。"),
+        );
       } finally {
         hidden.remove();
       }
@@ -13943,8 +13963,7 @@ var entry_default = {
   panel: {
     title: "Quick Calendar",
     render(container, context) {
-      const firstView = manifestCommands.find((command) => (commandModes[command.name] || "view") === "view") || manifestCommands[0];
-      return invokeCommand(firstView.name, container, context, { launchType: "userInitiated" });
+      return invokeCommand(panelCommandName, container, context, { launchType: "userInitiated" });
     },
     destroy() {
       if (root) {

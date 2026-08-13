@@ -2,5 +2,6 @@
 
 Converted from Raycast extension `calendar` for Qx.
 
-Source commands: index
+The bundled `index` view is used by the panel internally; it is not exported
+as a duplicate Qx launcher command.
 Source tools: -

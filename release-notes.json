@@ -11,7 +11,43 @@
         }
       }
     ],
+    "clipboard-actions": [
+      {
+        "version": "1.0.0",
+        "published_at": "2026-08-08",
+        "notes_localizations": {
+          "en": "Added opt-in no-view commands to paste clipboard text as plain text and save clipboard images as unique offline PNG files.",
+          "zh-CN": "新增可选的无界面命令：将剪贴板文字以纯文本粘贴，并把剪贴板图片离线保存为不覆盖的唯一 PNG 文件。"
+        }
+      }
+    ],
+    "hacker-news": [
+      {
+        "version": "1.0.1",
+        "published_at": "2026-08-08",
+        "notes_localizations": {
+          "en": "Removed the duplicate panel-opening command; story actions remain available in the Workbench.",
+          "zh-CN": "移除重复的面板打开命令，帖子操作继续保留在 Workbench 中。"
+        }
+      },
+      {
+        "version": "1.0.0",
+        "published_at": "2026-08-03",
+        "notes_localizations": {
+          "en": "Initial Hacker News Workbench panel with latest stories, lazy nested comments, and stale-while-revalidate caching.",
+          "zh-CN": "首个 Hacker News Workbench 面板：支持最新帖子、按需嵌套评论与 stale-while-revalidate 缓存。"
+        }
+      }
+    ],
     "brew": [
+      {
+        "version": "1.1.1",
+        "published_at": "2026-08-08",
+        "notes_localizations": {
+          "en": "Moved package refresh and upgrade operations into the panel and removed duplicate searchable commands.",
+          "zh-CN": "将软件包刷新与升级操作统一到面板，并移除重复的可搜索命令。"
+        }
+      },
       {
         "version": "1.1.0",
         "published_at": "2026-07-23",
@@ -22,6 +58,14 @@
       }
     ],
     "external-display-control": [
+      {
+        "version": "1.2.4",
+        "published_at": "2026-08-08",
+        "notes_localizations": {
+          "en": "Removed the duplicate panel-opening command; open the display controls through the plugin panel.",
+          "zh-CN": "移除重复的面板打开命令，显示器控制改由插件面板入口打开。"
+        }
+      },
       {
         "version": "1.2.3",
         "published_at": "2026-08-07",
@@ -163,6 +207,14 @@
     ],
     "raycast-calendar": [
       {
+        "version": "1.2.1",
+        "published_at": "2026-08-08",
+        "notes_localizations": {
+          "en": "Removed the duplicate panel-opening command; the calendar view is now opened through the plugin panel.",
+          "zh-CN": "移除重复的面板打开命令，日历视图改由插件面板入口打开。"
+        }
+      },
+      {
         "version": "1.2.0",
         "published_at": "2026-07-23",
         "notes_localizations": {
@@ -172,6 +224,14 @@
       }
     ],
     "qx-bing-wallpaper": [
+      {
+        "version": "2.2.2",
+        "published_at": "2026-08-08",
+        "notes_localizations": {
+          "en": "Removed the duplicate gallery-opening command while retaining real wallpaper and background operations.",
+          "zh-CN": "移除重复的图库打开命令，同时保留真实的壁纸与后台操作。"
+        }
+      },
       {
         "version": "2.2.1",
         "published_at": "2026-07-25",
@@ -198,6 +258,14 @@
       }
     ],
     "qxgh": [
+      {
+        "version": "1.5.6",
+        "published_at": "2026-08-08",
+        "notes_localizations": {
+          "en": "Removed the duplicate panel-opening command while retaining refresh, status, and Island operations.",
+          "zh-CN": "移除重复的面板打开命令，同时保留刷新、状态与灵动岛操作。"
+        }
+      },
       {
         "version": "1.5.5",
         "published_at": "2026-08-07",
@@ -265,6 +333,14 @@
     ],
     "qxgold": [
       {
+        "version": "1.2.1",
+        "published_at": "2026-08-08",
+        "notes_localizations": {
+          "en": "Removed the duplicate panel-opening command; price tracking remains in the plugin panel.",
+          "zh-CN": "移除重复的面板打开命令，金价追踪继续通过插件面板提供。"
+        }
+      },
+      {
         "version": "1.2.0",
         "published_at": "2026-08-01",
         "notes_localizations": {
@@ -290,6 +366,14 @@
       }
     ],
     "qxtieba": [
+      {
+        "version": "1.1.11",
+        "published_at": "2026-08-08",
+        "notes_localizations": {
+          "en": "Removed the duplicate launcher command and only show Mark Unread for posts already marked read.",
+          "zh-CN": "移除重复的启动命令，并仅对已读帖子显示“标为未读”操作。"
+        }
+      },
       {
         "version": "1.1.10",
         "published_at": "2026-08-06",
@@ -396,6 +480,14 @@
       }
     ],
     "qxheihe": [
+      {
+        "version": "1.4.12",
+        "published_at": "2026-08-08",
+        "notes_localizations": {
+          "en": "Removed duplicate panel and comments-opening actions; only show Mark Unread for posts already marked read.",
+          "zh-CN": "移除重复的面板与评论打开操作，并仅对已读帖子显示“标为未读”。"
+        }
+      },
       {
         "version": "1.4.11",
         "published_at": "2026-07-31",
@@ -535,6 +627,14 @@
     ],
     "qxcoolapk": [
       {
+        "version": "1.4.8",
+        "published_at": "2026-08-08",
+        "notes_localizations": {
+          "en": "Removed the duplicate launcher command and only show Mark Unread for posts already marked read.",
+          "zh-CN": "移除重复的启动命令，并仅对已读帖子显示“标为未读”操作。"
+        }
+      },
+      {
         "version": "1.4.7",
         "published_at": "2026-08-06",
         "notes_localizations": {
@@ -673,6 +773,14 @@
     ],
     "qxweibo": [
       {
+        "version": "1.1.8",
+        "published_at": "2026-08-08",
+        "notes_localizations": {
+          "en": "Removed the duplicate launcher command and only show Mark Unread for posts already marked read.",
+          "zh-CN": "移除重复的启动命令，并仅对已读帖子显示“标为未读”操作。"
+        }
+      },
+      {
         "version": "1.1.7",
         "published_at": "2026-08-07",
         "notes_localizations": {
@@ -755,6 +863,14 @@
     ],
     "qxpicture": [
       {
+        "version": "0.5.1",
+        "published_at": "2026-08-08",
+        "notes_localizations": {
+          "en": "Removed the duplicate panel-opening command; image management remains available through the panel actions.",
+          "zh-CN": "移除重复的面板打开命令，图片管理继续通过面板操作提供。"
+        }
+      },
+      {
         "version": "0.5.0",
         "published_at": "2026-07-25",
         "notes_localizations": {
@@ -780,6 +896,14 @@
       }
     ],
     "sysinfo": [
+      {
+        "version": "1.4.1",
+        "published_at": "2026-08-08",
+        "notes_localizations": {
+          "en": "Removed the duplicate launcher command; system information is opened through the plugin panel.",
+          "zh-CN": "移除重复的启动命令，系统信息改由插件面板入口打开。"
+        }
+      },
       {
         "version": "1.4.0",
         "published_at": "2026-07-26",
@@ -823,6 +947,14 @@
     ],
     "unsplash": [
       {
+        "version": "1.2.1",
+        "published_at": "2026-08-08",
+        "notes_localizations": {
+          "en": "Removed the duplicate search-opening command while retaining real photo and wallpaper operations.",
+          "zh-CN": "移除重复的搜索打开命令，同时保留真实的照片与壁纸操作。"
+        }
+      },
+      {
         "version": "1.2.0",
         "published_at": "2026-07-23",
         "notes_localizations": {
@@ -832,6 +964,14 @@
       }
     ],
     "v2ex": [
+      {
+        "version": "3.0.2",
+        "published_at": "2026-08-08",
+        "notes_localizations": {
+          "en": "Removed panel-opening and tab-navigation commands; notification and token commands still return real output.",
+          "zh-CN": "移除面板打开与标签切换命令，通知和令牌命令继续返回真实结果。"
+        }
+      },
       {
         "version": "3.0.1",
         "published_at": "2026-08-07",
@@ -858,6 +998,14 @@
       }
     ],
     "weather": [
+      {
+        "version": "1.0.1",
+        "published_at": "2026-08-08",
+        "notes_localizations": {
+          "en": "Removed the duplicate panel-opening command; the refresh command remains available for real weather output.",
+          "zh-CN": "移除重复的面板打开命令，刷新命令继续提供真实天气结果。"
+        }
+      },
       {
         "version": "1.0.0",
         "published_at": "2026-07-23",

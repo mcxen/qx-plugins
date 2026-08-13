@@ -5,7 +5,7 @@ CLI-first macOS plugin: `context.cli` + host Workbench list/detail panel.
 ## Surfaces
 
 - **Panel** — formulae/casks browse (required)
-- **Commands** — open / refresh paths via search
+- **Actions** — refresh and package upgrades inside the panel
 
 ## Ports
 

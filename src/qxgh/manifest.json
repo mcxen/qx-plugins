@@ -5,7 +5,7 @@
     "zh-CN": "Github助手",
     "en": "QxGH"
   },
-  "version": "1.5.5",
+  "version": "1.5.6",
   "description": "QxGH — watch GitHub Actions and Releases from public github.com pages (no REST API). Business-only workbench UI.",
   "descriptions": {
     "en": "Monitor Actions runs and Releases for public GitHub repositories, with build status, estimated progress, and Island updates.",
@@ -13,7 +13,10 @@
   },
   "author": "mcx",
   "icon": "icon.svg",
-  "platforms": ["macos", "windows"],
+  "platforms": [
+    "macos",
+    "windows"
+  ],
   "keywords": [
     "qxgh",
     "github",
@@ -44,7 +47,19 @@
       "default": "mcxen/qx\nmcxen/qx-plugins",
       "description": "Public owner/repo — one per line. Reads github.com HTML (no API token).",
       "rows": 5,
-      "placeholder": "mcxen/qx\nmcxen/qx-plugins"
+      "placeholder": "mcxen/qx\nmcxen/qx-plugins",
+      "labels": {
+        "en": "Repositories",
+        "zh-CN": "仓库列表"
+      },
+      "descriptions": {
+        "en": "Public owner/repo — one per line. Reads github.com HTML (no API token).",
+        "zh-CN": "公开 owner/repo，每行一个；读取 github.com 网页，不需要 API 令牌。"
+      },
+      "placeholders": {
+        "en": "owner/repo, one per line",
+        "zh-CN": "每行一个 owner/repo"
+      }
     },
     {
       "id": "pollSeconds",
@@ -52,7 +67,15 @@
       "type": "string",
       "required": false,
       "default": "45",
-      "description": "Auto-refresh while the panel is open. 0 disables polling."
+      "description": "Auto-refresh while the panel is open. 0 disables polling.",
+      "labels": {
+        "en": "Poll interval (seconds)",
+        "zh-CN": "轮询间隔（秒）"
+      },
+      "descriptions": {
+        "en": "Auto-refresh while the panel is open. 0 disables polling.",
+        "zh-CN": "面板打开时自动刷新；0 表示关闭轮询。"
+      }
     },
     {
       "id": "cacheMinutes",
@@ -60,7 +83,15 @@
       "type": "string",
       "required": false,
       "default": "2",
-      "description": "SWR: treat cached Actions/Releases as fresh for this many minutes."
+      "description": "SWR: treat cached Actions/Releases as fresh for this many minutes.",
+      "labels": {
+        "en": "Cache minutes",
+        "zh-CN": "缓存有效期（分钟）"
+      },
+      "descriptions": {
+        "en": "SWR: treat cached Actions/Releases as fresh for this many minutes.",
+        "zh-CN": "将缓存的 Actions/Release 视为新鲜数据的分钟数。"
+      }
     },
     {
       "id": "islandWatch",
@@ -68,7 +99,15 @@
       "type": "boolean",
       "required": false,
       "default": true,
-      "description": "Show external QxIsland when a watched repo has a running/queued workflow."
+      "description": "Show external QxIsland when a watched repo has a running/queued workflow.",
+      "labels": {
+        "en": "Island for in-progress runs",
+        "zh-CN": "在灵动岛显示运行中的任务"
+      },
+      "descriptions": {
+        "en": "Show external QxIsland when a watched repo has a running/queued workflow.",
+        "zh-CN": "监控的仓库有运行中或排队中的工作流时显示 Qx 灵动岛。"
+      }
     },
     {
       "id": "trayWatch",
@@ -76,24 +115,19 @@
       "type": "boolean",
       "required": false,
       "default": true,
-      "description": "Add an OS-native QxGH tray submenu with deployment percentage, elapsed time, and refresh actions."
+      "description": "Add an OS-native QxGH tray submenu with deployment percentage, elapsed time, and refresh actions.",
+      "labels": {
+        "en": "Show active deployment in tray",
+        "zh-CN": "在托盘显示活动部署"
+      },
+      "descriptions": {
+        "en": "Add an OS-native QxGH tray submenu with deployment percentage, elapsed time, and refresh actions.",
+        "zh-CN": "添加带部署百分比、耗时和刷新操作的 QxGH 托盘子菜单。"
+      }
     }
   ],
   "entry": "index.js",
   "commands": [
-    {
-      "name": "open-qxgh",
-      "title": "QxGH",
-      "description": "Open the QxGH Actions & Releases panel",
-      "keywords": [
-        "qxgh",
-        "github",
-        "actions",
-        "ci",
-        "release",
-        "进度"
-      ]
-    },
     {
       "name": "refresh-qxgh",
       "title": "Refresh QxGH",
@@ -103,7 +137,15 @@
         "github",
         "refresh",
         "ci"
-      ]
+      ],
+      "titles": {
+        "en": "Refresh QxGH",
+        "zh-CN": "刷新 QxGH"
+      },
+      "descriptions": {
+        "en": "Force refresh Actions and Releases for pinned repos",
+        "zh-CN": "强制刷新固定仓库的 Actions 和 Releases。"
+      }
     },
     {
       "name": "qxgh-status",
@@ -114,7 +156,15 @@
         "github",
         "status",
         "summary"
-      ]
+      ],
+      "titles": {
+        "en": "QxGH CI Summary",
+        "zh-CN": "QxGH CI 摘要"
+      },
+      "descriptions": {
+        "en": "Toast a short summary of latest runs",
+        "zh-CN": "提示最新运行任务的简要摘要。"
+      }
     },
     {
       "name": "qxgh-watch-island",
@@ -125,7 +175,15 @@
         "github",
         "island",
         "watch"
-      ]
+      ],
+      "titles": {
+        "en": "QxGH Watch on Island",
+        "zh-CN": "在灵动岛关注 QxGH"
+      },
+      "descriptions": {
+        "en": "Pin the hottest in-progress run on the external island",
+        "zh-CN": "将最活跃的运行中任务固定到外部灵动岛。"
+      }
     }
   ],
   "panel": {
@@ -137,7 +195,11 @@
       "releases",
       "ci",
       "gh"
-    ]
+    ],
+    "titles": {
+      "en": "QxGH",
+      "zh-CN": "QxGH"
+    }
   },
   "min_app_version": "0.5.38"
 }

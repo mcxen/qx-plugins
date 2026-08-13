@@ -664,17 +664,17 @@ function createPanel(container, context) {
         fit: "cover",
       } : undefined,
       detail: detailFor(post),
-      actions: [{
-        id: `open:${post.linkid}`,
-        label: copy("Open on Xiaoheihe", "在小黑盒中打开"),
-        primary: true,
-      }, {
-        id: `${isRead ? "unread" : "read"}:${post.linkid}`,
-        label: isRead ? copy("Mark Unread", "标为未读") : copy("Mark Read", "标为已读"),
-      }, {
-        id: `open-comments:${post.linkid}`,
-        label: copy("Open Comments on Xiaoheihe", "在小黑盒中查看评论"),
-      }],
+      actions: [
+        {
+          id: `open:${post.linkid}`,
+          label: copy("Open on Xiaoheihe", "在小黑盒中打开"),
+          primary: true,
+        },
+        ...(isRead ? [{
+          id: `unread:${post.linkid}`,
+          label: copy("Mark Unread", "标为未读"),
+        }] : []),
+      ],
     };
   }
 
@@ -749,12 +749,7 @@ function createPanel(container, context) {
         onAction(id, item) {
           if (id === "refresh") void loadFeed({ force: true });
           else if (id === "load-more") void loadMore();
-          else if (id.startsWith("read:")) {
-            if (markRead(id.slice("read:".length))) {
-              paint();
-              void persistCache();
-            }
-          } else if (id.startsWith("unread:")) {
+          else if (id.startsWith("unread:")) {
             if (markUnread(id.slice("unread:".length))) {
               paint();
               void persistCache();
@@ -764,10 +759,6 @@ function createPanel(container, context) {
             const target = state.all.find((post) => String(post.linkid) === postId)
               || state.all.find((post) => String(post.linkid) === String(item?.id))
               || selectedPost();
-            if (target) void context.openUrl(postUrl(target));
-          } else if (id.startsWith("open-comments:")) {
-            const postId = id.slice("open-comments:".length);
-            const target = state.all.find((post) => String(post.linkid) === postId) || selectedPost();
             if (target) void context.openUrl(postUrl(target));
           }
         },
@@ -1023,17 +1014,6 @@ function createPanel(container, context) {
 const activePanels = new WeakMap();
 
 const plugin = {
-  commands: [{
-    name: "open-qxheihe",
-    title: "打开 QxHeihe 小黑盒",
-    async run(context) {
-      setLocale(context);
-      await context.showToast(copy(
-        "Open QxHeihe from Extensions or search.",
-        "请从扩展模块或搜索中打开 QxHeihe。"
-      ));
-    },
-  }],
   panel: {
     title: "QxHeihe 小黑盒",
     render(container, context) {

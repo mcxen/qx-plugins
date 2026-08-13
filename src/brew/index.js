@@ -356,49 +356,6 @@ function createPanel(context) {
 }
 
 export default {
-  commands: [
-    {
-      name: "open-brew",
-      title: "Brew",
-      async run(context) {
-        setLocale(context);
-        context.showToast(text("Open Brew from Extensions", "请从扩展中打开 Brew"));
-      },
-    },
-    {
-      name: "brew-outdated",
-      title: "Brew: Outdated",
-      async run(context) {
-        setLocale(context);
-        try {
-          const items = await loadOutdated(context);
-          context.showToast(items.length
-            ? `${items.length} ${text("outdated packages", "个软件包可更新")}`
-            : text("All packages are up to date", "全部软件包均为最新版本"));
-        } catch (error) {
-          context.showToast(String(error?.message || error));
-        }
-      },
-    },
-    {
-      name: "brew-upgrade-all",
-      title: "Brew: Upgrade All Outdated",
-      async run(context) {
-        setLocale(context);
-        const answer = await context.prompt(text(
-          "Upgrade all outdated packages? Type YES to continue.",
-          "更新全部可更新软件包？输入 YES 继续。",
-        ), "");
-        if (answer !== "YES") return;
-        try {
-          await brewRun(context, ["upgrade"], 600_000);
-          context.showToast(text("Homebrew upgrade finished", "Homebrew 更新完成"));
-        } catch (error) {
-          context.showToast(String(error?.message || error));
-        }
-      },
-    },
-  ],
   panel: {
     title: "Brew",
     render(container, context) {

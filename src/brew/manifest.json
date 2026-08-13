@@ -1,8 +1,16 @@
 {
   "id": "brew",
   "name": "Brew",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "description": "Search, inspect, upgrade and uninstall Homebrew formulae & casks (macOS). Uses Qx context.cli.",
+  "names": {
+    "en": "Brew",
+    "zh-CN": "Homebrew"
+  },
+  "descriptions": {
+    "en": "Search, inspect, upgrade and uninstall Homebrew formulae and casks on macOS.",
+    "zh-CN": "在 macOS 上搜索、查看、更新和卸载 Homebrew formula 与 cask。"
+  },
   "author": "qx (ported from Raycast brew by nhojb et al.)",
   "icon": "icon.svg",
   "screenshots": [
@@ -31,47 +39,27 @@
     {
       "id": "brewPath",
       "label": "Brew executable",
+      "labels": {
+        "en": "Brew executable",
+        "zh-CN": "Brew 可执行文件"
+      },
       "type": "string",
       "required": false,
       "default": "",
-      "description": "Optional absolute path to brew. Empty = auto-detect (/opt/homebrew/bin/brew, /usr/local/bin/brew, PATH)."
+      "description": "Optional absolute path to brew. Empty = auto-detect (/opt/homebrew/bin/brew, /usr/local/bin/brew, PATH).",
+      "descriptions": {
+        "en": "Optional absolute path to brew. Empty = auto-detect.",
+        "zh-CN": "可选的 brew 绝对路径。留空时自动检测。"
+      }
     }
   ],
   "entry": "index.js",
-  "commands": [
-    {
-      "name": "open-brew",
-      "title": "Brew",
-      "description": "Open Homebrew manager panel",
-      "keywords": [
-        "brew",
-        "homebrew",
-        "installed",
-        "packages"
-      ]
-    },
-    {
-      "name": "brew-outdated",
-      "title": "Brew: Outdated",
-      "description": "Show outdated formulae & casks",
-      "keywords": [
-        "brew",
-        "outdated",
-        "upgrade"
-      ]
-    },
-    {
-      "name": "brew-upgrade-all",
-      "title": "Brew: Upgrade All Outdated",
-      "description": "Run brew upgrade for all outdated packages",
-      "keywords": [
-        "brew",
-        "upgrade"
-      ]
-    }
-  ],
   "panel": {
     "title": "Brew",
+    "titles": {
+      "en": "Brew",
+      "zh-CN": "Homebrew"
+    },
     "icon": "icon.png",
     "keywords": [
       "brew",

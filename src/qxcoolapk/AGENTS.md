@@ -5,7 +5,7 @@
 | Surface | Role |
 |---|---|
 | Workbench panel | Coolapk hot/news/digital feeds, local search, article detail and replies |
-| Command | Launcher entry |
+| Launcher | The panel name is the launcher/search entry; no duplicate open command |
 | HTTP | Anonymous Coolapk feed/detail/reply and protected-image requests |
 | Persist storage | SWR feed/detail/read cache with 3/7-day pruning |
 

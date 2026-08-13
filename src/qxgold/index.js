@@ -86,11 +86,6 @@ async function fetchPrice(context) {
 }
 
 export default {
-  commands: [{
-    name: "open-qxgold",
-    title: "打开 QX Gold 金价追踪",
-    async run(context) { await context.showToast?.(text("Open QX Gold from Extensions or search.", "请从扩展模块或搜索中打开 QX Gold。")); },
-  }],
   panel: {
     title: "QX Gold 金价追踪",
     render(container, context) {

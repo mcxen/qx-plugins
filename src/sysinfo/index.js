@@ -718,16 +718,6 @@ function createPanel(context) {
 }
 
 export default {
-  commands: [
-    {
-      name: "open-sysinfo",
-      title: "Sysinfo",
-      async run(context) {
-        setLocale(context);
-        context.showToast(text("Open Sysinfo from Extensions", "请从扩展中打开 Sysinfo"));
-      },
-    },
-  ],
   panel: {
     title: "Sysinfo",
     async render(container, context) {

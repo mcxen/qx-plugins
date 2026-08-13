@@ -544,14 +544,6 @@ let destroyPanel = null;
 export default {
   commands: [
     {
-      name: "open-weather",
-      title: "Weather",
-      async run(context) {
-        setLocale(context);
-        context.showToast(text("Open the Weather panel from Extensions", "请从扩展打开天气面板"));
-      },
-    },
-    {
       name: "refresh-weather",
       title: "Refresh Weather",
       async run(context) {

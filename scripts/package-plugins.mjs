@@ -173,11 +173,29 @@ async function main() {
           .filter((value) => value === "macos" || value === "windows" || value === "linux"),
       )]
       : [];
+    const names =
+      manifest.names && typeof manifest.names === "object" && !Array.isArray(manifest.names)
+        ? Object.fromEntries(
+            Object.entries(manifest.names)
+              .map(([key, value]) => [String(key), String(value ?? "").trim()])
+              .filter(([, value]) => value),
+          )
+        : undefined;
+    const descriptions =
+      manifest.descriptions && typeof manifest.descriptions === "object" && !Array.isArray(manifest.descriptions)
+        ? Object.fromEntries(
+            Object.entries(manifest.descriptions)
+              .map(([key, value]) => [String(key), String(value ?? "").trim()])
+              .filter(([, value]) => value),
+          )
+        : undefined;
     const nextEntry = {
       id,
       name: manifest.name || id,
       version: manifest.version || "1.0.0",
       description: manifest.description || "",
+      ...(names && Object.keys(names).length > 0 ? { names } : {}),
+      ...(descriptions && Object.keys(descriptions).length > 0 ? { descriptions } : {}),
       download_url: `${rawBase}/${archiveName}`,
       size_bytes: size,
       checksum_sha256: checksum,

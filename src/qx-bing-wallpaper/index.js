@@ -347,14 +347,6 @@ async function backgroundWallpaper(context, random, notify = true) {
 export default {
   commands: [
     {
-      name: "open-gallery",
-      title: "Qx Bing Wallpaper",
-      async run(context) {
-        setLocale(context);
-        context.showToast(text("Open Qx Bing Wallpaper from Extensions", "请从扩展中打开 Qx Bing Wallpaper"));
-      },
-    },
-    {
       name: "set-random-wallpaper",
       title: "Set Random Bing Wallpaper",
       mode: "no-view",

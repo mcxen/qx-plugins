@@ -4,7 +4,6 @@ Native Qx business plugin. Do not run it through the Raycast converter.
 
 ## Surfaces
 
-- `open-gallery`: panel entry
 - `set-random-wallpaper` / `set-latest-wallpaper`: manual no-view commands
 - `daily-wallpaper`: the single daily background command; reads `dailyWallpaperMode`
 - Workbench List: thumbnail images, selection, structured details, item/panel Actions

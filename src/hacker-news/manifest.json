@@ -1,0 +1,96 @@
+{
+  "id": "hacker-news",
+  "name": "Hacker News",
+  "names": {
+    "en": "Hacker News",
+    "zh-CN": "Hacker News"
+  },
+  "version": "1.0.1",
+  "description": "Browse the latest Hacker News stories with details and comments.",
+  "descriptions": {
+    "en": "Browse the latest Hacker News stories with details and comments.",
+    "zh-CN": "浏览 Hacker News 最新帖子、正文与评论。"
+  },
+  "author": "mcx",
+  "icon": "",
+  "keywords": [
+    "hacker news",
+    "hn",
+    "news",
+    "technology",
+    "community",
+    "社区",
+    "帖子",
+    "评论"
+  ],
+  "permissions": [
+    "http",
+    "open-url",
+    "clipboard"
+  ],
+  "preferences": [
+    {
+      "id": "storyLimit",
+      "label": "Stories to load",
+      "labels": {
+        "en": "Stories to load",
+        "zh-CN": "加载帖子数量"
+      },
+      "type": "select",
+      "required": false,
+      "default": "30",
+      "description": "Number of newest stories to load from Hacker News.",
+      "descriptions": {
+        "en": "Number of newest stories to load from Hacker News.",
+        "zh-CN": "从 Hacker News 加载的最新帖子数量。"
+      },
+      "options": [
+        { "label": "20", "labels": { "en": "20", "zh-CN": "20" }, "value": "20" },
+        { "label": "30", "labels": { "en": "30", "zh-CN": "30" }, "value": "30" },
+        { "label": "50", "labels": { "en": "50", "zh-CN": "50" }, "value": "50" }
+      ]
+    },
+    {
+      "id": "cacheTtlMinutes",
+      "label": "Cache freshness (minutes)",
+      "labels": {
+        "en": "Cache freshness (minutes)",
+        "zh-CN": "缓存有效期（分钟）"
+      },
+      "type": "select",
+      "required": false,
+      "default": "5",
+      "description": "Cached stories and comments remain visible while a stale refresh runs.",
+      "descriptions": {
+        "en": "Cached stories and comments remain visible while a stale refresh runs.",
+        "zh-CN": "后台刷新时仍显示缓存的帖子和评论。"
+      },
+      "options": [
+        { "label": "5", "labels": { "en": "5", "zh-CN": "5" }, "value": "5" },
+        { "label": "15", "labels": { "en": "15", "zh-CN": "15" }, "value": "15" },
+        { "label": "30", "labels": { "en": "30", "zh-CN": "30" }, "value": "30" }
+      ]
+    }
+  ],
+  "storage": {
+    "cacheTargets": [
+      {
+        "id": "hacker-news",
+        "label": "Hacker News cache",
+        "description": "Latest stories and fetched comment trees. Safe to rebuild from the public Hacker News API.",
+        "keys": [
+          "hacker-news.stories.v1",
+          "hacker-news.comments.v1"
+        ],
+        "retentionDays": 7
+      }
+    ]
+  },
+  "entry": "index.js",
+  "panel": {
+    "keywords": ["hacker news", "hn", "news", "technology", "社区", "帖子", "评论"]
+  },
+  "min_app_version": "0.6.13",
+  "platforms": ["macos", "windows"],
+  "screenshots": []
+}

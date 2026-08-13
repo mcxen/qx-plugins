@@ -5,7 +5,7 @@
 | Surface | Role |
 |---|---|
 | Workbench panel | Community list, search, master-detail and multi-image preview |
-| Command | Launcher entry |
+| Launcher | The panel name is the launcher/search entry; no duplicate open command |
 | HTTP | Xiaoheihe feed and public post detail |
 | Persist storage | SWR feed/detail/read cache with 3/7-day pruning |
 

@@ -1,8 +1,16 @@
 {
   "id": "raycast-calendar",
   "name": "Quick Calendar",
-  "version": "1.2.0",
+  "names": {
+    "en": "Quick Calendar",
+    "zh-CN": "快捷日历"
+  },
+  "version": "1.2.1",
   "description": "View calendar month-by-month",
+  "descriptions": {
+    "en": "View calendar month-by-month",
+    "zh-CN": "按月浏览日历。"
+  },
   "author": "fuksman",
   "icon": "icon.svg",
   "screenshots": [
@@ -18,17 +26,33 @@
     {
       "id": "weekStart",
       "label": "First Day of Week",
+      "labels": {
+        "en": "First Day of Week",
+        "zh-CN": "每周起始日"
+      },
       "type": "select",
       "required": true,
       "default": "1",
       "description": "First Day of Week",
+      "descriptions": {
+        "en": "First Day of Week",
+        "zh-CN": "每周从哪一天开始。"
+      },
       "options": [
         {
           "label": "Monday",
+          "labels": {
+            "en": "Monday",
+            "zh-CN": "星期一"
+          },
           "value": "1"
         },
         {
           "label": "Sunday",
+          "labels": {
+            "en": "Sunday",
+            "zh-CN": "星期日"
+          },
           "value": "0"
         }
       ]
@@ -36,25 +60,49 @@
     {
       "id": "showWeeks",
       "label": "Week numbers",
+      "labels": {
+        "en": "Week numbers",
+        "zh-CN": "显示周数"
+      },
       "type": "boolean",
       "required": true,
       "default": true,
-      "description": "Indicated if it is necessary to show week numbers"
+      "description": "Indicated if it is necessary to show week numbers",
+      "descriptions": {
+        "en": "Indicated if it is necessary to show week numbers",
+        "zh-CN": "是否显示周数。"
+      }
     },
     {
       "id": "viewMode",
       "label": "View Mode",
+      "labels": {
+        "en": "View Mode",
+        "zh-CN": "视图模式"
+      },
       "type": "select",
       "required": false,
       "default": "1",
       "description": "View Mode",
+      "descriptions": {
+        "en": "View Mode",
+        "zh-CN": "选择日历视图模式。"
+      },
       "options": [
         {
           "label": "Compact",
+          "labels": {
+            "en": "Compact",
+            "zh-CN": "紧凑"
+          },
           "value": "0"
         },
         {
           "label": "Wide",
+          "labels": {
+            "en": "Wide",
+            "zh-CN": "宽阔"
+          },
           "value": "1"
         }
       ]
@@ -66,18 +114,12 @@
     "clipboard"
   ],
   "entry": "index.js",
-  "commands": [
-    {
-      "name": "index",
-      "title": "Quick Calendar",
-      "description": "Shows calendar for a month",
-      "icon": "command-icon.png",
-      "keywords": [],
-      "mode": "view"
-    }
-  ],
   "panel": {
     "title": "Quick Calendar",
+    "titles": {
+      "en": "Quick Calendar",
+      "zh-CN": "快捷日历"
+    },
     "icon": "command-icon.png",
     "keywords": []
   },

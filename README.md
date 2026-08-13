@@ -28,6 +28,7 @@ available; all plugins remain usable without a contribution.
 ```text
 src/<plugin-id>/          # plugin source (manifest + entry + assets)
 scripts/                  # convert + package tooling
+store/                    # Cloudflare Pages plugin store website
 index.json                # marketplace catalog (checksums, permissions, min version)
 release-notes.json        # localized, newest-first App Store-style version history
 <plugin-id>.qx-plugin     # packaged zip archives published for download
@@ -105,6 +106,19 @@ Rebuilds bundled plugin entries, scans `src/*/manifest.json`, builds determinist
 SHA-256, and rewrites `index.json`. Build-only `*.source.js` files remain in the
 repository and are not included in the published archives.
 
+## Plugin store website
+
+Static store UI lives in [`store/`](./store) (Cloudflare Pages). It bakes
+`index.json` + icons at build time and shows versions / release notes.
+
+```bash
+npm run store:dev      # Vite → http://localhost:5178
+npm run store:pages    # wrangler pages dev → http://localhost:8788
+npm run store:build    # output → store/dist
+```
+
+See [`store/README.md`](./store/README.md).
+
 ## Host foundations required by converted plugins
 
 Qx does **not** run Raycast extensions natively. The converter builds a browser
@@ -147,6 +161,10 @@ README abstract (what / why / which version), not a dump of esbuild internals.
 - `min_app_version`: minimum Qx app that provides required host APIs
 - `permissions`: capability groups (`http`, `open-url`) and/or
   `invoke:<cmd>` for exact commands
+- `commands`: optional searchable operations only. Use a command for a real
+  input/output or background operation; do not add an `open-*` or plugin-name
+  command that only opens the plugin panel. Panel operations belong to
+  Workbench Actions, and the panel itself is the launcher entry.
 - `screenshots`: filenames packaged next to `index.js`
 - `raycast`: conversion metadata + platform compatibility report
 

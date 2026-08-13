@@ -11,19 +11,6 @@ import {
 const panels = new WeakMap();
 
 const plugin = {
-  commands: [
-    {
-      name: "open-qxweibo",
-      title: "打开 QxWeibo 微博",
-      async run(context) {
-        setLocale(context);
-        await context.showToast(copy(
-          "Open QxWeibo from Extensions or search.",
-          "请从扩展模块或搜索中打开 QxWeibo。",
-        ));
-      },
-    },
-  ],
   panel: {
     title: "QxWeibo 微博",
     render(container, context) {

@@ -5,7 +5,7 @@
     "en": "V2EX",
     "zh-CN": "V2EX"
   },
-  "version": "3.0.1",
+  "version": "3.0.2",
   "description": "Browse V2EX latest, hot, and node topics with Workbench list/detail, replies, and cached host APIs.",
   "descriptions": {
     "en": "Browse V2EX latest, hot, and node topics with Workbench list/detail, replies, and cached host APIs.",
@@ -43,7 +43,15 @@
       "label": "Access Token",
       "type": "password",
       "required": false,
-      "description": "V2EX API v2 token for nodes / notifications. Create at https://v2ex.com/settings/tokens"
+      "description": "V2EX API v2 token for nodes / notifications. Create at https://v2ex.com/settings/tokens",
+      "labels": {
+        "en": "Access Token",
+        "zh-CN": "访问令牌"
+      },
+      "descriptions": {
+        "en": "V2EX API v2 token for nodes and notifications.",
+        "zh-CN": "用于节点和通知的 V2EX API v2 令牌。"
+      }
     },
     {
       "id": "nodes",
@@ -51,7 +59,15 @@
       "type": "string",
       "required": false,
       "default": "programmer create share ideas apple jobs qna",
-      "description": "Space-separated node names for the Nodes tab (requires token)."
+      "description": "Space-separated node names for the Nodes tab (requires token).",
+      "labels": {
+        "en": "Nodes",
+        "zh-CN": "节点"
+      },
+      "descriptions": {
+        "en": "Space-separated node names for the Nodes tab (requires token).",
+        "zh-CN": "节点页使用的空格分隔节点名称（需要令牌）。"
+      }
     },
     {
       "id": "cacheTtlMinutes",
@@ -59,45 +75,19 @@
       "type": "string",
       "required": false,
       "default": "3",
-      "description": "How long latest/hot/node lists are considered fresh. Stale cache is still shown while refreshing."
+      "description": "How long latest/hot/node lists are considered fresh. Stale cache is still shown while refreshing.",
+      "labels": {
+        "en": "List cache (minutes)",
+        "zh-CN": "列表缓存（分钟）"
+      },
+      "descriptions": {
+        "en": "How long latest/hot lists are considered fresh. Stale cache is still shown while refreshing.",
+        "zh-CN": "最新和热门列表保持新鲜的时长；刷新时仍显示过期缓存。"
+      }
     }
   ],
   "entry": "index.js",
   "commands": [
-    {
-      "name": "open-v2ex",
-      "title": "Open V2EX",
-      "description": "Browse latest and hot V2EX topics",
-      "keywords": [
-        "v2ex",
-        "forum",
-        "topics",
-        "tech",
-        "探索",
-        "最新",
-        "热门"
-      ]
-    },
-    {
-      "name": "view-hot",
-      "title": "V2EX Hot",
-      "description": "Open V2EX hot topics",
-      "keywords": [
-        "v2ex",
-        "hot",
-        "热门"
-      ]
-    },
-    {
-      "name": "view-latest",
-      "title": "V2EX Latest",
-      "description": "Open V2EX latest topics",
-      "keywords": [
-        "v2ex",
-        "latest",
-        "最新"
-      ]
-    },
     {
       "name": "view-notifications",
       "title": "View Notifications",
@@ -107,7 +97,15 @@
         "notifications",
         "通知",
         "消息"
-      ]
+      ],
+      "titles": {
+        "en": "View Notifications",
+        "zh-CN": "查看通知"
+      },
+      "descriptions": {
+        "en": "View your V2EX notifications (requires token)",
+        "zh-CN": "查看 V2EX 通知（需要令牌）。"
+      }
     },
     {
       "name": "view-token",
@@ -117,7 +115,15 @@
         "v2ex",
         "token",
         "令牌"
-      ]
+      ],
+      "titles": {
+        "en": "View Token Info",
+        "zh-CN": "查看令牌信息"
+      },
+      "descriptions": {
+        "en": "Check your V2EX API token status (requires token)",
+        "zh-CN": "检查 V2EX API 令牌状态（需要令牌）。"
+      }
     }
   ],
   "panel": {
@@ -129,7 +135,12 @@
       "社区",
       "帖子",
       "节点"
-    ]
+    ],
+    "titles": {
+      "en": "V2EX",
+      "zh-CN": "V2EX"
+    },
+    "title": "V2EX"
   },
   "min_app_version": "0.6.13",
   "platforms": [

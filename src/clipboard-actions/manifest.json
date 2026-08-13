@@ -1,0 +1,102 @@
+{
+  "id": "clipboard-actions",
+  "name": "Clipboard Actions",
+  "version": "1.0.0",
+  "description": "Paste clipboard text as plain text or save the current clipboard image without overwriting existing files.",
+  "names": {
+    "en": "Clipboard Actions",
+    "zh-CN": "剪贴板动作"
+  },
+  "descriptions": {
+    "en": "Paste clipboard text as plain text or save the current clipboard image without overwriting existing files.",
+    "zh-CN": "将剪贴板文字以纯文本粘贴，或将当前剪贴板图片保存为不会覆盖旧文件的新 PNG。"
+  },
+  "author": "mcx",
+  "platforms": ["macos", "windows"],
+  "keywords": [
+    "clipboard",
+    "paste",
+    "plain text",
+    "save image",
+    "clipboard image",
+    "剪贴板",
+    "粘贴",
+    "纯文本",
+    "保存图片"
+  ],
+  "permissions": [
+    "clipboard",
+    "invoke:plugin_perform_paste",
+    "invoke:plugin_file_read_base64",
+    "invoke:plugin_file_write_base64",
+    "invoke:plugin_file_exists"
+  ],
+  "entry": "index.js",
+  "preferences": [
+    {
+      "id": "saveDirectory",
+      "label": "Image save directory",
+      "labels": {
+        "en": "Image save directory",
+        "zh-CN": "图片保存目录"
+      },
+      "type": "string",
+      "required": false,
+      "default": "~/Pictures/Qx Clipboard",
+      "description": "Directory for images saved by the Save Clipboard Image command.",
+      "descriptions": {
+        "en": "Directory for images saved by the Save Clipboard Image command.",
+        "zh-CN": "“保存剪贴板图片”命令写入图片的目录。"
+      },
+      "placeholders": {
+        "en": "~/Pictures/Qx Clipboard",
+        "zh-CN": "~/Pictures/Qx Clipboard"
+      }
+    }
+  ],
+  "commands": [
+    {
+      "name": "paste-clipboard-plain-text",
+      "title": "Paste Clipboard as Plain Text",
+      "titles": {
+        "en": "Paste Clipboard as Plain Text",
+        "zh-CN": "以纯文本粘贴剪贴板"
+      },
+      "description": "Replace the clipboard with its text representation and paste it into the previous foreground app.",
+      "descriptions": {
+        "en": "Replace the clipboard with its text representation and paste it into the previous foreground app.",
+        "zh-CN": "将剪贴板替换为纯文本，并粘贴到之前的前台应用。"
+      },
+      "mode": "no-view",
+      "keywords": ["paste", "text", "plain", "粘贴", "文字", "纯文本"]
+    },
+    {
+      "name": "save-clipboard-image",
+      "title": "Save Clipboard Image",
+      "titles": {
+        "en": "Save Clipboard Image",
+        "zh-CN": "保存剪贴板图片"
+      },
+      "description": "Save the current clipboard image as a unique PNG without overwriting an existing file.",
+      "descriptions": {
+        "en": "Save the current clipboard image as a unique PNG without overwriting an existing file.",
+        "zh-CN": "将当前剪贴板图片保存为唯一 PNG 文件，不覆盖已有文件。"
+      },
+      "mode": "no-view",
+      "keywords": ["save", "image", "clipboard", "保存", "图片", "剪贴板"]
+    }
+  ],
+  "shortcuts": [
+    {
+      "command": "paste-clipboard-plain-text",
+      "key": "Alt+Shift+V",
+      "enabled": false
+    },
+    {
+      "command": "save-clipboard-image",
+      "key": "Alt+Shift+I",
+      "enabled": false
+    }
+  ],
+  "min_app_version": "0.6.67"
+}

@@ -1,7 +1,7 @@
 {
   "name": "qx-plugins",
   "private": true,
-  "version": "1.6.0",
+  "version": "1.6.1",
   "type": "module",
   "scripts": {
     "convert:raycast": "node scripts/convert-raycast-extension.mjs",
@@ -13,12 +13,16 @@
     "build:plugins": "npm run build:qxcoolapk && npm run build:qxtieba && npm run build:qxweibo && npm run build:agent-usage",
     "package:plugins": "npm run build:plugins && node scripts/package-plugins.mjs",
     "package:one": "node scripts/package-plugins.mjs",
+    "store:dev": "npm --prefix store run dev",
+    "store:build": "npm --prefix store run build",
+    "store:pages": "npm --prefix store run pages:dev",
     "smoke:qxheihe": "node scripts/smoke-qxheihe.mjs",
     "smoke:qxtieba": "node scripts/smoke-qxtieba.mjs",
     "smoke:qxcoolapk": "npm run build:qxcoolapk && node scripts/smoke-qxcoolapk.mjs",
     "smoke:qxweibo": "npm run build:qxweibo && node scripts/smoke-qxweibo.mjs",
     "smoke:qxgh": "node scripts/smoke-qxgh.mjs",
     "smoke:qxpicture": "node scripts/smoke-qxpicture.mjs",
+    "smoke:clipboard-actions": "node scripts/smoke-clipboard-actions.mjs",
     "smoke:bing-wallpaper": "node scripts/smoke-qx-bing-wallpaper.mjs",
     "smoke:sysinfo": "node scripts/smoke-sysinfo.mjs",
     "smoke:agent-usage": "npm run build:agent-usage && node scripts/smoke-agent-usage.mjs"
