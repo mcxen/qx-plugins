@@ -1,6 +1,16 @@
 {
   "schema_version": 1,
   "plugins": {
+    "another-boring-piece": [
+      {
+        "version": "1.0.0",
+        "published_at": "2026-08-13",
+        "notes_localizations": {
+          "en": "First Qx-native release with today's hand-picked art, native details and Actions, opt-in rotation, bounded wallpaper caching, and a 200-item local history. Original author and contributors are retained.",
+          "zh-CN": "首个 Qx 原生版本：提供每日精选艺术、原生详情与 Actions、主动启用的自动轮换、有界壁纸缓存及最多 200 条本地历史，并保留原作者与贡献者署名。"
+        }
+      }
+    ],
     "agent-usage": [
       {
         "version": "1.0.0",

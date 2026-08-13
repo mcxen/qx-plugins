@@ -1,0 +1,148 @@
+{
+  "id": "another-boring-piece",
+  "name": "Art Wallpapers",
+  "names": {
+    "en": "Art Wallpapers",
+    "zh-CN": "每日艺术壁纸"
+  },
+  "version": "1.0.0",
+  "description": "Another boring piece. Daily. Hand-picked fine-art wallpapers from anotherboring.day.",
+  "descriptions": {
+    "en": "Another boring piece. Daily. Browse hand-picked fine-art wallpapers, set or download them, and keep a local history.",
+    "zh-CN": "Another boring piece. Daily. 浏览每日精选艺术作品，设置或下载壁纸，并保留本地操作历史。"
+  },
+  "author": "yevgen_glukhov",
+  "icon": "icon.svg",
+  "keywords": [
+    "art",
+    "wallpaper",
+    "painting",
+    "daily",
+    "another boring piece",
+    "艺术",
+    "壁纸",
+    "名画",
+    "每日"
+  ],
+  "platforms": ["macos", "windows"],
+  "permissions": [
+    "http",
+    "open-url",
+    "clipboard",
+    "system",
+    "notifications",
+    "invoke:plugin_file_exists",
+    "invoke:plugin_file_ensure_dir",
+    "invoke:plugin_file_write_base64"
+  ],
+  "preferences": [
+    {
+      "id": "applyTo",
+      "label": "Apply Wallpaper To",
+      "labels": { "en": "Apply Wallpaper To", "zh-CN": "应用壁纸到" },
+      "type": "select",
+      "required": false,
+      "default": "every",
+      "description": "On macOS, choose every desktop or only the current desktop.",
+      "descriptions": {
+        "en": "On macOS, choose every desktop or only the current desktop.",
+        "zh-CN": "在 macOS 上选择应用到所有桌面或仅当前桌面。"
+      },
+      "options": [
+        { "label": "Every Desktop", "labels": { "en": "Every Desktop", "zh-CN": "所有桌面" }, "value": "every" },
+        { "label": "Current Desktop", "labels": { "en": "Current Desktop", "zh-CN": "当前桌面" }, "value": "current" }
+      ]
+    },
+    {
+      "id": "autoSwitchEnabled",
+      "label": "Automatic Rotation",
+      "labels": { "en": "Automatic Rotation", "zh-CN": "自动轮换" },
+      "type": "boolean",
+      "required": false,
+      "default": false,
+      "description": "Allow the background command to rotate art wallpapers.",
+      "descriptions": {
+        "en": "Allow the background command to rotate art wallpapers. Off by default.",
+        "zh-CN": "允许后台命令自动轮换艺术壁纸；默认关闭。"
+      }
+    },
+    {
+      "id": "refreshIntervalSeconds",
+      "label": "Rotation Interval",
+      "labels": { "en": "Rotation Interval", "zh-CN": "轮换间隔" },
+      "type": "select",
+      "required": false,
+      "default": "3600",
+      "description": "How often an enabled background rotation may change the wallpaper.",
+      "descriptions": {
+        "en": "How often an enabled background rotation may change the wallpaper.",
+        "zh-CN": "启用自动轮换后，允许后台更换壁纸的时间间隔。"
+      },
+      "options": [
+        { "label": "30 Minutes", "labels": { "en": "30 Minutes", "zh-CN": "30 分钟" }, "value": "1800" },
+        { "label": "1 Hour", "labels": { "en": "1 Hour", "zh-CN": "1 小时" }, "value": "3600" },
+        { "label": "1 Day", "labels": { "en": "1 Day", "zh-CN": "1 天" }, "value": "86400" }
+      ]
+    },
+    {
+      "id": "notifyOnSwitch",
+      "label": "Rotation Notification",
+      "labels": { "en": "Rotation Notification", "zh-CN": "轮换通知" },
+      "type": "boolean",
+      "required": false,
+      "default": false,
+      "description": "Show a notification after an automatic wallpaper change.",
+      "descriptions": {
+        "en": "Show a notification after an automatic wallpaper change.",
+        "zh-CN": "自动更换壁纸后显示通知。"
+      }
+    }
+  ],
+  "storage": {
+    "cacheTargets": [
+      {
+        "id": "art-wallpaper-catalog",
+        "label": "Art wallpaper catalog",
+        "description": "Rebuildable anotherboring.day catalog and bounded image-slot index.",
+        "keys": ["another-boring.catalog.v1", "another-boring.image-index.v1"],
+        "retentionDays": 7
+      }
+    ]
+  },
+  "entry": "index.js",
+  "commands": [
+    {
+      "name": "set-random-art-wallpaper",
+      "title": "Set Random Art Wallpaper",
+      "titles": { "en": "Set Random Art Wallpaper", "zh-CN": "设置随机艺术壁纸" },
+      "description": "Set a random hand-picked artwork as wallpaper now.",
+      "descriptions": {
+        "en": "Set a random hand-picked artwork as wallpaper now.",
+        "zh-CN": "立即将一幅随机精选艺术作品设为壁纸。"
+      },
+      "keywords": ["random", "art", "wallpaper", "随机", "艺术壁纸"],
+      "mode": "no-view"
+    },
+    {
+      "name": "auto-switch-art-wallpaper",
+      "title": "Rotate Art Wallpaper",
+      "titles": { "en": "Rotate Art Wallpaper", "zh-CN": "轮换艺术壁纸" },
+      "description": "Run one rotation now; the same command powers opt-in background rotation.",
+      "descriptions": {
+        "en": "Run one rotation now; the same command powers opt-in background rotation.",
+        "zh-CN": "立即轮换一次；同一命令也用于用户主动启用的后台轮换。"
+      },
+      "keywords": ["automatic", "rotate", "art", "wallpaper", "自动", "轮换"],
+      "mode": "no-view",
+      "interval": "30m"
+    }
+  ],
+  "panel": {
+    "title": "Art Wallpapers",
+    "titles": { "en": "Art Wallpapers", "zh-CN": "每日艺术壁纸" },
+    "icon": "icon.svg",
+    "keywords": ["art", "wallpaper", "painting", "艺术", "壁纸", "名画"]
+  },
+  "min_app_version": "0.6.86",
+  "screenshots": []
+}

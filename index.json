@@ -42,6 +42,50 @@
       ]
     },
     {
+      "id": "another-boring-piece",
+      "name": "Art Wallpapers",
+      "version": "1.0.0",
+      "description": "Another boring piece. Daily. Hand-picked fine-art wallpapers from anotherboring.day.",
+      "names": {
+        "en": "Art Wallpapers",
+        "zh-CN": "每日艺术壁纸"
+      },
+      "descriptions": {
+        "en": "Another boring piece. Daily. Browse hand-picked fine-art wallpapers, set or download them, and keep a local history.",
+        "zh-CN": "Another boring piece. Daily. 浏览每日精选艺术作品，设置或下载壁纸，并保留本地操作历史。"
+      },
+      "download_url": "https://raw.githubusercontent.com/mcxen/qx-plugins/main/another-boring-piece.qx-plugin",
+      "size_bytes": 41672,
+      "checksum_sha256": "3be625c9ed184ebcd795bc16ae980fc1694bea966c2ce3cd13ebe7ebcbda7dfe",
+      "required_permissions": [
+        "http",
+        "open-url",
+        "clipboard",
+        "system",
+        "notifications",
+        "invoke:plugin_file_exists",
+        "invoke:plugin_file_ensure_dir",
+        "invoke:plugin_file_write_base64"
+      ],
+      "updated_at": "2026-08-13",
+      "author": "yevgen_glukhov",
+      "min_app_version": "0.6.86",
+      "platforms": [
+        "macos",
+        "windows"
+      ],
+      "releases": [
+        {
+          "version": "1.0.0",
+          "published_at": "2026-08-13",
+          "notes_localizations": {
+            "en": "First Qx-native release with today's hand-picked art, native details and Actions, opt-in rotation, bounded wallpaper caching, and a 200-item local history. Original author and contributors are retained.",
+            "zh-CN": "首个 Qx 原生版本：提供每日精选艺术、原生详情与 Actions、主动启用的自动轮换、有界壁纸缓存及最多 200 条本地历史，并保留原作者与贡献者署名。"
+          }
+        }
+      ]
+    },
+    {
       "id": "brew",
       "name": "Brew",
       "version": "1.1.1",
