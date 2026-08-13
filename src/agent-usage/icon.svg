@@ -1,14 +1,1 @@
-<svg width="128" height="128" viewBox="0 0 128 128" fill="none" xmlns="http://www.w3.org/2000/svg">
-  <defs>
-    <linearGradient id="surface" x1="20" y1="16" x2="108" y2="116" gradientUnits="userSpaceOnUse">
-      <stop stop-color="#5DE1C4"/>
-      <stop offset="1" stop-color="#4996FF"/>
-    </linearGradient>
-  </defs>
-  <rect x="8" y="8" width="112" height="112" rx="30" fill="#111827"/>
-  <path d="M31 82.5C31 64.827 45.327 50.5 63 50.5H97V61.5H63C51.402 61.5 42 70.902 42 82.5V90H31V82.5Z" fill="url(#surface)"/>
-  <circle cx="35.5" cy="90.5" r="10.5" fill="#F8FAFC"/>
-  <circle cx="63.5" cy="61.5" r="10.5" fill="#F8FAFC"/>
-  <circle cx="96.5" cy="61.5" r="10.5" fill="#F8FAFC"/>
-  <path d="M32 37H96" stroke="url(#surface)" stroke-width="11" stroke-linecap="round"/>
-</svg>
+<svg xmlns="http://www.w3.org/2000/svg" width="128" height="128" fill="none" viewBox="0 0 128 128"><defs><linearGradient id="surface" x1="20" x2="108" y1="16" y2="116" gradientUnits="userSpaceOnUse"><stop stop-color="#5DE1C4"/><stop offset="1" stop-color="#4996FF"/></linearGradient></defs><rect width="112" height="112" x="8" y="8" fill="#111827" rx="30"/><path fill="url(#surface)" d="M31 82.5C31 64.827 45.327 50.5 63 50.5H97V61.5H63C51.402 61.5 42 70.902 42 82.5V90H31V82.5Z"/><circle cx="35.5" cy="90.5" r="10.5" fill="#F8FAFC"/><circle cx="63.5" cy="61.5" r="10.5" fill="#F8FAFC"/><circle cx="96.5" cy="61.5" r="10.5" fill="#F8FAFC"/><path stroke="url(#surface)" stroke-linecap="round" stroke-width="11" d="M32 37H96"/></svg>

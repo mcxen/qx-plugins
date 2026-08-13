@@ -1,8 +1,1 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128">
-  <rect x="4" y="4" width="120" height="120" rx="28" fill="#f7fafd"/>
-  <path d="M23 48c0-6 5-11 11-11h19l7-10h16l7 10h11c6 0 11 5 11 11v39c0 6-5 11-11 11H34c-6 0-11-5-11-11Z" fill="#fff" stroke="#283540" stroke-width="3" stroke-linejoin="round"/>
-  <path d="M94 37h9c6 0 11 5 11 11v39c0 6-5 11-11 11h-9Z" fill="#dceeff" stroke="#283540" stroke-width="3" stroke-linejoin="round"/>
-  <circle cx="65" cy="68" r="22" fill="#a9d8f5" stroke="#283540" stroke-width="3"/>
-  <circle cx="65" cy="68" r="10" fill="#ffe27a" stroke="#283540" stroke-width="3"/>
-  <path d="M34 51h15" stroke="#283540" stroke-width="4" stroke-linecap="round"/>
-</svg>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128"><rect width="120" height="120" x="4" y="4" fill="#f7fafd" rx="28"/><path fill="#fff" stroke="#283540" stroke-linejoin="round" stroke-width="3" d="M23 48c0-6 5-11 11-11h19l7-10h16l7 10h11c6 0 11 5 11 11v39c0 6-5 11-11 11H34c-6 0-11-5-11-11Z"/><path fill="#dceeff" stroke="#283540" stroke-linejoin="round" stroke-width="3" d="M94 37h9c6 0 11 5 11 11v39c0 6-5 11-11 11h-9Z"/><circle cx="65" cy="68" r="22" fill="#a9d8f5" stroke="#283540" stroke-width="3"/><circle cx="65" cy="68" r="10" fill="#ffe27a" stroke="#283540" stroke-width="3"/><path stroke="#283540" stroke-linecap="round" stroke-width="4" d="M34 51h15"/></svg>

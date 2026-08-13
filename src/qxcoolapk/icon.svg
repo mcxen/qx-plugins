@@ -1,9 +1,1 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128">
-  <rect x="4" y="4" width="120" height="120" rx="28" fill="#f7fafd"/>
-  <path d="M29 28h62c7 0 12 5 12 12v38c0 7-5 12-12 12H62l-19 18 3-18H29c-7 0-12-5-12-12V40c0-7 5-12 12-12Z" fill="#fff" stroke="#283540" stroke-width="3" stroke-linejoin="round"/>
-  <path d="M91 28h10c7 0 12 5 12 12v38c0 7-5 12-12 12H91Z" fill="#dceeff" stroke="#283540" stroke-width="3" stroke-linejoin="round"/>
-  <circle cx="43" cy="58" r="6" fill="#a9d8f5" stroke="#283540" stroke-width="3"/>
-  <circle cx="64" cy="58" r="6" fill="#ffe27a" stroke="#283540" stroke-width="3"/>
-  <circle cx="85" cy="58" r="6" fill="#a9d8f5" stroke="#283540" stroke-width="3"/>
-  <path d="M45 42h34" stroke="#283540" stroke-width="4" stroke-linecap="round"/>
-</svg>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128"><rect width="120" height="120" x="4" y="4" fill="#f7fafd" rx="28"/><path fill="#fff" stroke="#283540" stroke-linejoin="round" stroke-width="3" d="M29 28h62c7 0 12 5 12 12v38c0 7-5 12-12 12H62l-19 18 3-18H29c-7 0-12-5-12-12V40c0-7 5-12 12-12Z"/><path fill="#dceeff" stroke="#283540" stroke-linejoin="round" stroke-width="3" d="M91 28h10c7 0 12 5 12 12v38c0 7-5 12-12 12H91Z"/><circle cx="43" cy="58" r="6" fill="#a9d8f5" stroke="#283540" stroke-width="3"/><circle cx="64" cy="58" r="6" fill="#ffe27a" stroke="#283540" stroke-width="3"/><circle cx="85" cy="58" r="6" fill="#a9d8f5" stroke="#283540" stroke-width="3"/><path stroke="#283540" stroke-linecap="round" stroke-width="4" d="M45 42h34"/></svg>
