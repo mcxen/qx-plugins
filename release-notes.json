@@ -13,6 +13,14 @@
     ],
     "agent-usage": [
       {
+        "version": "1.1.0",
+        "published_at": "2026-08-13",
+        "notes_localizations": {
+          "en": "Adds provider controls in Settings, official Codex and Grok device sign-in/reconnect actions, visible login progress, and actionable network diagnostics; successful sign-in refreshes usage automatically.",
+          "zh-CN": "新增设置中的服务商开关、Codex 与 Grok 官方设备登录/重新连接、可见登录进度及可操作的网络诊断；登录成功后自动刷新用量。"
+        }
+      },
+      {
         "version": "1.0.1",
         "published_at": "2026-08-13",
         "notes_localizations": {

@@ -343,6 +343,18 @@ export async function fetchGrokUsage(context) {
 }
 
 export const PROVIDERS = [
-  { id: "codex", title: "Codex", dashboard: "https://chatgpt.com/codex/settings/usage", fetch: fetchCodexUsage },
-  { id: "grok", title: "Grok", dashboard: "https://grok.com/?_s=usage", fetch: fetchGrokUsage },
+  {
+    id: "codex",
+    title: "Codex",
+    dashboard: "https://chatgpt.com/codex/settings/usage",
+    login: { program: "codex", args: ["login", "--device-auth"] },
+    fetch: fetchCodexUsage,
+  },
+  {
+    id: "grok",
+    title: "Grok",
+    dashboard: "https://grok.com/?_s=usage",
+    login: { program: "grok", args: ["login", "--device-auth"] },
+    fetch: fetchGrokUsage,
+  },
 ];

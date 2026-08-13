@@ -110,7 +110,40 @@ function errorInfo(error, provider) {
   if (message.startsWith("local_file:")) {
     return text("The local session file could not be read.", "无法读取本机登录态文件。");
   }
+  if (/fetch failed|network|timed? out|timeout/i.test(message)) {
+    return text("The service could not be reached. Check the network and retry.", "无法连接服务，请检查网络后重试。");
+  }
   return text("Usage is temporarily unavailable.", "用量暂时不可用。");
+}
+
+function boolPreference(value, fallback = true) {
+  if (value == null || value === "") return fallback;
+  return value === true || value === "true" || value === 1 || value === "1";
+}
+
+function loginOutput(job) {
+  const raw = [job?.stdout, job?.stderr]
+    .filter(Boolean)
+    .join("\n")
+    .replace(/\x1b\[[0-?]*[ -\/]*[@-~]/g, "")
+    .trim();
+  return raw ? raw.split(/\r?\n/).filter(Boolean).slice(-8).join("\n") : "";
+}
+
+function officialLoginUrl(output) {
+  const urls = String(output || "").match(/https?:\/\/[^\s<>'"`]+/g) || [];
+  return urls.find((value) => {
+    try {
+      const host = new URL(value).hostname.toLowerCase();
+      return host === "auth.openai.com"
+        || host === "chatgpt.com"
+        || host === "auth.x.ai"
+        || host === "accounts.x.ai"
+        || host === "grok.com";
+    } catch {
+      return false;
+    }
+  }) || null;
 }
 
 function validWindow(value) {
@@ -227,13 +260,16 @@ function createPanel(container, context) {
     dead: false,
     view: null,
     refreshPromise: null,
+    enabledProviders: PROVIDERS,
+    loginJobs: new Map(),
+    loginTimers: new Set(),
   };
 
   const providerById = (id) => PROVIDERS.find((provider) => provider.id === id);
 
   const visibleResults = () => {
     const query = state.query.trim().toLocaleLowerCase();
-    return PROVIDERS.filter((provider) => state.tab === "all" || state.tab === provider.id)
+    return state.enabledProviders.filter((provider) => state.tab === "all" || state.tab === provider.id)
       .filter((provider) => {
         const result = state.results.get(provider.id);
         const usage = result?.usage;
@@ -249,17 +285,23 @@ function createPanel(container, context) {
     const result = state.results.get(provider.id);
     const usage = result?.usage;
     const warning = result?.error ? errorInfo(result.error, provider.id) : null;
+    const login = state.loginJobs.get(provider.id);
     if (!usage) {
       return {
         id: provider.id,
         title: provider.title,
-        subtitle: warning || text("Waiting for a local session…", "正在等待本机登录态…"),
+        subtitle: login?.running
+          ? text("Waiting for browser sign-in…", "正在等待浏览器登录…")
+          : warning || text("Waiting for a local session…", "正在等待本机登录态…"),
         icon: providerIcon(provider.id),
-        badge: warning ? text("Sign in", "登录") : text("Checking", "检查中"),
+        badge: login?.running ? text("Connecting", "连接中") : warning ? text("Sign in", "登录") : text("Checking", "检查中"),
         tone: warning ? "neutral" : "accent",
         detail: {
           title: provider.title,
-          subtitle: warning || text("Checking the local CLI session", "正在检查本机 CLI 登录态"),
+          subtitle: login?.running
+            ? text("Complete the official sign-in in your browser", "请在浏览器中完成官方登录")
+            : warning || text("Checking the local CLI session", "正在检查本机 CLI 登录态"),
+          body: loginOutput(login) || undefined,
           sections: [{
             title: text("Setup", "设置"),
             fields: [{
@@ -270,7 +312,16 @@ function createPanel(container, context) {
             }],
           }],
         },
-        actions: [{
+        actions: [login?.running ? {
+          id: `cancel-login:${provider.id}`,
+          label: text("Cancel Sign In", "取消登录"),
+          menuKey: "x",
+          tone: "danger",
+        } : {
+          id: `login:${provider.id}`,
+          label: text("Sign In", "登录"),
+          menuKey: "l",
+        }, {
           id: `open:${provider.id}`,
           label: text("Open Dashboard", "打开用量页面"),
           menuKey: "o",
@@ -292,6 +343,11 @@ function createPanel(container, context) {
       detail: usageDetail(usage, warning),
       actions: [
         {
+          id: `login:${provider.id}`,
+          label: text("Reconnect", "重新登录"),
+          menuKey: "l",
+        },
+        {
           id: `copy:${provider.id}`,
           label: text("Copy Summary", "复制摘要"),
           menuKey: "c",
@@ -307,13 +363,61 @@ function createPanel(container, context) {
     };
   };
 
+  const scheduleLoginPoll = (provider, jobId) => {
+    const timer = setTimeout(async () => {
+      state.loginTimers.delete(timer);
+      if (state.dead) return;
+      try {
+        const job = await context.cli.poll(jobId);
+        const previous = state.loginJobs.get(provider.id) || {};
+        const output = loginOutput(job);
+        const url = officialLoginUrl(output);
+        state.loginJobs.set(provider.id, { ...job, opened: previous.opened || Boolean(url) });
+        if (url && !previous.opened) void context.openUrl(url);
+        paint();
+        if (job.running) scheduleLoginPoll(provider, jobId);
+        else if (job.state === "succeeded") {
+          context.showToast(text(`${provider.title} connected.`, `${provider.title} 已连接。`));
+          state.results.delete(provider.id);
+          void refresh(true);
+        } else {
+          context.showToast(text(`${provider.title} sign-in did not complete.`, `${provider.title} 登录未完成。`));
+        }
+      } catch (error) {
+        state.loginJobs.set(provider.id, { running: false, state: "failed", stderr: String(error?.message || error) });
+        paint();
+      }
+    }, 700);
+    state.loginTimers.add(timer);
+  };
+
+  const startLogin = async (provider) => {
+    try {
+      const executable = await context.cli.which(provider.login.program);
+      if (!executable) throw new Error(`${provider.login.program} CLI not found`);
+      const job = await context.cli.start({
+        kind: "run",
+        program: provider.login.program,
+        args: provider.login.args,
+        timeoutMs: 10 * 60 * 1000,
+      });
+      state.loginJobs.set(provider.id, job);
+      paint();
+      scheduleLoginPoll(provider, job.id);
+    } catch (error) {
+      state.loginJobs.set(provider.id, { running: false, state: "failed", stderr: String(error?.message || error) });
+      paint();
+    }
+  };
+
   const paint = () => {
     if (state.dead) return;
     const providers = visibleResults();
     if (!providers.some((provider) => provider.id === state.selectedId)) {
       state.selectedId = providers[0]?.id || null;
     }
-    const configuredCount = PROVIDERS.filter((provider) => state.results.get(provider.id)?.usage).length;
+    const configuredCount = state.enabledProviders.filter((provider) => state.results.get(provider.id)?.usage).length;
+    const providerCount = state.enabledProviders.length;
     const view = {
       revision: ++state.viewRevision,
       title: text("Agent Usage", "Agent 用量"),
@@ -324,10 +428,10 @@ function createPanel(container, context) {
         { id: "all", label: text("All", "全部"), active: state.tab === "all" },
         { id: "codex", label: "Codex", active: state.tab === "codex" },
         { id: "grok", label: "Grok", active: state.tab === "grok" },
-      ],
+      ].filter((tab) => tab.id === "all" || state.enabledProviders.some((provider) => provider.id === tab.id)),
       loading: state.loading && configuredCount === 0,
       meta: configuredCount
-        ? text(`${configuredCount}/2 sessions · ${absoluteTime(state.savedAt)}`, `${configuredCount}/2 个登录态 · ${absoluteTime(state.savedAt)}`)
+        ? text(`${configuredCount}/${providerCount} sessions · ${absoluteTime(state.savedAt)}`, `${configuredCount}/${providerCount} 个登录态 · ${absoluteTime(state.savedAt)}`)
         : text("Local CLI sessions", "本机 CLI 登录态"),
       selectedId: state.selectedId,
       items: providers.map(itemFor),
@@ -373,7 +477,12 @@ function createPanel(container, context) {
           const providerId = explicitProvider || String(item?.id || state.selectedId || "");
           const provider = providerById(providerId);
           const usage = state.results.get(providerId)?.usage;
-          if (action === "copy" && usage) {
+          if (action === "login" && provider) {
+            void startLogin(provider);
+          } else if (action === "cancel-login" && provider) {
+            const job = state.loginJobs.get(providerId);
+            if (job?.id) void context.cli.cancel(job.id);
+          } else if (action === "copy" && usage) {
             void context.clipboard.write(summaryText(usage)).then(
               () => context.showToast(text("Usage summary copied.", "用量摘要已复制。")),
               () => context.showToast(text("Could not copy the usage summary.", "无法复制用量摘要。")),
@@ -387,7 +496,7 @@ function createPanel(container, context) {
   };
 
   const persist = async () => {
-    const usage = PROVIDERS.map((provider) => state.results.get(provider.id)?.usage).filter(validUsage);
+    const usage = state.enabledProviders.map((provider) => state.results.get(provider.id)?.usage).filter(validUsage);
     try {
       await context.storage.persist.set(CACHE_KEY, { savedAt: state.savedAt, usage });
     } catch {
@@ -402,7 +511,7 @@ function createPanel(container, context) {
     state.generation += 1;
     const revision = state.generation;
     paint();
-    const request = Promise.all(PROVIDERS.map(async (provider) => {
+    const request = Promise.all(state.enabledProviders.map(async (provider) => {
       try {
         return { provider, usage: await provider.fetch(context), error: null };
       } catch (error) {
@@ -433,6 +542,17 @@ function createPanel(container, context) {
 
   const hydrate = async () => {
     try {
+      const [showCodex, showGrok] = await Promise.all([
+        context.getPreference("showCodex"),
+        context.getPreference("showGrok"),
+      ]);
+      state.enabledProviders = PROVIDERS.filter((provider) => provider.id === "codex"
+        ? boolPreference(showCodex)
+        : boolPreference(showGrok));
+    } catch {
+      state.enabledProviders = PROVIDERS;
+    }
+    try {
       const cache = normalizeCache(await context.storage.persist.get(CACHE_KEY));
       if (state.dead) return;
       state.savedAt = cache.savedAt;
@@ -452,6 +572,8 @@ function createPanel(container, context) {
     destroy() {
       state.dead = true;
       state.generation += 1;
+      for (const timer of state.loginTimers) clearTimeout(timer);
+      state.loginTimers.clear();
       state.view = null;
       stopLocale?.();
       stopLocale = null;

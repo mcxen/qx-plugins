@@ -3,7 +3,7 @@ import { Buffer } from "node:buffer";
 import { readFile } from "node:fs/promises";
 
 const manifest = JSON.parse(await readFile(new URL("../src/agent-usage/manifest.json", import.meta.url), "utf8"));
-assert.equal(manifest.version, "1.0.1");
+assert.equal(manifest.version, "1.1.0");
 assert.equal(
   manifest.min_app_version,
   "0.6.50",
@@ -62,8 +62,10 @@ let handlers = null;
 let persisted = null;
 let copied = "";
 let opened = "";
+let loginStarted = null;
 const calls = { codex: 0, grok: 0 };
 const context = {
+  getPreference: async () => true,
   locale: { current: "en", onChange: () => () => {} },
   ui: {
     mountWorkbench(view, nextHandlers) {
@@ -113,6 +115,21 @@ const context = {
     },
   },
   clipboard: { write: async (value) => { copied = value; } },
+  cli: {
+    which: async (program) => `/usr/local/bin/${program}`,
+    start: async (request) => {
+      loginStarted = request;
+      return { id: "login-job", running: true, state: "running", stdout: "", stderr: "" };
+    },
+    poll: async () => ({
+      id: "login-job",
+      running: false,
+      state: "succeeded",
+      stdout: "Open \u001b[94mhttps://auth.openai.com/codex/device\u001b[0m and enter TEST-CODE",
+      stderr: "",
+    }),
+    cancel: async () => {},
+  },
   openUrl: async (value) => { opened = value; },
   showToast() {},
 };
@@ -131,6 +148,14 @@ assert.equal(latestView.items.find((item) => item.id === "codex")?.badge, "75% l
 assert.equal(latestView.items.find((item) => item.id === "grok")?.badge, "60% left");
 assert.equal(persisted.usage.length, 2, "only normalized provider snapshots should be cached");
 assert.ok(!JSON.stringify(persisted).includes("smoke-codex-token"), "cache must not contain tokens");
+assert.ok(latestView.items.find((item) => item.id === "codex")?.actions.some((action) => action.id === "login:codex"));
+
+handlers.onAction("login:codex", { id: "codex" });
+for (let attempt = 0; attempt < 30 && !opened.includes("auth.openai.com"); attempt += 1) {
+  await new Promise((resolve) => setTimeout(resolve, 30));
+}
+assert.deepEqual(loginStarted?.args, ["login", "--device-auth"]);
+assert.equal(opened, "https://auth.openai.com/codex/device");
 
 handlers.onAction("copy:codex", { id: "codex" });
 await new Promise((resolve) => setTimeout(resolve, 0));
