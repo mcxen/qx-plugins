@@ -1,7 +1,1 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128">
-  <rect x="4" y="4" width="120" height="120" rx="28" fill="#f7fafd"/>
-  <path d="M29 27h64c7 0 12 5 12 12v39c0 7-5 12-12 12H62l-19 18 3-18H29c-7 0-12-5-12-12V39c0-7 5-12 12-12Z" fill="#fff" stroke="#283540" stroke-width="3" stroke-linejoin="round"/>
-  <path d="M93 27h10c7 0 12 5 12 12v39c0 7-5 12-12 12H93Z" fill="#dceeff" stroke="#283540" stroke-width="3" stroke-linejoin="round"/>
-  <path d="M38 48h45M38 62h32M38 76h41" stroke="#a9d8f5" stroke-width="6" stroke-linecap="round"/>
-  <circle cx="84" cy="48" r="6" fill="#ffe27a" stroke="#283540" stroke-width="3"/>
-</svg>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128"><rect width="120" height="120" x="4" y="4" fill="#f7fafd" rx="28"/><path fill="#fff" stroke="#283540" stroke-linejoin="round" stroke-width="3" d="M29 27h64c7 0 12 5 12 12v39c0 7-5 12-12 12H62l-19 18 3-18H29c-7 0-12-5-12-12V39c0-7 5-12 12-12Z"/><path fill="#dceeff" stroke="#283540" stroke-linejoin="round" stroke-width="3" d="M93 27h10c7 0 12 5 12 12v39c0 7-5 12-12 12H93Z"/><path stroke="#a9d8f5" stroke-linecap="round" stroke-width="6" d="M38 48h45M38 62h32M38 76h41"/><circle cx="84" cy="48" r="6" fill="#ffe27a" stroke="#283540" stroke-width="3"/></svg>

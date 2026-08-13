@@ -1,8 +1,1 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128">
-  <rect x="4" y="4" width="120" height="120" rx="28" fill="#f7fafd"/>
-  <path d="m64 20 39 22v44l-39 22-39-22V42Z" fill="#fff" stroke="#283540" stroke-width="3" stroke-linejoin="round"/>
-  <path d="m103 42 10 6v44l-39 22-10-6 39-22Z" fill="#dceeff" stroke="#283540" stroke-width="3" stroke-linejoin="round"/>
-  <path d="M64 20v44l39-22" fill="#a9d8f5" stroke="#283540" stroke-width="3" stroke-linejoin="round"/>
-  <path d="M48 71h32M48 83h22" stroke="#283540" stroke-width="5" stroke-linecap="round"/>
-  <circle cx="64" cy="53" r="7" fill="#ffe27a" stroke="#283540" stroke-width="3"/>
-</svg>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128"><rect width="120" height="120" x="4" y="4" fill="#f7fafd" rx="28"/><path fill="#fff" stroke="#283540" stroke-linejoin="round" stroke-width="3" d="m64 20 39 22v44l-39 22-39-22V42Z"/><path fill="#dceeff" stroke="#283540" stroke-linejoin="round" stroke-width="3" d="m103 42 10 6v44l-39 22-10-6 39-22Z"/><path fill="#a9d8f5" stroke="#283540" stroke-linejoin="round" stroke-width="3" d="M64 20v44l39-22"/><path stroke="#283540" stroke-linecap="round" stroke-width="5" d="M48 71h32M48 83h22"/><circle cx="64" cy="53" r="7" fill="#ffe27a" stroke="#283540" stroke-width="3"/></svg>
