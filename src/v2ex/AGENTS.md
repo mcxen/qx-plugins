@@ -32,6 +32,7 @@ src/v2ex/
 7. Actions use stable ids + unique `menuKey`. Host owns Enter open/back for list↔detail.
 8. One action description only — no duplicated Bottom Bar / primary “open detail” fakes.
 9. Nodes and notifications require token; latest/hot do not.
+10. The host V2EX service resolves leading `@member` mentions against the latest earlier reply by that author. Preserve its `parent_id`, bounded `depth`, and `reply_to_author` fields when publishing Workbench `parentId`, `depth`, and `replyToAuthor`; do not infer a second tree in the plugin.
 
 ## Tabs / filters
 

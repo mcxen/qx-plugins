@@ -265,6 +265,13 @@ function parsePost(post, users, index) {
   };
 }
 
+function nestedReplyTarget(body) {
+  const text = String(body || "").trimStart();
+  return text.match(/^@([A-Za-z0-9_-]{1,64})\b/)?.[1]
+    || text.match(/^回复\s+([^：:\s]{1,64})\s*[：:]/)?.[1]
+    || "";
+}
+
 function parseThreadResponse(input, fallbackPost = {}) {
   const response = decodeMessage(input);
   const error = nestedField(response, 1);
@@ -283,22 +290,49 @@ function parseThreadResponse(input, fallbackPost = {}) {
   const threadAuthor = authorFor(thread, 18, 56, users);
   const opId = threadAuthor.id || firstPost?.authorId || "";
   const opName = threadAuthor.name || firstPost?.author || fallbackPost.author || "";
-  const replies = posts.slice(firstPost ? 1 : 0).map((post) => {
-    const nestedLines = post.comments.map((comment) => {
-      const likes = comment.likeCount > 0 ? `  ♥ ${comment.likeCount}` : "";
-      return `↳ ${comment.author || "Reply"}：${comment.body}${likes}`;
-    });
-    const body = `${post.body}${nestedLines.length ? `\n\n${nestedLines.join("\n")}` : ""}`.trim();
-    return {
+  const replies = posts.slice(firstPost ? 1 : 0).flatMap((post) => {
+    const floorReply = {
       id: post.id,
       floor: post.floor,
       author: post.author || "Unknown author",
       likeCount: post.likeCount,
       createdAt: post.createdAt,
       originalPoster: Boolean((opId && post.authorId === opId) || (opName && post.author === opName)),
-      body,
-      content: tiebaEmotionContent(body),
+      body: post.body,
+      content: tiebaEmotionContent(post.body),
     };
+    const latestByAuthor = new Map([[floorReply.author.toLowerCase(), {
+      id: floorReply.id,
+      depth: 0,
+      author: floorReply.author,
+    }]]);
+    const nestedReplies = post.comments.map((comment, index) => {
+      const target = nestedReplyTarget(comment.body);
+      const parent = target ? latestByAuthor.get(target.toLowerCase()) : undefined;
+      const id = `${post.id}:${comment.id || index + 1}`;
+      const reply = {
+        id,
+        parentId: parent?.id || post.id,
+        depth: Math.min(8, (parent?.depth || 0) + 1),
+        replyToAuthor: parent?.author || post.author || undefined,
+        floor: `${post.floor}.${index + 1}`,
+        author: comment.author || "Unknown author",
+        likeCount: comment.likeCount,
+        createdAt: comment.createdAt,
+        originalPoster: Boolean(
+          (opId && comment.authorId === opId) || (opName && comment.author === opName)
+        ),
+        body: comment.body,
+        content: tiebaEmotionContent(comment.body),
+      };
+      latestByAuthor.set(reply.author.toLowerCase(), {
+        id: reply.id,
+        depth: reply.depth,
+        author: reply.author,
+      });
+      return reply;
+    });
+    return [floorReply, ...nestedReplies];
   }).filter((post) => post.body);
   const threadContent = contentText(values(thread, 142));
   const threadImages = contentImages(values(thread, 142));

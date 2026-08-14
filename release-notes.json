@@ -13,6 +13,14 @@
     ],
     "agent-usage": [
       {
+        "version": "1.2.0",
+        "published_at": "2026-08-14",
+        "notes_localizations": {
+          "en": "Adds an optional Launcher Home quota card backed only by the normalized credential-free snapshot; the host controls refresh scheduling and never starts the plugin runtime in the background.",
+          "zh-CN": "新增可选的启动器主页配额卡片，仅读取归一化且不含凭据的快照；刷新调度由宿主管理，后台不会启动插件运行时。"
+        }
+      },
+      {
         "version": "1.1.0",
         "published_at": "2026-08-13",
         "notes_localizations": {
@@ -48,6 +56,22 @@
       }
     ],
     "hacker-news": [
+      {
+        "version": "1.1.1",
+        "published_at": "2026-08-14",
+        "notes_localizations": {
+          "en": "Shows cached comments immediately, refreshes stale trees in the visible Workbench with island-only activity, and registers dynamic comment keys for storage management.",
+          "zh-CN": "评论缓存命中后立即显示，过期树在当前 Workbench 刷新且加载动画只进入灵动岛，并将动态评论键纳入存储管理。"
+        }
+      },
+      {
+        "version": "1.1.0",
+        "published_at": "2026-08-14",
+        "notes_localizations": {
+          "en": "Preserves Firebase comment parentage through the shared Workbench reply-tree contract with host indentation and branch collapse.",
+          "zh-CN": "通过统一 Workbench 回复树协议保留 Firebase 评论父子关系，并由宿主统一提供缩进与分支折叠。"
+        }
+      },
       {
         "version": "1.0.1",
         "published_at": "2026-08-08",
@@ -392,6 +416,14 @@
       }
     ],
     "qxtieba": [
+      {
+        "version": "1.2.0",
+        "published_at": "2026-08-14",
+        "notes_localizations": {
+          "en": "Publishes Tieba floors and nested comments as a real Workbench reply tree with stable parent ids, depth, reply targets, host indentation, and branch collapse.",
+          "zh-CN": "将贴吧楼层和楼中楼评论发布为真实的 Workbench 回复树，支持稳定父级、层级、回复对象、宿主缩进与分支折叠。"
+        }
+      },
       {
         "version": "1.1.11",
         "published_at": "2026-08-08",
@@ -990,6 +1022,22 @@
       }
     ],
     "v2ex": [
+      {
+        "version": "3.1.1",
+        "published_at": "2026-08-14",
+        "notes_localizations": {
+          "en": "Keeps cached replies visible while stale data refreshes into the current Workbench, moves reply activity to the island, and registers dynamic V2EX cache keys for storage management.",
+          "zh-CN": "过期回复刷新时保留缓存并回写当前 Workbench，将回复加载活动统一放入灵动岛，并把动态 V2EX 缓存键纳入存储管理。"
+        }
+      },
+      {
+        "version": "3.1.0",
+        "published_at": "2026-08-14",
+        "notes_localizations": {
+          "en": "Groups leading @mentions under the latest earlier reply by that member through the shared Workbench reply-tree contract, with bounded depth and graceful unmatched mentions.",
+          "zh-CN": "通过统一 Workbench 回复树协议，将开头 @用户 的回复归到该用户最近的前序回复下，并限制层级、兼容无法匹配的提及。"
+        }
+      },
       {
         "version": "3.0.2",
         "published_at": "2026-08-08",

@@ -5,7 +5,7 @@
     "en": "Hacker News",
     "zh-CN": "Hacker News"
   },
-  "version": "1.0.1",
+  "version": "1.1.1",
   "description": "Browse the latest Hacker News stories with details and comments.",
   "descriptions": {
     "en": "Browse the latest Hacker News stories with details and comments.",
@@ -79,9 +79,9 @@
         "label": "Hacker News cache",
         "description": "Latest stories and fetched comment trees. Safe to rebuild from the public Hacker News API.",
         "keys": [
-          "hacker-news.stories.v1",
-          "hacker-news.comments.v1"
+          "hacker-news.stories.v1"
         ],
+        "keyPrefixes": ["hacker-news.comments.v1."],
         "retentionDays": 7
       }
     ]
@@ -90,7 +90,7 @@
   "panel": {
     "keywords": ["hacker news", "hn", "news", "technology", "社区", "帖子", "评论"]
   },
-  "min_app_version": "0.6.13",
+  "min_app_version": "0.6.87",
   "platforms": ["macos", "windows"],
   "screenshots": []
 }

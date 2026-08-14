@@ -170,15 +170,23 @@ assert.deepEqual(protoDetail.content, [
   { type: "asset-image", assetPath: "assets/emotions/image_emoticon12.png", alt: "image_emoticon12" },
 ]);
 assert.deepEqual(protoDetail.images, ["https://imgsrc.baidu.com/main.jpg"]);
-assert.equal(protoDetail.replies.length, 1);
+assert.equal(protoDetail.replies.length, 2);
 assert.equal(protoDetail.replies[0].author, "吧友");
 assert.equal(protoDetail.replies[0].likeCount, 7);
-assert.match(protoDetail.replies[0].body, /↳ 楼主：楼中楼评论/);
+assert.equal(protoDetail.replies[0].body, "Protobuf 楼层image_emoticon8继续");
 assert.doesNotMatch(protoDetail.replies[0].body, /♥ 7/);
 assert.deepEqual(protoDetail.replies[0].content, [
   { type: "text", text: "Protobuf 楼层" },
   { type: "asset-image", assetPath: "assets/emotions/image_emoticon8.png", alt: "image_emoticon8" },
-  { type: "text", text: "继续\n\n↳ 楼主：楼中楼评论" },
+  { type: "text", text: "继续" },
+]);
+assert.equal(protoDetail.replies[1].parentId, "1002");
+assert.equal(protoDetail.replies[1].depth, 1);
+assert.equal(protoDetail.replies[1].replyToAuthor, "吧友");
+assert.equal(protoDetail.replies[1].floor, "2.1");
+assert.equal(protoDetail.replies[1].originalPoster, true);
+assert.deepEqual(protoDetail.replies[1].content, [
+  { type: "text", text: "楼中楼评论" },
   { type: "asset-image", assetPath: "assets/emotions/image_emoticon124.png", alt: "image_emoticon124" },
 ]);
 assert.equal(tiebaEmotionContent("保留 image_emoticon55"), undefined);

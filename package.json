@@ -19,6 +19,8 @@
     "store:pages": "npm --prefix store run pages:dev",
     "smoke:qxheihe": "node scripts/smoke-qxheihe.mjs",
     "smoke:qxtieba": "node scripts/smoke-qxtieba.mjs",
+    "smoke:v2ex": "node scripts/smoke-v2ex.mjs",
+    "smoke:hacker-news": "node scripts/smoke-hacker-news.mjs",
     "smoke:qxcoolapk": "npm run build:qxcoolapk && node scripts/smoke-qxcoolapk.mjs",
     "smoke:qxweibo": "npm run build:qxweibo && node scripts/smoke-qxweibo.mjs",
     "smoke:qxgh": "node scripts/smoke-qxgh.mjs",

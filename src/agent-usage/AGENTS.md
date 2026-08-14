@@ -9,7 +9,8 @@
 
 ## Surfaces and UI
 
-- The plugin owns one host-rendered Workbench panel; it must not render iframe HTML or duplicate Qx shell chrome.
+- The plugin owns one host-rendered Workbench panel plus one manifest-only `agent.usage` Home Surface Provider; neither may render iframe HTML or duplicate Qx shell chrome.
+- Home reads only `agent-usage.snapshot.v1` through the host adapter. It must never start the plugin runtime, read authentication files, or call provider networks.
 - `panel.render` paints immediately, hydrates the persisted snapshot, then refreshes stale data.
 - Rows stay compact: provider, account/plan, remaining percentage, reset time, and native details. Do not invent usage history or estimated progress.
 - Enter remains host list-to-detail navigation. Refresh, Copy Summary, and Open Dashboard live in Actions with stable ids and unique menu keys.

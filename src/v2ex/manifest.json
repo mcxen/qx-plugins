@@ -5,7 +5,7 @@
     "en": "V2EX",
     "zh-CN": "V2EX"
   },
-  "version": "3.0.2",
+  "version": "3.1.1",
   "description": "Browse V2EX latest, hot, and node topics with Workbench list/detail, replies, and cached host APIs.",
   "descriptions": {
     "en": "Browse V2EX latest, hot, and node topics with Workbench list/detail, replies, and cached host APIs.",
@@ -86,6 +86,17 @@
       }
     }
   ],
+  "storage": {
+    "cacheTargets": [
+      {
+        "id": "v2ex",
+        "label": "V2EX cache",
+        "description": "Topic lists, notifications, and per-topic replies. Safe to rebuild from V2EX.",
+        "keyPrefixes": ["v2ex.cache."],
+        "retentionDays": 7
+      }
+    ]
+  },
   "entry": "index.js",
   "commands": [
     {
@@ -142,7 +153,7 @@
     },
     "title": "V2EX"
   },
-  "min_app_version": "0.6.13",
+  "min_app_version": "0.6.87",
   "platforms": [
     "macos",
     "windows"

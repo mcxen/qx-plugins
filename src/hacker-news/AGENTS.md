@@ -32,6 +32,8 @@ src/hacker-news/
    usable cache instead of showing false success or deleting it.
 6. Workbench actions have stable ids and unique menu keys. Do not add a global
    keyboard listener or duplicate host Enter/Esc navigation.
+7. Preserve the Firebase `kids` relationship as Workbench `parentId`, bounded
+   `depth`, and `replyToAuthor`; Qx owns tree ordering, indentation, and collapse.
 
 ## Permissions
 

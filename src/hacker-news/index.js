@@ -195,11 +195,13 @@ async function fetchStories(context, limit) {
   return stories;
 }
 
-async function fetchComments(context, story) {
+export async function fetchComments(context, story) {
   const queue = (story.kids || []).map((id, index) => ({
     id,
     path: [index + 1],
     depth: 1,
+    parentId: undefined,
+    replyToAuthor: undefined,
   }));
   const comments = [];
 
@@ -219,6 +221,9 @@ async function fetchComments(context, story) {
         id: String(item.id),
         floor: entry.path.join("."),
         author: String(item.by || text("deleted", "已删除用户")),
+        parentId: entry.parentId,
+        depth: Math.min(MAX_COMMENT_DEPTH, Math.max(0, entry.depth - 1)),
+        replyToAuthor: entry.replyToAuthor,
         body,
         createdAt: formatDate(item.time),
         originalPoster: Boolean(story.by && item.by === story.by),
@@ -230,6 +235,8 @@ async function fetchComments(context, story) {
             id: childId,
             path: [...entry.path, childIndex + 1],
             depth: entry.depth + 1,
+            parentId: String(item.id),
+            replyToAuthor: String(item.by || text("deleted", "已删除用户")),
           });
         });
       }
@@ -281,7 +288,6 @@ function createPanel(context) {
   function storyDetail(story) {
     const id = String(story.id);
     const cached = state.comments.get(id);
-    const loading = state.commentsLoading.has(id);
     return {
       title: story.title,
       subtitle: `${compactNumber(story.score)} ${text("points", "分")} · ${story.by} · ${formatTime(story.time)} · ${compactNumber(story.descendants)} ${text("comments", "条评论")}`,
@@ -296,11 +302,9 @@ function createPanel(context) {
         title: text("Comments", "评论区"),
         total: story.descendants,
         items: cached?.items || [],
-        status: loading
-          ? { state: "loading", label: text("Loading comments…", "正在加载评论…") }
-          : cached?.error
-            ? { state: "error", error: cached.error }
-            : undefined,
+        status: cached?.error
+          ? { state: "error", error: cached.error }
+          : undefined,
         emptyText: story.descendants
           ? text("No readable comments loaded.", "暂时没有加载到可读评论。")
           : text("No comments yet.", "暂无评论。"),
@@ -413,17 +417,28 @@ function createPanel(context) {
     const id = String(storyId || "");
     const story = state.stories.find((row) => String(row.id) === id);
     if (!story || state.dead || state.commentsLoading.has(id)) return;
-    if (!force && state.comments.has(id) && !state.comments.get(id)?.error) return;
+    const current = state.comments.get(id);
+    if (
+      !force
+      && current
+      && !current.error
+      && Date.now() - Number(current.savedAt) <= state.ttlMs
+    ) return;
 
     state.commentsLoading.add(id);
     paint();
     try {
       const cached = await storageGet(context, `${COMMENT_CACHE_PREFIX}${id}`);
       const fresh = validCommentCache(cached) && Date.now() - Number(cached.savedAt) <= state.ttlMs;
-      if (!force && validCommentCache(cached)) {
+      if (
+        !force
+        && validCommentCache(cached)
+        && (!current || Number(cached.savedAt) >= Number(current.savedAt))
+      ) {
         state.comments.set(id, { items: cached.items, savedAt: cached.savedAt });
-        if (fresh || story.kids.length === 0) return;
+        paint();
       }
+      if (!force && (fresh || story.kids.length === 0) && (current || validCommentCache(cached))) return;
       const items = await fetchComments(context, story);
       if (state.dead) return;
       const savedAt = Date.now();

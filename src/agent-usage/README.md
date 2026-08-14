@@ -2,6 +2,10 @@
 
 Agent Usage is a clean Qx-native rewrite of the business intent behind Raycast's
 [Agent Usage](https://github.com/raycast/extensions/tree/22d64eb97c47ca6ddf9d53444e7ee4375a0b2134/extensions/agent-usage).
+
+Qx 0.6.87 and later can optionally project the plugin's normalized, credential-free
+snapshot on Launcher Home. The Home card never starts the plugin runtime or performs
+provider network requests; opening the card enters the full Workbench.
 No Raycast UI, runtime shim, or converter output is included.
 
 The 1.0 release focuses on two provider paths that were verified against their

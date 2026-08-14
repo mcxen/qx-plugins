@@ -4,7 +4,7 @@
     {
       "id": "agent-usage",
       "name": "Agent Usage",
-      "version": "1.1.0",
+      "version": "1.2.0",
       "description": "Lightweight Qx-native Codex and Grok quota overview using local CLI sessions.",
       "names": {
         "en": "Agent Usage",
@@ -15,8 +15,8 @@
         "zh-CN": "在轻量原生 Workbench 中读取本机 CLI 登录态，查看 Codex 与 Grok 配额窗口。"
       },
       "download_url": "https://raw.githubusercontent.com/mcxen/qx-plugins/main/agent-usage.qx-plugin",
-      "size_bytes": 43829,
-      "checksum_sha256": "55533044cf970cac3e5d6bb89b11ed983b8a7c6842d49fb37fea666ab37cfb36",
+      "size_bytes": 45305,
+      "checksum_sha256": "755b7fa7319a65d5f92927de04dfb2f6327134e535b3c50d4b6c30eb65653743",
       "required_permissions": [
         "http",
         "open-url",
@@ -24,14 +24,22 @@
         "cli",
         "invoke:plugin_file_read_base64"
       ],
-      "updated_at": "2026-08-13",
+      "updated_at": "2026-08-14",
       "author": "mcx",
-      "min_app_version": "0.6.50",
+      "min_app_version": "0.6.87",
       "platforms": [
         "macos",
         "windows"
       ],
       "releases": [
+        {
+          "version": "1.2.0",
+          "published_at": "2026-08-14",
+          "notes_localizations": {
+            "en": "Adds an optional Launcher Home quota card backed only by the normalized credential-free snapshot; the host controls refresh scheduling and never starts the plugin runtime in the background.",
+            "zh-CN": "新增可选的启动器主页配额卡片，仅读取归一化且不含凭据的快照；刷新调度由宿主管理，后台不会启动插件运行时。"
+          }
+        },
         {
           "version": "1.1.0",
           "published_at": "2026-08-13",
@@ -352,7 +360,7 @@
     {
       "id": "hacker-news",
       "name": "Hacker News",
-      "version": "1.0.1",
+      "version": "1.1.1",
       "description": "Browse the latest Hacker News stories with details and comments.",
       "names": {
         "en": "Hacker News",
@@ -363,21 +371,37 @@
         "zh-CN": "浏览 Hacker News 最新帖子、正文与评论。"
       },
       "download_url": "https://raw.githubusercontent.com/mcxen/qx-plugins/main/hacker-news.qx-plugin",
-      "size_bytes": 26525,
-      "checksum_sha256": "128ce713f8c98bf513bdd75611c919af79fe82fdaee78d42717ac6e057f426ce",
+      "size_bytes": 28100,
+      "checksum_sha256": "e9a9d73bff8cede7553684eeabfb871aa71adabbce2b8f1b7051799d18d98e7f",
       "required_permissions": [
         "http",
         "open-url",
         "clipboard"
       ],
-      "updated_at": "2026-08-09",
+      "updated_at": "2026-08-14",
       "author": "mcx",
-      "min_app_version": "0.6.13",
+      "min_app_version": "0.6.87",
       "platforms": [
         "macos",
         "windows"
       ],
       "releases": [
+        {
+          "version": "1.1.1",
+          "published_at": "2026-08-14",
+          "notes_localizations": {
+            "en": "Shows cached comments immediately, refreshes stale trees in the visible Workbench with island-only activity, and registers dynamic comment keys for storage management.",
+            "zh-CN": "评论缓存命中后立即显示，过期树在当前 Workbench 刷新且加载动画只进入灵动岛，并将动态评论键纳入存储管理。"
+          }
+        },
+        {
+          "version": "1.1.0",
+          "published_at": "2026-08-14",
+          "notes_localizations": {
+            "en": "Preserves Firebase comment parentage through the shared Workbench reply-tree contract with host indentation and branch collapse.",
+            "zh-CN": "通过统一 Workbench 回复树协议保留 Firebase 评论父子关系，并由宿主统一提供缩进与分支折叠。"
+          }
+        },
         {
           "version": "1.0.1",
           "published_at": "2026-08-08",
@@ -1146,7 +1170,7 @@
     {
       "id": "qxtieba",
       "name": "QxTieba 贴吧",
-      "version": "1.1.11",
+      "version": "1.2.0",
       "description": "聚合浏览多个百度贴吧的公开帖子流，在 Qx 内阅读正文与楼层评论。",
       "names": {
         "en": "QxTieba",
@@ -1157,21 +1181,29 @@
         "zh-CN": "聚合浏览多个百度贴吧的公开帖子流，在 Qx 内阅读正文与楼层评论。"
       },
       "download_url": "https://raw.githubusercontent.com/mcxen/qx-plugins/main/qxtieba.qx-plugin",
-      "size_bytes": 377883,
-      "checksum_sha256": "27600dfebf15a3e746be22e17892bfbb6eaff50a025ee3209c99126c54a93cf9",
+      "size_bytes": 380221,
+      "checksum_sha256": "7b630724da9addbafab7394a6dbba20d3c6989470d53811ce8dfdd654e29da1d",
       "required_permissions": [
         "http",
         "open-url",
         "island"
       ],
-      "updated_at": "2026-08-09",
+      "updated_at": "2026-08-14",
       "author": "Qx",
-      "min_app_version": "0.6.50",
+      "min_app_version": "0.6.87",
       "platforms": [
         "macos",
         "windows"
       ],
       "releases": [
+        {
+          "version": "1.2.0",
+          "published_at": "2026-08-14",
+          "notes_localizations": {
+            "en": "Publishes Tieba floors and nested comments as a real Workbench reply tree with stable parent ids, depth, reply targets, host indentation, and branch collapse.",
+            "zh-CN": "将贴吧楼层和楼中楼评论发布为真实的 Workbench 回复树，支持稳定父级、层级、回复对象、宿主缩进与分支折叠。"
+          }
+        },
         {
           "version": "1.1.11",
           "published_at": "2026-08-08",
@@ -1542,7 +1574,7 @@
     {
       "id": "v2ex",
       "name": "V2EX",
-      "version": "3.0.2",
+      "version": "3.1.1",
       "description": "Browse V2EX latest, hot, and node topics with Workbench list/detail, replies, and cached host APIs.",
       "names": {
         "en": "V2EX",
@@ -1553,8 +1585,8 @@
         "zh-CN": "通过 Workbench 列表/详情浏览 V2EX 最新、热门与节点主题，支持回复与宿主缓存接口。"
       },
       "download_url": "https://raw.githubusercontent.com/mcxen/qx-plugins/main/v2ex.qx-plugin",
-      "size_bytes": 41308,
-      "checksum_sha256": "4318e7b7f1f222b7a3ce602a528eab535a51ad149d91944afe936da79a316892",
+      "size_bytes": 43770,
+      "checksum_sha256": "bd41782157836119b9cbfafc822bad1c0b1244b70cb46f338eeb7fdae74d5225",
       "required_permissions": [
         "http",
         "open-url",
@@ -1567,14 +1599,30 @@
         "invoke:v2ex_fetch_token_info",
         "invoke:v2ex_fetch_notifications"
       ],
-      "updated_at": "2026-08-09",
+      "updated_at": "2026-08-14",
       "author": "mcx",
-      "min_app_version": "0.6.13",
+      "min_app_version": "0.6.87",
       "platforms": [
         "macos",
         "windows"
       ],
       "releases": [
+        {
+          "version": "3.1.1",
+          "published_at": "2026-08-14",
+          "notes_localizations": {
+            "en": "Keeps cached replies visible while stale data refreshes into the current Workbench, moves reply activity to the island, and registers dynamic V2EX cache keys for storage management.",
+            "zh-CN": "过期回复刷新时保留缓存并回写当前 Workbench，将回复加载活动统一放入灵动岛，并把动态 V2EX 缓存键纳入存储管理。"
+          }
+        },
+        {
+          "version": "3.1.0",
+          "published_at": "2026-08-14",
+          "notes_localizations": {
+            "en": "Groups leading @mentions under the latest earlier reply by that member through the shared Workbench reply-tree contract, with bounded depth and graceful unmatched mentions.",
+            "zh-CN": "通过统一 Workbench 回复树协议，将开头 @用户 的回复归到该用户最近的前序回复下，并限制层级、兼容无法匹配的提及。"
+          }
+        },
         {
           "version": "3.0.2",
           "published_at": "2026-08-08",

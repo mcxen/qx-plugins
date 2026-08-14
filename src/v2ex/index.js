@@ -204,7 +204,7 @@ function normalizeTopic(row) {
   };
 }
 
-function normalizeReply(row, index) {
+export function normalizeV2exReply(row, index) {
   const id = Number(row?.id);
   if (!Number.isFinite(id)) return null;
   return {
@@ -213,6 +213,11 @@ function normalizeReply(row, index) {
     author: String(row?.author || "").trim() || text("unknown", "未知"),
     created: Number(row?.created) || 0,
     floor: Number(row?.floor) || index + 1,
+    parentId: row?.parentId == null && row?.parent_id == null
+      ? undefined
+      : String(row.parentId ?? row.parent_id),
+    depth: Math.min(8, Math.max(0, Number(row?.depth) || 0)),
+    replyToAuthor: String(row?.replyToAuthor ?? row?.reply_to_author ?? "").trim() || undefined,
   };
 }
 
@@ -271,7 +276,7 @@ async function fetchRepliesLive(context, topicId, token) {
     token: token || undefined,
   });
   return (Array.isArray(rows) ? rows : [])
-    .map((row, index) => normalizeReply(row, index))
+    .map((row, index) => normalizeV2exReply(row, index))
     .filter(Boolean);
 }
 
@@ -303,7 +308,7 @@ function createPanel(context, initialMode = "latest") {
     topics: [],
     notifications: [],
     selectedId: null,
-    /** @type {Map<string, { items: any[], status?: any, error?: string }>} */
+    /** @type {Map<string, { items: any[], savedAt: number, error?: string }>} */
     replies: new Map(),
     loading: false,
     repliesLoading: new Set(),
@@ -347,7 +352,6 @@ function createPanel(context, initialMode = "latest") {
   function topicDetail(topic) {
     const key = String(topic.id);
     const cached = state.replies.get(key);
-    const loading = state.repliesLoading.has(key);
     const body = stripHtml(topic.content) || text("(no content)", "（无内容）");
     return {
       title: topic.title,
@@ -372,15 +376,16 @@ function createPanel(context, initialMode = "latest") {
           id: String(reply.id),
           floor: reply.floor,
           author: reply.author,
+          parentId: reply.parentId,
+          depth: reply.depth,
+          replyToAuthor: reply.replyToAuthor,
           createdAt: formatTime(reply.created),
           originalPoster: reply.author === topic.author,
           body: stripHtml(reply.content) || text("(empty)", "（空）"),
         })),
-        status: loading
-          ? { state: "loading", label: text("Loading replies…", "正在加载回复…") }
-          : cached?.error
-            ? { state: "error", error: cached.error }
-            : undefined,
+        status: cached?.error
+          ? { state: "error", error: cached.error }
+          : undefined,
         emptyText: text("No replies yet.", "暂无回复。"),
       },
     };
@@ -599,29 +604,37 @@ function createPanel(context, initialMode = "latest") {
   async function ensureReplies(topicId, { force = false } = {}) {
     const key = String(topicId);
     if (!key || state.dead) return;
-    if (!force && state.replies.has(key) && !state.replies.get(key)?.error) return;
     if (state.repliesLoading.has(key)) return;
+
+    const ttlMs = state.ttlMs || DEFAULT_TTL_MS;
+    const current = state.replies.get(key);
+    if (!force && current && !current.error && Date.now() - current.savedAt <= ttlMs) return;
 
     state.repliesLoading.add(key);
     paint();
     try {
       const token = await getToken(context);
-      const ttlMs = await getTtlMs(context);
-      const result = await loadWithCache(
-        context,
-        `replies:${key}`,
-        () => fetchRepliesLive(context, Number(key), token),
-        { force, ttlMs },
-      );
+      const cached = await readCache(context, `replies:${key}`);
       if (state.dead) return;
-      state.replies.set(key, {
-        items: Array.isArray(result.data) ? result.data : [],
-        error: result.error ? errorMessage(result.error) : undefined,
-      });
+      const cachedAge = cached?.savedAt ? Date.now() - Number(cached.savedAt) : Infinity;
+      const usable = cached && Array.isArray(cached.data) && cachedAge <= STALE_MS;
+      if (!force && usable && (!current || Number(cached.savedAt) >= current.savedAt)) {
+        state.replies.set(key, { items: cached.data, savedAt: Number(cached.savedAt) });
+        paint();
+      }
+      if (!force && usable && cachedAge <= ttlMs) return;
+
+      const items = await fetchRepliesLive(context, Number(key), token);
+      if (state.dead) return;
+      const savedAt = Date.now();
+      state.replies.set(key, { items, savedAt });
+      await writeCache(context, `replies:${key}`, items);
     } catch (err) {
       if (state.dead) return;
+      const existing = state.replies.get(key);
       state.replies.set(key, {
-        items: state.replies.get(key)?.items || [],
+        items: existing?.items || [],
+        savedAt: existing?.savedAt || 0,
         error: errorMessage(err),
       });
     } finally {

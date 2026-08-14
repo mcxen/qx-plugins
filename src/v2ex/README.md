@@ -7,10 +7,10 @@ Marketplace panel for browsing V2EX through the host **Workbench** protocol.
 - Latest / Hot topic lists (public API, no token)
 - Nodes tab (API v2 token + space-separated node preference)
 - Notifications tab (token)
-- Structured topic detail + host-rendered replies
+- Structured topic detail + host-rendered reply trees; leading `@member` replies nest under the latest earlier reply by that member
 - Actions: open in browser, copy link/title, refresh, check token
 - **Cache**: plugin `storage.persist` + host `invoke:v2ex_*` disk/memory cache  
-  Reopen paints from cache immediately; network refresh runs in the background
+  Reopen paints replies from cache immediately; stale refresh updates the visible Workbench while the island shows activity
 
 ## Preferences
 
@@ -28,7 +28,7 @@ Marketplace panel for browsing V2EX through the host **Workbench** protocol.
 
 ## Host compatibility
 
-Requires Qx **0.6.13+** with Workbench + `v2ex_fetch_*` commands. Token is read from
+Requires Qx **0.6.87+** with Workbench reply trees + `v2ex_fetch_*` commands. Token is read from
 plugin preferences and passed into invoke args so global host settings are optional.
 
 ## Module mode

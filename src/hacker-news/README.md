@@ -6,8 +6,8 @@
 
 - 最新帖子列表，可配置首屏加载数量
 - 帖子正文与 Hacker News 原帖链接
-- 选中后加载嵌套评论，并保留作者、时间和楼层路径
-- 持久化 stale-while-revalidate 缓存，网络失败时保留可用内容
+- 选中后加载真实嵌套评论树，并保留父级、层级、作者、时间和楼层路径
+- 持久化 stale-while-revalidate 缓存：评论命中后立即显示，刷新动画只进入灵动岛，网络失败保留可用内容
 - 打开原帖与复制链接
 
 ## Data source
@@ -19,6 +19,6 @@ The first release intentionally has no translation provider or AI API setting. T
 
 ## Host compatibility
 
-Requires Qx **0.6.13+** with the Workbench, HTTP, open-url, clipboard, and plugin persistence ports.
+Requires Qx **0.6.87+** with Workbench reply trees, HTTP, open-url, clipboard, and plugin persistence ports.
 
 The plugin publishes only Workbench data. Qx owns the shell, keyboard navigation, detail entry/return, Actions menu, Context Panel, and Esc cascade.

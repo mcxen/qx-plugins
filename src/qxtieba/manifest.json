@@ -1,7 +1,7 @@
 {
   "id": "qxtieba",
   "name": "QxTieba 贴吧",
-  "version": "1.1.11",
+  "version": "1.2.0",
   "description": "聚合浏览多个百度贴吧的公开帖子流，在 Qx 内阅读正文与楼层评论。",
   "author": "Qx",
   "icon": "icon.svg",
@@ -150,7 +150,7 @@
       "zh-CN": "QxTieba 贴吧"
     }
   },
-  "min_app_version": "0.6.50",
+  "min_app_version": "0.6.87",
   "platforms": [
     "macos",
     "windows"
