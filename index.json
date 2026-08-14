@@ -4,7 +4,7 @@
     {
       "id": "agent-usage",
       "name": "Agent Usage",
-      "version": "1.1.0",
+      "version": "1.2.0",
       "description": "Lightweight Qx-native Codex and Grok quota overview using local CLI sessions.",
       "names": {
         "en": "Agent Usage",
@@ -15,8 +15,8 @@
         "zh-CN": "在轻量原生 Workbench 中读取本机 CLI 登录态，查看 Codex 与 Grok 配额窗口。"
       },
       "download_url": "https://raw.githubusercontent.com/mcxen/qx-plugins/main/agent-usage.qx-plugin",
-      "size_bytes": 43829,
-      "checksum_sha256": "55533044cf970cac3e5d6bb89b11ed983b8a7c6842d49fb37fea666ab37cfb36",
+      "size_bytes": 45215,
+      "checksum_sha256": "89ebc98d0ce016974540a17ebab3db630e5b18bfaa0745d7f13d8027d0e6e4c5",
       "required_permissions": [
         "http",
         "open-url",
@@ -24,14 +24,22 @@
         "cli",
         "invoke:plugin_file_read_base64"
       ],
-      "updated_at": "2026-08-13",
+      "updated_at": "2026-08-14",
       "author": "mcx",
-      "min_app_version": "0.6.50",
+      "min_app_version": "0.6.87",
       "platforms": [
         "macos",
         "windows"
       ],
       "releases": [
+        {
+          "version": "1.2.0",
+          "published_at": "2026-08-14",
+          "notes_localizations": {
+            "en": "Adds a host-rendered Home Dashboard card for cached Codex and Grok quota windows without loading the plugin runtime or exposing credentials.",
+            "zh-CN": "新增宿主绘制的主页 Dashboard 卡片，直接显示缓存的 Codex 与 Grok 配额窗口，无需加载插件运行时或暴露凭据。"
+          }
+        },
         {
           "version": "1.1.0",
           "published_at": "2026-08-13",

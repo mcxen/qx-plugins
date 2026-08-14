@@ -2,6 +2,8 @@
 
 Agent Usage is a clean Qx-native rewrite of the business intent behind Raycast's
 [Agent Usage](https://github.com/raycast/extensions/tree/22d64eb97c47ca6ddf9d53444e7ee4375a0b2134/extensions/agent-usage).
+
+The plugin can also publish its normalized, token-free quota snapshot to the Qx Home Dashboard. Enable **Agent Usage** from the Home three-dot menu; selecting a provider opens the full Workbench for refresh, sign-in, and details.
 No Raycast UI, runtime shim, or converter output is included.
 
 The 1.0 release focuses on two provider paths that were verified against their

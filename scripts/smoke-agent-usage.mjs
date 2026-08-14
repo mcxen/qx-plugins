@@ -3,10 +3,10 @@ import { Buffer } from "node:buffer";
 import { readFile } from "node:fs/promises";
 
 const manifest = JSON.parse(await readFile(new URL("../src/agent-usage/manifest.json", import.meta.url), "utf8"));
-assert.equal(manifest.version, "1.1.0");
+assert.equal(manifest.version, "1.2.0");
 assert.equal(
   manifest.min_app_version,
-  "0.6.50",
+  "0.6.87",
   "marketplace compatibility must match the newest host API actually used by the plugin",
 );
 assert.deepEqual(manifest.storage?.cacheTargets, [{
@@ -16,6 +16,18 @@ assert.deepEqual(manifest.storage?.cacheTargets, [{
   keys: ["agent-usage.snapshot.v1"],
   retentionDays: 7,
 }], "cacheTargets must use the host's required id/keys schema");
+assert.deepEqual(manifest.surfaceProviders, [{
+  id: "usage-overview",
+  source: "agent.usage",
+  surfaces: ["home"],
+  presentation: "wide",
+  titles: { en: "Agent Usage", "zh-CN": "Agent 用量" },
+  descriptions: {
+    en: "Show cached Codex and Grok quota windows on the Qx Home Dashboard.",
+    "zh-CN": "在 Qx 主页 Dashboard 显示缓存的 Codex 与 Grok 配额窗口。",
+  },
+  defaultEnabled: false,
+}], "Home integration must remain a declarative cache-only provider");
 
 const moduleUrl = new URL("../src/agent-usage/index.js", import.meta.url);
 moduleUrl.searchParams.set("smoke", String(Date.now()));

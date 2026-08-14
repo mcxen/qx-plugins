@@ -13,6 +13,14 @@
     ],
     "agent-usage": [
       {
+        "version": "1.2.0",
+        "published_at": "2026-08-14",
+        "notes_localizations": {
+          "en": "Adds a host-rendered Home Dashboard card for cached Codex and Grok quota windows without loading the plugin runtime or exposing credentials.",
+          "zh-CN": "新增宿主绘制的主页 Dashboard 卡片，直接显示缓存的 Codex 与 Grok 配额窗口，无需加载插件运行时或暴露凭据。"
+        }
+      },
+      {
         "version": "1.1.0",
         "published_at": "2026-08-13",
         "notes_localizations": {

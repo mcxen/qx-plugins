@@ -5,7 +5,7 @@
     "en": "Agent Usage",
     "zh-CN": "Agent 用量"
   },
-  "version": "1.1.0",
+  "version": "1.2.0",
   "description": "Lightweight Qx-native Codex and Grok quota overview using local CLI sessions.",
   "descriptions": {
     "en": "Check Codex and Grok quota windows from local CLI sessions in a lightweight native Workbench.",
@@ -68,13 +68,30 @@
       }
     ]
   },
+  "surfaceProviders": [
+    {
+      "id": "usage-overview",
+      "source": "agent.usage",
+      "surfaces": ["home"],
+      "presentation": "wide",
+      "titles": {
+        "en": "Agent Usage",
+        "zh-CN": "Agent 用量"
+      },
+      "descriptions": {
+        "en": "Show cached Codex and Grok quota windows on the Qx Home Dashboard.",
+        "zh-CN": "在 Qx 主页 Dashboard 显示缓存的 Codex 与 Grok 配额窗口。"
+      },
+      "defaultEnabled": false
+    }
+  ],
   "entry": "index.js",
   "panel": {
     "title": "Agent Usage",
     "icon": "icon.svg",
     "keywords": ["agent", "usage", "quota", "codex", "grok", "用量", "额度"]
   },
-  "min_app_version": "0.6.50",
+  "min_app_version": "0.6.87",
   "platforms": ["macos", "windows"],
   "screenshots": []
 }
