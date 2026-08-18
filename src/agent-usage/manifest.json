@@ -5,7 +5,7 @@
     "en": "Agent Usage",
     "zh-CN": "Agent 用量"
   },
-  "version": "1.2.1",
+  "version": "1.2.2",
   "description": "Lightweight Qx-native Codex and Grok quota overview using local CLI sessions.",
   "descriptions": {
     "en": "Check Codex and Grok quota windows from local CLI sessions in a lightweight native Workbench.",

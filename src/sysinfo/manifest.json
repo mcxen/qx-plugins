@@ -5,7 +5,7 @@
     "en": "Sysinfo",
     "zh-CN": "系统信息"
   },
-  "version": "1.4.2",
+  "version": "1.4.3",
   "description": "Native Qx System Monitor for CPU, memory, power, storage, displays, network, and processes on macOS and Windows.",
   "descriptions": {
     "en": "Lightweight native hardware monitor for CPU, memory, power, storage, displays, network, and processes.",

@@ -4,7 +4,7 @@
     {
       "id": "agent-usage",
       "name": "Agent Usage",
-      "version": "1.2.1",
+      "version": "1.2.2",
       "description": "Lightweight Qx-native Codex and Grok quota overview using local CLI sessions.",
       "names": {
         "en": "Agent Usage",
@@ -15,8 +15,8 @@
         "zh-CN": "在轻量原生 Workbench 中读取本机 CLI 登录态，查看 Codex 与 Grok 配额窗口。"
       },
       "download_url": "https://raw.githubusercontent.com/mcxen/qx-plugins/main/agent-usage.qx-plugin",
-      "size_bytes": 330137,
-      "checksum_sha256": "dd10c4fec5eab121fc7cac9bb50586b9b5083a960b9fe74a2d81f667ce2d6814",
+      "size_bytes": 2503589,
+      "checksum_sha256": "83f0f22d91f75a4bde80fa291ae0fdfb6a32e8035f58dbf7efc03992ffa4619e",
       "required_permissions": [
         "http",
         "open-url",
@@ -32,6 +32,14 @@
         "windows"
       ],
       "releases": [
+        {
+          "version": "1.2.2",
+          "published_at": "2026-08-18",
+          "notes_localizations": {
+            "en": "Publishes the refined Qx oil-print plugin icon with a consistent rounded paper frame and safer subject bounds.",
+            "zh-CN": "发布优化后的 Qx 油印风格插件图标，统一圆角纸张外框并调整主体安全范围。"
+          }
+        },
         {
           "version": "1.2.1",
           "published_at": "2026-08-18",
@@ -77,7 +85,7 @@
     {
       "id": "another-boring-piece",
       "name": "Art Wallpapers",
-      "version": "1.0.1",
+      "version": "1.0.2",
       "description": "Another boring piece. Daily. Hand-picked fine-art wallpapers from anotherboring.day.",
       "names": {
         "en": "Art Wallpapers",
@@ -88,8 +96,8 @@
         "zh-CN": "Another boring piece. Daily. 浏览每日精选艺术作品，设置或下载壁纸，并保留本地操作历史。"
       },
       "download_url": "https://raw.githubusercontent.com/mcxen/qx-plugins/main/another-boring-piece.qx-plugin",
-      "size_bytes": 369347,
-      "checksum_sha256": "05f323701b8d79d6f7d0ca133a0bf6d3d286d974aa1e456618c35232db23d865",
+      "size_bytes": 3233265,
+      "checksum_sha256": "bac15b4dcc0e056c962efbfe8c9db6830d4f015db482ac15f7a900ce91656a7d",
       "required_permissions": [
         "http",
         "open-url",
@@ -108,6 +116,14 @@
         "windows"
       ],
       "releases": [
+        {
+          "version": "1.0.2",
+          "published_at": "2026-08-18",
+          "notes_localizations": {
+            "en": "Publishes the refined Qx oil-print plugin icon with a consistent rounded paper frame and safer subject bounds.",
+            "zh-CN": "发布优化后的 Qx 油印风格插件图标，统一圆角纸张外框并调整主体安全范围。"
+          }
+        },
         {
           "version": "1.0.1",
           "published_at": "2026-08-18",
@@ -129,7 +145,7 @@
     {
       "id": "brew",
       "name": "Brew",
-      "version": "1.1.2",
+      "version": "1.1.3",
       "description": "Search, inspect, upgrade and uninstall Homebrew formulae & casks (macOS). Uses Qx context.cli.",
       "names": {
         "en": "Brew",
@@ -140,8 +156,8 @@
         "zh-CN": "在 macOS 上搜索、查看、更新和卸载 Homebrew formula 与 cask。"
       },
       "download_url": "https://raw.githubusercontent.com/mcxen/qx-plugins/main/brew.qx-plugin",
-      "size_bytes": 4365868,
-      "checksum_sha256": "674e1eead29a1169eeaf366060059659f6b31cc4c159e6bb2b19882c1fd889ea",
+      "size_bytes": 6939317,
+      "checksum_sha256": "dcc66c58a4bba20a22962d40c45045f15fe1878a4c04924a58e578a8f986b471",
       "required_permissions": [
         "cli",
         "notifications",
@@ -154,6 +170,14 @@
         "macos"
       ],
       "releases": [
+        {
+          "version": "1.1.3",
+          "published_at": "2026-08-18",
+          "notes_localizations": {
+            "en": "Publishes the refined Qx oil-print plugin icon with a consistent rounded paper frame and safer subject bounds.",
+            "zh-CN": "发布优化后的 Qx 油印风格插件图标，统一圆角纸张外框并调整主体安全范围。"
+          }
+        },
         {
           "version": "1.1.2",
           "published_at": "2026-08-18",
@@ -183,7 +207,7 @@
     {
       "id": "clipboard-actions",
       "name": "Clipboard Actions",
-      "version": "1.0.1",
+      "version": "1.0.2",
       "description": "Paste clipboard text as plain text or save the current clipboard image without overwriting existing files.",
       "names": {
         "en": "Clipboard Actions",
@@ -194,8 +218,8 @@
         "zh-CN": "将剪贴板文字以纯文本粘贴，或将当前剪贴板图片保存为不会覆盖旧文件的新 PNG。"
       },
       "download_url": "https://raw.githubusercontent.com/mcxen/qx-plugins/main/clipboard-actions.qx-plugin",
-      "size_bytes": 284730,
-      "checksum_sha256": "60e6a900afcb20c67c5f47b110c96b80a77625bab8c51fe80b4fa0c041cc9b30",
+      "size_bytes": 3310832,
+      "checksum_sha256": "ff54664ff8dae1cc49704ffd17a4f2c5a938b66727569a22d07bb45cc421baac",
       "required_permissions": [
         "clipboard",
         "invoke:plugin_perform_paste",
@@ -211,6 +235,14 @@
         "windows"
       ],
       "releases": [
+        {
+          "version": "1.0.2",
+          "published_at": "2026-08-18",
+          "notes_localizations": {
+            "en": "Publishes the refined Qx oil-print plugin icon with a consistent rounded paper frame and safer subject bounds.",
+            "zh-CN": "发布优化后的 Qx 油印风格插件图标，统一圆角纸张外框并调整主体安全范围。"
+          }
+        },
         {
           "version": "1.0.1",
           "published_at": "2026-08-18",
@@ -232,7 +264,7 @@
     {
       "id": "external-display-control",
       "name": "External Display Control",
-      "version": "1.2.5",
+      "version": "1.2.6",
       "description": "Adjust built-in and external display brightness through Qx's native macOS and Windows display service.",
       "names": {
         "en": "Display Brightness",
@@ -243,8 +275,8 @@
         "zh-CN": "通过 Qx 原生显示器服务调节内置和外接显示器亮度。"
       },
       "download_url": "https://raw.githubusercontent.com/mcxen/qx-plugins/main/external-display-control.qx-plugin",
-      "size_bytes": 331680,
-      "checksum_sha256": "3074c0a9ec4da3e26c999e23c3301bf0e6458fa85982e8fb458f4aee0b0e3c55",
+      "size_bytes": 2899294,
+      "checksum_sha256": "b86f3fe7ef6f7efa16d1dbc32c6d0a644dd2c63f26b28e594623c7319b1a85c8",
       "required_permissions": [
         "tray",
         "system",
@@ -259,6 +291,14 @@
         "windows"
       ],
       "releases": [
+        {
+          "version": "1.2.6",
+          "published_at": "2026-08-18",
+          "notes_localizations": {
+            "en": "Publishes the refined Qx oil-print plugin icon with a consistent rounded paper frame and safer subject bounds.",
+            "zh-CN": "发布优化后的 Qx 油印风格插件图标，统一圆角纸张外框并调整主体安全范围。"
+          }
+        },
         {
           "version": "1.2.5",
           "published_at": "2026-08-18",
@@ -471,7 +511,7 @@
     {
       "id": "pomodoro-island",
       "name": "Pomodoro Island",
-      "version": "1.6.3",
+      "version": "1.6.4",
       "description": "Reference plugin for declarative Workbench and the structured QxIsland session protocol, with persistent background timing and history.",
       "names": {
         "en": "Pomodoro Island",
@@ -482,8 +522,8 @@
         "zh-CN": "带休息提醒的专注计时器。"
       },
       "download_url": "https://raw.githubusercontent.com/mcxen/qx-plugins/main/pomodoro-island.qx-plugin",
-      "size_bytes": 373330,
-      "checksum_sha256": "f4735ae9c008edadb50911e9acaf4ece542457fba77ea3d1952bc1938f39f9f6",
+      "size_bytes": 2949715,
+      "checksum_sha256": "5fbe69778611d5f26f0a0faa183bbfca871c16c9bbbec7f234ff4735f7c1cb8b",
       "required_permissions": [
         "island",
         "notifications"
@@ -496,6 +536,14 @@
         "windows"
       ],
       "releases": [
+        {
+          "version": "1.6.4",
+          "published_at": "2026-08-18",
+          "notes_localizations": {
+            "en": "Publishes the refined Qx oil-print plugin icon with a consistent rounded paper frame and safer subject bounds.",
+            "zh-CN": "发布优化后的 Qx 油印风格插件图标，统一圆角纸张外框并调整主体安全范围。"
+          }
+        },
         {
           "version": "1.6.3",
           "published_at": "2026-08-18",
@@ -525,7 +573,7 @@
     {
       "id": "raycast-calendar",
       "name": "Quick Calendar",
-      "version": "1.2.2",
+      "version": "1.2.3",
       "description": "View calendar month-by-month",
       "names": {
         "en": "Quick Calendar",
@@ -536,8 +584,8 @@
         "zh-CN": "按月浏览日历。"
       },
       "download_url": "https://raw.githubusercontent.com/mcxen/qx-plugins/main/raycast-calendar.qx-plugin",
-      "size_bytes": 3778089,
-      "checksum_sha256": "1dc2f0e3dec344dd249657c25eafb9ef557bd6ad87fd8c52d7609b204fcde3e4",
+      "size_bytes": 6632012,
+      "checksum_sha256": "f1c7e9b123b8fbdbf97c3554f32fc68c379c6c3640792b3c97acc2b87de95022",
       "required_permissions": [
         "http",
         "open-url",
@@ -551,6 +599,14 @@
         "windows"
       ],
       "releases": [
+        {
+          "version": "1.2.3",
+          "published_at": "2026-08-18",
+          "notes_localizations": {
+            "en": "Publishes the refined Qx oil-print plugin icon with a consistent rounded paper frame and safer subject bounds.",
+            "zh-CN": "发布优化后的 Qx 油印风格插件图标，统一圆角纸张外框并调整主体安全范围。"
+          }
+        },
         {
           "version": "1.2.2",
           "published_at": "2026-08-18",
@@ -580,7 +636,7 @@
     {
       "id": "qx-bing-wallpaper",
       "name": "Qx Bing Wallpaper",
-      "version": "2.2.3",
+      "version": "2.2.4",
       "description": "Browse Bing's daily images in a native Qx thumbnail list, then download or set them as wallpaper.",
       "names": {
         "en": "Qx Bing Wallpaper",
@@ -591,8 +647,8 @@
         "zh-CN": "浏览必应每日图片，下载图片或将其设为壁纸。"
       },
       "download_url": "https://raw.githubusercontent.com/mcxen/qx-plugins/main/qx-bing-wallpaper.qx-plugin",
-      "size_bytes": 12080960,
-      "checksum_sha256": "865f75babd2e2f5e23eaa41f22634782110f04a5698ae66095bb30d607dceee9",
+      "size_bytes": 14717400,
+      "checksum_sha256": "3474ce4ad03dbd988b5cb23f1d815d69ea0ba5dfb2b531dce36534a0005d677b",
       "required_permissions": [
         "http",
         "open-url",
@@ -610,6 +666,14 @@
         "windows"
       ],
       "releases": [
+        {
+          "version": "2.2.4",
+          "published_at": "2026-08-18",
+          "notes_localizations": {
+            "en": "Publishes the refined Qx oil-print plugin icon with a consistent rounded paper frame and safer subject bounds.",
+            "zh-CN": "发布优化后的 Qx 油印风格插件图标，统一圆角纸张外框并调整主体安全范围。"
+          }
+        },
         {
           "version": "2.2.3",
           "published_at": "2026-08-18",
@@ -839,7 +903,7 @@
     {
       "id": "qxgh",
       "name": "QxGH",
-      "version": "1.5.7",
+      "version": "1.5.8",
       "description": "QxGH — watch GitHub Actions and Releases from public github.com pages (no REST API). Business-only workbench UI.",
       "names": {
         "zh-CN": "Github助手",
@@ -850,8 +914,8 @@
         "zh-CN": "监控公开 GitHub 仓库的 Actions 运行与 Releases，并显示构建状态、预计进度和灵动岛提醒。"
       },
       "download_url": "https://raw.githubusercontent.com/mcxen/qx-plugins/main/qxgh.qx-plugin",
-      "size_bytes": 353288,
-      "checksum_sha256": "a2a1e3149849bb9fbfbe2b027b2cc8f783d4efcd9d1f9223d5bcfe2b25e51756",
+      "size_bytes": 3052780,
+      "checksum_sha256": "2e23ec1b68b0e4e1b4b1ec5d630b6f4f0f8e9a65995647f2bf8808ac2c2f2318",
       "required_permissions": [
         "http",
         "open-url",
@@ -867,6 +931,14 @@
         "windows"
       ],
       "releases": [
+        {
+          "version": "1.5.8",
+          "published_at": "2026-08-18",
+          "notes_localizations": {
+            "en": "Publishes the refined Qx oil-print plugin icon with a consistent rounded paper frame and safer subject bounds.",
+            "zh-CN": "发布优化后的 Qx 油印风格插件图标，统一圆角纸张外框并调整主体安全范围。"
+          }
+        },
         {
           "version": "1.5.7",
           "published_at": "2026-08-18",
@@ -952,7 +1024,7 @@
     {
       "id": "qxgold",
       "name": "QxGold",
-      "version": "1.2.2",
+      "version": "1.2.3",
       "description": "Live JD accumulated-gold quotes with locally sampled history.",
       "names": {
         "zh-CN": "金价追踪",
@@ -963,8 +1035,8 @@
         "en": "Live JD accumulated-gold quotes with locally sampled history."
       },
       "download_url": "https://raw.githubusercontent.com/mcxen/qx-plugins/main/qxgold.qx-plugin",
-      "size_bytes": 358410,
-      "checksum_sha256": "3a24e12231a8036ccaf94bb9e06d44412b8286213479313d7cdbb3bed0ac6ce7",
+      "size_bytes": 3002791,
+      "checksum_sha256": "ae6f4394dc50d7c69456f14e9e70ac0f353d36b3c3c0919d6774a5769c353fa1",
       "required_permissions": [
         "http",
         "island"
@@ -977,6 +1049,14 @@
         "windows"
       ],
       "releases": [
+        {
+          "version": "1.2.3",
+          "published_at": "2026-08-18",
+          "notes_localizations": {
+            "en": "Publishes the refined Qx oil-print plugin icon with a consistent rounded paper frame and safer subject bounds.",
+            "zh-CN": "发布优化后的 Qx 油印风格插件图标，统一圆角纸张外框并调整主体安全范围。"
+          }
+        },
         {
           "version": "1.2.2",
           "published_at": "2026-08-18",
@@ -1205,7 +1285,7 @@
     {
       "id": "qxpicture",
       "name": "Qxpicture",
-      "version": "0.5.2",
+      "version": "0.5.3",
       "description": "Browse random image APIs, save images, copy them, and set desktop wallpaper.",
       "names": {
         "zh-CN": "Qxpicture 随机图片",
@@ -1216,8 +1296,8 @@
         "en": "Browse random image APIs, save images, copy them, and set desktop wallpaper."
       },
       "download_url": "https://raw.githubusercontent.com/mcxen/qx-plugins/main/qxpicture.qx-plugin",
-      "size_bytes": 357098,
-      "checksum_sha256": "b02dd5896b3339cb836a9b14c5ab3d393ce57d98f1ec8bb1391b7e0d0bf40cae",
+      "size_bytes": 3273225,
+      "checksum_sha256": "b6af303511450898863668a2cbb471665e6004f8a2707f04b87ac49837178b82",
       "required_permissions": [
         "storage",
         "http",
@@ -1237,6 +1317,14 @@
         "windows"
       ],
       "releases": [
+        {
+          "version": "0.5.3",
+          "published_at": "2026-08-18",
+          "notes_localizations": {
+            "en": "Publishes the refined Qx oil-print plugin icon with a consistent rounded paper frame and safer subject bounds.",
+            "zh-CN": "发布优化后的 Qx 油印风格插件图标，统一圆角纸张外框并调整主体安全范围。"
+          }
+        },
         {
           "version": "0.5.2",
           "published_at": "2026-08-18",
@@ -1569,7 +1657,7 @@
     {
       "id": "sysinfo",
       "name": "Sysinfo",
-      "version": "1.4.2",
+      "version": "1.4.3",
       "description": "Native Qx System Monitor for CPU, memory, power, storage, displays, network, and processes on macOS and Windows.",
       "names": {
         "en": "Sysinfo",
@@ -1580,8 +1668,8 @@
         "zh-CN": "轻量原生硬件监视器：查看 CPU、内存、电源、存储、显示器、网络与进程信息。"
       },
       "download_url": "https://raw.githubusercontent.com/mcxen/qx-plugins/main/sysinfo.qx-plugin",
-      "size_bytes": 381006,
-      "checksum_sha256": "745ee9fd93fd5cd9bdec6e27df63c69c067a867bc50780c91b2011600dd0adaf",
+      "size_bytes": 2825889,
+      "checksum_sha256": "7fe077260d4b05e4bf5af45c703281458eff9318f064ed3e46a17de8d8e05830",
       "required_permissions": [
         "system",
         "system-stats",
@@ -1597,6 +1685,14 @@
         "windows"
       ],
       "releases": [
+        {
+          "version": "1.4.3",
+          "published_at": "2026-08-18",
+          "notes_localizations": {
+            "en": "Publishes the refined Qx oil-print plugin icon with a consistent rounded paper frame and safer subject bounds.",
+            "zh-CN": "发布优化后的 Qx 油印风格插件图标，统一圆角纸张外框并调整主体安全范围。"
+          }
+        },
         {
           "version": "1.4.2",
           "published_at": "2026-08-18",
@@ -1812,7 +1908,7 @@
     {
       "id": "weather",
       "name": "Weather",
-      "version": "1.0.2",
+      "version": "1.0.3",
       "description": "Current conditions and multi-day forecast via Open-Meteo (or OpenWeatherMap). Cached for fast reopen.",
       "names": {
         "en": "Weather",
@@ -1823,8 +1919,8 @@
         "zh-CN": "通过 Open-Meteo 或 OpenWeatherMap 查看当前天气和多日预报。"
       },
       "download_url": "https://raw.githubusercontent.com/mcxen/qx-plugins/main/weather.qx-plugin",
-      "size_bytes": 282779,
-      "checksum_sha256": "abd3a2fd9817970d32ee4ee5da29bf4183ccf81428c5918e605ea83f5a90b673",
+      "size_bytes": 2570136,
+      "checksum_sha256": "192dbacf6776b07356f2113d123cba15842103e3688104acd430cd30435b1db7",
       "required_permissions": [
         "http",
         "open-url",
@@ -1843,6 +1939,14 @@
         "windows"
       ],
       "releases": [
+        {
+          "version": "1.0.3",
+          "published_at": "2026-08-18",
+          "notes_localizations": {
+            "en": "Publishes the refined Qx oil-print plugin icon with a consistent rounded paper frame and safer subject bounds.",
+            "zh-CN": "发布优化后的 Qx 油印风格插件图标，统一圆角纸张外框并调整主体安全范围。"
+          }
+        },
         {
           "version": "1.0.2",
           "published_at": "2026-08-18",
