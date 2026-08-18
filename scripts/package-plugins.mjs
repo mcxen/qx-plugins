@@ -51,7 +51,13 @@ async function listPackageFiles(pluginDir, prefix = "") {
     const relativePath = prefix ? path.posix.join(prefix, entry.name) : entry.name;
     if (entry.isDirectory()) {
       files.push(...await listPackageFiles(pluginDir, relativePath));
-    } else if (entry.isFile() && !entry.name.endsWith(".source.js")) {
+    } else if (
+      entry.isFile()
+      && !entry.name.endsWith(".source.js")
+      // Keep design explorations in the source tree without shipping them in
+      // the installable archive. Manifest-declared icon-generated.png remains.
+      && !/^icon-generated-v\d+\.(?:png|jpe?g|webp)$/i.test(entry.name)
+    ) {
       files.push(relativePath);
     }
   }

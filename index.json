@@ -411,8 +411,8 @@
         "zh-CN": "浏览 Hacker News 最新帖子、正文与评论。"
       },
       "download_url": "https://raw.githubusercontent.com/mcxen/qx-plugins/main/hacker-news.qx-plugin",
-      "size_bytes": 320260,
-      "checksum_sha256": "fc3a1f3ef3c184f24207ef6ad0826b063e5c3083c07aa6bb614a914b48e3581f",
+      "size_bytes": 2815969,
+      "checksum_sha256": "6e51cd505698643a21c10c8cc9317d6598e0cdc187e21da46d084f439727b960",
       "required_permissions": [
         "http",
         "open-url",
@@ -666,8 +666,8 @@
         "en": "Browse Coolapk community feeds and read complete posts, images, and replies in Qx."
       },
       "download_url": "https://raw.githubusercontent.com/mcxen/qx-plugins/main/qxcoolapk.qx-plugin",
-      "size_bytes": 387435,
-      "checksum_sha256": "674ef5fcb4235e55c913268e7a12f35baad2ad2e59d8a21d3a2927314da27c62",
+      "size_bytes": 2965720,
+      "checksum_sha256": "e428588613b0e33f5f95fa79c78efb0a98da81fc01de81ebd07967b74dd8a4b7",
       "required_permissions": [
         "http",
         "open-url",
@@ -1033,8 +1033,8 @@
         "zh-CN": "浏览小黑盒社区推荐内容，在 Qx 内查看正文、多图、帖子信息与匿名优先评论。"
       },
       "download_url": "https://raw.githubusercontent.com/mcxen/qx-plugins/main/qxheihe.qx-plugin",
-      "size_bytes": 356530,
-      "checksum_sha256": "74d8be7bd7c4786e2dd2daaa4dd8ec2ab80e62c91713af0e5447871d41b70bd4",
+      "size_bytes": 3328182,
+      "checksum_sha256": "f713e1ea9b1a6070faa84810b6af2604b5ef3f51240b1873750752ef6fcb1b1d",
       "required_permissions": [
         "http",
         "open-url",
@@ -1293,8 +1293,8 @@
         "zh-CN": "聚合浏览多个百度贴吧的公开帖子流，在 Qx 内阅读正文与楼层评论。"
       },
       "download_url": "https://raw.githubusercontent.com/mcxen/qx-plugins/main/qxtieba.qx-plugin",
-      "size_bytes": 626903,
-      "checksum_sha256": "c043dc242c1c4a205afafc8708829e09267d5a91ba164a7c0c4c33819b7e4add",
+      "size_bytes": 3330023,
+      "checksum_sha256": "5cbf374e39a2e65c63b14395bec86f6217ed27a7fd1603773bfb47438ffa4bb2",
       "required_permissions": [
         "http",
         "open-url",
@@ -1452,8 +1452,8 @@
         "en": "Read configured Weibo users, an aggregated following feed, comments, and proxied images in Qx."
       },
       "download_url": "https://raw.githubusercontent.com/mcxen/qx-plugins/main/qxweibo.qx-plugin",
-      "size_bytes": 435383,
-      "checksum_sha256": "a2402754da24f4f38aaf9323b9474563e9fd422f56f53502f7f385908eb3a314",
+      "size_bytes": 3191760,
+      "checksum_sha256": "605c3dbc2e94f94fab186cf306b87d794277fb0543e0b5e097101d18c944b974",
       "required_permissions": [
         "http",
         "open-url",
@@ -1669,8 +1669,8 @@
         "zh-CN": "搜索 Unsplash 图片，下载并设置桌面壁纸。"
       },
       "download_url": "https://raw.githubusercontent.com/mcxen/qx-plugins/main/unsplash.qx-plugin",
-      "size_bytes": 6644569,
-      "checksum_sha256": "949d66fc04ee91cc5c83f2116d6c224c6977216c1f16776295c44644c4fc78a7",
+      "size_bytes": 9497000,
+      "checksum_sha256": "65090906f3ba5d83f3e3323f30426c23739d84bc6823f196ebfa57456c9a0e3c",
       "required_permissions": [
         "http",
         "open-url",
@@ -1729,8 +1729,8 @@
         "zh-CN": "通过 Workbench 列表/详情浏览 V2EX 最新、热门与节点主题，支持回复与宿主缓存接口。"
       },
       "download_url": "https://raw.githubusercontent.com/mcxen/qx-plugins/main/v2ex.qx-plugin",
-      "size_bytes": 351964,
-      "checksum_sha256": "b87b152ab2be9a88bfec57a9389a6f6fb3dab68a585faf0c76ac86df02fec778",
+      "size_bytes": 3045657,
+      "checksum_sha256": "e566155575cbb9d6af6812e887d129c5616f323dc0da17bb3342672b1c1725f3",
       "required_permissions": [
         "http",
         "open-url",
