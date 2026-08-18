@@ -36,6 +36,17 @@ async function readManifestScreenshots(pluginDir) {
   }
 }
 
+async function readManifestIcon(pluginDir) {
+  const manifestPath = path.join(pluginDir, "manifest.json");
+  if (!existsSync(manifestPath)) return "";
+  try {
+    const manifest = JSON.parse(await readFile(manifestPath, "utf8"));
+    return typeof manifest.icon === "string" ? manifest.icon.trim() : "";
+  } catch {
+    return "";
+  }
+}
+
 /** Fall back: numbered preview assets in the plugin folder. */
 async function discoverLooseScreenshots(pluginDir, declared) {
   if (declared.length > 0) return declared;
@@ -104,7 +115,11 @@ async function main() {
 
     // Icons
     let picked = null;
-    for (const name of ICON_CANDIDATES) {
+    const manifestIcon = await readManifestIcon(pluginDir);
+    const iconCandidates = [manifestIcon, ...ICON_CANDIDATES]
+      .filter(Boolean)
+      .filter((name, index, values) => values.indexOf(name) === index);
+    for (const name of iconCandidates) {
       const full = path.join(pluginDir, name);
       if (existsSync(full)) {
         picked = { full, name };

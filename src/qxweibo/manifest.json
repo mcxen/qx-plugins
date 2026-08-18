@@ -5,14 +5,14 @@
     "zh-CN": "QxWeibo 微博",
     "en": "QxWeibo"
   },
-  "version": "1.1.8",
+  "version": "1.1.9",
   "description": "Read configured Weibo users, an aggregated following feed, comments, and proxied images in Qx.",
   "descriptions": {
     "zh-CN": "在 Qx 中阅读指定微博用户、聚合关注流、评论区和代理图片。",
     "en": "Read configured Weibo users, an aggregated following feed, comments, and proxied images in Qx."
   },
   "author": "Qx",
-  "icon": "icon.svg",
+  "icon": "icon-generated.png",
   "keywords": [
     "weibo",
     "微博",
@@ -266,7 +266,7 @@
   "entry": "index.js",
   "panel": {
     "title": "QxWeibo 微博",
-    "icon": "icon.svg",
+    "icon": "icon-generated.png",
     "keywords": [
       "weibo",
       "微博",

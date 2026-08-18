@@ -5,14 +5,14 @@
     "en": "Agent Usage",
     "zh-CN": "Agent 用量"
   },
-  "version": "1.2.0",
+  "version": "1.2.1",
   "description": "Lightweight Qx-native Codex and Grok quota overview using local CLI sessions.",
   "descriptions": {
     "en": "Check Codex and Grok quota windows from local CLI sessions in a lightweight native Workbench.",
     "zh-CN": "在轻量原生 Workbench 中读取本机 CLI 登录态，查看 Codex 与 Grok 配额窗口。"
   },
   "author": "mcx",
-  "icon": "icon.svg",
+  "icon": "icon-generated.png",
   "keywords": [
     "agent",
     "usage",
@@ -35,7 +35,10 @@
     {
       "id": "showCodex",
       "label": "Show Codex",
-      "labels": { "en": "Show Codex", "zh-CN": "显示 Codex" },
+      "labels": {
+        "en": "Show Codex",
+        "zh-CN": "显示 Codex"
+      },
       "type": "boolean",
       "default": true,
       "description": "Read the official Codex CLI session and show quota windows. Sign in from the plugin panel.",
@@ -47,7 +50,10 @@
     {
       "id": "showGrok",
       "label": "Show Grok",
-      "labels": { "en": "Show Grok", "zh-CN": "显示 Grok" },
+      "labels": {
+        "en": "Show Grok",
+        "zh-CN": "显示 Grok"
+      },
       "type": "boolean",
       "default": true,
       "description": "Read the official Grok CLI session and show credits. Sign in from the plugin panel.",
@@ -63,7 +69,9 @@
         "id": "usage-snapshot",
         "label": "Agent usage snapshot",
         "description": "Normalized Codex and Grok quota snapshots without local tokens or raw responses.",
-        "keys": ["agent-usage.snapshot.v1"],
+        "keys": [
+          "agent-usage.snapshot.v1"
+        ],
         "retentionDays": 7
       }
     ]
@@ -72,7 +80,9 @@
     {
       "id": "usage-overview",
       "source": "agent.usage",
-      "surfaces": ["home"],
+      "surfaces": [
+        "home"
+      ],
       "presentation": "wide",
       "titles": {
         "en": "Agent Usage",
@@ -88,10 +98,21 @@
   "entry": "index.js",
   "panel": {
     "title": "Agent Usage",
-    "icon": "icon.svg",
-    "keywords": ["agent", "usage", "quota", "codex", "grok", "用量", "额度"]
+    "icon": "icon-generated.png",
+    "keywords": [
+      "agent",
+      "usage",
+      "quota",
+      "codex",
+      "grok",
+      "用量",
+      "额度"
+    ]
   },
   "min_app_version": "0.6.87",
-  "platforms": ["macos", "windows"],
+  "platforms": [
+    "macos",
+    "windows"
+  ],
   "screenshots": []
 }

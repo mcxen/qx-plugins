@@ -1,10 +1,10 @@
 {
   "id": "qxtieba",
   "name": "QxTieba 贴吧",
-  "version": "1.2.0",
+  "version": "1.2.1",
   "description": "聚合浏览多个百度贴吧的公开帖子流，在 Qx 内阅读正文与楼层评论。",
   "author": "Qx",
-  "icon": "icon.svg",
+  "icon": "icon-generated.png",
   "keywords": [
     "贴吧",
     "百度贴吧",
@@ -136,7 +136,7 @@
   "entry": "index.js",
   "panel": {
     "title": "QxTieba 贴吧",
-    "icon": "icon.svg",
+    "icon": "icon-generated.png",
     "keywords": [
       "贴吧",
       "百度贴吧",

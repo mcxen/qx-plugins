@@ -6,10 +6,17 @@ on:
     paths:
       - "store/**"
       - "index.json"
+      - "src/**/manifest.json"
+      - "src/**/icon-generated.png"
       - "src/**/icon.*"
       - "src/**/extension-icon.png"
       - "src/**/command-icon.png"
       - "src/**/bing-wallpaper-icon.png"
+      # Manifest screenshots may use plugin-specific names such as brew-1.png.
+      - "src/**/*.png"
+      - "src/**/*.jpg"
+      - "src/**/*.jpeg"
+      - "src/**/*.webp"
   workflow_dispatch:
 
 jobs:

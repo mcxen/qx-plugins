@@ -1,7 +1,7 @@
 {
   "id": "qx-bing-wallpaper",
   "name": "Qx Bing Wallpaper",
-  "version": "2.2.2",
+  "version": "2.2.3",
   "description": "Browse Bing's daily images in a native Qx thumbnail list, then download or set them as wallpaper.",
   "names": {
     "en": "Qx Bing Wallpaper",
@@ -12,14 +12,25 @@
     "zh-CN": "浏览必应每日图片，下载图片或将其设为壁纸。"
   },
   "author": "Qx",
-  "icon": "icon.svg",
+  "icon": "icon-generated.png",
   "screenshots": [
     "bing-wallpaper-1.png",
     "bing-wallpaper-2.png",
     "bing-wallpaper-3.png"
   ],
-  "platforms": ["macos", "windows"],
-  "keywords": ["bing", "wallpaper", "gallery", "daily image", "壁纸", "图库", "必应"],
+  "platforms": [
+    "macos",
+    "windows"
+  ],
+  "keywords": [
+    "bing",
+    "wallpaper",
+    "gallery",
+    "daily image",
+    "壁纸",
+    "图库",
+    "必应"
+  ],
   "permissions": [
     "http",
     "open-url",
@@ -46,8 +57,22 @@
         "zh-CN": "macOS：应用到所有桌面或仅当前桌面。"
       },
       "options": [
-        { "label": "Every Desktop", "labels": { "en": "Every Desktop", "zh-CN": "所有桌面" }, "value": "every" },
-        { "label": "Current Desktop", "labels": { "en": "Current Desktop", "zh-CN": "当前桌面" }, "value": "current" }
+        {
+          "label": "Every Desktop",
+          "labels": {
+            "en": "Every Desktop",
+            "zh-CN": "所有桌面"
+          },
+          "value": "every"
+        },
+        {
+          "label": "Current Desktop",
+          "labels": {
+            "en": "Current Desktop",
+            "zh-CN": "当前桌面"
+          },
+          "value": "current"
+        }
       ]
     },
     {
@@ -82,8 +107,22 @@
         "zh-CN": "选择每日任务使用最新图片还是随机图片。"
       },
       "options": [
-        { "label": "Latest Image", "labels": { "en": "Latest Image", "zh-CN": "最新图片" }, "value": "latest" },
-        { "label": "Random Recent Image", "labels": { "en": "Random Recent Image", "zh-CN": "近期随机图片" }, "value": "random" }
+        {
+          "label": "Latest Image",
+          "labels": {
+            "en": "Latest Image",
+            "zh-CN": "最新图片"
+          },
+          "value": "latest"
+        },
+        {
+          "label": "Random Recent Image",
+          "labels": {
+            "en": "Random Recent Image",
+            "zh-CN": "近期随机图片"
+          },
+          "value": "random"
+        }
       ]
     }
   ],
@@ -102,7 +141,11 @@
         "zh-CN": "立即设置一张近期随机必应壁纸。"
       },
       "icon": "random-wallpaper-icon.png",
-      "keywords": ["random", "bing", "wallpaper"],
+      "keywords": [
+        "random",
+        "bing",
+        "wallpaper"
+      ],
       "mode": "no-view"
     },
     {
@@ -118,7 +161,11 @@
         "zh-CN": "立即设置最新必应壁纸。"
       },
       "icon": "auto-switch-wallpaper-icon.png",
-      "keywords": ["latest", "bing", "wallpaper"],
+      "keywords": [
+        "latest",
+        "bing",
+        "wallpaper"
+      ],
       "mode": "no-view"
     },
     {
@@ -134,7 +181,12 @@
         "zh-CN": "每天应用一次配置的必应壁纸。"
       },
       "icon": "auto-switch-wallpaper-icon.png",
-      "keywords": ["daily", "automatic", "bing", "wallpaper"],
+      "keywords": [
+        "daily",
+        "automatic",
+        "bing",
+        "wallpaper"
+      ],
       "mode": "no-view",
       "interval": "1d"
     }
@@ -145,8 +197,15 @@
       "en": "Qx Bing Wallpaper",
       "zh-CN": "必应壁纸"
     },
-    "icon": "extension-icon.png",
-    "keywords": ["bing", "wallpaper", "gallery", "必应", "壁纸", "图库"]
+    "icon": "icon-generated.png",
+    "keywords": [
+      "bing",
+      "wallpaper",
+      "gallery",
+      "必应",
+      "壁纸",
+      "图库"
+    ]
   },
   "min_app_version": "0.6.13"
 }

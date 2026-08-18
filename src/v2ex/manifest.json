@@ -5,14 +5,14 @@
     "en": "V2EX",
     "zh-CN": "V2EX"
   },
-  "version": "3.1.1",
+  "version": "3.1.2",
   "description": "Browse V2EX latest, hot, and node topics with Workbench list/detail, replies, and cached host APIs.",
   "descriptions": {
     "en": "Browse V2EX latest, hot, and node topics with Workbench list/detail, replies, and cached host APIs.",
     "zh-CN": "通过 Workbench 列表/详情浏览 V2EX 最新、热门与节点主题，支持回复与宿主缓存接口。"
   },
   "author": "mcx",
-  "icon": "icon.svg",
+  "icon": "icon-generated.png",
   "keywords": [
     "v2ex",
     "forum",
@@ -92,7 +92,9 @@
         "id": "v2ex",
         "label": "V2EX cache",
         "description": "Topic lists, notifications, and per-topic replies. Safe to rebuild from V2EX.",
-        "keyPrefixes": ["v2ex.cache."],
+        "keyPrefixes": [
+          "v2ex.cache."
+        ],
         "retentionDays": 7
       }
     ]
@@ -138,6 +140,7 @@
     }
   ],
   "panel": {
+    "icon": "icon-generated.png",
     "keywords": [
       "v2ex",
       "forum",

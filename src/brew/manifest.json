@@ -1,7 +1,7 @@
 {
   "id": "brew",
   "name": "Brew",
-  "version": "1.1.1",
+  "version": "1.1.2",
   "description": "Search, inspect, upgrade and uninstall Homebrew formulae & casks (macOS). Uses Qx context.cli.",
   "names": {
     "en": "Brew",
@@ -12,7 +12,7 @@
     "zh-CN": "在 macOS 上搜索、查看、更新和卸载 Homebrew formula 与 cask。"
   },
   "author": "qx (ported from Raycast brew by nhojb et al.)",
-  "icon": "icon.svg",
+  "icon": "icon-generated.png",
   "screenshots": [
     "brew-1.png",
     "brew-2.png"
@@ -60,7 +60,7 @@
       "en": "Brew",
       "zh-CN": "Homebrew"
     },
-    "icon": "icon.png",
+    "icon": "icon-generated.png",
     "keywords": [
       "brew",
       "homebrew",

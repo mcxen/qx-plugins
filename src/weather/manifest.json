@@ -5,14 +5,14 @@
     "en": "Weather",
     "zh-CN": "天气"
   },
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "Current conditions and multi-day forecast via Open-Meteo (or OpenWeatherMap). Cached for fast reopen.",
   "descriptions": {
     "en": "Current conditions and multi-day forecast via Open-Meteo or OpenWeatherMap.",
     "zh-CN": "通过 Open-Meteo 或 OpenWeatherMap 查看当前天气和多日预报。"
   },
   "author": "mcx",
-  "icon": "icon.svg",
+  "icon": "icon-generated.png",
   "keywords": [
     "weather",
     "forecast",
@@ -126,7 +126,11 @@
         "en": "Force refresh weather data",
         "zh-CN": "强制刷新天气数据。"
       },
-      "keywords": ["weather", "refresh", "刷新"]
+      "keywords": [
+        "weather",
+        "refresh",
+        "刷新"
+      ]
     }
   ],
   "panel": {
@@ -135,10 +139,18 @@
       "en": "Weather",
       "zh-CN": "天气"
     },
-    "icon": "",
-    "keywords": ["weather", "forecast", "天气", "气温"]
+    "icon": "icon-generated.png",
+    "keywords": [
+      "weather",
+      "forecast",
+      "天气",
+      "气温"
+    ]
   },
   "min_app_version": "0.5.18",
-  "platforms": ["macos", "windows"],
+  "platforms": [
+    "macos",
+    "windows"
+  ],
   "screenshots": []
 }

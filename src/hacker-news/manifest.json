@@ -5,14 +5,14 @@
     "en": "Hacker News",
     "zh-CN": "Hacker News"
   },
-  "version": "1.1.1",
+  "version": "1.1.2",
   "description": "Browse the latest Hacker News stories with details and comments.",
   "descriptions": {
     "en": "Browse the latest Hacker News stories with details and comments.",
     "zh-CN": "浏览 Hacker News 最新帖子、正文与评论。"
   },
   "author": "mcx",
-  "icon": "",
+  "icon": "icon-generated.png",
   "keywords": [
     "hacker news",
     "hn",
@@ -45,9 +45,30 @@
         "zh-CN": "从 Hacker News 加载的最新帖子数量。"
       },
       "options": [
-        { "label": "20", "labels": { "en": "20", "zh-CN": "20" }, "value": "20" },
-        { "label": "30", "labels": { "en": "30", "zh-CN": "30" }, "value": "30" },
-        { "label": "50", "labels": { "en": "50", "zh-CN": "50" }, "value": "50" }
+        {
+          "label": "20",
+          "labels": {
+            "en": "20",
+            "zh-CN": "20"
+          },
+          "value": "20"
+        },
+        {
+          "label": "30",
+          "labels": {
+            "en": "30",
+            "zh-CN": "30"
+          },
+          "value": "30"
+        },
+        {
+          "label": "50",
+          "labels": {
+            "en": "50",
+            "zh-CN": "50"
+          },
+          "value": "50"
+        }
       ]
     },
     {
@@ -66,9 +87,30 @@
         "zh-CN": "后台刷新时仍显示缓存的帖子和评论。"
       },
       "options": [
-        { "label": "5", "labels": { "en": "5", "zh-CN": "5" }, "value": "5" },
-        { "label": "15", "labels": { "en": "15", "zh-CN": "15" }, "value": "15" },
-        { "label": "30", "labels": { "en": "30", "zh-CN": "30" }, "value": "30" }
+        {
+          "label": "5",
+          "labels": {
+            "en": "5",
+            "zh-CN": "5"
+          },
+          "value": "5"
+        },
+        {
+          "label": "15",
+          "labels": {
+            "en": "15",
+            "zh-CN": "15"
+          },
+          "value": "15"
+        },
+        {
+          "label": "30",
+          "labels": {
+            "en": "30",
+            "zh-CN": "30"
+          },
+          "value": "30"
+        }
       ]
     }
   ],
@@ -81,16 +123,30 @@
         "keys": [
           "hacker-news.stories.v1"
         ],
-        "keyPrefixes": ["hacker-news.comments.v1."],
+        "keyPrefixes": [
+          "hacker-news.comments.v1."
+        ],
         "retentionDays": 7
       }
     ]
   },
   "entry": "index.js",
   "panel": {
-    "keywords": ["hacker news", "hn", "news", "technology", "社区", "帖子", "评论"]
+    "icon": "icon-generated.png",
+    "keywords": [
+      "hacker news",
+      "hn",
+      "news",
+      "technology",
+      "社区",
+      "帖子",
+      "评论"
+    ]
   },
   "min_app_version": "0.6.87",
-  "platforms": ["macos", "windows"],
+  "platforms": [
+    "macos",
+    "windows"
+  ],
   "screenshots": []
 }

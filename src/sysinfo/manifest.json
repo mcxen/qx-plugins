@@ -5,14 +5,14 @@
     "en": "Sysinfo",
     "zh-CN": "系统信息"
   },
-  "version": "1.4.1",
+  "version": "1.4.2",
   "description": "Native Qx System Monitor for CPU, memory, power, storage, displays, network, and processes on macOS and Windows.",
   "descriptions": {
     "en": "Lightweight native hardware monitor for CPU, memory, power, storage, displays, network, and processes.",
     "zh-CN": "轻量原生硬件监视器：查看 CPU、内存、电源、存储、显示器、网络与进程信息。"
   },
   "author": "Qx",
-  "icon": "icon.svg",
+  "icon": "icon-generated.png",
   "keywords": [
     "system",
     "sysinfo",
@@ -40,16 +40,37 @@
       "en": "Sysinfo",
       "zh-CN": "系统信息"
     },
-    "icon": "icon.svg",
-    "keywords": ["system", "monitor", "processes", "系统", "性能"]
+    "icon": "icon-generated.png",
+    "keywords": [
+      "system",
+      "monitor",
+      "processes",
+      "系统",
+      "性能"
+    ]
   },
   "homeWidgets": [
-    { "id": "cpu", "source": "system.cpu" },
-    { "id": "memory", "source": "system.memory" },
-    { "id": "power", "source": "system.power" },
-    { "id": "network", "source": "system.network" }
+    {
+      "id": "cpu",
+      "source": "system.cpu"
+    },
+    {
+      "id": "memory",
+      "source": "system.memory"
+    },
+    {
+      "id": "power",
+      "source": "system.power"
+    },
+    {
+      "id": "network",
+      "source": "system.network"
+    }
   ],
   "min_app_version": "0.6.38",
-  "platforms": ["macos", "windows"],
+  "platforms": [
+    "macos",
+    "windows"
+  ],
   "screenshots": []
 }

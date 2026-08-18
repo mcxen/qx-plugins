@@ -1,10 +1,10 @@
 {
   "id": "external-display-control",
   "name": "External Display Control",
-  "version": "1.2.4",
+  "version": "1.2.5",
   "description": "Adjust built-in and external display brightness through Qx's native macOS and Windows display service.",
   "author": "mcx",
-  "icon": "icon.svg",
+  "icon": "icon-generated.png",
   "platforms": [
     "macos",
     "windows"
@@ -28,7 +28,7 @@
   "entry": "index.js",
   "panel": {
     "title": "Display Brightness",
-    "icon": "",
+    "icon": "icon-generated.png",
     "keywords": [
       "display",
       "monitor",

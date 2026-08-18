@@ -5,14 +5,14 @@
     "en": "Unsplash",
     "zh-CN": "Unsplash"
   },
-  "version": "1.2.1",
+  "version": "1.2.2",
   "description": "Search Unsplash photos, download, and set desktop wallpaper. Ported for Qx (Access Key API; likes/OAuth not included).",
   "descriptions": {
     "en": "Search Unsplash photos, download, and set desktop wallpaper.",
     "zh-CN": "搜索 Unsplash 图片，下载并设置桌面壁纸。"
   },
   "author": "qx (ported from Raycast unsplash)",
-  "icon": "icon.svg",
+  "icon": "icon-generated.png",
   "screenshots": [
     "unsplash-1.png",
     "unsplash-2.png"
@@ -73,10 +73,38 @@
         "zh-CN": "下载和壁纸使用的图片尺寸。"
       },
       "options": [
-        { "label": "Raw", "labels": { "en": "Raw", "zh-CN": "原图" }, "value": "raw" },
-        { "label": "Full", "labels": { "en": "Full", "zh-CN": "完整" }, "value": "full" },
-        { "label": "Regular", "labels": { "en": "Regular", "zh-CN": "标准" }, "value": "regular" },
-        { "label": "Small", "labels": { "en": "Small", "zh-CN": "小图" }, "value": "small" }
+        {
+          "label": "Raw",
+          "labels": {
+            "en": "Raw",
+            "zh-CN": "原图"
+          },
+          "value": "raw"
+        },
+        {
+          "label": "Full",
+          "labels": {
+            "en": "Full",
+            "zh-CN": "完整"
+          },
+          "value": "full"
+        },
+        {
+          "label": "Regular",
+          "labels": {
+            "en": "Regular",
+            "zh-CN": "标准"
+          },
+          "value": "regular"
+        },
+        {
+          "label": "Small",
+          "labels": {
+            "en": "Small",
+            "zh-CN": "小图"
+          },
+          "value": "small"
+        }
       ]
     },
     {
@@ -127,8 +155,22 @@
         "zh-CN": "macOS：应用到所有桌面或仅当前桌面；Windows 使用系统壁纸。"
       },
       "options": [
-        { "label": "Every Monitor", "labels": { "en": "Every Monitor", "zh-CN": "所有显示器" }, "value": "every" },
-        { "label": "Current Monitor", "labels": { "en": "Current Monitor", "zh-CN": "当前显示器" }, "value": "current" }
+        {
+          "label": "Every Monitor",
+          "labels": {
+            "en": "Every Monitor",
+            "zh-CN": "所有显示器"
+          },
+          "value": "every"
+        },
+        {
+          "label": "Current Monitor",
+          "labels": {
+            "en": "Current Monitor",
+            "zh-CN": "当前显示器"
+          },
+          "value": "current"
+        }
       ]
     }
   ],
@@ -146,7 +188,11 @@
         "en": "Download a random Unsplash photo and set as wallpaper",
         "zh-CN": "下载一张随机 Unsplash 图片并设为壁纸。"
       },
-      "keywords": ["unsplash", "random", "wallpaper"],
+      "keywords": [
+        "unsplash",
+        "random",
+        "wallpaper"
+      ],
       "mode": "no-view",
       "interval": "1d"
     }
@@ -157,8 +203,12 @@
       "en": "Unsplash",
       "zh-CN": "Unsplash"
     },
-    "icon": "icon.png",
-    "keywords": ["unsplash", "wallpaper", "photos"]
+    "icon": "icon-generated.png",
+    "keywords": [
+      "unsplash",
+      "wallpaper",
+      "photos"
+    ]
   },
   "min_app_version": "0.6.13",
   "raycast": {

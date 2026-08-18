@@ -5,16 +5,25 @@
     "zh-CN": "金价追踪",
     "en": "QxGold"
   },
-  "version": "1.2.1",
+  "version": "1.2.2",
   "description": "Live JD accumulated-gold quotes with locally sampled history.",
   "descriptions": {
     "zh-CN": "京东积存金实时价格与本地真实采样曲线。",
     "en": "Live JD accumulated-gold quotes with locally sampled history."
   },
   "author": "Qx",
-  "icon": "icon.svg",
-  "keywords": ["黄金", "金价", "gold", "京东", "投资"],
-  "permissions": ["http", "island"],
+  "icon": "icon-generated.png",
+  "keywords": [
+    "黄金",
+    "金价",
+    "gold",
+    "京东",
+    "投资"
+  ],
+  "permissions": [
+    "http",
+    "island"
+  ],
   "preferences": [
     {
       "id": "showInIsland",
@@ -31,8 +40,22 @@
         "zh-CN": "开启后在 Qx 灵动岛显示当前金价；关闭后不占用灵动岛信息位。"
       },
       "options": [
-        { "label": "开启 / On", "labels": { "en": "On", "zh-CN": "开启" }, "value": "on" },
-        { "label": "关闭 / Off", "labels": { "en": "Off", "zh-CN": "关闭" }, "value": "off" }
+        {
+          "label": "开启 / On",
+          "labels": {
+            "en": "On",
+            "zh-CN": "开启"
+          },
+          "value": "on"
+        },
+        {
+          "label": "关闭 / Off",
+          "labels": {
+            "en": "Off",
+            "zh-CN": "关闭"
+          },
+          "value": "off"
+        }
       ]
     },
     {
@@ -45,9 +68,30 @@
       "type": "select",
       "default": "60",
       "options": [
-        { "label": "30 秒", "labels": { "en": "30 seconds", "zh-CN": "30 秒" }, "value": "30" },
-        { "label": "60 秒", "labels": { "en": "60 seconds", "zh-CN": "60 秒" }, "value": "60" },
-        { "label": "5 分钟", "labels": { "en": "5 minutes", "zh-CN": "5 分钟" }, "value": "300" }
+        {
+          "label": "30 秒",
+          "labels": {
+            "en": "30 seconds",
+            "zh-CN": "30 秒"
+          },
+          "value": "30"
+        },
+        {
+          "label": "60 秒",
+          "labels": {
+            "en": "60 seconds",
+            "zh-CN": "60 秒"
+          },
+          "value": "60"
+        },
+        {
+          "label": "5 分钟",
+          "labels": {
+            "en": "5 minutes",
+            "zh-CN": "5 分钟"
+          },
+          "value": "300"
+        }
       ]
     },
     {
@@ -60,9 +104,30 @@
       "type": "select",
       "default": "7",
       "options": [
-        { "label": "1 天", "labels": { "en": "1 day", "zh-CN": "1 天" }, "value": "1" },
-        { "label": "7 天", "labels": { "en": "7 days", "zh-CN": "7 天" }, "value": "7" },
-        { "label": "30 天", "labels": { "en": "30 days", "zh-CN": "30 天" }, "value": "30" }
+        {
+          "label": "1 天",
+          "labels": {
+            "en": "1 day",
+            "zh-CN": "1 天"
+          },
+          "value": "1"
+        },
+        {
+          "label": "7 天",
+          "labels": {
+            "en": "7 days",
+            "zh-CN": "7 天"
+          },
+          "value": "7"
+        },
+        {
+          "label": "30 天",
+          "labels": {
+            "en": "30 days",
+            "zh-CN": "30 天"
+          },
+          "value": "30"
+        }
       ]
     }
   ],
@@ -72,21 +137,32 @@
         "id": "gold-history",
         "label": "QX Gold 金价历史",
         "description": "京东金融积存金价格快照与历史曲线。",
-        "keys": ["qxgold.history.v1"],
+        "keys": [
+          "qxgold.history.v1"
+        ],
         "retentionDays": 30
       }
     ]
   },
   "entry": "index.js",
   "panel": {
+    "icon": "icon-generated.png",
     "title": "QxGold",
     "titles": {
       "en": "QxGold",
       "zh-CN": "金价追踪"
     },
-    "keywords": ["黄金", "金价", "gold", "京东"]
+    "keywords": [
+      "黄金",
+      "金价",
+      "gold",
+      "京东"
+    ]
   },
   "min_app_version": "0.6.19",
-  "platforms": ["macos", "windows"],
+  "platforms": [
+    "macos",
+    "windows"
+  ],
   "screenshots": []
 }

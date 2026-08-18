@@ -3,6 +3,14 @@
   "plugins": {
     "another-boring-piece": [
       {
+        "version": "1.0.1",
+        "published_at": "2026-08-18",
+        "notes_localizations": {
+          "en": "Refreshes the community plugin icon with a dedicated generated asset and updates marketplace presentation metadata.",
+          "zh-CN": "为社区插件更新独立生成的图标资源，并同步完善市场展示元数据。"
+        }
+      },
+      {
         "version": "1.0.0",
         "published_at": "2026-08-13",
         "notes_localizations": {
@@ -12,6 +20,14 @@
       }
     ],
     "agent-usage": [
+      {
+        "version": "1.2.1",
+        "published_at": "2026-08-18",
+        "notes_localizations": {
+          "en": "Refreshes the community plugin icon with a dedicated generated asset and updates marketplace presentation metadata.",
+          "zh-CN": "为社区插件更新独立生成的图标资源，并同步完善市场展示元数据。"
+        }
+      },
       {
         "version": "1.2.0",
         "published_at": "2026-08-14",
@@ -47,6 +63,14 @@
     ],
     "clipboard-actions": [
       {
+        "version": "1.0.1",
+        "published_at": "2026-08-18",
+        "notes_localizations": {
+          "en": "Refreshes the community plugin icon with a dedicated generated asset and updates marketplace presentation metadata.",
+          "zh-CN": "为社区插件更新独立生成的图标资源，并同步完善市场展示元数据。"
+        }
+      },
+      {
         "version": "1.0.0",
         "published_at": "2026-08-08",
         "notes_localizations": {
@@ -56,6 +80,14 @@
       }
     ],
     "hacker-news": [
+      {
+        "version": "1.1.2",
+        "published_at": "2026-08-18",
+        "notes_localizations": {
+          "en": "Refreshes the community plugin icon with a dedicated generated asset and updates marketplace presentation metadata.",
+          "zh-CN": "为社区插件更新独立生成的图标资源，并同步完善市场展示元数据。"
+        }
+      },
       {
         "version": "1.1.1",
         "published_at": "2026-08-14",
@@ -91,6 +123,14 @@
     ],
     "brew": [
       {
+        "version": "1.1.2",
+        "published_at": "2026-08-18",
+        "notes_localizations": {
+          "en": "Refreshes the community plugin icon with a dedicated generated asset and updates marketplace presentation metadata.",
+          "zh-CN": "为社区插件更新独立生成的图标资源，并同步完善市场展示元数据。"
+        }
+      },
+      {
         "version": "1.1.1",
         "published_at": "2026-08-08",
         "notes_localizations": {
@@ -108,6 +148,14 @@
       }
     ],
     "external-display-control": [
+      {
+        "version": "1.2.5",
+        "published_at": "2026-08-18",
+        "notes_localizations": {
+          "en": "Refreshes the community plugin icon with a dedicated generated asset and updates marketplace presentation metadata.",
+          "zh-CN": "为社区插件更新独立生成的图标资源，并同步完善市场展示元数据。"
+        }
+      },
       {
         "version": "1.2.4",
         "published_at": "2026-08-08",
@@ -239,6 +287,14 @@
     ],
     "pomodoro-island": [
       {
+        "version": "1.6.3",
+        "published_at": "2026-08-18",
+        "notes_localizations": {
+          "en": "Refreshes the community plugin icon with a dedicated generated asset and updates marketplace presentation metadata.",
+          "zh-CN": "为社区插件更新独立生成的图标资源，并同步完善市场展示元数据。"
+        }
+      },
+      {
         "version": "1.6.2",
         "published_at": "2026-08-07",
         "notes_localizations": {
@@ -257,6 +313,14 @@
     ],
     "raycast-calendar": [
       {
+        "version": "1.2.2",
+        "published_at": "2026-08-18",
+        "notes_localizations": {
+          "en": "Refreshes the community plugin icon with a dedicated generated asset and updates marketplace presentation metadata.",
+          "zh-CN": "为社区插件更新独立生成的图标资源，并同步完善市场展示元数据。"
+        }
+      },
+      {
         "version": "1.2.1",
         "published_at": "2026-08-08",
         "notes_localizations": {
@@ -274,6 +338,14 @@
       }
     ],
     "qx-bing-wallpaper": [
+      {
+        "version": "2.2.3",
+        "published_at": "2026-08-18",
+        "notes_localizations": {
+          "en": "Refreshes the community plugin icon with a dedicated generated asset and updates marketplace presentation metadata.",
+          "zh-CN": "为社区插件更新独立生成的图标资源，并同步完善市场展示元数据。"
+        }
+      },
       {
         "version": "2.2.2",
         "published_at": "2026-08-08",
@@ -308,6 +380,14 @@
       }
     ],
     "qxgh": [
+      {
+        "version": "1.5.7",
+        "published_at": "2026-08-18",
+        "notes_localizations": {
+          "en": "Refreshes the community plugin icon with a dedicated generated asset and updates marketplace presentation metadata.",
+          "zh-CN": "为社区插件更新独立生成的图标资源，并同步完善市场展示元数据。"
+        }
+      },
       {
         "version": "1.5.6",
         "published_at": "2026-08-08",
@@ -383,6 +463,14 @@
     ],
     "qxgold": [
       {
+        "version": "1.2.2",
+        "published_at": "2026-08-18",
+        "notes_localizations": {
+          "en": "Refreshes the community plugin icon with a dedicated generated asset and updates marketplace presentation metadata.",
+          "zh-CN": "为社区插件更新独立生成的图标资源，并同步完善市场展示元数据。"
+        }
+      },
+      {
         "version": "1.2.1",
         "published_at": "2026-08-08",
         "notes_localizations": {
@@ -416,6 +504,14 @@
       }
     ],
     "qxtieba": [
+      {
+        "version": "1.2.1",
+        "published_at": "2026-08-18",
+        "notes_localizations": {
+          "en": "Refreshes the community plugin icon with a dedicated generated asset and updates marketplace presentation metadata.",
+          "zh-CN": "为社区插件更新独立生成的图标资源，并同步完善市场展示元数据。"
+        }
+      },
       {
         "version": "1.2.0",
         "published_at": "2026-08-14",
@@ -538,6 +634,14 @@
       }
     ],
     "qxheihe": [
+      {
+        "version": "1.4.13",
+        "published_at": "2026-08-18",
+        "notes_localizations": {
+          "en": "Refreshes the community plugin icon with a dedicated generated asset and updates marketplace presentation metadata.",
+          "zh-CN": "为社区插件更新独立生成的图标资源，并同步完善市场展示元数据。"
+        }
+      },
       {
         "version": "1.4.12",
         "published_at": "2026-08-08",
@@ -685,6 +789,14 @@
     ],
     "qxcoolapk": [
       {
+        "version": "1.4.9",
+        "published_at": "2026-08-18",
+        "notes_localizations": {
+          "en": "Refreshes the community plugin icon with a dedicated generated asset and updates marketplace presentation metadata.",
+          "zh-CN": "为社区插件更新独立生成的图标资源，并同步完善市场展示元数据。"
+        }
+      },
+      {
         "version": "1.4.8",
         "published_at": "2026-08-08",
         "notes_localizations": {
@@ -831,6 +943,14 @@
     ],
     "qxweibo": [
       {
+        "version": "1.1.9",
+        "published_at": "2026-08-18",
+        "notes_localizations": {
+          "en": "Refreshes the community plugin icon with a dedicated generated asset and updates marketplace presentation metadata.",
+          "zh-CN": "为社区插件更新独立生成的图标资源，并同步完善市场展示元数据。"
+        }
+      },
+      {
         "version": "1.1.8",
         "published_at": "2026-08-08",
         "notes_localizations": {
@@ -921,6 +1041,14 @@
     ],
     "qxpicture": [
       {
+        "version": "0.5.2",
+        "published_at": "2026-08-18",
+        "notes_localizations": {
+          "en": "Refreshes the community plugin icon with a dedicated generated asset and updates marketplace presentation metadata.",
+          "zh-CN": "为社区插件更新独立生成的图标资源，并同步完善市场展示元数据。"
+        }
+      },
+      {
         "version": "0.5.1",
         "published_at": "2026-08-08",
         "notes_localizations": {
@@ -954,6 +1082,14 @@
       }
     ],
     "sysinfo": [
+      {
+        "version": "1.4.2",
+        "published_at": "2026-08-18",
+        "notes_localizations": {
+          "en": "Refreshes the community plugin icon with a dedicated generated asset and updates marketplace presentation metadata.",
+          "zh-CN": "为社区插件更新独立生成的图标资源，并同步完善市场展示元数据。"
+        }
+      },
       {
         "version": "1.4.1",
         "published_at": "2026-08-08",
@@ -1005,6 +1141,14 @@
     ],
     "unsplash": [
       {
+        "version": "1.2.2",
+        "published_at": "2026-08-18",
+        "notes_localizations": {
+          "en": "Refreshes the community plugin icon with a dedicated generated asset and updates marketplace presentation metadata.",
+          "zh-CN": "为社区插件更新独立生成的图标资源，并同步完善市场展示元数据。"
+        }
+      },
+      {
         "version": "1.2.1",
         "published_at": "2026-08-08",
         "notes_localizations": {
@@ -1022,6 +1166,14 @@
       }
     ],
     "v2ex": [
+      {
+        "version": "3.1.2",
+        "published_at": "2026-08-18",
+        "notes_localizations": {
+          "en": "Refreshes the community plugin icon with a dedicated generated asset and updates marketplace presentation metadata.",
+          "zh-CN": "为社区插件更新独立生成的图标资源，并同步完善市场展示元数据。"
+        }
+      },
       {
         "version": "3.1.1",
         "published_at": "2026-08-14",
@@ -1072,6 +1224,14 @@
       }
     ],
     "weather": [
+      {
+        "version": "1.0.2",
+        "published_at": "2026-08-18",
+        "notes_localizations": {
+          "en": "Refreshes the community plugin icon with a dedicated generated asset and updates marketplace presentation metadata.",
+          "zh-CN": "为社区插件更新独立生成的图标资源，并同步完善市场展示元数据。"
+        }
+      },
       {
         "version": "1.0.1",
         "published_at": "2026-08-08",

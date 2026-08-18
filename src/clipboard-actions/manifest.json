@@ -1,7 +1,7 @@
 {
   "id": "clipboard-actions",
   "name": "Clipboard Actions",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Paste clipboard text as plain text or save the current clipboard image without overwriting existing files.",
   "names": {
     "en": "Clipboard Actions",
@@ -12,7 +12,11 @@
     "zh-CN": "将剪贴板文字以纯文本粘贴，或将当前剪贴板图片保存为不会覆盖旧文件的新 PNG。"
   },
   "author": "mcx",
-  "platforms": ["macos", "windows"],
+  "icon": "icon-generated.png",
+  "platforms": [
+    "macos",
+    "windows"
+  ],
   "keywords": [
     "clipboard",
     "paste",
@@ -68,7 +72,14 @@
         "zh-CN": "将剪贴板替换为纯文本，并粘贴到之前的前台应用。"
       },
       "mode": "no-view",
-      "keywords": ["paste", "text", "plain", "粘贴", "文字", "纯文本"]
+      "keywords": [
+        "paste",
+        "text",
+        "plain",
+        "粘贴",
+        "文字",
+        "纯文本"
+      ]
     },
     {
       "name": "save-clipboard-image",
@@ -83,7 +94,14 @@
         "zh-CN": "将当前剪贴板图片保存为唯一 PNG 文件，不覆盖已有文件。"
       },
       "mode": "no-view",
-      "keywords": ["save", "image", "clipboard", "保存", "图片", "剪贴板"]
+      "keywords": [
+        "save",
+        "image",
+        "clipboard",
+        "保存",
+        "图片",
+        "剪贴板"
+      ]
     }
   ],
   "shortcuts": [

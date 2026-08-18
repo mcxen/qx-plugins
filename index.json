@@ -4,7 +4,7 @@
     {
       "id": "agent-usage",
       "name": "Agent Usage",
-      "version": "1.2.0",
+      "version": "1.2.1",
       "description": "Lightweight Qx-native Codex and Grok quota overview using local CLI sessions.",
       "names": {
         "en": "Agent Usage",
@@ -15,8 +15,8 @@
         "zh-CN": "在轻量原生 Workbench 中读取本机 CLI 登录态，查看 Codex 与 Grok 配额窗口。"
       },
       "download_url": "https://raw.githubusercontent.com/mcxen/qx-plugins/main/agent-usage.qx-plugin",
-      "size_bytes": 45305,
-      "checksum_sha256": "755b7fa7319a65d5f92927de04dfb2f6327134e535b3c50d4b6c30eb65653743",
+      "size_bytes": 330137,
+      "checksum_sha256": "dd10c4fec5eab121fc7cac9bb50586b9b5083a960b9fe74a2d81f667ce2d6814",
       "required_permissions": [
         "http",
         "open-url",
@@ -24,7 +24,7 @@
         "cli",
         "invoke:plugin_file_read_base64"
       ],
-      "updated_at": "2026-08-14",
+      "updated_at": "2026-08-18",
       "author": "mcx",
       "min_app_version": "0.6.87",
       "platforms": [
@@ -32,6 +32,14 @@
         "windows"
       ],
       "releases": [
+        {
+          "version": "1.2.1",
+          "published_at": "2026-08-18",
+          "notes_localizations": {
+            "en": "Refreshes the community plugin icon with a dedicated generated asset and updates marketplace presentation metadata.",
+            "zh-CN": "为社区插件更新独立生成的图标资源，并同步完善市场展示元数据。"
+          }
+        },
         {
           "version": "1.2.0",
           "published_at": "2026-08-14",
@@ -69,7 +77,7 @@
     {
       "id": "another-boring-piece",
       "name": "Art Wallpapers",
-      "version": "1.0.0",
+      "version": "1.0.1",
       "description": "Another boring piece. Daily. Hand-picked fine-art wallpapers from anotherboring.day.",
       "names": {
         "en": "Art Wallpapers",
@@ -80,8 +88,8 @@
         "zh-CN": "Another boring piece. Daily. 浏览每日精选艺术作品，设置或下载壁纸，并保留本地操作历史。"
       },
       "download_url": "https://raw.githubusercontent.com/mcxen/qx-plugins/main/another-boring-piece.qx-plugin",
-      "size_bytes": 41672,
-      "checksum_sha256": "3be625c9ed184ebcd795bc16ae980fc1694bea966c2ce3cd13ebe7ebcbda7dfe",
+      "size_bytes": 369347,
+      "checksum_sha256": "05f323701b8d79d6f7d0ca133a0bf6d3d286d974aa1e456618c35232db23d865",
       "required_permissions": [
         "http",
         "open-url",
@@ -92,7 +100,7 @@
         "invoke:plugin_file_ensure_dir",
         "invoke:plugin_file_write_base64"
       ],
-      "updated_at": "2026-08-13",
+      "updated_at": "2026-08-18",
       "author": "yevgen_glukhov",
       "min_app_version": "0.6.86",
       "platforms": [
@@ -100,6 +108,14 @@
         "windows"
       ],
       "releases": [
+        {
+          "version": "1.0.1",
+          "published_at": "2026-08-18",
+          "notes_localizations": {
+            "en": "Refreshes the community plugin icon with a dedicated generated asset and updates marketplace presentation metadata.",
+            "zh-CN": "为社区插件更新独立生成的图标资源，并同步完善市场展示元数据。"
+          }
+        },
         {
           "version": "1.0.0",
           "published_at": "2026-08-13",
@@ -113,7 +129,7 @@
     {
       "id": "brew",
       "name": "Brew",
-      "version": "1.1.1",
+      "version": "1.1.2",
       "description": "Search, inspect, upgrade and uninstall Homebrew formulae & casks (macOS). Uses Qx context.cli.",
       "names": {
         "en": "Brew",
@@ -124,20 +140,28 @@
         "zh-CN": "在 macOS 上搜索、查看、更新和卸载 Homebrew formula 与 cask。"
       },
       "download_url": "https://raw.githubusercontent.com/mcxen/qx-plugins/main/brew.qx-plugin",
-      "size_bytes": 4096417,
-      "checksum_sha256": "023af349eaf76e107c4dd55647283f90ec80d7026d90c587cd3df66d3187ec61",
+      "size_bytes": 4365868,
+      "checksum_sha256": "674e1eead29a1169eeaf366060059659f6b31cc4c159e6bb2b19882c1fd889ea",
       "required_permissions": [
         "cli",
         "notifications",
         "open-url"
       ],
-      "updated_at": "2026-08-09",
+      "updated_at": "2026-08-18",
       "author": "qx (ported from Raycast brew by nhojb et al.)",
       "min_app_version": "0.5.39",
       "platforms": [
         "macos"
       ],
       "releases": [
+        {
+          "version": "1.1.2",
+          "published_at": "2026-08-18",
+          "notes_localizations": {
+            "en": "Refreshes the community plugin icon with a dedicated generated asset and updates marketplace presentation metadata.",
+            "zh-CN": "为社区插件更新独立生成的图标资源，并同步完善市场展示元数据。"
+          }
+        },
         {
           "version": "1.1.1",
           "published_at": "2026-08-08",
@@ -159,7 +183,7 @@
     {
       "id": "clipboard-actions",
       "name": "Clipboard Actions",
-      "version": "1.0.0",
+      "version": "1.0.1",
       "description": "Paste clipboard text as plain text or save the current clipboard image without overwriting existing files.",
       "names": {
         "en": "Clipboard Actions",
@@ -170,8 +194,8 @@
         "zh-CN": "将剪贴板文字以纯文本粘贴，或将当前剪贴板图片保存为不会覆盖旧文件的新 PNG。"
       },
       "download_url": "https://raw.githubusercontent.com/mcxen/qx-plugins/main/clipboard-actions.qx-plugin",
-      "size_bytes": 13271,
-      "checksum_sha256": "99049fb3dde5ea7b4d18821d54863a78e322e1b0f2da4914d0764ebc14b2516e",
+      "size_bytes": 284730,
+      "checksum_sha256": "60e6a900afcb20c67c5f47b110c96b80a77625bab8c51fe80b4fa0c041cc9b30",
       "required_permissions": [
         "clipboard",
         "invoke:plugin_perform_paste",
@@ -179,7 +203,7 @@
         "invoke:plugin_file_write_base64",
         "invoke:plugin_file_exists"
       ],
-      "updated_at": "2026-08-08",
+      "updated_at": "2026-08-18",
       "author": "mcx",
       "min_app_version": "0.6.67",
       "platforms": [
@@ -187,6 +211,14 @@
         "windows"
       ],
       "releases": [
+        {
+          "version": "1.0.1",
+          "published_at": "2026-08-18",
+          "notes_localizations": {
+            "en": "Refreshes the community plugin icon with a dedicated generated asset and updates marketplace presentation metadata.",
+            "zh-CN": "为社区插件更新独立生成的图标资源，并同步完善市场展示元数据。"
+          }
+        },
         {
           "version": "1.0.0",
           "published_at": "2026-08-08",
@@ -200,7 +232,7 @@
     {
       "id": "external-display-control",
       "name": "External Display Control",
-      "version": "1.2.4",
+      "version": "1.2.5",
       "description": "Adjust built-in and external display brightness through Qx's native macOS and Windows display service.",
       "names": {
         "en": "Display Brightness",
@@ -211,15 +243,15 @@
         "zh-CN": "通过 Qx 原生显示器服务调节内置和外接显示器亮度。"
       },
       "download_url": "https://raw.githubusercontent.com/mcxen/qx-plugins/main/external-display-control.qx-plugin",
-      "size_bytes": 41721,
-      "checksum_sha256": "87881c53d252d6bece1a33595ca6c2c75d48896c2456aae7157e0595aedbb805",
+      "size_bytes": 331680,
+      "checksum_sha256": "3074c0a9ec4da3e26c999e23c3301bf0e6458fa85982e8fb458f4aee0b0e3c55",
       "required_permissions": [
         "tray",
         "system",
         "display-control",
         "invoke:display_brightness_set"
       ],
-      "updated_at": "2026-08-09",
+      "updated_at": "2026-08-18",
       "author": "mcx",
       "min_app_version": "0.6.55",
       "platforms": [
@@ -227,6 +259,14 @@
         "windows"
       ],
       "releases": [
+        {
+          "version": "1.2.5",
+          "published_at": "2026-08-18",
+          "notes_localizations": {
+            "en": "Refreshes the community plugin icon with a dedicated generated asset and updates marketplace presentation metadata.",
+            "zh-CN": "为社区插件更新独立生成的图标资源，并同步完善市场展示元数据。"
+          }
+        },
         {
           "version": "1.2.4",
           "published_at": "2026-08-08",
@@ -360,7 +400,7 @@
     {
       "id": "hacker-news",
       "name": "Hacker News",
-      "version": "1.1.1",
+      "version": "1.1.2",
       "description": "Browse the latest Hacker News stories with details and comments.",
       "names": {
         "en": "Hacker News",
@@ -371,14 +411,14 @@
         "zh-CN": "浏览 Hacker News 最新帖子、正文与评论。"
       },
       "download_url": "https://raw.githubusercontent.com/mcxen/qx-plugins/main/hacker-news.qx-plugin",
-      "size_bytes": 28100,
-      "checksum_sha256": "e9a9d73bff8cede7553684eeabfb871aa71adabbce2b8f1b7051799d18d98e7f",
+      "size_bytes": 320260,
+      "checksum_sha256": "fc3a1f3ef3c184f24207ef6ad0826b063e5c3083c07aa6bb614a914b48e3581f",
       "required_permissions": [
         "http",
         "open-url",
         "clipboard"
       ],
-      "updated_at": "2026-08-14",
+      "updated_at": "2026-08-18",
       "author": "mcx",
       "min_app_version": "0.6.87",
       "platforms": [
@@ -386,6 +426,14 @@
         "windows"
       ],
       "releases": [
+        {
+          "version": "1.1.2",
+          "published_at": "2026-08-18",
+          "notes_localizations": {
+            "en": "Refreshes the community plugin icon with a dedicated generated asset and updates marketplace presentation metadata.",
+            "zh-CN": "为社区插件更新独立生成的图标资源，并同步完善市场展示元数据。"
+          }
+        },
         {
           "version": "1.1.1",
           "published_at": "2026-08-14",
@@ -423,7 +471,7 @@
     {
       "id": "pomodoro-island",
       "name": "Pomodoro Island",
-      "version": "1.6.2",
+      "version": "1.6.3",
       "description": "Reference plugin for declarative Workbench and the structured QxIsland session protocol, with persistent background timing and history.",
       "names": {
         "en": "Pomodoro Island",
@@ -434,13 +482,13 @@
         "zh-CN": "带休息提醒的专注计时器。"
       },
       "download_url": "https://raw.githubusercontent.com/mcxen/qx-plugins/main/pomodoro-island.qx-plugin",
-      "size_bytes": 36319,
-      "checksum_sha256": "f1cb8dbf3250ba1af0f73748c9d0799316545eed6a89552c9e094464924f0f5e",
+      "size_bytes": 373330,
+      "checksum_sha256": "f4735ae9c008edadb50911e9acaf4ece542457fba77ea3d1952bc1938f39f9f6",
       "required_permissions": [
         "island",
         "notifications"
       ],
-      "updated_at": "2026-08-09",
+      "updated_at": "2026-08-18",
       "author": "mcx",
       "min_app_version": "0.5.43",
       "platforms": [
@@ -448,6 +496,14 @@
         "windows"
       ],
       "releases": [
+        {
+          "version": "1.6.3",
+          "published_at": "2026-08-18",
+          "notes_localizations": {
+            "en": "Refreshes the community plugin icon with a dedicated generated asset and updates marketplace presentation metadata.",
+            "zh-CN": "为社区插件更新独立生成的图标资源，并同步完善市场展示元数据。"
+          }
+        },
         {
           "version": "1.6.2",
           "published_at": "2026-08-07",
@@ -469,7 +525,7 @@
     {
       "id": "raycast-calendar",
       "name": "Quick Calendar",
-      "version": "1.2.1",
+      "version": "1.2.2",
       "description": "View calendar month-by-month",
       "names": {
         "en": "Quick Calendar",
@@ -480,14 +536,14 @@
         "zh-CN": "按月浏览日历。"
       },
       "download_url": "https://raw.githubusercontent.com/mcxen/qx-plugins/main/raycast-calendar.qx-plugin",
-      "size_bytes": 3501506,
-      "checksum_sha256": "b1f0a8c493adaf8a551819e8b0d8f2fa9f2e054d27af170df086c6305e918e8d",
+      "size_bytes": 3778089,
+      "checksum_sha256": "1dc2f0e3dec344dd249657c25eafb9ef557bd6ad87fd8c52d7609b204fcde3e4",
       "required_permissions": [
         "http",
         "open-url",
         "clipboard"
       ],
-      "updated_at": "2026-08-09",
+      "updated_at": "2026-08-18",
       "author": "fuksman",
       "min_app_version": "0.4.28",
       "platforms": [
@@ -495,6 +551,14 @@
         "windows"
       ],
       "releases": [
+        {
+          "version": "1.2.2",
+          "published_at": "2026-08-18",
+          "notes_localizations": {
+            "en": "Refreshes the community plugin icon with a dedicated generated asset and updates marketplace presentation metadata.",
+            "zh-CN": "为社区插件更新独立生成的图标资源，并同步完善市场展示元数据。"
+          }
+        },
         {
           "version": "1.2.1",
           "published_at": "2026-08-08",
@@ -516,7 +580,7 @@
     {
       "id": "qx-bing-wallpaper",
       "name": "Qx Bing Wallpaper",
-      "version": "2.2.2",
+      "version": "2.2.3",
       "description": "Browse Bing's daily images in a native Qx thumbnail list, then download or set them as wallpaper.",
       "names": {
         "en": "Qx Bing Wallpaper",
@@ -527,8 +591,8 @@
         "zh-CN": "浏览必应每日图片，下载图片或将其设为壁纸。"
       },
       "download_url": "https://raw.githubusercontent.com/mcxen/qx-plugins/main/qx-bing-wallpaper.qx-plugin",
-      "size_bytes": 11776515,
-      "checksum_sha256": "7bdb856c5a0a444134ec2cbc268aff16e3937070f81a4ef94180c306b490a40f",
+      "size_bytes": 12080960,
+      "checksum_sha256": "865f75babd2e2f5e23eaa41f22634782110f04a5698ae66095bb30d607dceee9",
       "required_permissions": [
         "http",
         "open-url",
@@ -538,7 +602,7 @@
         "invoke:plugin_file_write_base64",
         "invoke:plugin_file_ensure_dir"
       ],
-      "updated_at": "2026-08-09",
+      "updated_at": "2026-08-18",
       "author": "Qx",
       "min_app_version": "0.6.13",
       "platforms": [
@@ -546,6 +610,14 @@
         "windows"
       ],
       "releases": [
+        {
+          "version": "2.2.3",
+          "published_at": "2026-08-18",
+          "notes_localizations": {
+            "en": "Refreshes the community plugin icon with a dedicated generated asset and updates marketplace presentation metadata.",
+            "zh-CN": "为社区插件更新独立生成的图标资源，并同步完善市场展示元数据。"
+          }
+        },
         {
           "version": "2.2.2",
           "published_at": "2026-08-08",
@@ -583,7 +655,7 @@
     {
       "id": "qxcoolapk",
       "name": "QxCoolapk 酷安",
-      "version": "1.4.8",
+      "version": "1.4.9",
       "description": "Browse Coolapk hot, news, and digital feeds and read complete posts, images, and replies in Qx.",
       "names": {
         "zh-CN": "QxCoolapk 酷安",
@@ -594,15 +666,15 @@
         "en": "Browse Coolapk community feeds and read complete posts, images, and replies in Qx."
       },
       "download_url": "https://raw.githubusercontent.com/mcxen/qx-plugins/main/qxcoolapk.qx-plugin",
-      "size_bytes": 75813,
-      "checksum_sha256": "16454821fc55a5bc7f2c5cdfc8290074393ae06f1b2bad2bb9e602d0a98b32b0",
+      "size_bytes": 387435,
+      "checksum_sha256": "674ef5fcb4235e55c913268e7a12f35baad2ad2e59d8a21d3a2927314da27c62",
       "required_permissions": [
         "http",
         "open-url",
         "system",
         "island"
       ],
-      "updated_at": "2026-08-09",
+      "updated_at": "2026-08-18",
       "author": "Qx",
       "min_app_version": "0.6.50",
       "platforms": [
@@ -610,6 +682,14 @@
         "windows"
       ],
       "releases": [
+        {
+          "version": "1.4.9",
+          "published_at": "2026-08-18",
+          "notes_localizations": {
+            "en": "Refreshes the community plugin icon with a dedicated generated asset and updates marketplace presentation metadata.",
+            "zh-CN": "为社区插件更新独立生成的图标资源，并同步完善市场展示元数据。"
+          }
+        },
         {
           "version": "1.4.8",
           "published_at": "2026-08-08",
@@ -759,7 +839,7 @@
     {
       "id": "qxgh",
       "name": "QxGH",
-      "version": "1.5.6",
+      "version": "1.5.7",
       "description": "QxGH — watch GitHub Actions and Releases from public github.com pages (no REST API). Business-only workbench UI.",
       "names": {
         "zh-CN": "Github助手",
@@ -770,8 +850,8 @@
         "zh-CN": "监控公开 GitHub 仓库的 Actions 运行与 Releases，并显示构建状态、预计进度和灵动岛提醒。"
       },
       "download_url": "https://raw.githubusercontent.com/mcxen/qx-plugins/main/qxgh.qx-plugin",
-      "size_bytes": 54648,
-      "checksum_sha256": "72e654662c64e6cd61e0de8dfceeb1a62fb3afb33b327ccffbb3eba7565ebf01",
+      "size_bytes": 353288,
+      "checksum_sha256": "a2a1e3149849bb9fbfbe2b027b2cc8f783d4efcd9d1f9223d5bcfe2b25e51756",
       "required_permissions": [
         "http",
         "open-url",
@@ -779,7 +859,7 @@
         "island",
         "tray"
       ],
-      "updated_at": "2026-08-09",
+      "updated_at": "2026-08-18",
       "author": "mcx",
       "min_app_version": "0.5.38",
       "platforms": [
@@ -787,6 +867,14 @@
         "windows"
       ],
       "releases": [
+        {
+          "version": "1.5.7",
+          "published_at": "2026-08-18",
+          "notes_localizations": {
+            "en": "Refreshes the community plugin icon with a dedicated generated asset and updates marketplace presentation metadata.",
+            "zh-CN": "为社区插件更新独立生成的图标资源，并同步完善市场展示元数据。"
+          }
+        },
         {
           "version": "1.5.6",
           "published_at": "2026-08-08",
@@ -864,7 +952,7 @@
     {
       "id": "qxgold",
       "name": "QxGold",
-      "version": "1.2.1",
+      "version": "1.2.2",
       "description": "Live JD accumulated-gold quotes with locally sampled history.",
       "names": {
         "zh-CN": "金价追踪",
@@ -875,13 +963,13 @@
         "en": "Live JD accumulated-gold quotes with locally sampled history."
       },
       "download_url": "https://raw.githubusercontent.com/mcxen/qx-plugins/main/qxgold.qx-plugin",
-      "size_bytes": 17441,
-      "checksum_sha256": "572c69386b87135637254823785799a8fa6ad4d8e2c92ee882bb2619b8aab496",
+      "size_bytes": 358410,
+      "checksum_sha256": "3a24e12231a8036ccaf94bb9e06d44412b8286213479313d7cdbb3bed0ac6ce7",
       "required_permissions": [
         "http",
         "island"
       ],
-      "updated_at": "2026-08-09",
+      "updated_at": "2026-08-18",
       "author": "Qx",
       "min_app_version": "0.6.19",
       "platforms": [
@@ -889,6 +977,14 @@
         "windows"
       ],
       "releases": [
+        {
+          "version": "1.2.2",
+          "published_at": "2026-08-18",
+          "notes_localizations": {
+            "en": "Refreshes the community plugin icon with a dedicated generated asset and updates marketplace presentation metadata.",
+            "zh-CN": "为社区插件更新独立生成的图标资源，并同步完善市场展示元数据。"
+          }
+        },
         {
           "version": "1.2.1",
           "published_at": "2026-08-08",
@@ -926,7 +1022,7 @@
     {
       "id": "qxheihe",
       "name": "QxHeihe 小黑盒",
-      "version": "1.4.12",
+      "version": "1.4.13",
       "description": "浏览小黑盒社区推荐内容，在 Qx 内查看正文、多图、帖子信息与匿名优先评论。",
       "names": {
         "en": "QxHeihe",
@@ -937,14 +1033,14 @@
         "zh-CN": "浏览小黑盒社区推荐内容，在 Qx 内查看正文、多图、帖子信息与匿名优先评论。"
       },
       "download_url": "https://raw.githubusercontent.com/mcxen/qx-plugins/main/qxheihe.qx-plugin",
-      "size_bytes": 53038,
-      "checksum_sha256": "0824c548f292da210191663d848edfe0a3f466a1b5ec41e9f312e85c84c54361",
+      "size_bytes": 356530,
+      "checksum_sha256": "74d8be7bd7c4786e2dd2daaa4dd8ec2ab80e62c91713af0e5447871d41b70bd4",
       "required_permissions": [
         "http",
         "open-url",
         "island"
       ],
-      "updated_at": "2026-08-09",
+      "updated_at": "2026-08-18",
       "author": "mcx",
       "min_app_version": "0.6.50",
       "platforms": [
@@ -952,6 +1048,14 @@
         "windows"
       ],
       "releases": [
+        {
+          "version": "1.4.13",
+          "published_at": "2026-08-18",
+          "notes_localizations": {
+            "en": "Refreshes the community plugin icon with a dedicated generated asset and updates marketplace presentation metadata.",
+            "zh-CN": "为社区插件更新独立生成的图标资源，并同步完善市场展示元数据。"
+          }
+        },
         {
           "version": "1.4.12",
           "published_at": "2026-08-08",
@@ -1101,7 +1205,7 @@
     {
       "id": "qxpicture",
       "name": "Qxpicture",
-      "version": "0.5.1",
+      "version": "0.5.2",
       "description": "Browse random image APIs, save images, copy them, and set desktop wallpaper.",
       "names": {
         "zh-CN": "Qxpicture 随机图片",
@@ -1112,8 +1216,8 @@
         "en": "Browse random image APIs, save images, copy them, and set desktop wallpaper."
       },
       "download_url": "https://raw.githubusercontent.com/mcxen/qx-plugins/main/qxpicture.qx-plugin",
-      "size_bytes": 68930,
-      "checksum_sha256": "51946766d3b53d3a17b674e457c865a0eb2a86646eb9abed62dc3bb23fff8ff5",
+      "size_bytes": 357098,
+      "checksum_sha256": "b02dd5896b3339cb836a9b14c5ab3d393ce57d98f1ec8bb1391b7e0d0bf40cae",
       "required_permissions": [
         "storage",
         "http",
@@ -1125,7 +1229,7 @@
         "invoke:plugin_file_write_base64",
         "invoke:clipboard_write_image_file"
       ],
-      "updated_at": "2026-08-09",
+      "updated_at": "2026-08-18",
       "author": "Qx",
       "min_app_version": "0.6.22",
       "platforms": [
@@ -1133,6 +1237,14 @@
         "windows"
       ],
       "releases": [
+        {
+          "version": "0.5.2",
+          "published_at": "2026-08-18",
+          "notes_localizations": {
+            "en": "Refreshes the community plugin icon with a dedicated generated asset and updates marketplace presentation metadata.",
+            "zh-CN": "为社区插件更新独立生成的图标资源，并同步完善市场展示元数据。"
+          }
+        },
         {
           "version": "0.5.1",
           "published_at": "2026-08-08",
@@ -1170,7 +1282,7 @@
     {
       "id": "qxtieba",
       "name": "QxTieba 贴吧",
-      "version": "1.2.0",
+      "version": "1.2.1",
       "description": "聚合浏览多个百度贴吧的公开帖子流，在 Qx 内阅读正文与楼层评论。",
       "names": {
         "en": "QxTieba",
@@ -1181,14 +1293,14 @@
         "zh-CN": "聚合浏览多个百度贴吧的公开帖子流，在 Qx 内阅读正文与楼层评论。"
       },
       "download_url": "https://raw.githubusercontent.com/mcxen/qx-plugins/main/qxtieba.qx-plugin",
-      "size_bytes": 380221,
-      "checksum_sha256": "7b630724da9addbafab7394a6dbba20d3c6989470d53811ce8dfdd654e29da1d",
+      "size_bytes": 626903,
+      "checksum_sha256": "c043dc242c1c4a205afafc8708829e09267d5a91ba164a7c0c4c33819b7e4add",
       "required_permissions": [
         "http",
         "open-url",
         "island"
       ],
-      "updated_at": "2026-08-14",
+      "updated_at": "2026-08-18",
       "author": "Qx",
       "min_app_version": "0.6.87",
       "platforms": [
@@ -1196,6 +1308,14 @@
         "windows"
       ],
       "releases": [
+        {
+          "version": "1.2.1",
+          "published_at": "2026-08-18",
+          "notes_localizations": {
+            "en": "Refreshes the community plugin icon with a dedicated generated asset and updates marketplace presentation metadata.",
+            "zh-CN": "为社区插件更新独立生成的图标资源，并同步完善市场展示元数据。"
+          }
+        },
         {
           "version": "1.2.0",
           "published_at": "2026-08-14",
@@ -1321,7 +1441,7 @@
     {
       "id": "qxweibo",
       "name": "QxWeibo 微博",
-      "version": "1.1.8",
+      "version": "1.1.9",
       "description": "Read configured Weibo users, an aggregated following feed, comments, and proxied images in Qx.",
       "names": {
         "zh-CN": "QxWeibo 微博",
@@ -1332,15 +1452,15 @@
         "en": "Read configured Weibo users, an aggregated following feed, comments, and proxied images in Qx."
       },
       "download_url": "https://raw.githubusercontent.com/mcxen/qx-plugins/main/qxweibo.qx-plugin",
-      "size_bytes": 84701,
-      "checksum_sha256": "b789c130dcfc2d4d26ee6b8bdf2f4c443fce8f23e31ad6f8b96176567f9c1763",
+      "size_bytes": 435383,
+      "checksum_sha256": "a2402754da24f4f38aaf9323b9474563e9fd422f56f53502f7f385908eb3a314",
       "required_permissions": [
         "http",
         "open-url",
         "system",
         "island"
       ],
-      "updated_at": "2026-08-09",
+      "updated_at": "2026-08-18",
       "author": "Qx",
       "min_app_version": "0.6.50",
       "platforms": [
@@ -1348,6 +1468,14 @@
         "windows"
       ],
       "releases": [
+        {
+          "version": "1.1.9",
+          "published_at": "2026-08-18",
+          "notes_localizations": {
+            "en": "Refreshes the community plugin icon with a dedicated generated asset and updates marketplace presentation metadata.",
+            "zh-CN": "为社区插件更新独立生成的图标资源，并同步完善市场展示元数据。"
+          }
+        },
         {
           "version": "1.1.8",
           "published_at": "2026-08-08",
@@ -1441,7 +1569,7 @@
     {
       "id": "sysinfo",
       "name": "Sysinfo",
-      "version": "1.4.1",
+      "version": "1.4.2",
       "description": "Native Qx System Monitor for CPU, memory, power, storage, displays, network, and processes on macOS and Windows.",
       "names": {
         "en": "Sysinfo",
@@ -1452,8 +1580,8 @@
         "zh-CN": "轻量原生硬件监视器：查看 CPU、内存、电源、存储、显示器、网络与进程信息。"
       },
       "download_url": "https://raw.githubusercontent.com/mcxen/qx-plugins/main/sysinfo.qx-plugin",
-      "size_bytes": 40915,
-      "checksum_sha256": "f8e133f2c222fc50a4681739f8ee178ae7998f4777545037090f7e5376ebbc22",
+      "size_bytes": 381006,
+      "checksum_sha256": "745ee9fd93fd5cd9bdec6e27df63c69c067a867bc50780c91b2011600dd0adaf",
       "required_permissions": [
         "system",
         "system-stats",
@@ -1461,7 +1589,7 @@
         "processes",
         "invoke:qx_system_information_kill_process"
       ],
-      "updated_at": "2026-08-09",
+      "updated_at": "2026-08-18",
       "author": "Qx",
       "min_app_version": "0.6.38",
       "platforms": [
@@ -1469,6 +1597,14 @@
         "windows"
       ],
       "releases": [
+        {
+          "version": "1.4.2",
+          "published_at": "2026-08-18",
+          "notes_localizations": {
+            "en": "Refreshes the community plugin icon with a dedicated generated asset and updates marketplace presentation metadata.",
+            "zh-CN": "为社区插件更新独立生成的图标资源，并同步完善市场展示元数据。"
+          }
+        },
         {
           "version": "1.4.1",
           "published_at": "2026-08-08",
@@ -1522,7 +1658,7 @@
     {
       "id": "unsplash",
       "name": "Unsplash",
-      "version": "1.2.1",
+      "version": "1.2.2",
       "description": "Search Unsplash photos, download, and set desktop wallpaper. Ported for Qx (Access Key API; likes/OAuth not included).",
       "names": {
         "en": "Unsplash",
@@ -1533,8 +1669,8 @@
         "zh-CN": "搜索 Unsplash 图片，下载并设置桌面壁纸。"
       },
       "download_url": "https://raw.githubusercontent.com/mcxen/qx-plugins/main/unsplash.qx-plugin",
-      "size_bytes": 6348856,
-      "checksum_sha256": "631d93f579d8efb6176c0cecb6053dd2378acbd6c839d2a97d15e902cfe2d7a3",
+      "size_bytes": 6644569,
+      "checksum_sha256": "949d66fc04ee91cc5c83f2116d6c224c6977216c1f16776295c44644c4fc78a7",
       "required_permissions": [
         "http",
         "open-url",
@@ -1545,7 +1681,7 @@
         "invoke:plugin_file_ensure_dir",
         "invoke:plugin_file_exists"
       ],
-      "updated_at": "2026-08-09",
+      "updated_at": "2026-08-18",
       "author": "qx (ported from Raycast unsplash)",
       "min_app_version": "0.6.13",
       "platforms": [
@@ -1553,6 +1689,14 @@
         "windows"
       ],
       "releases": [
+        {
+          "version": "1.2.2",
+          "published_at": "2026-08-18",
+          "notes_localizations": {
+            "en": "Refreshes the community plugin icon with a dedicated generated asset and updates marketplace presentation metadata.",
+            "zh-CN": "为社区插件更新独立生成的图标资源，并同步完善市场展示元数据。"
+          }
+        },
         {
           "version": "1.2.1",
           "published_at": "2026-08-08",
@@ -1574,7 +1718,7 @@
     {
       "id": "v2ex",
       "name": "V2EX",
-      "version": "3.1.1",
+      "version": "3.1.2",
       "description": "Browse V2EX latest, hot, and node topics with Workbench list/detail, replies, and cached host APIs.",
       "names": {
         "en": "V2EX",
@@ -1585,8 +1729,8 @@
         "zh-CN": "通过 Workbench 列表/详情浏览 V2EX 最新、热门与节点主题，支持回复与宿主缓存接口。"
       },
       "download_url": "https://raw.githubusercontent.com/mcxen/qx-plugins/main/v2ex.qx-plugin",
-      "size_bytes": 43770,
-      "checksum_sha256": "bd41782157836119b9cbfafc822bad1c0b1244b70cb46f338eeb7fdae74d5225",
+      "size_bytes": 351964,
+      "checksum_sha256": "b87b152ab2be9a88bfec57a9389a6f6fb3dab68a585faf0c76ac86df02fec778",
       "required_permissions": [
         "http",
         "open-url",
@@ -1599,7 +1743,7 @@
         "invoke:v2ex_fetch_token_info",
         "invoke:v2ex_fetch_notifications"
       ],
-      "updated_at": "2026-08-14",
+      "updated_at": "2026-08-18",
       "author": "mcx",
       "min_app_version": "0.6.87",
       "platforms": [
@@ -1607,6 +1751,14 @@
         "windows"
       ],
       "releases": [
+        {
+          "version": "3.1.2",
+          "published_at": "2026-08-18",
+          "notes_localizations": {
+            "en": "Refreshes the community plugin icon with a dedicated generated asset and updates marketplace presentation metadata.",
+            "zh-CN": "为社区插件更新独立生成的图标资源，并同步完善市场展示元数据。"
+          }
+        },
         {
           "version": "3.1.1",
           "published_at": "2026-08-14",
@@ -1660,7 +1812,7 @@
     {
       "id": "weather",
       "name": "Weather",
-      "version": "1.0.1",
+      "version": "1.0.2",
       "description": "Current conditions and multi-day forecast via Open-Meteo (or OpenWeatherMap). Cached for fast reopen.",
       "names": {
         "en": "Weather",
@@ -1671,8 +1823,8 @@
         "zh-CN": "通过 Open-Meteo 或 OpenWeatherMap 查看当前天气和多日预报。"
       },
       "download_url": "https://raw.githubusercontent.com/mcxen/qx-plugins/main/weather.qx-plugin",
-      "size_bytes": 28623,
-      "checksum_sha256": "d719a47b0bbf339bee51307c500fb5111f03db45ef42d576623230cd74e55f23",
+      "size_bytes": 282779,
+      "checksum_sha256": "abd3a2fd9817970d32ee4ee5da29bf4183ccf81428c5918e605ea83f5a90b673",
       "required_permissions": [
         "http",
         "open-url",
@@ -1683,7 +1835,7 @@
         "invoke:get_cached_weather_for_location",
         "invoke:detect_location"
       ],
-      "updated_at": "2026-08-09",
+      "updated_at": "2026-08-18",
       "author": "mcx",
       "min_app_version": "0.5.18",
       "platforms": [
@@ -1691,6 +1843,14 @@
         "windows"
       ],
       "releases": [
+        {
+          "version": "1.0.2",
+          "published_at": "2026-08-18",
+          "notes_localizations": {
+            "en": "Refreshes the community plugin icon with a dedicated generated asset and updates marketplace presentation metadata.",
+            "zh-CN": "为社区插件更新独立生成的图标资源，并同步完善市场展示元数据。"
+          }
+        },
         {
           "version": "1.0.1",
           "published_at": "2026-08-08",

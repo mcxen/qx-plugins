@@ -5,14 +5,14 @@
     "en": "Quick Calendar",
     "zh-CN": "快捷日历"
   },
-  "version": "1.2.1",
+  "version": "1.2.2",
   "description": "View calendar month-by-month",
   "descriptions": {
     "en": "View calendar month-by-month",
     "zh-CN": "按月浏览日历。"
   },
   "author": "fuksman",
-  "icon": "icon.svg",
+  "icon": "icon-generated.png",
   "screenshots": [
     "calendar-1.png",
     "calendar-2.png"
@@ -120,7 +120,7 @@
       "en": "Quick Calendar",
       "zh-CN": "快捷日历"
     },
-    "icon": "command-icon.png",
+    "icon": "icon-generated.png",
     "keywords": []
   },
   "raycast": {
