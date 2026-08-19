@@ -5,7 +5,7 @@
     "en": "Unsplash",
     "zh-CN": "Unsplash"
   },
-  "version": "1.2.2",
+  "version": "1.2.3",
   "description": "Search Unsplash photos, download, and set desktop wallpaper. Ported for Qx (Access Key API; likes/OAuth not included).",
   "descriptions": {
     "en": "Search Unsplash photos, download, and set desktop wallpaper.",

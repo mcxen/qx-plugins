@@ -3,6 +3,14 @@
   "plugins": {
     "another-boring-piece": [
       {
+        "version": "1.0.3",
+        "published_at": "2026-08-19",
+        "notes_localizations": {
+          "en": "Publishes the final generated Qx icon and removes legacy logo assets and preview variants from the package.",
+          "zh-CN": "发布最终生成的 Qx 图标，并从插件包中移除旧 Logo 资源与历史预览图。"
+        }
+      },
+      {
         "version": "1.0.2",
         "published_at": "2026-08-18",
         "notes_localizations": {
@@ -28,6 +36,14 @@
       }
     ],
     "agent-usage": [
+      {
+        "version": "1.2.3",
+        "published_at": "2026-08-19",
+        "notes_localizations": {
+          "en": "Publishes the final generated Qx icon and removes legacy logo assets and preview variants from the package.",
+          "zh-CN": "发布最终生成的 Qx 图标，并从插件包中移除旧 Logo 资源与历史预览图。"
+        }
+      },
       {
         "version": "1.2.2",
         "published_at": "2026-08-18",
@@ -147,6 +163,14 @@
     ],
     "brew": [
       {
+        "version": "1.1.4",
+        "published_at": "2026-08-19",
+        "notes_localizations": {
+          "en": "Publishes the final generated Qx icon and removes legacy logo assets and preview variants from the package.",
+          "zh-CN": "发布最终生成的 Qx 图标，并从插件包中移除旧 Logo 资源与历史预览图。"
+        }
+      },
+      {
         "version": "1.1.3",
         "published_at": "2026-08-18",
         "notes_localizations": {
@@ -180,6 +204,14 @@
       }
     ],
     "external-display-control": [
+      {
+        "version": "1.2.7",
+        "published_at": "2026-08-19",
+        "notes_localizations": {
+          "en": "Publishes the final generated Qx icon and removes legacy logo assets and preview variants from the package.",
+          "zh-CN": "发布最终生成的 Qx 图标，并从插件包中移除旧 Logo 资源与历史预览图。"
+        }
+      },
       {
         "version": "1.2.6",
         "published_at": "2026-08-18",
@@ -327,6 +359,14 @@
     ],
     "pomodoro-island": [
       {
+        "version": "1.6.5",
+        "published_at": "2026-08-19",
+        "notes_localizations": {
+          "en": "Publishes the final generated Qx icon and removes legacy logo assets and preview variants from the package.",
+          "zh-CN": "发布最终生成的 Qx 图标，并从插件包中移除旧 Logo 资源与历史预览图。"
+        }
+      },
+      {
         "version": "1.6.4",
         "published_at": "2026-08-18",
         "notes_localizations": {
@@ -361,6 +401,14 @@
     ],
     "raycast-calendar": [
       {
+        "version": "1.2.4",
+        "published_at": "2026-08-19",
+        "notes_localizations": {
+          "en": "Publishes the final generated Qx icon and removes legacy logo assets and preview variants from the package.",
+          "zh-CN": "发布最终生成的 Qx 图标，并从插件包中移除旧 Logo 资源与历史预览图。"
+        }
+      },
+      {
         "version": "1.2.3",
         "published_at": "2026-08-18",
         "notes_localizations": {
@@ -394,6 +442,14 @@
       }
     ],
     "qx-bing-wallpaper": [
+      {
+        "version": "2.2.5",
+        "published_at": "2026-08-19",
+        "notes_localizations": {
+          "en": "Publishes the final generated Qx icon and removes legacy logo assets and preview variants from the package.",
+          "zh-CN": "发布最终生成的 Qx 图标，并从插件包中移除旧 Logo 资源与历史预览图。"
+        }
+      },
       {
         "version": "2.2.4",
         "published_at": "2026-08-18",
@@ -444,6 +500,14 @@
       }
     ],
     "qxgh": [
+      {
+        "version": "1.5.9",
+        "published_at": "2026-08-19",
+        "notes_localizations": {
+          "en": "Publishes the final generated Qx icon and removes legacy logo assets and preview variants from the package.",
+          "zh-CN": "发布最终生成的 Qx 图标，并从插件包中移除旧 Logo 资源与历史预览图。"
+        }
+      },
       {
         "version": "1.5.8",
         "published_at": "2026-08-18",
@@ -535,6 +599,14 @@
     ],
     "qxgold": [
       {
+        "version": "1.2.4",
+        "published_at": "2026-08-19",
+        "notes_localizations": {
+          "en": "Publishes the final generated Qx icon and removes legacy logo assets and preview variants from the package.",
+          "zh-CN": "发布最终生成的 Qx 图标，并从插件包中移除旧 Logo 资源与历史预览图。"
+        }
+      },
+      {
         "version": "1.2.3",
         "published_at": "2026-08-18",
         "notes_localizations": {
@@ -584,6 +656,14 @@
       }
     ],
     "qxtieba": [
+      {
+        "version": "1.2.2",
+        "published_at": "2026-08-19",
+        "notes_localizations": {
+          "en": "Publishes the final generated Qx icon and removes legacy logo assets and preview variants from the package.",
+          "zh-CN": "发布最终生成的 Qx 图标，并从插件包中移除旧 Logo 资源与历史预览图。"
+        }
+      },
       {
         "version": "1.2.1",
         "published_at": "2026-08-18",
@@ -714,6 +794,14 @@
       }
     ],
     "qxheihe": [
+      {
+        "version": "1.4.14",
+        "published_at": "2026-08-19",
+        "notes_localizations": {
+          "en": "Publishes the final generated Qx icon and removes legacy logo assets and preview variants from the package.",
+          "zh-CN": "发布最终生成的 Qx 图标，并从插件包中移除旧 Logo 资源与历史预览图。"
+        }
+      },
       {
         "version": "1.4.13",
         "published_at": "2026-08-18",
@@ -869,6 +957,14 @@
     ],
     "qxcoolapk": [
       {
+        "version": "1.4.10",
+        "published_at": "2026-08-19",
+        "notes_localizations": {
+          "en": "Publishes the final generated Qx icon and removes legacy logo assets and preview variants from the package.",
+          "zh-CN": "发布最终生成的 Qx 图标，并从插件包中移除旧 Logo 资源与历史预览图。"
+        }
+      },
+      {
         "version": "1.4.9",
         "published_at": "2026-08-18",
         "notes_localizations": {
@@ -1023,6 +1119,14 @@
     ],
     "qxweibo": [
       {
+        "version": "1.2.0",
+        "published_at": "2026-08-19",
+        "notes_localizations": {
+          "en": "Publishes the final generated Qx icon and removes legacy logo assets and preview variants from the package.",
+          "zh-CN": "发布最终生成的 Qx 图标，并从插件包中移除旧 Logo 资源与历史预览图。"
+        }
+      },
+      {
         "version": "1.1.9",
         "published_at": "2026-08-18",
         "notes_localizations": {
@@ -1121,6 +1225,14 @@
     ],
     "qxpicture": [
       {
+        "version": "0.5.4",
+        "published_at": "2026-08-19",
+        "notes_localizations": {
+          "en": "Publishes the final generated Qx icon and removes legacy logo assets and preview variants from the package.",
+          "zh-CN": "发布最终生成的 Qx 图标，并从插件包中移除旧 Logo 资源与历史预览图。"
+        }
+      },
+      {
         "version": "0.5.3",
         "published_at": "2026-08-18",
         "notes_localizations": {
@@ -1170,6 +1282,14 @@
       }
     ],
     "sysinfo": [
+      {
+        "version": "1.4.4",
+        "published_at": "2026-08-19",
+        "notes_localizations": {
+          "en": "Publishes the final generated Qx icon and removes legacy logo assets and preview variants from the package.",
+          "zh-CN": "发布最终生成的 Qx 图标，并从插件包中移除旧 Logo 资源与历史预览图。"
+        }
+      },
       {
         "version": "1.4.3",
         "published_at": "2026-08-18",
@@ -1237,6 +1357,14 @@
     ],
     "unsplash": [
       {
+        "version": "1.2.3",
+        "published_at": "2026-08-19",
+        "notes_localizations": {
+          "en": "Publishes the final generated Qx icon and removes legacy logo assets and preview variants from the package.",
+          "zh-CN": "发布最终生成的 Qx 图标，并从插件包中移除旧 Logo 资源与历史预览图。"
+        }
+      },
+      {
         "version": "1.2.2",
         "published_at": "2026-08-18",
         "notes_localizations": {
@@ -1262,6 +1390,14 @@
       }
     ],
     "v2ex": [
+      {
+        "version": "3.1.3",
+        "published_at": "2026-08-19",
+        "notes_localizations": {
+          "en": "Publishes the final generated Qx icon and removes legacy logo assets and preview variants from the package.",
+          "zh-CN": "发布最终生成的 Qx 图标，并从插件包中移除旧 Logo 资源与历史预览图。"
+        }
+      },
       {
         "version": "3.1.2",
         "published_at": "2026-08-18",
@@ -1320,6 +1456,14 @@
       }
     ],
     "weather": [
+      {
+        "version": "1.0.4",
+        "published_at": "2026-08-19",
+        "notes_localizations": {
+          "en": "Publishes the final generated Qx icon and removes legacy logo assets and preview variants from the package.",
+          "zh-CN": "发布最终生成的 Qx 图标，并从插件包中移除旧 Logo 资源与历史预览图。"
+        }
+      },
       {
         "version": "1.0.3",
         "published_at": "2026-08-18",

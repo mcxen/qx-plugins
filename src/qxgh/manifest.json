@@ -5,7 +5,7 @@
     "zh-CN": "Github助手",
     "en": "QxGH"
   },
-  "version": "1.5.8",
+  "version": "1.5.9",
   "description": "QxGH — watch GitHub Actions and Releases from public github.com pages (no REST API). Business-only workbench UI.",
   "descriptions": {
     "en": "Monitor Actions runs and Releases for public GitHub repositories, with build status, estimated progress, and Island updates.",
