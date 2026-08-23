@@ -1,84 +1,151 @@
+#!/usr/bin/env node
 import assert from "node:assert/strict";
-import plugin, { normalizeV2exReply } from "../src/v2ex/index.js";
+import plugin from "../src/v2ex/index.js";
 
-const nested = normalizeV2exReply({
-  id: 22,
-  content: "@alice nested reply",
-  author: "bob",
-  created: 1_700_000_000,
-  floor: 2,
-  parent_id: 11,
-  depth: 1,
-  reply_to_author: "alice",
-}, 1);
+const tick = () => new Promise((resolve) => setImmediate(resolve));
 
-assert.deepEqual(nested, {
-  id: 22,
-  content: "@alice nested reply",
-  author: "bob",
-  created: 1_700_000_000,
-  floor: 2,
-  parentId: "11",
-  depth: 1,
-  replyToAuthor: "alice",
+function deferred() {
+  let resolve;
+  let reject;
+  const promise = new Promise((ok, fail) => {
+    resolve = ok;
+    reject = fail;
+  });
+  return { promise, resolve, reject };
+}
+
+function topic(id, title) {
+  return {
+    id,
+    title,
+    url: `https://www.v2ex.com/t/${id}`,
+    node: "test",
+    author: "tester",
+    replies: 1,
+    created: 1_700_000_000,
+    content: `${title} body`,
+    last_modified: 1_700_000_000,
+  };
+}
+
+function reply(id, body) {
+  return {
+    id,
+    content: body,
+    author: "reply-user",
+    created: 1_700_000_010,
+    floor: 1,
+  };
+}
+
+function createRun({ ageMs, topicLoader, replyLoader }) {
+  const persisted = new Map([
+    ["v2ex.cache.topics:latest", {
+      data: [topic(1, "cached topic")],
+      savedAt: Date.now() - ageMs,
+    }],
+    ["v2ex.cache.replies:1", {
+      data: [reply(10, "cached reply")],
+      savedAt: Date.now() - ageMs,
+    }],
+  ]);
+  const snapshots = [];
+  const invokes = [];
+  let handlers;
+  const context = {
+    locale: { current: "en", onChange: () => () => {} },
+    getPreference: async (id) => {
+      if (id === "cacheTtlMinutes") return "3";
+      if (id === "nodes") return "programmer";
+      return "";
+    },
+    storage: {
+      persist: {
+        get: async (key) => persisted.get(key) ?? null,
+        set: async (key, value) => persisted.set(key, value),
+      },
+    },
+    invoke: async (command, args) => {
+      invokes.push({ command, args });
+      if (command === "v2ex_fetch_topics") return topicLoader();
+      if (command === "v2ex_fetch_topic_replies") return replyLoader();
+      return [];
+    },
+    http: { fetch: async () => { throw new Error("unexpected HTTP fallback"); } },
+    ui: {
+      mountWorkbench(snapshot, nextHandlers) {
+        snapshots.push(snapshot);
+        handlers = nextHandlers;
+        return { update: (next) => snapshots.push(next) };
+      },
+    },
+    showToast() {},
+    openUrl: async () => {},
+    clipboard: { write: async () => {} },
+  };
+  const container = { innerHTML: "", textContent: "" };
+  plugin.panel.render(container, context);
+  return { container, handlers: () => handlers, invokes, persisted, snapshots };
+}
+
+const liveTopics = deferred();
+const liveReplies = deferred();
+const staleRun = createRun({
+  ageMs: 2 * 60 * 60 * 1000,
+  topicLoader: () => liveTopics.promise,
+  replyLoader: () => liveReplies.promise,
 });
 
-const root = normalizeV2exReply({
-  id: 11,
-  content: "root",
-  author: "alice",
-  floor: 1,
-}, 0);
-assert.equal(root.parentId, undefined);
-assert.equal(root.depth, 0);
-assert.equal(root.replyToAuthor, undefined);
+assert.equal(staleRun.snapshots[0].loading, true, "first snapshot must be a loading shell");
+assert.equal(staleRun.snapshots[0].items.length, 0, "first snapshot must not publish a settled empty result");
+assert.equal(staleRun.snapshots[0].cache.key, "topics:latest", "host cache scope must match the current tab");
 
-const now = Date.now();
-const persisted = new Map([
-  ["v2ex.cache.topics:latest", {
-    savedAt: now,
-    data: [{ id: 42, title: "Cache contract", author: "op", node: "qx", replies: 1, content: "topic" }],
-  }],
-  ["v2ex.cache.replies:42", {
-    savedAt: now - 10 * 60_000,
-    data: [{ id: 1, author: "cached", floor: 1, content: "cached reply" }],
-  }],
-]);
-const snapshots = [];
-const context = {
-  locale: { current: "en", onChange() { return () => {}; } },
-  async getPreference(id) { return id === "cacheTtlMinutes" ? "3" : ""; },
-  storage: { persist: {
-    async get(key) { return persisted.get(key); },
-    async set(key, value) { persisted.set(key, value); },
-  } },
-  async invoke(command) {
-    if (command === "v2ex_fetch_topic_replies") {
-      await new Promise((resolve) => setTimeout(resolve, 5));
-      return [{ id: 2, author: "live", floor: 1, content: "live reply" }];
-    }
-    throw new Error(`unexpected invoke: ${command}`);
+for (let i = 0; i < 8 && !staleRun.snapshots.some((state) => state.items?.[0]?.title === "cached topic"); i += 1) await tick();
+assert.ok(
+  staleRun.snapshots.some((state) => state.items?.[0]?.title === "cached topic"),
+  "retained topic cache must paint before revalidation finishes",
+);
+assert.equal(
+  staleRun.invokes.filter((call) => call.command === "v2ex_fetch_topics").length,
+  1,
+  "stale topic cache should start exactly one background revalidation",
+);
+
+staleRun.handlers().onSelect("1");
+for (let i = 0; i < 8 && !staleRun.snapshots.some((state) => state.items?.[0]?.detail?.replies?.items?.[0]?.body === "cached reply"); i += 1) await tick();
+assert.ok(
+  staleRun.snapshots.some((state) => state.items?.[0]?.detail?.replies?.items?.[0]?.body === "cached reply"),
+  "retained reply cache must paint while reply revalidation runs",
+);
+
+liveReplies.resolve([reply(11, "live reply")]);
+for (let i = 0; i < 8 && !staleRun.snapshots.some((state) => state.items?.[0]?.detail?.replies?.items?.[0]?.body === "live reply"); i += 1) await tick();
+assert.ok(
+  staleRun.snapshots.some((state) => state.items?.[0]?.detail?.replies?.items?.[0]?.body === "live reply"),
+  "reply revalidation must update the current Workbench",
+);
+
+liveTopics.resolve([topic(2, "live topic")]);
+for (let i = 0; i < 8 && !staleRun.snapshots.some((state) => state.items?.[0]?.title === "live topic"); i += 1) await tick();
+assert.ok(
+  staleRun.snapshots.some((state) => state.items?.[0]?.title === "live topic"),
+  "topic revalidation must update the current Workbench",
+);
+assert.equal(staleRun.persisted.get("v2ex.cache.topics:latest").data[0].title, "live topic");
+plugin.panel.destroy(staleRun.container);
+
+let freshTopicCalls = 0;
+const freshRun = createRun({
+  ageMs: 1_000,
+  topicLoader: async () => {
+    freshTopicCalls += 1;
+    return [topic(2, "unexpected live topic")];
   },
-  ui: { mountWorkbench(snapshot) {
-    snapshots.push(structuredClone(snapshot));
-    return { update(next) { snapshots.push(structuredClone(next)); } };
-  } },
-};
-const container = { innerHTML: "", textContent: "" };
-await plugin.panel.render(container, context);
-await new Promise((resolve) => setTimeout(resolve, 30));
+  replyLoader: async () => [],
+});
+for (let i = 0; i < 8 && !freshRun.snapshots.some((state) => state.items?.[0]?.title === "cached topic"); i += 1) await tick();
+assert.ok(freshRun.snapshots.some((state) => state.items?.[0]?.title === "cached topic"));
+assert.equal(freshTopicCalls, 0, "fresh topic cache must avoid transport entirely");
+plugin.panel.destroy(freshRun.container);
 
-const cachedPaint = snapshots.find((snapshot) => (
-  snapshot.island?.secondary === "Loading replies"
-  && snapshot.items?.[0]?.detail?.replies?.items?.[0]?.body === "cached reply"
-));
-assert.ok(cachedPaint, "stale replies must paint immediately while island activity is visible");
-assert.equal(cachedPaint.items[0].detail.replies.status, undefined);
-const livePaint = snapshots.find((snapshot) => (
-  snapshot.island == null
-  && snapshot.items?.[0]?.detail?.replies?.items?.[0]?.body === "live reply"
-));
-assert.ok(livePaint, "live refresh must replace the visible cached replies");
-plugin.panel.destroy(container);
-
-console.log("V2EX smoke ok: reply tree + cache repaint + island-only loading");
+console.log("V2EX cache smoke checks passed");

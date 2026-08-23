@@ -1,7 +1,7 @@
 {
   "id": "qx-bing-wallpaper",
   "name": "Qx Bing Wallpaper",
-  "version": "2.2.5",
+  "version": "2.2.6",
   "description": "Browse Bing's daily images in a native Qx thumbnail list, then download or set them as wallpaper.",
   "names": {
     "en": "Qx Bing Wallpaper",
@@ -37,6 +37,7 @@
     "clipboard",
     "system",
     "island",
+    "invoke:plugin_file_exists",
     "invoke:plugin_file_write_base64",
     "invoke:plugin_file_ensure_dir"
   ],
@@ -188,7 +189,8 @@
         "wallpaper"
       ],
       "mode": "no-view",
-      "interval": "1d"
+      "interval": "1d",
+      "backgroundCategory": "wallpaper"
     }
   ],
   "panel": {

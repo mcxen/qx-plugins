@@ -11,6 +11,8 @@ Raycast converter or compatibility runtime.
 - Item Actions: set wallpaper, download, copy image link, open Bing source
 - Panel Actions: set a random wallpaper and refresh the List
 - Three-hour persisted cache with stale fallback
+- Host-persistent Workbench thumbnail/detail cache across Qx restarts
+- Bounded 20-slot wallpaper file ring; repeated application reuses the existing file
 - One daily background task, configurable to use the latest or a random recent image
 - Durable last-applied record; download or wallpaper failures remain visible as failed background runs
 - Host-native macOS and Windows wallpaper application (no PowerShell dependency)

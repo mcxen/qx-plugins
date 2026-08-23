@@ -98,7 +98,7 @@ function wallpaperDetail(wallpaper, extraFields = [], status) {
       url: previewUrl(wallpaper, 1280),
       alt: wallpaper.name,
       fit: "contain",
-      aspectRatio: "auto",
+      aspectRatio: "landscape",
       zoomable: true,
       caption: `${wallpaper.name} · ${wallpaper.artist}`,
     },

@@ -8,7 +8,7 @@
 
 const CACHE_PREFIX = "v2ex.cache.";
 const DEFAULT_TTL_MS = 3 * 60 * 1000;
-const STALE_MS = 60 * 60 * 1000;
+const STALE_MS = 7 * 24 * 60 * 60 * 1000;
 
 var qxLocale = "en";
 var stopLocale = null;
@@ -148,25 +148,35 @@ async function writeCache(context, key, data) {
  * Stale-while-revalidate: paint cache immediately; refresh when stale.
  * @returns {{ data: any, fromCache: boolean, refreshing: boolean, savedAt?: number, error?: unknown }}
  */
-async function loadWithCache(context, key, loader, { force = false, ttlMs = DEFAULT_TTL_MS } = {}) {
+async function loadWithCache(
+  context,
+  key,
+  loader,
+  { force = false, ttlMs = DEFAULT_TTL_MS, onRevalidated, onRevalidateError } = {},
+) {
   const cached = await readCache(context, key);
   const age = cached?.savedAt ? Date.now() - cached.savedAt : Infinity;
   const fresh = age <= ttlMs;
   const usable = cached && age <= STALE_MS;
 
   if (usable && !force) {
+    const background = !fresh
+      ? Promise.resolve()
+          .then(() => loader())
+          .then(async (data) => {
+            const savedAt = Date.now();
+            await writeCache(context, key, data);
+            onRevalidated?.(data, savedAt);
+          })
+          .catch((error) => onRevalidateError?.(error))
+      : null;
     const result = {
       data: cached.data,
       fromCache: true,
       refreshing: !fresh,
       savedAt: cached.savedAt,
+      background,
     };
-    if (!fresh) {
-      Promise.resolve()
-        .then(() => loader())
-        .then((data) => writeCache(context, key, data))
-        .catch(() => {});
-    }
     return result;
   }
 
@@ -310,7 +320,7 @@ function createPanel(context, initialMode = "latest") {
     selectedId: null,
     /** @type {Map<string, { items: any[], savedAt: number, error?: string }>} */
     replies: new Map(),
-    loading: false,
+    loading: true,
     repliesLoading: new Set(),
     error: null,
     meta: "",
@@ -461,6 +471,11 @@ function createPanel(context, initialMode = "latest") {
     return text("Latest", "最新");
   }
 
+  function cacheKey() {
+    if (state.mode === "nodes") return `node:${state.node || "default"}`;
+    return state.mode === "notifications" ? "notifications" : `topics:${state.mode}`;
+  }
+
   function panelActions() {
     // Item-scoped open/copy live on items[].actions. Host Enter/Esc own detail navigation.
     return [
@@ -520,6 +535,11 @@ function createPanel(context, initialMode = "latest") {
       revision: ++state.revision,
       title: "V2EX",
       layout: { kind: "list" },
+      cache: {
+        key: cacheKey(),
+        mode: "stale-while-revalidate",
+        maxAgeMs: STALE_MS,
+      },
       query: state.query,
       queryPlaceholder: state.mode === "nodes"
         ? text("Filter topics in this node…", "在当前节点中筛选主题…")
@@ -614,21 +634,43 @@ function createPanel(context, initialMode = "latest") {
     paint();
     try {
       const token = await getToken(context);
-      const cached = await readCache(context, `replies:${key}`);
+      const result = await loadWithCache(
+        context,
+        `replies:${key}`,
+        () => fetchRepliesLive(context, Number(key), token),
+        {
+          force,
+          ttlMs,
+          onRevalidated(data, savedAt) {
+            if (state.dead) return;
+            state.replies.set(key, {
+              items: Array.isArray(data) ? data : [],
+              savedAt,
+            });
+            paint();
+          },
+          onRevalidateError(error) {
+            if (state.dead) return;
+            const previous = state.replies.get(key);
+            state.replies.set(key, {
+              items: previous?.items || [],
+              savedAt: previous?.savedAt || 0,
+              error: errorMessage(error),
+            });
+            paint();
+          },
+        },
+      );
       if (state.dead) return;
-      const cachedAge = cached?.savedAt ? Date.now() - Number(cached.savedAt) : Infinity;
-      const usable = cached && Array.isArray(cached.data) && cachedAge <= STALE_MS;
-      if (!force && usable && (!current || Number(cached.savedAt) >= current.savedAt)) {
-        state.replies.set(key, { items: cached.data, savedAt: Number(cached.savedAt) });
+      state.replies.set(key, {
+        items: Array.isArray(result.data) ? result.data : [],
+        savedAt: Number(result.savedAt) || Date.now(),
+        error: result.error ? errorMessage(result.error) : undefined,
+      });
+      if (result.background) {
         paint();
+        await result.background;
       }
-      if (!force && usable && cachedAge <= ttlMs) return;
-
-      const items = await fetchRepliesLive(context, Number(key), token);
-      if (state.dead) return;
-      const savedAt = Date.now();
-      state.replies.set(key, { items, savedAt });
-      await writeCache(context, `replies:${key}`, items);
     } catch (err) {
       if (state.dead) return;
       const existing = state.replies.get(key);
@@ -674,7 +716,24 @@ function createPanel(context, initialMode = "latest") {
           context,
           "notifications",
           () => fetchNotificationsLive(context, token),
-          { force, ttlMs: Math.min(state.ttlMs, 60_000) },
+          {
+            force,
+            ttlMs: Math.min(state.ttlMs, 60_000),
+            onRevalidated(data) {
+              if (state.dead || generation !== state.loadGeneration || state.mode !== "notifications") return;
+              state.notifications = Array.isArray(data) ? data : [];
+              state.topics = [];
+              state.meta = `${state.notifications.length} ${text("notices", "条通知")}`;
+              state.error = null;
+              paint();
+            },
+            onRevalidateError(error) {
+              if (state.dead || generation !== state.loadGeneration || state.mode !== "notifications") return;
+              state.meta = `${state.notifications.length} ${text("notices", "条通知")} · ${text("offline cache", "离线缓存")}`;
+              state.error = errorMessage(error);
+              paint();
+            },
+          },
         );
         if (state.dead || generation !== state.loadGeneration) return;
         state.notifications = Array.isArray(result.data) ? result.data : [];
@@ -684,6 +743,10 @@ function createPanel(context, initialMode = "latest") {
           : `${state.notifications.length} ${text("notices", "条通知")}`;
         if (result.error) {
           state.meta += ` · ${text("offline cache", "离线缓存")}`;
+        }
+        if (result.background) {
+          paint();
+          await result.background;
         }
       } else if (state.mode === "nodes") {
         if (!state.node) {
@@ -699,11 +762,29 @@ function createPanel(context, initialMode = "latest") {
             "按节点浏览需要在插件偏好中填写访问令牌。",
           ));
         }
+        const requestedNode = state.node;
         const result = await loadWithCache(
           context,
-          `node:${state.node}`,
-          () => fetchNodeTopicsLive(context, state.node, token),
-          { force, ttlMs: state.ttlMs },
+          `node:${requestedNode}`,
+          () => fetchNodeTopicsLive(context, requestedNode, token),
+          {
+            force,
+            ttlMs: state.ttlMs,
+            onRevalidated(data) {
+              if (state.dead || generation !== state.loadGeneration || state.mode !== "nodes" || state.node !== requestedNode) return;
+              state.topics = Array.isArray(data) ? data : [];
+              state.notifications = [];
+              state.meta = `${state.topics.length} ${text("in", "条 ·")} ${requestedNode}`;
+              state.error = null;
+              paint();
+            },
+            onRevalidateError(error) {
+              if (state.dead || generation !== state.loadGeneration || state.mode !== "nodes" || state.node !== requestedNode) return;
+              state.meta = `${state.topics.length} ${text("in", "条 ·")} ${requestedNode} · ${text("offline cache", "离线缓存")}`;
+              state.error = errorMessage(error);
+              paint();
+            },
+          },
         );
         if (state.dead || generation !== state.loadGeneration) return;
         state.topics = Array.isArray(result.data) ? result.data : [];
@@ -712,12 +793,36 @@ function createPanel(context, initialMode = "latest") {
           ? `${state.topics.length} ${text("in", "条 ·")} ${state.node} · ${text("cached", "已缓存")} ${ageLabel(result.savedAt)}${result.refreshing ? ` · ${text("updating…", "更新中…")}` : ""}`
           : `${state.topics.length} ${text("in", "条 ·")} ${state.node}`;
         if (result.error) state.meta += ` · ${text("offline cache", "离线缓存")}`;
+        if (result.background) {
+          paint();
+          await result.background;
+        }
       } else {
+        const requestedMode = state.mode;
         const result = await loadWithCache(
           context,
-          `topics:${state.mode}`,
-          () => fetchTopicsLive(context, state.mode),
-          { force, ttlMs: state.ttlMs },
+          `topics:${requestedMode}`,
+          () => fetchTopicsLive(context, requestedMode),
+          {
+            force,
+            ttlMs: state.ttlMs,
+            onRevalidated(data) {
+              if (state.dead || generation !== state.loadGeneration || state.mode !== requestedMode) return;
+              state.topics = Array.isArray(data) ? data : [];
+              state.notifications = [];
+              const liveLabel = requestedMode === "hot" ? text("hot", "热门") : text("latest", "最新");
+              state.meta = `${state.topics.length} ${text("topics", "个主题")} · ${liveLabel}`;
+              state.error = null;
+              paint();
+            },
+            onRevalidateError(error) {
+              if (state.dead || generation !== state.loadGeneration || state.mode !== requestedMode) return;
+              const staleLabel = requestedMode === "hot" ? text("hot", "热门") : text("latest", "最新");
+              state.meta = `${state.topics.length} ${text("topics", "个主题")} · ${staleLabel} · ${text("offline cache", "离线缓存")}`;
+              state.error = errorMessage(error);
+              paint();
+            },
+          },
         );
         if (state.dead || generation !== state.loadGeneration) return;
         state.topics = Array.isArray(result.data) ? result.data : [];
@@ -727,6 +832,10 @@ function createPanel(context, initialMode = "latest") {
           ? `${state.topics.length} ${text("topics", "个主题")} · ${label} · ${text("cached", "已缓存")} ${ageLabel(result.savedAt)}${result.refreshing ? ` · ${text("updating…", "更新中…")}` : ""}`
           : `${state.topics.length} ${text("topics", "个主题")} · ${label}`;
         if (result.error) state.meta += ` · ${text("offline cache", "离线缓存")}`;
+        if (result.background) {
+          paint();
+          await result.background;
+        }
       }
 
       const rows = state.mode === "notifications" ? visibleNotifications() : visibleTopics();
@@ -738,9 +847,6 @@ function createPanel(context, initialMode = "latest") {
     } catch (err) {
       if (state.dead || generation !== state.loadGeneration) return;
       state.error = errorMessage(err);
-      if (state.mode === "notifications") state.notifications = [];
-      else state.topics = [];
-      state.meta = "";
     } finally {
       if (state.dead || generation !== state.loadGeneration) return;
       state.loading = false;

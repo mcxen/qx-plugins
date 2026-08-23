@@ -1,4 +1,14 @@
 import assert from "node:assert/strict";
+import { readFile } from "node:fs/promises";
+
+const manifest = JSON.parse(
+  await readFile(new URL("../src/another-boring-piece/manifest.json", import.meta.url), "utf8"),
+);
+assert.equal(
+  manifest.commands.find((command) => command.name === "auto-switch-art-wallpaper")?.backgroundCategory,
+  "wallpaper",
+  "art wallpaper automation must join the host wallpaper pause policy",
+);
 
 const moduleUrl = new URL("../src/another-boring-piece/index.js", import.meta.url);
 moduleUrl.searchParams.set("smoke", String(Date.now()));

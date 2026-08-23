@@ -11,6 +11,7 @@
 - One Workbench panel with `today` and `history` tabs.
 - `set-random-art-wallpaper`: real user-triggered no-view command.
 - `auto-switch-art-wallpaper`: 30-minute host heartbeat; background changes are opt-in and respect the configured interval.
+- The heartbeat declares `backgroundCategory: "wallpaper"`; Qx owns the cross-plugin pause/resume policy.
 - No duplicate open-panel or history command.
 
 ## Cache invariants

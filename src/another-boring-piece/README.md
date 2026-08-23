@@ -22,12 +22,13 @@ Features:
 - Opt-in background rotation, disabled by default
 - Local history for selected, downloaded, and automatically rotated artwork
 - Six-hour stale-while-revalidate catalog cache
+- Host-persistent Workbench thumbnail/detail cache across Qx restarts
 - Bounded 20-slot local wallpaper file cache with deterministic reuse
 - History capped at 200 entries
 
-Only catalog data and normalized history metadata are persisted. Image bytes are
-stored in a bounded plugin-owned ring for the host wallpaper setter; downloaded
-copies go directly to the user's Downloads directory.
+Catalog data and normalized history metadata are persisted by the plugin. Workbench
+preview bytes use Qx's bounded host cache; wallpaper setter bytes use the separate
+bounded plugin-owned ring. Downloaded copies go directly to the user's Downloads directory.
 
 ## 中文说明
 

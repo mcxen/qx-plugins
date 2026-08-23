@@ -6,9 +6,12 @@ Native Qx business plugin. Do not run it through the Raycast converter.
 
 - `set-random-wallpaper` / `set-latest-wallpaper`: manual no-view commands
 - `daily-wallpaper`: the single daily background command; reads `dailyWallpaperMode`
+- `daily-wallpaper` declares `backgroundCategory: "wallpaper"` so the Qx host can pause
+  automatic wallpaper changes across every compatible plugin without disabling manual actions.
 - Workbench List: thumbnail images, selection, structured details, item/panel Actions
 - Host-owned adaptive image detail + zoom Dialog; no iframe CSS/lightbox workaround
 - Persisted Bing archive cache
+- Host-persistent Workbench image cache plus a plugin-owned 20-slot wallpaper file ring
 
 ## Invariants
 
@@ -23,6 +26,7 @@ Native Qx business plugin. Do not run it through the Raycast converter.
 8. Never catch and swallow command failures. The host background ledger must receive rejection
    so it cannot display a false success.
 9. Persist a last-applied record only after both file write and host wallpaper application succeed.
+10. Reapplying an existing image must reuse its indexed slot; never restore one-file-per-application growth.
 
 ## Permissions
 
@@ -31,7 +35,7 @@ Native Qx business plugin. Do not run it through the Raycast converter.
 - `clipboard`: copy image link Action
 - `system`: platform/home detection and host-native macOS/Windows wallpaper setter
 - `island`: Workbench busy projection
-- exact `plugin_file_*`: file output
+- exact `plugin_file_*`: exists/ensure/write for the 20-slot wallpaper ring and explicit downloads
 
 ## Edit checklist
 

@@ -32,7 +32,9 @@ src/v2ex/
 7. Actions use stable ids + unique `menuKey`. Host owns Enter open/back for list↔detail.
 8. One action description only — no duplicated Bottom Bar / primary “open detail” fakes.
 9. Nodes and notifications require token; latest/hot do not.
-10. The host V2EX service resolves leading `@member` mentions against the latest earlier reply by that author. Preserve its `parent_id`, bounded `depth`, and `reply_to_author` fields when publishing Workbench `parentId`, `depth`, and `replyToAuthor`; do not infer a second tree in the plugin.
+10. The first Workbench snapshot is a loading shell with a stable cache scope; never publish a settled empty collection before cache restore.
+11. Read usable persist cache before transport on every non-force load. Expired-but-retained data stays visible while revalidation updates the current Workbench, not only the next open.
+12. The host V2EX service resolves leading `@member` mentions against the latest earlier reply by that author. Preserve its `parent_id`, bounded `depth`, and `reply_to_author` fields as Workbench `parentId`, `depth`, and `replyToAuthor`; do not infer a second tree in the plugin.
 
 ## Tabs / filters
 

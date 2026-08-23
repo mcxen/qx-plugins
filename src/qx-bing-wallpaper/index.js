@@ -5,7 +5,9 @@
 
 const CACHE_KEY = "bing-wallpapers.v1";
 const LAST_APPLIED_KEY = "bing-wallpaper.last-applied.v1";
+const IMAGE_INDEX_KEY = "bing-wallpaper.image-index.v1";
 const CACHE_TTL_MS = 3 * 60 * 60 * 1000;
+const IMAGE_SLOT_LIMIT = 20;
 const WALLPAPER_DIR = "/qx-plugin-files/qx-bing-wallpaper/wallpapers";
 
 let qxLocale = "en";
@@ -110,24 +112,62 @@ async function loadWallpapers(context, force = false) {
   }
 }
 
-async function downloadImage(context, image, directory) {
+async function fetchImageBytes(context, image) {
   const url = imageUrl(image, "uhd");
   const response = await context.http.fetch(url, { method: "GET", timeoutMs: 120_000 });
   if (!response.ok) throw new Error(`Download HTTP ${response.status}`);
-  const bytes = new Uint8Array(await response.arrayBuffer());
+  return new Uint8Array(await response.arrayBuffer());
+}
+
+async function downloadImage(context, image, directory) {
+  const bytes = await fetchImageBytes(context, image);
   const path = `${String(directory).replace(/[\\/]$/, "")}/bing-${imageId(image)}-${image.startdate || "wallpaper"}.jpg`;
   await context.qx.invokeRust("plugin_file_ensure_dir", { path: String(directory) });
   await context.qx.invokeRust("plugin_file_write_base64", { path, dataBase64: toBase64(bytes) });
   return path;
 }
 
+function normalizeImageIndex(value) {
+  const source = value && typeof value === "object" && !Array.isArray(value) ? value : {};
+  const entries = (Array.isArray(source.entries) ? source.entries : []).map((entry) => {
+    const slot = Math.floor(Number(entry?.slot));
+    if (!entry?.id || !entry?.path || !Number.isFinite(slot) || slot < 0 || slot >= IMAGE_SLOT_LIMIT) return null;
+    return { id: String(entry.id), slot, path: String(entry.path), touchedAt: Number(entry.touchedAt) || 0 };
+  }).filter(Boolean).slice(-IMAGE_SLOT_LIMIT);
+  const nextSlot = Math.floor(Number(source.nextSlot) || 0);
+  return { nextSlot: ((nextSlot % IMAGE_SLOT_LIMIT) + IMAGE_SLOT_LIMIT) % IMAGE_SLOT_LIMIT, entries };
+}
+
+async function ensureWallpaperFile(context, image) {
+  const index = normalizeImageIndex(await context.storage.persist.get(IMAGE_INDEX_KEY).catch(() => null));
+  const id = imageId(image);
+  const existing = index.entries.find((entry) => entry.id === id);
+  if (existing) {
+    const exists = await context.qx.invokeRust("plugin_file_exists", { path: existing.path }).catch(() => false);
+    if (exists) {
+      existing.touchedAt = Date.now();
+      await context.storage.persist.set(IMAGE_INDEX_KEY, index);
+      return existing.path;
+    }
+  }
+
+  const bytes = await fetchImageBytes(context, image);
+  const slot = index.nextSlot;
+  const path = `${WALLPAPER_DIR}/slot-${String(slot).padStart(2, "0")}.jpg`;
+  await context.qx.invokeRust("plugin_file_ensure_dir", { path: WALLPAPER_DIR });
+  await context.qx.invokeRust("plugin_file_write_base64", { path, dataBase64: toBase64(bytes) });
+  const entries = index.entries.filter((entry) => entry.id !== id && entry.slot !== slot);
+  entries.push({ id, slot, path, touchedAt: Date.now() });
+  await context.storage.persist.set(IMAGE_INDEX_KEY, {
+    nextSlot: (slot + 1) % IMAGE_SLOT_LIMIT,
+    entries: entries.slice(-IMAGE_SLOT_LIMIT),
+  });
+  return path;
+}
+
 async function applyWallpaper(context, image) {
-  const env = await context.system.env();
   const applyTo = String(await preference(context, "applyTo", "every"));
-  const directory = env.platform === "windows"
-    ? `${env.homeDir}\\Pictures\\Qx Bing Wallpaper`
-    : WALLPAPER_DIR;
-  const path = await downloadImage(context, image, directory);
+  const path = await ensureWallpaperFile(context, image);
   await context.system.setWallpaper(path, { scope: applyTo === "current" ? "current" : "every" });
   return path;
 }
@@ -203,7 +243,7 @@ function createPanelState(context) {
               url: imageUrl(image, "uhd"),
               alt: title,
               fit: "contain",
-              aspectRatio: "auto",
+              aspectRatio: "landscape",
               zoomable: true,
               caption: credit,
             },

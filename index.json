@@ -93,7 +93,7 @@
     {
       "id": "another-boring-piece",
       "name": "Art Wallpapers",
-      "version": "1.0.3",
+      "version": "1.0.4",
       "description": "Another boring piece. Daily. Hand-picked fine-art wallpapers from anotherboring.day.",
       "names": {
         "en": "Art Wallpapers",
@@ -104,8 +104,8 @@
         "zh-CN": "Another boring piece. Daily. 浏览每日精选艺术作品，设置或下载壁纸，并保留本地操作历史。"
       },
       "download_url": "https://raw.githubusercontent.com/mcxen/qx-plugins/main/another-boring-piece.qx-plugin",
-      "size_bytes": 3232656,
-      "checksum_sha256": "556ce41c928fb90ebb2a388191024538672cf0912c2d84db8b5574277350e132",
+      "size_bytes": 3233313,
+      "checksum_sha256": "6d76a3aae8347d657bcf0039beb27a6b2a8d9e83081f83cc2c562f7d796980d0",
       "required_permissions": [
         "http",
         "open-url",
@@ -116,7 +116,7 @@
         "invoke:plugin_file_ensure_dir",
         "invoke:plugin_file_write_base64"
       ],
-      "updated_at": "2026-08-19",
+      "updated_at": "2026-08-23",
       "author": "yevgen_glukhov",
       "min_app_version": "0.6.86",
       "platforms": [
@@ -124,6 +124,14 @@
         "windows"
       ],
       "releases": [
+        {
+          "version": "1.0.4",
+          "published_at": "2026-08-23",
+          "notes_localizations": {
+            "en": "Connects art rotation to Qx's shared wallpaper pause control and stabilizes cached Workbench wallpaper previews across restarts.",
+            "zh-CN": "将艺术壁纸轮换接入 Qx 通用暂停控制，并稳定应用重启后的 Workbench 壁纸缓存预览。"
+          }
+        },
         {
           "version": "1.0.3",
           "published_at": "2026-08-19",
@@ -684,7 +692,7 @@
     {
       "id": "qx-bing-wallpaper",
       "name": "Qx Bing Wallpaper",
-      "version": "2.2.5",
+      "version": "2.2.6",
       "description": "Browse Bing's daily images in a native Qx thumbnail list, then download or set them as wallpaper.",
       "names": {
         "en": "Qx Bing Wallpaper",
@@ -695,18 +703,19 @@
         "zh-CN": "浏览必应每日图片，下载图片或将其设为壁纸。"
       },
       "download_url": "https://raw.githubusercontent.com/mcxen/qx-plugins/main/qx-bing-wallpaper.qx-plugin",
-      "size_bytes": 13105626,
-      "checksum_sha256": "0ccab7891cf8f335756e906a0a5e94f6e82325e5530e73673689799137dd466c",
+      "size_bytes": 13108655,
+      "checksum_sha256": "f80478beee2119a4b593f6f371939d65d5b81e85261e9d50ec942cd2c8e0d298",
       "required_permissions": [
         "http",
         "open-url",
         "clipboard",
         "system",
         "island",
+        "invoke:plugin_file_exists",
         "invoke:plugin_file_write_base64",
         "invoke:plugin_file_ensure_dir"
       ],
-      "updated_at": "2026-08-19",
+      "updated_at": "2026-08-23",
       "author": "Qx",
       "min_app_version": "0.6.13",
       "platforms": [
@@ -714,6 +723,14 @@
         "windows"
       ],
       "releases": [
+        {
+          "version": "2.2.6",
+          "published_at": "2026-08-23",
+          "notes_localizations": {
+            "en": "Adds a bounded 20-slot wallpaper cache, reuses existing downloads, stabilizes landscape details, and joins Qx's shared wallpaper pause control.",
+            "zh-CN": "新增 20 槽有界壁纸缓存并复用已有下载，稳定横向详情，同时接入 Qx 通用壁纸暂停控制。"
+          }
+        },
         {
           "version": "2.2.5",
           "published_at": "2026-08-19",
@@ -1942,7 +1959,7 @@
     {
       "id": "v2ex",
       "name": "V2EX",
-      "version": "3.1.3",
+      "version": "3.1.4",
       "description": "Browse V2EX latest, hot, and node topics with Workbench list/detail, replies, and cached host APIs.",
       "names": {
         "en": "V2EX",
@@ -1953,8 +1970,8 @@
         "zh-CN": "通过 Workbench 列表/详情浏览 V2EX 最新、热门与节点主题，支持回复与宿主缓存接口。"
       },
       "download_url": "https://raw.githubusercontent.com/mcxen/qx-plugins/main/v2ex.qx-plugin",
-      "size_bytes": 3045238,
-      "checksum_sha256": "ab16ea8b8817b908860e93fca3489ef64160a5c0d24c575ee4d750e390aabfff",
+      "size_bytes": 3050124,
+      "checksum_sha256": "fe7ac0cdf3907f58353b6a56907f30f9184a0aa55b4e112f79c34179f727b6cd",
       "required_permissions": [
         "http",
         "open-url",
@@ -1967,7 +1984,7 @@
         "invoke:v2ex_fetch_token_info",
         "invoke:v2ex_fetch_notifications"
       ],
-      "updated_at": "2026-08-19",
+      "updated_at": "2026-08-23",
       "author": "mcx",
       "min_app_version": "0.6.87",
       "platforms": [
@@ -1975,6 +1992,14 @@
         "windows"
       ],
       "releases": [
+        {
+          "version": "3.1.4",
+          "published_at": "2026-08-23",
+          "notes_localizations": {
+            "en": "Makes ordinary list and reply loads cache-first, keeps retained stale content visible while revalidating the current Workbench, and isolates cache scopes by tab and node.",
+            "zh-CN": "让普通列表与回复加载始终优先读取缓存，保留过期内容并在当前 Workbench 完成后台更新，同时按标签页与节点隔离缓存。"
+          }
+        },
         {
           "version": "3.1.3",
           "published_at": "2026-08-19",

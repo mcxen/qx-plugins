@@ -3,6 +3,14 @@
   "plugins": {
     "another-boring-piece": [
       {
+        "version": "1.0.4",
+        "published_at": "2026-08-23",
+        "notes_localizations": {
+          "en": "Connects art rotation to Qx's shared wallpaper pause control and stabilizes cached Workbench wallpaper previews across restarts.",
+          "zh-CN": "将艺术壁纸轮换接入 Qx 通用暂停控制，并稳定应用重启后的 Workbench 壁纸缓存预览。"
+        }
+      },
+      {
         "version": "1.0.3",
         "published_at": "2026-08-19",
         "notes_localizations": {
@@ -442,6 +450,14 @@
       }
     ],
     "qx-bing-wallpaper": [
+      {
+        "version": "2.2.6",
+        "published_at": "2026-08-23",
+        "notes_localizations": {
+          "en": "Adds a bounded 20-slot wallpaper cache, reuses existing downloads, stabilizes landscape details, and joins Qx's shared wallpaper pause control.",
+          "zh-CN": "新增 20 槽有界壁纸缓存并复用已有下载，稳定横向详情，同时接入 Qx 通用壁纸暂停控制。"
+        }
+      },
       {
         "version": "2.2.5",
         "published_at": "2026-08-19",
@@ -1390,6 +1406,14 @@
       }
     ],
     "v2ex": [
+      {
+        "version": "3.1.4",
+        "published_at": "2026-08-23",
+        "notes_localizations": {
+          "en": "Makes ordinary list and reply loads cache-first, keeps retained stale content visible while revalidating the current Workbench, and isolates cache scopes by tab and node.",
+          "zh-CN": "让普通列表与回复加载始终优先读取缓存，保留过期内容并在当前 Workbench 完成后台更新，同时按标签页与节点隔离缓存。"
+        }
+      },
       {
         "version": "3.1.3",
         "published_at": "2026-08-19",

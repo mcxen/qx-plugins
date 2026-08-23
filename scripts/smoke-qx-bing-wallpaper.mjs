@@ -17,6 +17,11 @@ assert.deepEqual(
   ["daily-wallpaper"],
   "exactly one command should own the daily schedule",
 );
+assert.equal(
+  manifest.commands.find((command) => command.name === "daily-wallpaper")?.backgroundCategory,
+  "wallpaper",
+  "daily wallpaper automation must join the host wallpaper pause policy",
+);
 
 const images = [
   {
@@ -35,12 +40,16 @@ function createContext({ mode = "latest", failArchive = false } = {}) {
   const persisted = new Map();
   const wallpaperPaths = [];
   const invokes = [];
+  const files = new Set();
+  let imageFetches = 0;
   const toasts = [];
   const workbenchSnapshots = [];
   return {
     persisted,
     wallpaperPaths,
     invokes,
+    files,
+    get imageFetches() { return imageFetches; },
     toasts,
     workbenchSnapshots,
     context: {
@@ -52,6 +61,7 @@ function createContext({ mode = "latest", failArchive = false } = {}) {
             if (failArchive) return { ok: false, status: 503 };
             return { ok: true, status: 200, json: async () => ({ images }) };
           }
+          imageFetches += 1;
           return {
             ok: true,
             status: 200,
@@ -76,6 +86,9 @@ function createContext({ mode = "latest", failArchive = false } = {}) {
       qx: {
         invokeRust: async (command, args) => {
           invokes.push({ command, args });
+          if (command === "plugin_file_exists") return files.has(args.path);
+          if (command === "plugin_file_write_base64") files.add(args.path);
+          return null;
         },
       },
       ui: {
@@ -128,6 +141,18 @@ assert.equal(
 assert.ok(
   latestRun.invokes.some((call) => call.command === "plugin_file_write_base64"),
   "wallpaper image must be written through the host file port",
+);
+await daily.run(latestRun.context, { launchType: "background" });
+assert.equal(latestRun.imageFetches, 1, "reapplying the same wallpaper must reuse the bounded file cache");
+assert.equal(
+  latestRun.invokes.filter((call) => call.command === "plugin_file_write_base64").length,
+  1,
+  "reapplying the same wallpaper must not write another file",
+);
+assert.equal(
+  latestRun.persisted.get("bing-wallpaper.image-index.v1")?.entries?.length,
+  1,
+  "wallpaper file cache must persist its slot index",
 );
 
 const randomRun = createContext({ mode: "random" });
