@@ -1,7 +1,7 @@
 {
   "name": "qx-plugins",
   "private": true,
-  "version": "1.8.6",
+  "version": "1.8.7",
   "type": "module",
   "scripts": {
     "convert:raycast": "node scripts/convert-raycast-extension.mjs",
@@ -29,7 +29,8 @@
     "smoke:bing-wallpaper": "node scripts/smoke-qx-bing-wallpaper.mjs",
     "smoke:sysinfo": "node scripts/smoke-sysinfo.mjs",
     "smoke:agent-usage": "npm run build:agent-usage && node scripts/smoke-agent-usage.mjs",
-    "smoke:another-boring-piece": "npm run build:another-boring-piece && node scripts/smoke-another-boring-piece.mjs"
+    "smoke:another-boring-piece": "npm run build:another-boring-piece && node scripts/smoke-another-boring-piece.mjs",
+    "smoke:blueprint": "node scripts/smoke-blueprint.mjs"
   },
   "dependencies": {
     "bcryptjs": "^3.0.2",

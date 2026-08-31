@@ -101,6 +101,16 @@
         }
       }
     ],
+    "blueprint": [
+      {
+        "version": "1.0.0",
+        "published_at": "2026-08-31",
+        "notes_localizations": {
+          "en": "First BluePrint Xianji release with PAT-authenticated stateless MCP discovery, note browsing, authenticated image previews, creation, complete-model editing, and baseVersion conflict protection.",
+          "zh-CN": "首个 BluePrint 随手记版本：支持 PAT 鉴权无状态 MCP 能力发现、笔记浏览、鉴权图片预览、新建、完整模型编辑与 baseVersion 冲突保护。"
+        }
+      }
+    ],
     "clipboard-actions": [
       {
         "version": "1.0.2",

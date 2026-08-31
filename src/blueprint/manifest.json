@@ -1,0 +1,87 @@
+{
+  "id": "blueprint",
+  "name": "BluePrint",
+  "names": {
+    "en": "BluePrint",
+    "zh-CN": "BluePrint 随手记"
+  },
+  "version": "1.0.0",
+  "description": "Read, create, and safely edit BluePrint Xianji notes through PAT-authenticated MCP.",
+  "descriptions": {
+    "en": "Read, create, and safely edit BluePrint Xianji notes through PAT-authenticated MCP.",
+    "zh-CN": "通过 PAT 鉴权 MCP 查看、新建并安全编辑 BluePrint 随手记。"
+  },
+  "author": "mcx",
+  "icon": "blueprint-logo.png",
+  "keywords": [
+    "blueprint",
+    "xianji",
+    "notes",
+    "mcp",
+    "随手记",
+    "笔记"
+  ],
+  "permissions": [
+    "http",
+    "open-url"
+  ],
+  "preferences": [
+    {
+      "id": "endpoint",
+      "label": "MCP endpoint",
+      "type": "string",
+      "required": true,
+      "default": "http://127.0.0.1:8787/mcp",
+      "placeholder": "https://blueprint.example.com/mcp",
+      "description": "BluePrint Streamable HTTP MCP endpoint. A base URL is normalized to /mcp.",
+      "labels": {
+        "en": "MCP endpoint",
+        "zh-CN": "MCP 地址"
+      },
+      "descriptions": {
+        "en": "BluePrint Streamable HTTP MCP endpoint. A base URL is normalized to /mcp.",
+        "zh-CN": "BluePrint Streamable HTTP MCP 地址；基础地址会自动补全 /mcp。"
+      },
+      "placeholders": {
+        "en": "https://blueprint.example.com/mcp",
+        "zh-CN": "https://blueprint.example.com/mcp"
+      }
+    },
+    {
+      "id": "pat",
+      "label": "Personal access token",
+      "type": "password",
+      "required": true,
+      "description": "BluePrint PAT with content:read and content:write. The token is sent only as an Authorization header.",
+      "labels": {
+        "en": "Personal access token",
+        "zh-CN": "个人访问令牌"
+      },
+      "descriptions": {
+        "en": "BluePrint PAT with content:read and content:write. It is never placed in content, URLs, caches, or logs.",
+        "zh-CN": "需要 content:read 与 content:write；令牌不会写入内容、URL、缓存或日志。"
+      }
+    }
+  ],
+  "entry": "index.js",
+  "panel": {
+    "icon": "blueprint-logo.png",
+    "title": "BluePrint",
+    "titles": {
+      "en": "BluePrint",
+      "zh-CN": "BluePrint 随手记"
+    },
+    "keywords": [
+      "blueprint",
+      "xianji",
+      "notes",
+      "随手记"
+    ]
+  },
+  "min_app_version": "0.6.103",
+  "platforms": [
+    "macos",
+    "windows"
+  ],
+  "screenshots": []
+}

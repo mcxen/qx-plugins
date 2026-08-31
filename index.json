@@ -167,6 +167,44 @@
       ]
     },
     {
+      "id": "blueprint",
+      "name": "BluePrint",
+      "version": "1.0.0",
+      "description": "Read, create, and safely edit BluePrint Xianji notes through PAT-authenticated MCP.",
+      "names": {
+        "en": "BluePrint",
+        "zh-CN": "BluePrint 随手记"
+      },
+      "descriptions": {
+        "en": "Read, create, and safely edit BluePrint Xianji notes through PAT-authenticated MCP.",
+        "zh-CN": "通过 PAT 鉴权 MCP 查看、新建并安全编辑 BluePrint 随手记。"
+      },
+      "download_url": "https://raw.githubusercontent.com/mcxen/qx-plugins/main/blueprint.qx-plugin",
+      "size_bytes": 72325,
+      "checksum_sha256": "984b27b4433cacbfa139eb49b4d2bfe6063b8994464676ff8b79c34f2783f998",
+      "required_permissions": [
+        "http",
+        "open-url"
+      ],
+      "updated_at": "2026-08-31",
+      "author": "mcx",
+      "min_app_version": "0.6.103",
+      "platforms": [
+        "macos",
+        "windows"
+      ],
+      "releases": [
+        {
+          "version": "1.0.0",
+          "published_at": "2026-08-31",
+          "notes_localizations": {
+            "en": "First BluePrint Xianji release with PAT-authenticated stateless MCP discovery, note browsing, authenticated image previews, creation, complete-model editing, and baseVersion conflict protection.",
+            "zh-CN": "首个 BluePrint 随手记版本：支持 PAT 鉴权无状态 MCP 能力发现、笔记浏览、鉴权图片预览、新建、完整模型编辑与 baseVersion 冲突保护。"
+          }
+        }
+      ]
+    },
+    {
       "id": "brew",
       "name": "Brew",
       "version": "1.1.4",
