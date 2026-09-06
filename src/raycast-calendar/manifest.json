@@ -5,11 +5,12 @@
     "en": "Quick Calendar",
     "zh-CN": "快捷日历"
   },
-  "version": "1.2.4",
-  "description": "View calendar month-by-month",
+  "version": "1.3.0",
+  "min_app_version": "0.6.101",
+  "description": "Monthly calendar with Chinese lunar dates and holiday work schedules",
   "descriptions": {
-    "en": "View calendar month-by-month",
-    "zh-CN": "按月浏览日历。"
+    "en": "Monthly calendar with offline Chinese lunar dates and the 2026 mainland China holiday and make-up workday schedule.",
+    "zh-CN": "按月浏览日历，离线显示中国农历与 2026 年中国大陆节假日、调休补班表。"
   },
   "author": "fuksman",
   "icon": "icon-generated.png",
@@ -21,7 +22,26 @@
     "macos",
     "windows"
   ],
-  "keywords": [],
+  "keywords": [
+    "calendar",
+    "lunar",
+    "holiday",
+    "日历",
+    "rili",
+    "rl",
+    "快捷日历",
+    "kuaijierili",
+    "kjrl",
+    "农历",
+    "节假日",
+    "调休",
+    "nongli",
+    "nl",
+    "jiejiari",
+    "jjr",
+    "tiaoxiu",
+    "tx"
+  ],
   "preferences": [
     {
       "id": "weekStart",
@@ -74,6 +94,16 @@
       }
     },
     {
+      "id": "showLunar",
+      "label": "Chinese lunar dates",
+      "labels": {
+        "en": "Chinese lunar dates",
+        "zh-CN": "显示中国农历"
+      },
+      "type": "boolean",
+      "default": true
+    },
+    {
       "id": "viewMode",
       "label": "View Mode",
       "labels": {
@@ -109,7 +139,6 @@
     }
   ],
   "permissions": [
-    "http",
     "open-url",
     "clipboard"
   ],
@@ -122,33 +151,5 @@
     },
     "icon": "icon-generated.png",
     "keywords": []
-  },
-  "raycast": {
-    "source": "calendar",
-    "compatible": "generic-shim",
-    "sourceCommands": [
-      "index"
-    ],
-    "sourceTools": [],
-    "platformCompatibility": {
-      "macos": {
-        "status": "supported",
-        "features": [
-          "Raycast UI",
-          "Clipboard"
-        ],
-        "degraded": []
-      },
-      "windows": {
-        "status": "supported",
-        "features": [
-          "Raycast UI",
-          "Clipboard"
-        ],
-        "degraded": [],
-        "unsupported": [],
-        "notes": []
-      }
-    }
   }
 }

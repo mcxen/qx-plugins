@@ -28,7 +28,20 @@
     "image",
     "background",
     "壁纸",
-    "图片"
+    "图片",
+    "摄影",
+    "sheying",
+    "sy",
+    "tupian",
+    "tp",
+    "图库",
+    "tuku",
+    "tk",
+    "bizhi",
+    "bz",
+    "摄影图库",
+    "sheyingtuku",
+    "sytk"
   ],
   "permissions": [
     "http",
@@ -191,7 +204,10 @@
       "keywords": [
         "unsplash",
         "random",
-        "wallpaper"
+        "wallpaper",
+        "随机壁纸",
+        "suijibizhi",
+        "sjbz"
       ],
       "mode": "no-view",
       "interval": "1d"

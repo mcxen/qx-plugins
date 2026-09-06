@@ -22,7 +22,19 @@
     "艺术",
     "壁纸",
     "名画",
-    "每日"
+    "每日",
+    "艺术壁纸",
+    "yishubizhi",
+    "ysbz",
+    "bizhi",
+    "bz",
+    "minghua",
+    "mh",
+    "yishu",
+    "ys",
+    "每日艺术壁纸",
+    "meiriyishubizhi",
+    "mrysbz"
   ],
   "platforms": [
     "macos",
@@ -181,7 +193,10 @@
         "art",
         "wallpaper",
         "随机",
-        "艺术壁纸"
+        "艺术壁纸",
+        "随机艺术壁纸",
+        "suijiyishubizhi",
+        "sjysbz"
       ],
       "mode": "no-view"
     },
@@ -203,7 +218,10 @@
         "art",
         "wallpaper",
         "自动",
-        "轮换"
+        "轮换",
+        "轮换艺术壁纸",
+        "lunhuanyishubizhi",
+        "lhysbz"
       ],
       "mode": "no-view",
       "interval": "30m",

@@ -19,7 +19,12 @@
     "用户",
     "关注",
     "帖子",
-    "评论"
+    "评论",
+    "wb",
+    "guanzhu",
+    "gz",
+    "yonghu",
+    "yh"
   ],
   "permissions": [
     "http",

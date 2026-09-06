@@ -146,6 +146,15 @@ See:
 
 ## Agent working rules
 
+- Every plugin owns its Chinese search aliases in `manifest.keywords`, with
+  useful Chinese terms, unaccented full pinyin and initials (e.g. 日历/rili/rl).
+  Panel-specific aliases may use `panel.keywords`; action-specific terms belong
+  to `commands[].keywords`. The Qx host indexes declarations; do not add a
+  per-plugin dictionary to the host or runtime-only open/search commands.
+- Keep all existing keywords and add search acceptance cases in the host's
+  `scripts/fixtures/plugin-search-cases.json`; run `npm run test:plugin-search`
+  in Qx. Search must not require activating the plugin, network or credentials.
+
 - Prefer **port APIs** (`context.http`, `context.storage.persist`, `context.island`) over inventing host commands.
 - Keep **one plugin = one directory**; do not nest multiple plugins in one folder.
 - After logic changes: **package** + **local install** before claiming fixed.

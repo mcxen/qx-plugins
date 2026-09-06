@@ -6,12 +6,15 @@
   "scripts": {
     "convert:raycast": "node scripts/convert-raycast-extension.mjs",
     "convert:raycast-url": "node scripts/convert-raycast-url.mjs",
+    "build:blueprint": "esbuild src/blueprint/index.source.js --bundle --format=esm --platform=browser --target=es2022 --minify --legal-comments=inline --outfile=src/blueprint/index.js",
     "build:qxcoolapk": "esbuild src/qxcoolapk/index.source.js --bundle --format=esm --platform=browser --target=es2022 --minify --legal-comments=inline --outfile=src/qxcoolapk/index.js",
     "build:qxtieba": "esbuild src/qxtieba/index.source.js --bundle --format=esm --platform=browser --target=es2022 --minify --legal-comments=inline --outfile=src/qxtieba/index.js",
     "build:qxweibo": "esbuild src/qxweibo/index.source.js --bundle --format=esm --platform=browser --target=es2022 --minify --legal-comments=inline --outfile=src/qxweibo/index.js",
     "build:agent-usage": "esbuild src/agent-usage/index.source.js --bundle --format=esm --platform=browser --target=es2022 --minify --legal-comments=inline --outfile=src/agent-usage/index.js",
     "build:another-boring-piece": "esbuild src/another-boring-piece/index.source.js --bundle --format=esm --platform=browser --target=es2022 --minify --legal-comments=inline --outfile=src/another-boring-piece/index.js",
-    "build:plugins": "npm run build:qxcoolapk && npm run build:qxtieba && npm run build:qxweibo && npm run build:agent-usage && npm run build:another-boring-piece",
+    "build:calendar": "esbuild src/raycast-calendar/index.source.js --bundle --format=esm --platform=browser --target=es2022 --minify --outfile=src/raycast-calendar/index.js",
+    "smoke:calendar": "npm run build:calendar && node scripts/smoke-calendar.mjs",
+    "build:plugins": "npm run build:qxcoolapk && npm run build:qxtieba && npm run build:qxweibo && npm run build:agent-usage && npm run build:another-boring-piece && npm run build:calendar && npm run build:blueprint",
     "package:plugins": "npm run build:plugins && node scripts/package-plugins.mjs",
     "package:one": "node scripts/package-plugins.mjs",
     "store:dev": "npm --prefix store run dev",
@@ -30,7 +33,7 @@
     "smoke:sysinfo": "node scripts/smoke-sysinfo.mjs",
     "smoke:agent-usage": "npm run build:agent-usage && node scripts/smoke-agent-usage.mjs",
     "smoke:another-boring-piece": "npm run build:another-boring-piece && node scripts/smoke-another-boring-piece.mjs",
-    "smoke:blueprint": "node scripts/smoke-blueprint.mjs"
+    "smoke:blueprint": "npm run build:blueprint && node scripts/smoke-blueprint.mjs"
   },
   "dependencies": {
     "bcryptjs": "^3.0.2",

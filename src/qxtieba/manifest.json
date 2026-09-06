@@ -11,7 +11,13 @@
     "tieba",
     "社区",
     "帖子",
-    "评论"
+    "评论",
+    "tb",
+    "baidutieba",
+    "bdtb",
+    "百度",
+    "baidu",
+    "bd"
   ],
   "permissions": [
     "http",

@@ -17,7 +17,16 @@
     "external monitor",
     "显示器",
     "外接显示器",
-    "亮度"
+    "亮度",
+    "xianshiqi",
+    "xsq",
+    "liangdu",
+    "ld",
+    "显示器亮度",
+    "xianshiqiliangdu",
+    "xsqld",
+    "waijiexianshiqi",
+    "wjxsq"
   ],
   "permissions": [
     "tray",

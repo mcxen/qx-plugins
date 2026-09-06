@@ -23,7 +23,17 @@
     "帖子",
     "热门",
     "最新",
-    "节点"
+    "节点",
+    "技术社区",
+    "jishushequ",
+    "jssq",
+    "shequ",
+    "sq",
+    "论坛",
+    "luntan",
+    "lt",
+    "jiedian",
+    "jd"
   ],
   "permissions": [
     "http",
@@ -109,7 +119,11 @@
         "v2ex",
         "notifications",
         "通知",
-        "消息"
+        "消息",
+        "tongzhi",
+        "tz",
+        "xiaoxi",
+        "xx"
       ],
       "titles": {
         "en": "View Notifications",
@@ -127,7 +141,9 @@
       "keywords": [
         "v2ex",
         "token",
-        "令牌"
+        "令牌",
+        "lingpai",
+        "lp"
       ],
       "titles": {
         "en": "View Token Info",

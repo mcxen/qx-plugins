@@ -28,7 +28,19 @@
     "package",
     "install",
     "upgrade",
-    "macos"
+    "macos",
+    "包管理",
+    "baoguanli",
+    "bgl",
+    "软件包",
+    "ruanjianbao",
+    "rjb",
+    "安装软件",
+    "anzhuangruanjian",
+    "azrj",
+    "软件管理",
+    "ruanjianguanli",
+    "rjgl"
   ],
   "permissions": [
     "cli",

@@ -29,7 +29,19 @@
     "daily image",
     "壁纸",
     "图库",
-    "必应"
+    "必应",
+    "biying",
+    "by",
+    "bizhi",
+    "bz",
+    "必应壁纸",
+    "biyingbizhi",
+    "bybz",
+    "tuku",
+    "tk",
+    "每日壁纸",
+    "meiribizhi",
+    "mrbz"
   ],
   "permissions": [
     "http",
@@ -145,7 +157,10 @@
       "keywords": [
         "random",
         "bing",
-        "wallpaper"
+        "wallpaper",
+        "随机壁纸",
+        "suijibizhi",
+        "sjbz"
       ],
       "mode": "no-view"
     },
@@ -165,7 +180,10 @@
       "keywords": [
         "latest",
         "bing",
-        "wallpaper"
+        "wallpaper",
+        "最新壁纸",
+        "zuixinbizhi",
+        "zxbz"
       ],
       "mode": "no-view"
     },
@@ -186,7 +204,10 @@
         "daily",
         "automatic",
         "bing",
-        "wallpaper"
+        "wallpaper",
+        "每日壁纸",
+        "meiribizhi",
+        "mrbz"
       ],
       "mode": "no-view",
       "interval": "1d",

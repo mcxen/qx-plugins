@@ -29,7 +29,19 @@
     "Github助手",
     "进度",
     "构建",
-    "发布"
+    "发布",
+    "助手",
+    "zhushou",
+    "zs",
+    "goujian",
+    "gj",
+    "fabu",
+    "fb",
+    "jindu",
+    "jd",
+    "工作流",
+    "gongzuoliu",
+    "gzl"
   ],
   "permissions": [
     "http",
@@ -136,7 +148,10 @@
         "qxgh",
         "github",
         "refresh",
-        "ci"
+        "ci",
+        "刷新",
+        "shuaxin",
+        "sx"
       ],
       "titles": {
         "en": "Refresh QxGH",
@@ -155,7 +170,10 @@
         "qxgh",
         "github",
         "status",
-        "summary"
+        "summary",
+        "构建摘要",
+        "goujianzhaiyao",
+        "gjzy"
       ],
       "titles": {
         "en": "QxGH CI Summary",
@@ -174,7 +192,10 @@
         "qxgh",
         "github",
         "island",
-        "watch"
+        "watch",
+        "关注构建",
+        "guanzhugoujian",
+        "gzgj"
       ],
       "titles": {
         "en": "QxGH Watch on Island",

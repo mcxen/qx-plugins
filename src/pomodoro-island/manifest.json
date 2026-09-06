@@ -24,7 +24,19 @@
     "productivity",
     "番茄钟",
     "专注",
-    "灵动岛"
+    "灵动岛",
+    "fanqiezhong",
+    "fqz",
+    "番茄",
+    "fanqie",
+    "fq",
+    "zhuanzhu",
+    "zz",
+    "计时器",
+    "jishiqi",
+    "jsq",
+    "lingdongdao",
+    "ldd"
   ],
   "permissions": [
     "island",
@@ -83,7 +95,10 @@
         "focus",
         "timer",
         "番茄钟",
-        "专注"
+        "专注",
+        "开始专注",
+        "kaishizhuanzhu",
+        "kszz"
       ]
     },
     {
@@ -102,7 +117,10 @@
         "pomodoro",
         "break",
         "timer",
-        "休息"
+        "休息",
+        "短休息",
+        "duanxiuxi",
+        "dxx"
       ]
     },
     {
@@ -122,7 +140,11 @@
         "pause",
         "resume",
         "暂停",
-        "继续"
+        "继续",
+        "zanting",
+        "zt",
+        "jixu",
+        "jx"
       ]
     },
     {
@@ -141,7 +163,9 @@
         "pomodoro",
         "stop",
         "reset",
-        "停止"
+        "停止",
+        "tingzhi",
+        "tz"
       ]
     },
     {
@@ -161,7 +185,10 @@
       "keywords": [
         "pomodoro",
         "background",
-        "timer"
+        "timer",
+        "后台心跳",
+        "houtaixintiao",
+        "htxt"
       ]
     }
   ],

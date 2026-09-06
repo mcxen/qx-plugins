@@ -19,7 +19,16 @@
     "temperature",
     "天气",
     "气温",
-    "预报"
+    "预报",
+    "tianqi",
+    "tq",
+    "qiwen",
+    "qw",
+    "yubao",
+    "yb",
+    "天气预报",
+    "tianqiyubao",
+    "tqyb"
   ],
   "permissions": [
     "http",
@@ -129,7 +138,10 @@
       "keywords": [
         "weather",
         "refresh",
-        "刷新"
+        "刷新",
+        "刷新天气",
+        "shuaxintianqi",
+        "sxtq"
       ]
     }
   ],

@@ -26,7 +26,18 @@
     "剪贴板",
     "粘贴",
     "纯文本",
-    "保存图片"
+    "保存图片",
+    "jiantieban",
+    "jtb",
+    "剪贴板动作",
+    "jiantiebandongzuo",
+    "jtbdz",
+    "zhantie",
+    "zt",
+    "chunwenben",
+    "cwb",
+    "baocuntupian",
+    "bctp"
   ],
   "permissions": [
     "clipboard",
@@ -78,7 +89,10 @@
         "plain",
         "粘贴",
         "文字",
-        "纯文本"
+        "纯文本",
+        "粘贴纯文本",
+        "zhantiechunwenben",
+        "ztcwb"
       ]
     },
     {
@@ -100,7 +114,10 @@
         "clipboard",
         "保存",
         "图片",
-        "剪贴板"
+        "剪贴板",
+        "保存剪贴板图片",
+        "baocunjiantiebantupian",
+        "bcjtbtp"
       ]
     }
   ],

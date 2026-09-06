@@ -19,7 +19,14 @@
     "notes",
     "mcp",
     "随手记",
-    "笔记"
+    "笔记",
+    "suishouji",
+    "ssj",
+    "biji",
+    "bj",
+    "蓝图",
+    "lantu",
+    "lt"
   ],
   "permissions": [
     "http",
@@ -61,9 +68,161 @@
         "en": "BluePrint PAT with content:read and content:write. It is never placed in content, URLs, caches, or logs.",
         "zh-CN": "需要 content:read 与 content:write；令牌不会写入内容、URL、缓存或日志。"
       }
+    },
+    {
+      "id": "layout",
+      "label": "Note layout",
+      "type": "select",
+      "default": "cards",
+      "options": [
+        {
+          "label": "Cards",
+          "value": "cards",
+          "labels": {
+            "en": "Cards",
+            "zh-CN": "卡片"
+          }
+        },
+        {
+          "label": "List",
+          "value": "list",
+          "labels": {
+            "en": "List",
+            "zh-CN": "列表"
+          }
+        }
+      ],
+      "labels": {
+        "en": "Note layout",
+        "zh-CN": "随手记布局"
+      },
+      "descriptions": {
+        "en": "Choose the host-owned cards or list presentation.",
+        "zh-CN": "选择宿主提供的卡片或列表布局。"
+      }
+    },
+    {
+      "id": "density",
+      "label": "Card density",
+      "type": "select",
+      "default": "comfortable",
+      "options": [
+        {
+          "label": "Comfortable",
+          "value": "comfortable",
+          "labels": {
+            "en": "Comfortable",
+            "zh-CN": "舒适"
+          }
+        },
+        {
+          "label": "Compact",
+          "value": "compact",
+          "labels": {
+            "en": "Compact",
+            "zh-CN": "紧凑"
+          }
+        }
+      ],
+      "labels": {
+        "en": "Card density",
+        "zh-CN": "卡片密度"
+      },
+      "descriptions": {
+        "en": "Adjust spacing without changing the source order.",
+        "zh-CN": "调整卡片间距，不改变随手记原始顺序。"
+      }
+    },
+    {
+      "id": "showImages",
+      "label": "Show note images",
+      "type": "boolean",
+      "default": true,
+      "labels": {
+        "en": "Show note images",
+        "zh-CN": "显示随手记图片"
+      },
+      "descriptions": {
+        "en": "Show attached images in the host-owned browsing surface.",
+        "zh-CN": "在宿主提供的浏览界面中显示附件图片。"
+      }
+    }
+  ],
+  "preferenceGroups": [
+    {
+      "id": "connection",
+      "title": "Connection",
+      "titles": {
+        "en": "Connection",
+        "zh-CN": "连接"
+      },
+      "description": "Configure and verify the BluePrint MCP connection.",
+      "descriptions": {
+        "en": "Configure and verify the BluePrint MCP connection.",
+        "zh-CN": "配置并验证 BluePrint MCP 连接。"
+      },
+      "preferenceIds": [
+        "endpoint",
+        "pat"
+      ],
+      "saveMode": "manual",
+      "connectionCheck": {
+        "command": "check-blueprint-connection",
+        "title": "Check connection",
+        "titles": {
+          "en": "Check connection",
+          "zh-CN": "检查连接"
+        }
+      }
+    },
+    {
+      "id": "browsing",
+      "title": "Browsing",
+      "titles": {
+        "en": "Browsing",
+        "zh-CN": "浏览"
+      },
+      "description": "Choose the note collection layout and media visibility.",
+      "descriptions": {
+        "en": "Choose the note collection layout and media visibility.",
+        "zh-CN": "选择随手记集合布局与媒体显示方式。"
+      },
+      "preferenceIds": [
+        "layout",
+        "density",
+        "showImages"
+      ],
+      "saveMode": "autosave"
     }
   ],
   "entry": "index.js",
+  "commands": [
+    {
+      "name": "check-blueprint-connection",
+      "title": "Check BluePrint Connection",
+      "titles": {
+        "en": "Check BluePrint Connection",
+        "zh-CN": "检查 BluePrint 连接"
+      },
+      "description": "Verify the configured endpoint, PAT identity, and available note capabilities.",
+      "descriptions": {
+        "en": "Verify the configured endpoint, PAT identity, and available note capabilities.",
+        "zh-CN": "验证已配置的 MCP 地址、PAT 身份和可用随手记能力。"
+      },
+      "mode": "no-view",
+      "keywords": [
+        "blueprint",
+        "connection",
+        "pat",
+        "mcp",
+        "连接",
+        "鉴权",
+        "检查连接",
+        "jianchalianjie",
+        "jclj"
+      ]
+    }
+  ],
   "panel": {
     "icon": "blueprint-logo.png",
     "title": "BluePrint",
