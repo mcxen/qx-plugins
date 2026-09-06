@@ -12,12 +12,12 @@ let forceConflict = false;
 let forceAuthError = false;
 let delayNextGet = false;
 let releaseDelayedGet = null;
-let layoutPreference = "cards";
+let layoutPreference;
 let densityPreference = "comfortable";
 let showImagesPreference = true;
 let notes = [{
   id: "note-1",
-  title: "First note",
+  title: "",
   content: "Existing content",
   pinned: false,
   background: "sage",
@@ -193,10 +193,13 @@ forceAuthError = false;
 
 const container = {};
 const lifecycle = plugin.panel.render(container, context);
-await waitFor(() => snapshot?.loading === false && snapshot.items?.length === 1 && snapshot.items[0].detail?.images?.length === 1, "initial Xianji list and authenticated image");
+await waitFor(() => snapshot?.loading === false && snapshot.layout?.kind === "cards" && snapshot.items?.length === 1 && snapshot.items[0].detail?.images?.length === 1, "initial Xianji cards and authenticated image");
 assert.equal(snapshot.meta, "Smoke Workspace · Read & write");
 assert.equal(snapshot.cache.mode, "disabled");
-assert.deepEqual(snapshot.layout, { kind: "cards", columns: 3, density: "comfortable", showImages: true });
+assert.deepEqual(snapshot.layout, { kind: "cards", density: "comfortable", showImages: true });
+assert.equal(snapshot.items[0].title, "", "cards preserve an empty upstream title");
+assert.equal(snapshot.detail, undefined, "the plugin does not open a detail pane by default");
+assert.ok(snapshot.items[0].detail, "the selected item still exposes detail for host Enter/open");
 assert.equal(snapshot.items[0].detail.images[0].url.startsWith("data:image/png;base64,"), true);
 assert.equal(snapshot.items[0].card.body, "Existing content");
 assert.deepEqual(snapshot.items[0].card.tags, ["work"]);
@@ -271,6 +274,28 @@ const inlineSave = await handlers.onEdit({ phase: "save", itemId: "note-1", sess
 assert.equal(inlineSave.status, "saved");
 assert.equal(requests.filter((request) => request.name === "blueprint_update_xianji_note").at(-1).args.content, "Inline content");
 await waitFor(() => snapshot.meta?.includes("Read & write"), "inline save capability refresh");
+const updateCountBeforeReplay = requests.filter((request) => request.name === "blueprint_update_xianji_note").length;
+const inlineReplay = await handlers.onEdit({ phase: "save", itemId: "note-1", sessionId: "inline-1", requestId: "inline-save-retry", value: "Inline content" });
+assert.equal(inlineReplay.status, "saved", "a same-session retry replays the successful save");
+assert.equal(inlineReplay.value, "Inline content");
+assert.equal(requests.filter((request) => request.name === "blueprint_update_xianji_note").length, updateCountBeforeReplay, "a replay never performs a second update");
+const changedReplay = await handlers.onEdit({ phase: "save", itemId: "note-1", sessionId: "inline-1", requestId: "inline-save-changed", value: "Changed after save" });
+assert.equal(changedReplay.status, "error", "a same-session changed body fails explicitly instead of reusing the old CAS version");
+assert.equal(requests.filter((request) => request.name === "blueprint_update_xianji_note").length, updateCountBeforeReplay);
+const inlineReplayCancel = await handlers.onEdit({ phase: "cancel", itemId: "note-1", sessionId: "inline-1", requestId: "inline-save-cancel" });
+assert.equal(inlineReplayCancel.status, "cancelled", "cancel releases a saved replay");
+const afterReplayCancel = await handlers.onEdit({ phase: "save", itemId: "note-1", sessionId: "inline-1", requestId: "inline-save-after-cancel", value: "Inline content" });
+assert.equal(afterReplayCancel.status, "error", "a cancelled replay cannot be reused");
+
+const destroyReplayStart = await handlers.onEdit({ phase: "start", itemId: "note-1", sessionId: "inline-destroy", requestId: "inline-destroy-start" });
+assert.equal(destroyReplayStart.status, "ready");
+const destroyReplaySave = await handlers.onEdit({ phase: "save", itemId: "note-1", sessionId: "inline-destroy", requestId: "inline-destroy-save", value: "Destroy replay" });
+assert.equal(destroyReplaySave.status, "saved");
+plugin.panel.destroy(container);
+plugin.panel.render(container, context);
+await waitFor(() => snapshot?.loading === false && snapshot.items?.length >= 1, "writable panel after destroy");
+const afterDestroyReplay = await handlers.onEdit({ phase: "save", itemId: "note-1", sessionId: "inline-destroy", requestId: "inline-destroy-after", value: "Destroy replay" });
+assert.equal(afterDestroyReplay.status, "error", "destroy releases saved replay records");
 
 const inlineConflictStart = await handlers.onEdit({ phase: "start", itemId: "note-1", sessionId: "inline-conflict", requestId: "inline-conflict-start" });
 assert.equal(inlineConflictStart.status, "ready");
@@ -309,8 +334,8 @@ densityPreference = "compact";
 showImagesPreference = false;
 const readOnlyContainer = {};
 plugin.panel.render(readOnlyContainer, context);
-await waitFor(() => snapshot?.loading === false && snapshot.layout?.kind === "list" && snapshot.items?.length >= 1, "read-only Xianji list");
-assert.deepEqual(snapshot.layout, { kind: "list", columns: 3, density: "compact", showImages: false });
+await waitFor(() => snapshot?.loading === false && snapshot.layout?.kind === "list" && snapshot.items?.length >= 1, "read-only explicit-list Xianji view");
+assert.deepEqual(snapshot.layout, { kind: "list", density: "compact", showImages: false });
 assert.equal(snapshot.actions.some((action) => action.id === "new-note"), false);
 assert.equal(snapshot.items[0].editor, undefined);
 assert.equal(snapshot.items[0].actions.some((action) => action.id.startsWith("edit:")), false);

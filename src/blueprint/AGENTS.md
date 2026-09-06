@@ -4,7 +4,7 @@
 
 - Source: `index.source.js` owns note workflows; `source/transport.js` owns MCP/auth transport. `npm run build:blueprint` produces the self-contained Blob-compatible `index.js`; run it before `package:one`.
 
-- Panel: host Workbench list/detail/form for BluePrint Xianji notes.
+- Panel: host Workbench Masonry cards by default, with optional list/detail/form for BluePrint Xianji notes. Preserve an explicitly saved list preference.
 - Transport: PAT-authenticated stateless Streamable HTTP MCP only.
 - Cache: disabled for Workbench note snapshots; PAT and authenticated image bytes stay out of persistence. Image previews are session-only and bounded (8 MiB per image, 32 MiB total).
 - Settings: endpoint and PAT are a manually saved connection group; layout, density, and image visibility are an autosaved browsing group. Keep the IDs and their defaults stable when changing the UI.
@@ -24,14 +24,20 @@
 
 The `onEdit` handler returns only domain status plus `value`, `revision`, or
 `message`; Qx's SDK adds the event identity to the wire acknowledgement.
+Successful inline saves retain a bounded replay result (8 sessions, 60 seconds),
+so retrying the same session and body does not issue another update. Cancel and
+destroy clear it. A changed body cannot reuse a completed session's old CAS version.
+The MCP request budget is 25 seconds; the host acknowledgement budget must exceed it.
 
 ## Async and security checklist
 
 - Keep `baseVersion` and a fresh `operationId` in the plugin edit session. A
   stale response must not replace a newer draft or close the host editor.
-- A conflict result retains the local value; “Keep draft and close” stores a
+- In the advanced form, a conflict result retains the local value; “Keep draft and close” stores a
   session draft for the next explicit edit, while “Load latest version” is the
   only action that replaces it.
+- Inline conflict retains the host draft and never silently rebases it. It currently
+  has no merge/reload action: preserve the draft before explicitly discarding and reopening.
 - Authenticated image requests must resolve to the configured MCP origin and
   BluePrint asset route before adding the Bearer header. Never publish a PAT in
   a URL, data model, error, toast, or log.

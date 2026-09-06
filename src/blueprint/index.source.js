@@ -5,6 +5,9 @@ import { assetIds, tagNames, parseTags, noteDraft, deriveWorkbenchUrl, buildNote
 const formatDate = (value) => formatNoteDate(value, locale);
 const backgroundLabel = (value) => labelBackground(value, text);
 
+const MAX_EDIT_REPLAYS = 8;
+const EDIT_REPLAY_TTL_MS = 60_000;
+
 // A host may destroy a panel without using the value returned by render().
 // Keep the explicit lifecycle at the manifest boundary as the source of truth.
 const panelLifecycles = new WeakMap();
@@ -67,6 +70,7 @@ function createPanel(context) {
     mediaLoading: new Set(),
     draftCache: new Map(),
     editSessions: new Map(),
+    editReplays: new Map(),
     requestGeneration: 0,
     loading: true,
     saving: false,
@@ -184,7 +188,6 @@ function createPanel(context) {
       title: "BluePrint",
       layout: {
         kind: state.layout,
-        columns: 3,
         density: state.density,
         showImages: state.showImages,
       },
@@ -234,6 +237,31 @@ function createPanel(context) {
     if (!state.editSessions.size) return;
     for (const session of state.editSessions.values()) session.invalidated = true;
     state.requestGeneration += 1;
+  }
+
+  function pruneEditReplays() {
+    const now = Date.now();
+    for (const [sessionId, replay] of state.editReplays) {
+      if (replay.expiresAt <= now) state.editReplays.delete(sessionId);
+    }
+    while (state.editReplays.size > MAX_EDIT_REPLAYS) {
+      const oldest = [...state.editReplays.entries()]
+        .sort(([, left], [, right]) => left.savedAt - right.savedAt)[0];
+      if (!oldest) break;
+      state.editReplays.delete(oldest[0]);
+    }
+  }
+
+  function rememberEditReplay(sessionId, itemId, value, revision) {
+    const now = Date.now();
+    state.editReplays.set(sessionId, {
+      itemId,
+      value,
+      revision,
+      savedAt: now,
+      expiresAt: now + EDIT_REPLAY_TTL_MS,
+    });
+    pruneEditReplays();
   }
 
   async function loadImages(note) {
@@ -384,6 +412,32 @@ function createPanel(context) {
     if (!itemId || !sessionId) {
       return editResult(event || { phase: "start" }, "error", { message: text("The edit session is invalid.", "编辑会话无效。") });
     }
+    pruneEditReplays();
+    const replay = state.editReplays.get(sessionId);
+    if (replay) {
+      if (replay.itemId !== itemId) {
+        return editResult(event, "error", { message: text("The edit session belongs to another note.", "编辑会话属于另一条随手记。") });
+      }
+      if (event.phase === "cancel") {
+        state.editReplays.delete(sessionId);
+        return editResult(event, "cancelled");
+      }
+      if (event.phase === "start") {
+        return editResult(event, "ready", { value: replay.value, revision: replay.revision });
+      }
+      if (event.phase === "save") {
+        const value = String(event.value ?? "");
+        if (value === replay.value) {
+          return editResult(event, "saved", { value: replay.value, revision: replay.revision });
+        }
+        return editResult(event, "error", {
+          message: text(
+            "This edit was already saved. Start a new edit before changing it.",
+            "这次编辑已经保存。若要修改，请重新开始编辑。",
+          ),
+        });
+      }
+    }
     if (event.phase === "start") {
       if (!canUpdate()) {
         return editResult(event, "error", { message: text("This PAT is read-only.", "此 PAT 只有读取权限。") });
@@ -480,13 +534,19 @@ function createPanel(context) {
       if (state.dead || requestGeneration !== state.requestGeneration || state.editSessions.get(sessionId) !== session) {
         return editResult(event, "error", { message: text("The edit session expired.", "编辑会话已失效。") });
       }
+      const canonicalValue = String(updated.content ?? value);
       state.notes = state.notes.map((item) => item.id === updated.id ? updated : item);
       state.editSessions.delete(sessionId);
+      // Keep a bounded, short-lived replay record. The host may have timed
+      // out after the upstream write succeeded and retry with a new requestId;
+      // replaying this result is safe, while a different body must start a new
+      // edit so it cannot accidentally reuse the old CAS baseVersion.
+      rememberEditReplay(sessionId, String(updated.id), canonicalValue, String(updated.version || "0"));
       state.error = null;
       context.showToast(text("BluePrint note saved", "BluePrint 随手记已保存"));
       paint();
       void refresh();
-      return editResult(event, "saved", { value: String(updated.content || value), revision: String(updated.version || "0") });
+      return editResult(event, "saved", { value: canonicalValue, revision: String(updated.version || "0") });
     } catch (error) {
       if (state.dead || requestGeneration !== state.requestGeneration || state.editSessions.get(sessionId) !== session) {
         return editResult(event, "error", { message: text("The edit session expired.", "编辑会话已失效。") });
@@ -689,6 +749,7 @@ function createPanel(context) {
       state.mediaLoading.clear();
       state.draftCache.clear();
       state.editSessions.clear();
+      state.editReplays.clear();
       state.notes = [];
       state.auth = null;
       state.identity = null;
