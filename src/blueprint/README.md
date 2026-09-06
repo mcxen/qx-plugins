@@ -10,6 +10,12 @@ conflict protection. Double-click a writable card body to start the host-owned
 inline editor; `Cmd/Ctrl+Enter` saves and `Esc` cancels through Qx's native
 editor session.
 
+Writable cards explicitly request the host Markdown editor. On hosts supporting
+this declaration, Qx supplies a compact Tiptap editor and a source-mode fallback;
+older hosts retain their plain-text editor. The API body remains a string, never
+Tiptap JSON. Images and files remain separate attachment arrays, and body edits
+preserve their asset IDs and all other fields in the complete CAS write model.
+
 Connection settings are grouped separately from browsing preferences. Use
 “Check BluePrint Connection” after saving the endpoint and PAT; it calls the
 real `blueprint_whoami` and `blueprint_list_capabilities` tools and reports the

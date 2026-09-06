@@ -166,6 +166,7 @@ function createPanel(context) {
         pinned: Boolean(note.pinned),
       },
       editor: canUpdate() && !draft ? {
+        format: "markdown",
         placeholder: text("Edit the note content…", "编辑随手记正文…"),
         rows: 10,
         maxBytes: 65_536,

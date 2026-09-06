@@ -21,6 +21,7 @@
 8. Writable notes publish the host-owned `cards` layout and `item.editor`; the plugin owns the authoritative start fetch, full-model CAS write, and typed save result. Read-only PATs omit the editor.
 9. Host Enter/Esc own list-detail navigation. Plugin actions use stable ids and unique `menuKey` values.
 10. No delete/trash action is exposed without a separate confirmed UX.
+11. Writable cards opt in with `editor.format: "markdown"`; Qx owns Tiptap and source mode. Keep the API body a string, preserve independent images/files, and never import the BluePrint Web editor or its simplified converter into this plugin.
 
 The `onEdit` handler returns only domain status plus `value`, `revision`, or
 `message`; Qx's SDK adds the event identity to the wire acknowledgement.

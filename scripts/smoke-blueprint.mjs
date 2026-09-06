@@ -202,6 +202,7 @@ assert.equal(snapshot.detail, undefined, "the plugin does not open a detail pane
 assert.ok(snapshot.items[0].detail, "the selected item still exposes detail for host Enter/open");
 assert.equal(snapshot.items[0].detail.images[0].url.startsWith("data:image/png;base64,"), true);
 assert.equal(snapshot.items[0].card.body, "Existing content");
+assert.equal(snapshot.items[0].editor.format, "markdown", "writable notes opt into host Markdown editing");
 assert.deepEqual(snapshot.items[0].card.tags, ["work"]);
 assert.equal(typeof snapshot.items[0].card.timestamp, "string");
 assert.notEqual(snapshot.items[0].card.timestamp, "—");
