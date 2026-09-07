@@ -468,6 +468,30 @@ img {
   letter-spacing: -0.015em;
 }
 
+.release-highlight {
+  max-width: 720px;
+  padding: var(--space-4);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--bg-panel);
+}
+
+.release-highlight__title {
+  margin-bottom: var(--space-2);
+  color: var(--text);
+  font-size: 13px;
+  font-weight: 560;
+}
+
+.release-highlight__items {
+  display: grid;
+  gap: 6px;
+  padding-left: 18px;
+  color: var(--text-secondary);
+  font-size: 13px;
+  line-height: 1.5;
+}
+
 .stats {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));

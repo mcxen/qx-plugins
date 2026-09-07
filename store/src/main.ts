@@ -303,6 +303,14 @@ function homeHtml(): string {
       <section class="opening" aria-labelledby="opening-title">
         <h1 id="opening-title" class="opening__title">${escapeHtml(tr("title"))}</h1>
         <p class="opening__lede">${escapeHtml(tr("lede"))}</p>
+        <section class="release-highlight" aria-labelledby="release-highlight-title">
+          <p id="release-highlight-title" class="release-highlight__title">${escapeHtml(tr("releaseHighlights"))}</p>
+          <ul class="release-highlight__items">
+            <li>${escapeHtml(tr("releaseBlueprint"))}</li>
+            <li>${escapeHtml(tr("releaseCalendar"))}</li>
+            <li>${escapeHtml(tr("releaseCatalog"))}</li>
+          </ul>
+        </section>
         <div class="stats">
           <div class="stat">
             <p class="stat__label">${escapeHtml(tr("statPlugins"))}</p>
