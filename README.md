@@ -148,8 +148,10 @@ Maintained plugins use real Qx product screenshots at a consistent 16:10 ratio.
 Capture settled list and representative detail states without focused inputs,
 open menus, loading placeholders, or pointer overlays; normalize to 1200 × 750,
 store the files under `src/<plugin-id>/`, and list them explicitly in
-`manifest.screenshots`. The store build copies those declared assets into the
-matching plugin detail page.
+`manifest.screenshots`. Upload public marketplace copies through
+`https://aapi.helioho.st/upload.php` and record the returned `img.meituan.net`
+URLs in `screenshot-cdn.json`. The store prefers those CDN URLs and retains the
+declared local files for package/offline use and as the build fallback.
 
 ## Maintained plugin policy
 

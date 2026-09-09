@@ -15,6 +15,7 @@ const iconsDir = path.join(publicDir, "icons");
 const shotsDir = path.join(publicDir, "screenshots");
 const srcRoot = path.join(repoRoot, "src");
 const indexPath = path.join(repoRoot, "index.json");
+const screenshotCdnPath = path.join(repoRoot, "screenshot-cdn.json");
 
 const ICON_CANDIDATES = [
   "icon.svg",
@@ -69,11 +70,15 @@ async function main() {
   }
 
   const catalog = JSON.parse(await readFile(indexPath, "utf8"));
+  const screenshotCdn = existsSync(screenshotCdnPath)
+    ? JSON.parse(await readFile(screenshotCdnPath, "utf8"))
+    : {};
   const plugins = Array.isArray(catalog.plugins) ? catalog.plugins : [];
   const iconMap = {};
   const shotMap = {};
   const i18nMap = {};
   let shotCount = 0;
+  let cdnShotCount = 0;
 
   for (const plugin of plugins) {
     const id = String(plugin.id || "").trim();
@@ -155,7 +160,13 @@ async function main() {
       const base = path.basename(name).replace(/[^\w.\-]+/g, "_");
       const outRel = `screenshots/${id}/${String(i).padStart(2, "0")}-${base}`;
       await copyFile(full, path.join(publicDir, outRel));
-      urls.push(outRel);
+      const cdnUrl = screenshotCdn?.[id]?.[name];
+      if (typeof cdnUrl === "string" && /^https:\/\/img\.meituan\.net\/content\//.test(cdnUrl)) {
+        urls.push(cdnUrl);
+        cdnShotCount += 1;
+      } else {
+        urls.push(outRel);
+      }
       shotCount += 1;
     }
     if (urls.length > 0) shotMap[id] = urls;
@@ -179,7 +190,7 @@ async function main() {
 
   await writeFile(path.join(publicDir, "catalog.json"), `${JSON.stringify(enriched, null, 2)}\n`, "utf8");
   console.log(
-    `store prepare: ${plugins.length} plugins, ${Object.keys(iconMap).length} icons, ${shotCount} screenshots, ${Object.keys(i18nMap).length} i18n maps → public/catalog.json`,
+    `store prepare: ${plugins.length} plugins, ${Object.keys(iconMap).length} icons, ${shotCount} screenshots (${cdnShotCount} CDN), ${Object.keys(i18nMap).length} i18n maps → public/catalog.json`,
   );
 }
 
