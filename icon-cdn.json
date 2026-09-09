@@ -1,0 +1,65 @@
+{
+  "agent-usage": {
+    "icon-generated.png": "https://img.meituan.net/content/71c057e4b6284e6091c668af5918a1892457265.png"
+  },
+  "another-boring-piece": {
+    "icon-generated.png": "https://img.meituan.net/content/4e7fff3373ad4d9c74d06dbe2c5bb54a3190018.png"
+  },
+  "qxgold": {
+    "icon-generated.png": "https://img.meituan.net/content/904e6710e0ad5b9b5b5c05160370ed8e2983773.png"
+  },
+  "blueprint": {
+    "blueprint-logo.png": "https://img.meituan.net/content/3cac66c1aa776612fc24f1d6165c522c43761.png"
+  },
+  "qxheihe": {
+    "icon-generated.png": "https://img.meituan.net/content/3ee483c8315acc0c737430e25159a3723274057.png"
+  },
+  "brew": {
+    "icon-generated.png": "https://img.meituan.net/content/61e5e37e9a2e2e2861a7f52e49c0b7462842021.png"
+  },
+  "qxpicture": {
+    "icon-generated.png": "https://img.meituan.net/content/19eda2525523da0b329f15e4a6e2d3f43203170.png"
+  },
+  "qxtieba": {
+    "icon-generated.png": "https://img.meituan.net/content/34472fffa50b12881bb075304883853a2949288.png"
+  },
+  "clipboard-actions": {
+    "icon-generated.png": "https://img.meituan.net/content/703798f60a456df62571fc8b40c7d06f3296546.png"
+  },
+  "external-display-control": {
+    "icon-generated.png": "https://img.meituan.net/content/10d493a9d96730296ef762f295edee8d2856686.png"
+  },
+  "qxweibo": {
+    "icon-generated.png": "https://img.meituan.net/content/ccd4479efd1c8ff28a48686fba4822843106545.png"
+  },
+  "hacker-news": {
+    "icon-generated.png": "https://img.meituan.net/content/e4030ddc82bb66c07c0ec522748a16732786811.png"
+  },
+  "pomodoro-island": {
+    "icon-generated.png": "https://img.meituan.net/content/d9feb7e4d96973a52dc32c8da2c7edf02912217.png"
+  },
+  "qx-bing-wallpaper": {
+    "icon-generated.png": "https://img.meituan.net/content/99fd14bdea52a57b9907f612dcc2ccbd2939538.png"
+  },
+  "qxcoolapk": {
+    "icon-generated.png": "https://img.meituan.net/content/748053aa6ae99243c31c1484e4ae745e2889393.png"
+  },
+  "qxgh": {
+    "icon-generated.png": "https://img.meituan.net/content/f2153db3263aa07c3eb702762ebb89ef2997229.png"
+  },
+  "raycast-calendar": {
+    "icon-generated.png": "https://img.meituan.net/content/f3aa076662a194caee9e6ab01be9ddfb3129635.png"
+  },
+  "sysinfo": {
+    "icon-generated.png": "https://img.meituan.net/content/6d7f703276e844ba355c9888843195622783983.png"
+  },
+  "unsplash": {
+    "icon-generated.png": "https://img.meituan.net/content/46ebfb4dd5ccc68372c2ad0b54cab9803147142.png"
+  },
+  "v2ex": {
+    "icon-generated.png": "https://img.meituan.net/content/6548d5fd8e2fd706c068e9220387c4e33001329.png"
+  },
+  "weather": {
+    "icon-generated.png": "https://img.meituan.net/content/61739992f0079f63caa898fe51910d6a2540552.png"
+  }
+}

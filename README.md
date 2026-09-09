@@ -150,8 +150,11 @@ open menus, loading placeholders, or pointer overlays; normalize to 1200 × 750,
 store the files under `src/<plugin-id>/`, and list them explicitly in
 `manifest.screenshots`. Upload public marketplace copies through
 `https://aapi.helioho.st/upload.php` and record the returned `img.meituan.net`
-URLs in `screenshot-cdn.json`. The store prefers those CDN URLs and retains the
-declared local files for package/offline use and as the build fallback.
+URLs in `screenshot-cdn.json`. Convert interface screenshots to PNG before
+uploading so the image host does not apply an extra lossy JPEG pass. Record
+uploaded manifest icon URLs in `icon-cdn.json`. The store prefers both CDN maps
+and retains the declared local files for package/offline use and as the build
+fallback.
 
 ## Maintained plugin policy
 

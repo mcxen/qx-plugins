@@ -14,9 +14,9 @@ npm run pages:dev    # Cloudflare Pages simulator at http://localhost:8788
 ```
 
 `prepare:data` copies root `index.json` → `public/catalog.json`, the manifest-selected icon, and
-declared/numbered screenshots from `src/*/`. Marketplace screenshots prefer the uploaded
-`img.meituan.net` URLs recorded in root `screenshot-cdn.json`; a missing or invalid mapping falls
-back to the local declared asset. The icon path declared by each plugin manifest is
+declared/numbered screenshots from `src/*/`. Marketplace icons and screenshots prefer the uploaded
+`img.meituan.net` URLs recorded in root `icon-cdn.json` and `screenshot-cdn.json`; a missing or
+invalid mapping falls back to the local declared asset. The icon path declared by each plugin manifest is
 preferred, so a plugin can ship the standard `icon-generated.png` replacement without relying on
 filename order; legacy icon filenames remain fallbacks. `public/catalog.json`, `public/icons/`,
 and `public/screenshots/` are ignored build outputs and must not be maintained by hand.
@@ -40,8 +40,9 @@ Or connect the repo in the Cloudflare dashboard with:
 ## Sync model
 
 1. Maintain plugins under `src/` and `release-notes.json`; set `manifest.icon` to the generated
-   `icon-generated.png`, list product screenshots in `manifest.screenshots`, and record their
-   uploaded CDN URLs in root `screenshot-cdn.json`.
+   `icon-generated.png`, list product screenshots in `manifest.screenshots`, and record uploaded
+   CDN URLs in root `icon-cdn.json` and `screenshot-cdn.json`. Upload UI screenshots as PNG to
+   avoid the image host's JPEG recompression.
 2. `npm run package:plugins` at repo root rewrites `index.json` + `.qx-plugin` archives.
 3. `npm run store:build` runs `prepare:data` and bakes that index, the selected icons, and screenshots
    into the static site.
