@@ -33,6 +33,7 @@ function createHarness(seed = new Map(), { failPattern = null } = {}) {
   let activeFetches = 0;
   let maxActiveFetches = 0;
   const httpCalls = [];
+  const httpRequests = [];
   const toasts = [];
   const storage = seed;
   const context = {
@@ -59,15 +60,27 @@ function createHarness(seed = new Map(), { failPattern = null } = {}) {
       },
     },
     http: {
-      async fetch(url) {
+      async fetch(url, options = {}) {
         const requestUrl = String(url);
         httpCalls.push(requestUrl);
+        httpRequests.push({ url: requestUrl, options: structuredClone(options) });
         activeFetches += 1;
         maxActiveFetches = Math.max(maxActiveFetches, activeFetches);
         await new Promise((resolve) => setTimeout(resolve, 0));
         activeFetches -= 1;
         if (failPattern && requestUrl.includes(failPattern)) {
           throw new Error(`mock failure for ${failPattern}`);
+        }
+        if (requestUrl.includes("/sdapi/v1/txt2img")) {
+          return {
+            ok: true,
+            status: 200,
+            url: requestUrl,
+            headers: { "content-type": "application/json" },
+            async json() {
+              return { images: ["iVBORw0KGgo="] };
+            },
+          };
         }
         if (requestUrl.includes("api.lolicon.app")) {
           return {
@@ -125,6 +138,9 @@ function createHarness(seed = new Map(), { failPattern = null } = {}) {
     },
     get httpCalls() {
       return httpCalls;
+    },
+    get httpRequests() {
+      return httpRequests;
     },
     get maxActiveFetches() {
       return maxActiveFetches;
@@ -199,6 +215,86 @@ assert.equal(custom.method, "POST");
 assert.equal(custom.jsonPath, "payload.image");
 assert.equal(harness.promptCalls, 0);
 
+// Independent capability: FastAPI-style JSON/base64 response and typed POST body.
+const fastApi = createHarness(harness.storage);
+await waitForAsyncHandlers();
+fastApi.handlers.onTab("settings");
+fastApi.handlers.onAction("add-source", null);
+await waitForAsyncHandlers();
+const fastApiDraft = { id: "__new_source__" };
+fastApi.handlers.onInput("settings:source:template", "a1111", fastApiDraft);
+await waitForAsyncHandlers();
+const draft = fastApi.container.__qxpicture.state.sourceDraft;
+assert.equal(draft.responseMode, "json-base64");
+assert.equal(draft.method, "POST");
+assert.equal(draft.jsonPath, "images[0]");
+assert.equal(draft.params.length, 6);
+assert.equal(
+  fastApi.snapshot.items.find((item) => item.id === "__new_source__")
+    .detail.form.controls.find((control) => control.id === "settings:param:prompt:key")
+    .group.layout,
+  "columns",
+  "parameter records should request the compact host layout",
+);
+fastApi.handlers.onInput("settings:param:prompt:value", "maltese puppy", fastApiDraft);
+fastApi.handlers.onAction("save-source-draft", fastApiDraft);
+await waitForAsyncHandlers();
+const fastApiSource = fastApi.container.__qxpicture.state.config.sources.find(
+  (source) => source.name === "Stable Diffusion WebUI",
+);
+assert.ok(fastApiSource, "FastAPI template should save as an editable source");
+fastApi.handlers.onTab("browse");
+fastApi.handlers.onSelect(fastApiSource.id);
+fastApi.handlers.onAction("refresh", { id: fastApiSource.id });
+await waitFor(
+  () => Boolean(fastApi.container.__qxpicture.state.downloads[fastApiSource.id]),
+  "FastAPI base64 response did not become an image download",
+);
+const generationRequest = fastApi.httpRequests.find((request) => request.url.includes("/sdapi/v1/txt2img"));
+assert.ok(generationRequest, "FastAPI generation endpoint was not called");
+assert.equal(generationRequest.options.method, "POST");
+const generationBody = JSON.parse(generationRequest.options.body);
+assert.equal(generationBody.prompt, "maltese puppy");
+assert.equal(generationBody.steps, 20, "number parameter should remain numeric in JSON");
+assert.match(
+  fastApi.container.__qxpicture.state.downloads[fastApiSource.id].preview,
+  /^data:image\/png;base64,/,
+);
+
+// Independent capability: direct binary image from a FastAPI POST with draft parameters.
+const directPost = createHarness(harness.storage);
+await waitForAsyncHandlers();
+directPost.handlers.onTab("settings");
+directPost.handlers.onAction("add-source", null);
+await waitForAsyncHandlers();
+const directDraft = { id: "__new_source__" };
+directPost.handlers.onInput("settings:source:name", "FastAPI Binary", directDraft);
+directPost.handlers.onInput("settings:source:url", "https://example.test/fooocus-direct", directDraft);
+directPost.handlers.onInput("settings:source:type", "direct", directDraft);
+directPost.handlers.onInput("settings:source:method", "POST", directDraft);
+directPost.handlers.onAction("add-param", directDraft);
+await waitForAsyncHandlers();
+const directParam = directPost.container.__qxpicture.state.sourceDraft.params[0];
+directPost.handlers.onInput(`settings:param:${directParam.id}:key`, "prompt", directDraft);
+directPost.handlers.onInput(`settings:param:${directParam.id}:value`, "forest", directDraft);
+directPost.handlers.onAction("save-source-draft", directDraft);
+await waitForAsyncHandlers();
+const directSource = directPost.container.__qxpicture.state.config.sources.find(
+  (source) => source.name === "FastAPI Binary",
+);
+assert.ok(directSource, "draft parameters should save with the API");
+directPost.handlers.onTab("browse");
+directPost.handlers.onSelect(directSource.id);
+directPost.handlers.onAction("refresh", { id: directSource.id });
+await waitFor(
+  () => Boolean(directPost.container.__qxpicture.state.downloads[directSource.id]),
+  "direct FastAPI POST did not become an image download",
+);
+const directRequest = directPost.httpRequests.find((request) => request.url.includes("fooocus-direct"));
+assert.equal(directRequest.options.method, "POST");
+assert.equal(JSON.parse(directRequest.options.body).prompt, "forest");
+assert.match(directRequest.options.headers.accept, /^image\/png/);
+
 const reloaded = createHarness(harness.storage);
 await waitForAsyncHandlers();
 assert.equal(
@@ -226,4 +322,4 @@ assert.equal(
 assert.ok(reloaded.container.__qxpicture.state.sourceDraft, "invalid draft remains editable");
 assert.match(reloaded.container.__qxpicture.state.error || "", /valid HTTP or HTTPS URL/i);
 
-process.stdout.write("Qxpicture cache warm-up, Refresh All, and API draft smoke tests passed\n");
+process.stdout.write("Qxpicture baseline, parameter draft, FastAPI base64, and direct-image POST tests passed\n");

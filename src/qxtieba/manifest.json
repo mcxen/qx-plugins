@@ -1,10 +1,14 @@
 {
   "id": "qxtieba",
   "name": "QxTieba 贴吧",
-  "version": "1.2.2",
+  "version": "1.2.3",
   "description": "聚合浏览多个百度贴吧的公开帖子流，在 Qx 内阅读正文与楼层评论。",
   "author": "Qx",
   "icon": "icon-generated.png",
+  "screenshots": [
+    "qxtieba-1.jpg",
+    "qxtieba-2.jpg"
+  ],
   "keywords": [
     "贴吧",
     "百度贴吧",
@@ -161,7 +165,6 @@
     "macos",
     "windows"
   ],
-  "screenshots": [],
   "names": {
     "en": "QxTieba",
     "zh-CN": "QxTieba 贴吧"

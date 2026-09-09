@@ -1,7 +1,7 @@
 {
   "id": "pomodoro-island",
   "name": "Pomodoro Island",
-  "version": "1.6.5",
+  "version": "1.6.6",
   "description": "Reference plugin for declarative Workbench and the structured QxIsland session protocol, with persistent background timing and history.",
   "names": {
     "en": "Pomodoro Island",
@@ -208,5 +208,7 @@
     ]
   },
   "min_app_version": "0.5.43",
-  "screenshots": []
+  "screenshots": [
+    "pomodoro-island-1.jpg"
+  ]
 }

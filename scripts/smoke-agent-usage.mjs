@@ -3,7 +3,11 @@ import { Buffer } from "node:buffer";
 import { readFile } from "node:fs/promises";
 
 const manifest = JSON.parse(await readFile(new URL("../src/agent-usage/manifest.json", import.meta.url), "utf8"));
-assert.equal(manifest.version, "1.2.0");
+const releaseNotes = JSON.parse(await readFile(new URL("../release-notes.json", import.meta.url), "utf8"));
+assert.ok(
+  releaseNotes.plugins?.["agent-usage"]?.some((entry) => entry.version === manifest.version),
+  "current manifest version must have marketplace release notes",
+);
 assert.equal(
   manifest.min_app_version,
   "0.6.87",

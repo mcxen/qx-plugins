@@ -2,7 +2,7 @@
 
 const CONFIG_KEY = "qxpicture.config.v1";
 const IMAGE_CACHE_KEY = "qxpicture.image-cache.v1";
-const CONFIG_SCHEMA_VERSION = 2;
+const CONFIG_SCHEMA_VERSION = 3;
 /** Virtual plugin-files path (host maps to disk). Prefer real user paths for wallpaper. */
 const PLUGIN_FILES_CACHE = "/qx-plugin-files/qxpicture/images";
 const GENERAL_SETTINGS_ID = "__general__";
@@ -160,7 +160,9 @@ function normalizeOptions(value) {
 
 function normalizeParam(raw, index) {
   const key = String(raw?.key || "").trim().slice(0, 120);
-  const type = raw?.type === "number" || raw?.type === "select" ? raw.type : "text";
+  const type = raw?.type === "number" || raw?.type === "select" || raw?.type === "boolean"
+    ? raw.type
+    : "text";
   return {
     id: String(raw?.id || key || `param-${index}-${Date.now()}`).trim().slice(0, 120),
     key,
@@ -185,7 +187,12 @@ function normalizePreset(raw, index) {
 }
 
 function normalizeSource(raw, fallbackId) {
-  const type = raw?.type === "json" ? "json" : "direct";
+  const responseMode = raw?.responseMode === "json-base64"
+    ? "json-base64"
+    : raw?.responseMode === "json-url" || raw?.type === "json"
+      ? "json-url"
+      : "direct";
+  const type = responseMode === "direct" ? "direct" : "json";
   const id = String(raw?.id || fallbackId || `custom-${Date.now()}`).trim();
   const defaultSource = DEFAULT_SOURCES.find((source) => source.id === id);
   const params = Array.isArray(raw?.params)
@@ -199,15 +206,19 @@ function normalizeSource(raw, fallbackId) {
     name: String(raw?.name || "Untitled API").trim(),
     url: String(raw?.url || "").trim(),
     type,
+    responseMode,
     params,
     presets,
-    ...(type === "json" ? {
-      method: raw?.method === "POST"
+    method: raw?.method === "POST"
         ? "POST"
         : raw?.method === "GET"
           ? "GET"
           : defaultSource?.method === "POST" ? "POST" : "GET",
+    ...(type === "json" ? {
       jsonPath: String(raw?.jsonPath || defaultSource?.jsonPath || "data[0].urls.original")
+    } : {}),
+    ...(responseMode === "json-base64" ? {
+      mediaType: String(raw?.mediaType || "image/png").slice(0, 80)
     } : {})
   };
 }
@@ -215,7 +226,7 @@ function normalizeSource(raw, fallbackId) {
 function defaultConfig() {
   return {
     schemaVersion: CONFIG_SCHEMA_VERSION,
-    sources: clone(DEFAULT_SOURCES),
+    sources: clone(DEFAULT_SOURCES).map((source) => normalizeSource(source, source.id)),
     downloadDirectory: "~/Downloads",
     wallpaperScope: "every"
   };
@@ -277,6 +288,7 @@ function appendParams(url, params) {
 }
 
 function typedParamValue(param) {
+  if (param.type === "boolean") return String(param.value).toLowerCase() === "true";
   if (param.type !== "number") return param.value;
   const number = Number(param.value);
   return Number.isFinite(number) ? number : param.value;
@@ -309,7 +321,7 @@ function buildRequest(source, cacheBust = false) {
     params = params.filter((param) => param.key !== "type");
   }
 
-  const method = source.type === "json" && source.method === "POST" ? "POST" : "GET";
+  const method = source.method === "POST" ? "POST" : "GET";
   if (method === "POST") {
     const payload = Object.fromEntries(
       params.filter((param) => param.key).map((param) => [param.key, typedParamValue(param)])
@@ -371,6 +383,15 @@ function toBase64(buffer) {
   return btoa(binary);
 }
 
+function fromBase64(value) {
+  const encoded = String(value || "").trim().replace(/^data:[^;,]+;base64,/i, "");
+  if (!encoded) return new Uint8Array();
+  const binary = atob(encoded.replace(/\s+/g, ""));
+  const bytes = new Uint8Array(binary.length);
+  for (let index = 0; index < binary.length; index += 1) bytes[index] = binary.charCodeAt(index);
+  return bytes;
+}
+
 function toDataUrl(bytes, type) {
   const encoded = toBase64(bytes);
   if (encoded.length > 1_900_000) return "";
@@ -410,20 +431,45 @@ function mediaScratchDirectory(env) {
 
 async function resolveDownload(context, source, { cacheBust = false } = {}) {
   let imageUrl = source.url;
-  if (source.type === "json") {
+  if (source.responseMode === "json-url" || source.responseMode === "json-base64") {
     const request = buildRequest(source, cacheBust);
     const response = await context.http.fetch(request.url, request.options);
     if (!response.ok) throw new Error(`${source.name}: HTTP ${response.status}`);
     const data = await response.json();
-    const url = String(valueAtPath(data, source.jsonPath) || "").trim();
+    const result = valueAtPath(data, source.jsonPath);
+    if (source.responseMode === "json-base64") {
+      let bytes;
+      try {
+        bytes = fromBase64(result);
+      } catch {
+        throw new Error(`${source.name}: ${text("JSON image result was not valid base64", "JSON 图片结果不是有效的 base64")}`);
+      }
+      if (!bytes.length) {
+        throw new Error(`${source.name}: ${text("JSON did not contain image bytes", "JSON 中没有图片数据")}`);
+      }
+      const mediaType = String(source.mediaType || "image/png");
+      const preview = toDataUrl(bytes, mediaType);
+      if (!preview) {
+        throw new Error(`${source.name}: ${text("image is too large for a safe preview", "图片过大，无法安全预览")}`);
+      }
+      return { bytes, mediaType, preview, url: String(response.url || request.url) };
+    }
+    const url = String(result || "").trim();
     if (!/^https?:\/\//i.test(url)) {
       throw new Error(`${source.name}: ${text("JSON did not contain an image URL", "JSON 中没有图片地址")}`);
     }
     imageUrl = url;
   }
 
-  const requestUrl = source.type === "direct" ? buildRequest(source, cacheBust).url : imageUrl;
-  const response = await context.http.fetch(requestUrl, { method: "GET", timeoutMs: 120_000 });
+  const directRequest = source.responseMode === "direct" ? buildRequest(source, cacheBust) : null;
+  const requestUrl = directRequest?.url || imageUrl;
+  const response = await context.http.fetch(requestUrl, directRequest
+    ? {
+        ...directRequest.options,
+        timeoutMs: 120_000,
+        headers: { ...(directRequest.options.headers || {}), accept: "image/png,image/jpeg,image/webp,image/*" }
+      }
+    : { method: "GET", timeoutMs: 120_000 });
   if (!response.ok) throw new Error(`${source.name}: HTTP ${response.status}`);
   const bytes = new Uint8Array(await response.arrayBuffer());
   if (!bytes.length) throw new Error(text("The image response was empty", "图片响应为空"));
@@ -608,8 +654,13 @@ function createPanel(context, container) {
       id: `browse:param:${param.id}`,
       label: param.key || text("Unnamed", "未命名"),
       value: param.value,
-      type: param.type,
-      options: param.options || [],
+      type: param.type === "boolean" ? "select" : param.type,
+      options: param.type === "boolean"
+        ? [
+            { label: text("On", "开启"), value: "true" },
+            { label: text("Off", "关闭"), value: "false" }
+          ]
+        : param.options || [],
       placeholder: param.type === "number" ? "0" : text("Parameter value", "参数值")
     }));
     const canUse = ready || Boolean(preview);
@@ -649,7 +700,12 @@ function createPanel(context, container) {
               ? text("Showing cached image. Choose Refresh to fetch a new one.", "正在显示缓存图片。点“刷新”可重新获取。")
               : text("Choose Refresh to load an image from this API.", "点“刷新”从该 API 加载图片。"),
         fields: [
-          { label: text("Type", "类型"), value: source.type === "json" ? "JSON" : text("Direct image", "直接图片") },
+          {
+            label: text("Response", "返回格式"),
+            value: source.responseMode === "json-base64"
+              ? text("JSON Base64 image", "JSON Base64 图片")
+              : source.type === "json" ? text("JSON image URL", "JSON 图片地址") : text("Direct image", "直接图片")
+          },
           {
             label: text("Status", "状态"),
             value: loading
@@ -738,19 +794,32 @@ function createPanel(context, container) {
         const n = index + 1;
         const groupId = `parameter:${param.id}`;
         const groupLabel = text(
-          `Parameter #${n}${param.key ? ` · ${param.key}` : ""}`,
-          `参数 #${n}${param.key ? ` · ${param.key}` : ""}`
+          `Parameter ${n}`,
+          `参数 ${n}`
         );
         const group = {
           id: groupId,
           label: groupLabel,
+          layout: "columns",
           action: {
             id: `delete-param:${param.id}`,
             label: text("Delete parameter", "删除参数"),
             tone: "danger"
           }
         };
-        const valueControl = param.type === "select" && (param.options || []).length
+        const valueControl = param.type === "boolean"
+          ? {
+              id: `settings:param:${param.id}:value`,
+              label: text("Value", "值"),
+              value: String(param.value).toLowerCase() === "true" ? "true" : "false",
+              type: "select",
+              options: [
+                { label: text("On", "开启"), value: "true" },
+                { label: text("Off", "关闭"), value: "false" }
+              ],
+              group: { id: groupId }
+            }
+          : param.type === "select" && (param.options || []).length
           ? {
               id: `settings:param:${param.id}:value`,
               label: text("Value", "值"),
@@ -784,6 +853,7 @@ function createPanel(context, container) {
             options: [
               { label: text("Text", "文本"), value: "text" },
               { label: text("Number", "数字"), value: "number" },
+              { label: text("On / Off", "开关"), value: "boolean" },
               { label: text("Select", "选项"), value: "select" }
             ],
             group: { id: groupId }
@@ -818,27 +888,31 @@ function createPanel(context, container) {
           : `${paramSummary}`,
         badge: isDraft
           ? text("Draft", "草稿")
-          : source.type === "json" ? "JSON" : text("Image", "图片"),
+          : source.responseMode === "json-base64" ? "Base64" : source.type === "json" ? "JSON" : text("Image", "图片"),
         detail: {
           title: isDraft
             ? text("Add image API", "添加图片 API")
             : source.name,
-          subtitle: source.url,
-          body: text(
-            "Edit Key / Value pairs below. Changes save immediately and are joined into the request on Refresh.",
-            "在下方编辑 Key / Value。修改会立即保存，刷新时拼接到请求 URL（或 POST JSON）。"
-          ),
           form: {
-            title: text("API + Parameters", "API 与参数"),
             description: text(
               isDraft
-                ? "Complete the required fields, then save. Nothing is persisted until validation succeeds."
-                : "Each parameter has its own Key, Type, Value, options, and delete action. Changes save automatically.",
+                ? "Name and URL are required. Choose a template or add only the parameters this API needs."
+                : "Changes save automatically and apply on refresh.",
               isDraft
-                ? "填写必填项后保存；校验成功前不会写入配置。"
-                : "每个参数独立管理参数名、类型、值、选项与删除操作，修改会自动保存。"
+                ? "名称和地址必填；可选择能力模板，或只添加接口需要的参数。"
+                : "修改自动保存，刷新图片时生效。"
             ),
             controls: [
+              ...(isDraft ? [{
+                id: "settings:source:template",
+                label: text("Template", "能力模板"),
+                value: source.template || "blank",
+                type: "select",
+                options: [
+                  { label: text("Blank API", "空白 API"), value: "blank" },
+                  { label: "Stable Diffusion WebUI · FastAPI", value: "a1111" }
+                ]
+              }] : []),
               {
                 id: "settings:source:name",
                 label: text("Name", "名称"),
@@ -847,47 +921,63 @@ function createPanel(context, container) {
               },
               {
                 id: "settings:source:url",
-                label: "URL",
+                label: text("API URL", "接口地址"),
                 value: source.url,
                 type: "text",
                 placeholder: "https://"
               },
               {
                 id: "settings:source:type",
-                label: text("Response Type", "响应类型"),
-                value: source.type,
+                label: text("Response Format", "返回格式"),
+                value: source.responseMode || (source.type === "json" ? "json-url" : "direct"),
                 type: "select",
                 options: [
                   { label: text("Direct image", "直接图片"), value: "direct" },
-                  { label: "JSON", value: "json" }
+                  { label: text("Image URL in JSON", "JSON 图片地址"), value: "json-url" },
+                  { label: text("Base64 image in JSON", "JSON Base64 图片"), value: "json-base64" }
+                ]
+              },
+              {
+                id: "settings:source:method",
+                label: text("Request", "请求方式"),
+                value: source.method || "GET",
+                type: "select",
+                options: [
+                  { label: text("GET · Query parameters", "GET · 查询参数"), value: "GET" },
+                  { label: text("POST · JSON body", "POST · JSON 请求体"), value: "POST" }
                 ]
               },
               ...(source.type === "json" ? [
                 {
-                  id: "settings:source:method",
-                  label: text("Parameter Transport", "参数传输方式"),
-                  value: source.method || "GET",
-                  type: "select",
-                  options: [
-                    { label: text("GET query string", "GET 查询串"), value: "GET" },
-                    { label: text("POST JSON body", "POST JSON 体"), value: "POST" }
-                  ]
-                },
-                {
                   id: "settings:source:jsonPath",
-                  label: text("JSON image path", "JSON 图片路径"),
+                  label: text("Result Path", "结果路径"),
                   value: source.jsonPath || "data[0].urls.original",
                   type: "text",
                   placeholder: "data[0].urls.original"
-                }
+                },
+                ...(source.responseMode === "json-base64" ? [{
+                  id: "settings:source:mediaType",
+                  label: text("Image Format", "图片格式"),
+                  value: source.mediaType || "image/png",
+                  type: "select",
+                  options: [
+                    { label: "PNG", value: "image/png" },
+                    { label: "JPEG", value: "image/jpeg" },
+                    { label: "WebP", value: "image/webp" }
+                  ]
+                }] : [])
               ] : []),
-              ...(!isDraft ? parameterControls : [])
+              ...parameterControls
             ],
             actions: isDraft ? [
               {
                 id: "save-source-draft",
                 label: text("Save API", "保存 API"),
                 primary: true
+              },
+              {
+                id: "add-param",
+                label: text("Add Parameter", "添加参数")
               },
               {
                 id: "cancel-source-draft",
@@ -910,37 +1000,15 @@ function createPanel(context, container) {
               }
             ]
           },
-          fields: [
-            {
-              label: text("Parameter list", "参数一览"),
-              value: paramSummary
-            },
+          fields: !isDraft && params.length ? [
             {
               label: text("Request preview", "请求预览"),
               value: request.displayUrl
             },
             ...(request.body
               ? [{ label: text("POST body preview", "POST 体预览"), value: request.body }]
-              : []),
-            {
-              label: text("Presets", "预设数量"),
-              value: (source.presets || []).length
-            }
-          ],
-          sections: params.length ? [{
-            title: text("Parameter rows", "参数行"),
-            body: params.map((param, index) => {
-              const key = param.key || text("(unnamed)", "（未命名）");
-              const val = param.value === "" ? text("(empty)", "（空）") : param.value;
-              return `#${index + 1}  ${key}  =  ${val}`;
-            }).join("\n")
-          }] : [{
-            title: text("Parameter rows", "参数行"),
-            body: text(
-              "No parameters. Typical presets: Picsum → width/height/blur; Lolicon → r18/keyword/num.",
-              "暂无参数。常用预置：Picsum → width/height/blur；Lolicon → r18/keyword/num。"
-            )
-          }]
+              : [])
+          ] : []
         },
         actions: isDraft ? [
           {
@@ -990,7 +1058,7 @@ function createPanel(context, container) {
       error: state.error,
       meta: browse
         ? text(`${state.config.sources.length} image APIs`, `${state.config.sources.length} 个图片 API`)
-        : `${text("Save to", "保存到")} ${state.config.downloadDirectory}`,
+        : undefined,
       emptyText: browse
         ? text("No image APIs. Add one in Settings.", "没有图片 API，请在设置中添加。")
         : text("No APIs configured.", "尚未配置 API。"),
@@ -1234,15 +1302,41 @@ function createPanel(context, container) {
 
     let needsHardPaint = false;
 
-    if (controlId === "settings:source:name") {
+    if (controlId === "settings:source:template") {
+      source.template = value === "a1111" ? "a1111" : "blank";
+      if (source.template === "a1111") {
+        source.name = "Stable Diffusion WebUI";
+        source.url = "http://127.0.0.1:7860/sdapi/v1/txt2img";
+        source.type = "json";
+        source.responseMode = "json-base64";
+        source.method = "POST";
+        source.jsonPath = "images[0]";
+        source.mediaType = "image/png";
+        source.params = [
+          { id: "prompt", key: "prompt", value: "", type: "text" },
+          { id: "negative-prompt", key: "negative_prompt", value: "", type: "text" },
+          { id: "steps", key: "steps", value: "20", type: "number" },
+          { id: "width", key: "width", value: "512", type: "number" },
+          { id: "height", key: "height", value: "512", type: "number" },
+          { id: "cfg-scale", key: "cfg_scale", value: "7", type: "number" }
+        ];
+      }
+      needsHardPaint = true;
+    } else if (controlId === "settings:source:name") {
       source.name = String(value).slice(0, 160);
     } else if (controlId === "settings:source:url") {
       source.url = String(value).slice(0, 2_000);
     } else if (controlId === "settings:source:type") {
-      source.type = value === "json" ? "json" : "direct";
+      source.responseMode = value === "json-base64"
+        ? "json-base64"
+        : value === "json-url" || value === "json" ? "json-url" : "direct";
+      source.type = source.responseMode === "direct" ? "direct" : "json";
       if (source.type === "json") {
         source.method ||= "GET";
-        source.jsonPath ||= "data[0].urls.original";
+        source.jsonPath ||= source.responseMode === "json-base64" ? "images[0]" : "data[0].urls.original";
+      }
+      if (source.responseMode === "json-base64") {
+        source.mediaType ||= "image/png";
       }
       needsHardPaint = true;
     } else if (controlId === "settings:source:method") {
@@ -1250,6 +1344,10 @@ function createPanel(context, container) {
       needsHardPaint = true;
     } else if (controlId === "settings:source:jsonPath") {
       source.jsonPath = String(value || "").trim().slice(0, 240) || "data[0].urls.original";
+    } else if (controlId === "settings:source:mediaType") {
+      source.mediaType = ["image/png", "image/jpeg", "image/webp"].includes(value)
+        ? value
+        : "image/png";
     } else if (controlId.startsWith("settings:param:")) {
       const parts = controlId.split(":");
       // settings:param:<id>:key|value|type|options
@@ -1271,13 +1369,16 @@ function createPanel(context, container) {
       } else if (property === "value") {
         param.value = String(value ?? "").slice(0, 2_000);
       } else if (property === "type") {
-        param.type = value === "number" || value === "select" ? value : "text";
+        param.type = value === "number" || value === "select" || value === "boolean" ? value : "text";
         if (param.type === "select") {
           param.options = param.options?.length
             ? param.options
             : [{ label: param.value || "Option", value: param.value || "option" }];
         } else {
           delete param.options;
+          if (param.type === "boolean") {
+            param.value = String(param.value).toLowerCase() === "true" ? "true" : "false";
+          }
         }
         needsHardPaint = true;
       } else if (property === "options") {
@@ -1304,7 +1405,7 @@ function createPanel(context, container) {
     else queueSoftPaint(480);
   };
 
-  const addParameter = async (source) => {
+  const addParameter = async (source, persist = true) => {
     const id = `param-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`;
     source.params ||= [];
     const nextIndex = source.params.length + 1;
@@ -1319,7 +1420,7 @@ function createPanel(context, container) {
       source.params[source.params.length - 1].key = `param${nextIndex}`;
     }
     invalidateSource(source);
-    await persistConfig();
+    if (persist) await persistConfig();
     paint();
     context.showToast(text(
       `Added parameter #${source.params.length}. Fill Key and Value below.`,
@@ -1349,7 +1450,7 @@ function createPanel(context, container) {
     context.showToast(text("Default parameters restored", "已填充默认参数"));
   };
 
-  const deleteParameter = async (source, paramId) => {
+  const deleteParameter = async (source, paramId, persist = true) => {
     const parameter = (source.params || []).find((param) => param.id === paramId);
     if (!parameter) return;
     const confirmation = await context.prompt(
@@ -1367,7 +1468,7 @@ function createPanel(context, container) {
       }
     }
     invalidateSource(source);
-    await persistConfig();
+    if (persist) await persistConfig();
     paint();
     context.showToast(text("Parameter deleted", "参数已删除"));
   };
@@ -1535,7 +1636,7 @@ function createPanel(context, container) {
       ""
     );
     if (confirmation !== "RESET") return;
-    state.config.sources = clone(DEFAULT_SOURCES);
+    state.config.sources = clone(DEFAULT_SOURCES).map((source) => normalizeSource(source, source.id));
     state.previews = {};
     state.downloads = {};
     state.imageCache = {};
@@ -1579,9 +1680,10 @@ function createPanel(context, container) {
     if (id === "clear-image-cache") return withBusy(text("Clearing cache…", "正在清除缓存…"), clearImageCache);
     if (id === "refresh-all") return refreshAllSources({ cacheBust: true, notify: true });
 
-    const source = sourceByExactId(targetId);
+    const source = targetId === NEW_SOURCE_ID ? state.sourceDraft : sourceByExactId(targetId);
     if (!source) return;
     if (id === "add-param") {
+      if (targetId === NEW_SOURCE_ID) return addParameter(source, false);
       return withBusy(text("Adding parameter…", "正在添加参数…"), () => addParameter(source));
     }
     if (id === "fill-default-params") {
@@ -1591,6 +1693,9 @@ function createPanel(context, container) {
       );
     }
     if (id.startsWith("delete-param:")) {
+      if (targetId === NEW_SOURCE_ID) {
+        return deleteParameter(source, id.slice("delete-param:".length), false);
+      }
       return withBusy(
         text("Deleting parameter…", "正在删除参数…"),
         () => deleteParameter(source, id.slice("delete-param:".length))

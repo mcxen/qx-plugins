@@ -3,6 +3,14 @@
   "plugins": {
     "another-boring-piece": [
       {
+        "version": "1.0.5",
+        "published_at": "2026-09-09",
+        "notes_localizations": {
+          "en": "Adds a standardized marketplace screenshot of the live Qx art wallpaper detail view.",
+          "zh-CN": "新增统一规格的市场截图，展示真实 Qx 艺术壁纸详情界面。"
+        }
+      },
+      {
         "version": "1.0.4",
         "published_at": "2026-08-23",
         "notes_localizations": {
@@ -44,6 +52,14 @@
       }
     ],
     "agent-usage": [
+      {
+        "version": "1.2.4",
+        "published_at": "2026-09-09",
+        "notes_localizations": {
+          "en": "Adds a privacy-safe standardized marketplace screenshot of the live quota overview.",
+          "zh-CN": "新增已隐藏账号信息的统一市场截图，展示真实配额概览。"
+        }
+      },
       {
         "version": "1.2.3",
         "published_at": "2026-08-19",
@@ -103,6 +119,14 @@
     ],
     "blueprint": [
       {
+        "version": "1.1.1",
+        "published_at": "2026-09-09",
+        "notes_localizations": {
+          "en": "Adds a privacy-safe standardized marketplace screenshot of the connection and browsing settings.",
+          "zh-CN": "新增已隐藏 PAT 的统一市场截图，展示连接与浏览设置。"
+        }
+      },
+      {
         "version": "1.1.0",
         "published_at": "2026-09-07",
         "notes_localizations": {
@@ -120,6 +144,14 @@
       }
     ],
     "clipboard-actions": [
+      {
+        "version": "1.0.3",
+        "published_at": "2026-09-09",
+        "notes_localizations": {
+          "en": "Adds a standardized marketplace screenshot of the command preferences and shortcuts.",
+          "zh-CN": "新增统一规格的市场截图，展示命令偏好与快捷键配置。"
+        }
+      },
       {
         "version": "1.0.2",
         "published_at": "2026-08-18",
@@ -146,6 +178,14 @@
       }
     ],
     "hacker-news": [
+      {
+        "version": "1.1.3",
+        "published_at": "2026-09-09",
+        "notes_localizations": {
+          "en": "Adds standardized marketplace screenshots of the live story list and comment detail views.",
+          "zh-CN": "新增统一规格的市场截图，展示真实帖子列表与评论详情界面。"
+        }
+      },
       {
         "version": "1.1.2",
         "published_at": "2026-08-18",
@@ -230,6 +270,14 @@
       }
     ],
     "external-display-control": [
+      {
+        "version": "1.2.8",
+        "published_at": "2026-09-09",
+        "notes_localizations": {
+          "en": "Adds a standardized marketplace screenshot of the live display brightness controls.",
+          "zh-CN": "新增统一规格的市场截图，展示真实显示器亮度控件。"
+        }
+      },
       {
         "version": "1.2.7",
         "published_at": "2026-08-19",
@@ -384,6 +432,14 @@
       }
     ],
     "pomodoro-island": [
+      {
+        "version": "1.6.6",
+        "published_at": "2026-09-09",
+        "notes_localizations": {
+          "en": "Adds a standardized marketplace screenshot of the focus-session workbench.",
+          "zh-CN": "新增统一规格的市场截图，展示专注会话 Workbench。"
+        }
+      },
       {
         "version": "1.6.5",
         "published_at": "2026-08-19",
@@ -543,6 +599,14 @@
     ],
     "qxgh": [
       {
+        "version": "1.5.10",
+        "published_at": "2026-09-09",
+        "notes_localizations": {
+          "en": "Adds a standardized marketplace screenshot of live GitHub Actions runs.",
+          "zh-CN": "新增统一规格的市场截图，展示实时 GitHub Actions 运行列表。"
+        }
+      },
+      {
         "version": "1.5.9",
         "published_at": "2026-08-19",
         "notes_localizations": {
@@ -641,6 +705,14 @@
     ],
     "qxgold": [
       {
+        "version": "1.2.5",
+        "published_at": "2026-09-09",
+        "notes_localizations": {
+          "en": "Adds a standardized marketplace screenshot of the live accumulated-gold quote.",
+          "zh-CN": "新增统一规格的市场截图，展示实时积存金报价。"
+        }
+      },
+      {
         "version": "1.2.4",
         "published_at": "2026-08-19",
         "notes_localizations": {
@@ -698,6 +770,14 @@
       }
     ],
     "qxtieba": [
+      {
+        "version": "1.2.3",
+        "published_at": "2026-09-09",
+        "notes_localizations": {
+          "en": "Adds standardized marketplace screenshots of the live mixed feed and floor-comment detail views.",
+          "zh-CN": "新增统一规格的市场截图，展示真实混合帖子流与楼层评论详情界面。"
+        }
+      },
       {
         "version": "1.2.2",
         "published_at": "2026-08-19",
@@ -836,6 +916,14 @@
       }
     ],
     "qxheihe": [
+      {
+        "version": "1.4.15",
+        "published_at": "2026-09-09",
+        "notes_localizations": {
+          "en": "Adds standardized marketplace screenshots of the live recommendation list and image-rich detail views.",
+          "zh-CN": "新增统一规格的市场截图，展示真实推荐列表与多图详情界面。"
+        }
+      },
       {
         "version": "1.4.14",
         "published_at": "2026-08-19",
@@ -999,6 +1087,14 @@
     ],
     "qxcoolapk": [
       {
+        "version": "1.4.11",
+        "published_at": "2026-09-09",
+        "notes_localizations": {
+          "en": "Adds standardized marketplace screenshots of the live community list and media detail views.",
+          "zh-CN": "新增统一规格的市场截图，展示真实社区列表与图片详情界面。"
+        }
+      },
+      {
         "version": "1.4.10",
         "published_at": "2026-08-19",
         "notes_localizations": {
@@ -1161,6 +1257,14 @@
     ],
     "qxweibo": [
       {
+        "version": "1.2.1",
+        "published_at": "2026-09-09",
+        "notes_localizations": {
+          "en": "Adds standardized marketplace screenshots of the configured-user feed and comment detail views.",
+          "zh-CN": "新增统一规格的市场截图，展示真实指定用户动态与评论详情界面。"
+        }
+      },
+      {
         "version": "1.2.0",
         "published_at": "2026-08-19",
         "notes_localizations": {
@@ -1267,6 +1371,22 @@
     ],
     "qxpicture": [
       {
+        "version": "0.5.6",
+        "published_at": "2026-09-09",
+        "notes_localizations": {
+          "en": "Adds a standardized marketplace screenshot of the image preview and parameter controls.",
+          "zh-CN": "新增统一规格的市场截图，展示图片预览与参数控件。"
+        }
+      },
+      {
+        "version": "0.5.5",
+        "published_at": "2026-09-09",
+        "notes_localizations": {
+          "en": "Adds compact parameter editing, draft-time parameters, typed booleans, FastAPI-compatible POST JSON, direct binary and JSON base64 image responses, plus a Stable Diffusion WebUI template.",
+          "zh-CN": "新增紧凑参数编辑、草稿阶段参数、布尔类型、兼容 FastAPI 的 POST JSON、直接二进制与 JSON Base64 图片响应，并提供 Stable Diffusion WebUI 模板。"
+        }
+      },
+      {
         "version": "0.5.4",
         "published_at": "2026-08-19",
         "notes_localizations": {
@@ -1324,6 +1444,14 @@
       }
     ],
     "sysinfo": [
+      {
+        "version": "1.4.5",
+        "published_at": "2026-09-09",
+        "notes_localizations": {
+          "en": "Adds a privacy-safe standardized marketplace screenshot of the live hardware overview.",
+          "zh-CN": "新增已隐藏设备名的统一市场截图，展示实时硬件概览。"
+        }
+      },
       {
         "version": "1.4.4",
         "published_at": "2026-08-19",
@@ -1433,6 +1561,14 @@
     ],
     "v2ex": [
       {
+        "version": "3.1.5",
+        "published_at": "2026-09-09",
+        "notes_localizations": {
+          "en": "Adds standardized marketplace screenshots of the live topic list and structured detail views.",
+          "zh-CN": "新增统一规格的市场截图，展示真实主题列表与结构化详情界面。"
+        }
+      },
+      {
         "version": "3.1.4",
         "published_at": "2026-08-23",
         "notes_localizations": {
@@ -1506,6 +1642,14 @@
       }
     ],
     "weather": [
+      {
+        "version": "1.0.5",
+        "published_at": "2026-09-09",
+        "notes_localizations": {
+          "en": "Adds a standardized marketplace screenshot of current conditions and the forecast.",
+          "zh-CN": "新增统一规格的市场截图，展示当前天气与多日预报。"
+        }
+      },
       {
         "version": "1.0.4",
         "published_at": "2026-08-19",

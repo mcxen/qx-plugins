@@ -5,7 +5,7 @@
     "en": "Weather",
     "zh-CN": "天气"
   },
-  "version": "1.0.4",
+  "version": "1.0.5",
   "description": "Current conditions and multi-day forecast via Open-Meteo (or OpenWeatherMap). Cached for fast reopen.",
   "descriptions": {
     "en": "Current conditions and multi-day forecast via Open-Meteo or OpenWeatherMap.",
@@ -164,5 +164,7 @@
     "macos",
     "windows"
   ],
-  "screenshots": []
+  "screenshots": [
+    "weather-1.jpg"
+  ]
 }

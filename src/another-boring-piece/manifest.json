@@ -5,7 +5,7 @@
     "en": "Art Wallpapers",
     "zh-CN": "每日艺术壁纸"
   },
-  "version": "1.0.4",
+  "version": "1.0.5",
   "description": "Another boring piece. Daily. Hand-picked fine-art wallpapers from anotherboring.day.",
   "descriptions": {
     "en": "Another boring piece. Daily. Browse hand-picked fine-art wallpapers, set or download them, and keep a local history.",
@@ -245,5 +245,7 @@
     ]
   },
   "min_app_version": "0.6.86",
-  "screenshots": []
+  "screenshots": [
+    "another-boring-piece-1.jpg"
+  ]
 }

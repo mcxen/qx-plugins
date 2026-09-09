@@ -144,6 +144,13 @@ Qx Marketplace reads `manifest.screenshots` and shows them in Installed /
 details. Assets are **not** fetched live from `raycast/extensions` at install
 time — only the packaged archive on `mcxen/qx-plugins` is downloaded.
 
+Maintained plugins use real Qx product screenshots at a consistent 16:10 ratio.
+Capture settled list and representative detail states without focused inputs,
+open menus, loading placeholders, or pointer overlays; normalize to 1200 × 750,
+store the files under `src/<plugin-id>/`, and list them explicitly in
+`manifest.screenshots`. The store build copies those declared assets into the
+matching plugin detail page.
+
 ## Maintained plugin policy
 
 - 阅读上游扩展源代码，保留业务意图，不保留 Raycast runtime/shim 结构。

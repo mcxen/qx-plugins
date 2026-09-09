@@ -5,7 +5,7 @@
     "zh-CN": "QxCoolapk 酷安",
     "en": "QxCoolapk"
   },
-  "version": "1.4.10",
+  "version": "1.4.11",
   "description": "Browse Coolapk hot, news, and digital feeds and read complete posts, images, and replies in Qx.",
   "descriptions": {
     "zh-CN": "浏览酷安社区热门、快讯与数码内容，并在 Qx 内阅读完整正文、图片和回复。",
@@ -13,6 +13,10 @@
   },
   "author": "Qx",
   "icon": "icon-generated.png",
+  "screenshots": [
+    "qxcoolapk-1.jpg",
+    "qxcoolapk-2.jpg"
+  ],
   "keywords": [
     "coolapk",
     "酷安",
@@ -297,6 +301,5 @@
   "platforms": [
     "macos",
     "windows"
-  ],
-  "screenshots": []
+  ]
 }

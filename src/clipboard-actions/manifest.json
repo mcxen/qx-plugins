@@ -1,7 +1,7 @@
 {
   "id": "clipboard-actions",
   "name": "Clipboard Actions",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "Paste clipboard text as plain text or save the current clipboard image without overwriting existing files.",
   "names": {
     "en": "Clipboard Actions",
@@ -133,5 +133,8 @@
       "enabled": false
     }
   ],
-  "min_app_version": "0.6.67"
+  "min_app_version": "0.6.67",
+  "screenshots": [
+    "clipboard-actions-1.jpg"
+  ]
 }

@@ -5,7 +5,7 @@
     "zh-CN": "QxWeibo 微博",
     "en": "QxWeibo"
   },
-  "version": "1.2.0",
+  "version": "1.2.1",
   "description": "Read configured Weibo users, an aggregated following feed, comments, and proxied images in Qx.",
   "descriptions": {
     "zh-CN": "在 Qx 中阅读指定微博用户、聚合关注流、评论区和代理图片。",
@@ -13,6 +13,10 @@
   },
   "author": "Qx",
   "icon": "icon-generated.png",
+  "screenshots": [
+    "qxweibo-1.jpg",
+    "qxweibo-2.jpg"
+  ],
   "keywords": [
     "weibo",
     "微博",
@@ -289,6 +293,5 @@
   "platforms": [
     "macos",
     "windows"
-  ],
-  "screenshots": []
+  ]
 }

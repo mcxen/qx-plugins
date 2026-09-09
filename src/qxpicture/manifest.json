@@ -5,7 +5,7 @@
     "zh-CN": "Qxpicture 随机图片",
     "en": "Qxpicture"
   },
-  "version": "0.5.4",
+  "version": "0.5.6",
   "description": "Browse random image APIs, save images, copy them, and set desktop wallpaper.",
   "descriptions": {
     "zh-CN": "浏览随机图片 API，保存或复制图片，并设置桌面壁纸。",
@@ -63,6 +63,7 @@
         "options": [
           "text",
           "number",
+          "boolean",
           "select"
         ]
       },
@@ -81,6 +82,11 @@
     "transports": [
       "query",
       "json-body"
+    ],
+    "responses": [
+      "image",
+      "json-url",
+      "json-base64"
     ]
   },
   "entry": "index.js",
@@ -99,5 +105,8 @@
       "壁纸"
     ]
   },
-  "min_app_version": "0.6.22"
+  "min_app_version": "0.6.22",
+  "screenshots": [
+    "qxpicture-1.jpg"
+  ]
 }

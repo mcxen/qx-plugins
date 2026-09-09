@@ -5,7 +5,7 @@
     "en": "BluePrint",
     "zh-CN": "BluePrint 随手记"
   },
-  "version": "1.1.0",
+  "version": "1.1.1",
   "description": "Read, create, and safely edit BluePrint Xianji notes through PAT-authenticated MCP.",
   "descriptions": {
     "en": "Read, create, and safely edit BluePrint Xianji notes through PAT-authenticated MCP.",
@@ -242,5 +242,7 @@
     "macos",
     "windows"
   ],
-  "screenshots": []
+  "screenshots": [
+    "blueprint-1.jpg"
+  ]
 }

@@ -5,7 +5,7 @@
     "zh-CN": "金价追踪",
     "en": "QxGold"
   },
-  "version": "1.2.4",
+  "version": "1.2.5",
   "description": "Live JD accumulated-gold quotes with locally sampled history.",
   "descriptions": {
     "zh-CN": "京东积存金实时价格与本地真实采样曲线。",
@@ -173,5 +173,7 @@
     "macos",
     "windows"
   ],
-  "screenshots": []
+  "screenshots": [
+    "qxgold-1.jpg"
+  ]
 }
