@@ -1,0 +1,122 @@
+{
+  "id": "speedtest",
+  "name": "Speedtest",
+  "names": {
+    "en": "Speedtest",
+    "zh-CN": "网络测速"
+  },
+  "version": "1.0.1",
+  "description": "Test internet download, upload, latency and jitter with the official speedtest.net CLI.",
+  "descriptions": {
+    "en": "Test internet download, upload, latency and jitter with the official speedtest.net CLI.",
+    "zh-CN": "使用官方 speedtest.net CLI 测试下载、上传、延迟和抖动。"
+  },
+  "author": "tonka3000, mcxen",
+  "icon": "icon-generated.png",
+  "keywords": [
+    "speedtest",
+    "speed test",
+    "ookla",
+    "bandwidth",
+    "ping",
+    "latency",
+    "download",
+    "upload",
+    "测速",
+    "cesu",
+    "cs",
+    "网速",
+    "wangsu",
+    "ws",
+    "网络测速",
+    "wangluocesu",
+    "wlcs",
+    "带宽",
+    "daikuan",
+    "dk",
+    "延迟",
+    "yanchi",
+    "yc"
+  ],
+  "permissions": [
+    "http",
+    "cli",
+    "system",
+    "clipboard",
+    "open-url",
+    "notifications",
+    "island",
+    "invoke:plugin_file_exists",
+    "invoke:plugin_file_ensure_dir",
+    "invoke:plugin_file_write_base64",
+    "invoke:plugin_file_empty_dir"
+  ],
+  "entry": "index.js",
+  "panel": {
+    "title": "Speedtest",
+    "titles": {
+      "en": "Speedtest",
+      "zh-CN": "网络测速"
+    },
+    "icon": "icon-generated.png",
+    "keywords": [
+      "speedtest",
+      "ookla",
+      "测速",
+      "网速"
+    ]
+  },
+  "storage": {
+    "cacheTargets": [
+      {
+        "id": "last-result",
+        "label": "Last speedtest result",
+        "labels": {
+          "en": "Last speedtest result",
+          "zh-CN": "最近一次测速结果"
+        },
+        "keys": [
+          "speedtest.last-result.v1"
+        ],
+        "retentionDays": 30
+      }
+    ]
+  },
+  "min_app_version": "0.6.54",
+  "platforms": [
+    "macos",
+    "windows"
+  ],
+  "raycast": {
+    "source": "speedtest",
+    "compatible": "native-cli-port",
+    "sourceCommit": "2e9c66f0bbc014643d6f9d7bd42ec7cd26bb3384",
+    "sourceUrl": "https://github.com/raycast/extensions/tree/2e9c66f0bbc014643d6f9d7bd42ec7cd26bb3384/extensions/speedtest",
+    "platformCompatibility": {
+      "macos": {
+        "status": "supported",
+        "features": [
+          "Official Ookla CLI download and SHA-256 verify",
+          "Live JSONL progress via context.cli jobs",
+          "Workbench list/detail, chart samples, Island progress"
+        ],
+        "degraded": [
+          "Raycast SVG speedometer and macOS QuickLook meter-image export are not ported; Workbench charts use real CLI samples"
+        ],
+        "unsupported": []
+      },
+      "windows": {
+        "status": "supported",
+        "features": [
+          "Official Ookla Windows CLI zip download and SHA-256 verify",
+          "Live JSONL progress via context.cli jobs",
+          "Workbench list/detail and Island progress"
+        ],
+        "degraded": [
+          "Meter PNG export used macOS QuickLook in the source extension"
+        ],
+        "unsupported": []
+      }
+    }
+  }
+}

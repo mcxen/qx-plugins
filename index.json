@@ -1837,6 +1837,53 @@
       ]
     },
     {
+      "id": "speedtest",
+      "name": "Speedtest",
+      "version": "1.0.1",
+      "description": "Test internet download, upload, latency and jitter with the official speedtest.net CLI.",
+      "names": {
+        "en": "Speedtest",
+        "zh-CN": "网络测速"
+      },
+      "descriptions": {
+        "en": "Test internet download, upload, latency and jitter with the official speedtest.net CLI.",
+        "zh-CN": "使用官方 speedtest.net CLI 测试下载、上传、延迟和抖动。"
+      },
+      "download_url": "https://raw.githubusercontent.com/mcxen/qx-plugins/main/speedtest.qx-plugin",
+      "size_bytes": 1030482,
+      "checksum_sha256": "7623d1cab80ca3b8d8afb7ad7d19977eb2922dd3390dbac50d8925c5a606ea88",
+      "required_permissions": [
+        "http",
+        "cli",
+        "system",
+        "clipboard",
+        "open-url",
+        "notifications",
+        "island",
+        "invoke:plugin_file_exists",
+        "invoke:plugin_file_ensure_dir",
+        "invoke:plugin_file_write_base64",
+        "invoke:plugin_file_empty_dir"
+      ],
+      "updated_at": "2026-09-21",
+      "author": "tonka3000, mcxen",
+      "min_app_version": "0.6.54",
+      "platforms": [
+        "macos",
+        "windows"
+      ],
+      "releases": [
+        {
+          "version": "1.0.1",
+          "published_at": "2026-09-21",
+          "notes_localizations": {
+            "en": "First Qx-native Speedtest release using the verified official Ookla CLI archive, live JSONL progress, host-rendered Workbench metrics and real bandwidth sample charts.",
+            "zh-CN": "首个 Qx 原生网络测速版本：使用校验后的 Ookla 官方 CLI 归档，提供实时 JSONL 进度、宿主 Workbench 指标与真实带宽采样曲线。"
+          }
+        }
+      ]
+    },
+    {
       "id": "sysinfo",
       "name": "Sysinfo",
       "version": "1.4.4",
